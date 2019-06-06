@@ -41,6 +41,9 @@ def main() :
         fgm = lc.getFragments(reg1, reg2)
         lc.print2Bed(cn1, sw1, cn2, sw2, fgm)
         lc.checkCopyNumber(fgm, cn1, cn2, sw1[0:2].upper(), sw2[0:2].upper())
+        if ((sw1.lower() == "ascat" or sw1.lower == "ascatngs") and sw2.lower() == "facets") or  ((sw2.lower() == "ascat" or sw2.lower == "ascatngs") and sw1.lower() == "facets") :
+            lc.print2GGplot(cn1, cn2, sw1, sw2)
+            lc.checkLogR(fgm, cn1, cn2, sw1, sw2)
 
     """
     OLD main program
