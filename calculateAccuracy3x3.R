@@ -12,3 +12,4 @@ for (i in 1:length(file.list)) {
 }
 
 cat (summary(vc))
+
