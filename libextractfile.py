@@ -311,6 +311,10 @@ def getCN(tcn, lcn) :
     return ret
 
 def getAscatLogR(path, reg, chr) :
+    """
+        Check in the ascatNGS copynumber file if there is a SNP in the region passed as parameter. This function is used only in case the extractAscat function cannot find the region in the file.
+        Please, don't use it as it takes a long of execution time!
+    """
     logR = 'NA'
     with open(path) as fi :
         reader = csv.DictReader(fi, delimiter="\t")
@@ -325,4 +329,5 @@ def getAscatLogR(path, reg, chr) :
         print "Not found region"
     return logR
 
-extractAscat("input_examples/TCGA-13-0887-01A-01W.copynumber.caveman.csv")
+if __name__ == "__main__" :
+    print "INFO:  This is a library file. Don't execute it alone"
