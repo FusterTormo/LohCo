@@ -2,6 +2,29 @@
 # -*- coding: utf-8 -*-
 
 import libconstants as lc
+import os
+import csv
+
+"""
+MAIN: All functions that extract information from the output files from each program and converts the data to the REGION format
+"""
+
+"""
+FUNCTIONS
+    - getFromFile: Read from a text file and return the data in region format
+    - extractArray: Read TCGA copy number segments and convert the data to region format
+    - extractFacets:  Read FACETS file information and convert the data to region format
+    - extractAscat: Read ascatNGS file information and convert the data to region format
+
+"""
+
+"""
+REGION FORMAT:
+{chr : [start, end, copy-number, total_copy_number, low_copy_number, logR_value]],
+ploidy : float,
+purity : float,
+likelyhood : float}
+"""
 
 def getFromFile(path, c, s, e) :
     """Read from a file and return the data in a specific format
@@ -34,9 +57,9 @@ def getFromFile(path, c, s, e) :
     return ar
 
 def extractArray(path) :
-    """Read TCGA copy number segment files. Return the data in a specific format
+    """Read TCGA copy number segment files. Return the data in a REGION format
 
-    Read the copy number segment files, extracting the chromsome, start position, end position, and copy number log2 ratio. As these files give less information than other tools, the list is appended with
+    Read the copy number segment files, extracting the chromosome, start position, end position, and copy number log2 ratio. As these files give less information than other tools, the list is appended with
     'NA' to get the same length as the other tools. So the structure of the list packed in the returning dict will be:
         [0] start position of the region (int)
         [1] end position of the region (int)
@@ -44,16 +67,15 @@ def extractArray(path) :
         [3] 'NA' as here is expected the tcn value
         [4] 'NA' as here is expected the lcn value
         [5] 'NA' as here is expected the logR value
+    The additional information, like purity, is not available. So this information is given as "NA", too.
 
     Parameters:
         path (str) : Path of the file to extract the data
 
     Returns :
-        dict : A dict where the key is the chromosome name and the value is a list of the regions in format [start, end, copy-number, 'NA', 'NA', 'NA']
+        REGION : A dict where the key is the chromosome name and the value is a list of the regions in format [start, end, copy-number, 'NA', 'NA.', 'NA']
     """
     #Get the number of columns where the chromosome, start and end are
-    #TODO Agregar las columnas que le faltan a la lista
-    #TODO Eliminar la variable ar_cn
     c = 1
     s = 2
     e = 3
@@ -67,22 +89,23 @@ def extractArray(path) :
             chr = aux[c]
             #Skip headers or columns without interesting information
             if chr in chromosomes :
-                reg = [int(aux[s]), int(aux[e])]
                 va = float(aux[cnv])
                 if va == 0 :
-                    reg2 = [int(aux[s]), int(aux[e]), 'N']
+                    reg = [int(aux[s]), int(aux[e]), 'N', 'NA', 'NA.', 'NA'] #Array regions does not have information about total_copy_number, low_copy_number, and logR
                 elif va > 0 :
-                    reg2 = [int(aux[s]), int(aux[e]), 'A']
+                    reg = [int(aux[s]), int(aux[e]), 'A', 'NA', 'NA.', 'NA'] #Array regions does not have information about total_copy_number, low_copy_number, and logR
                 else :
-                    reg2 = [int(aux[s]), int(aux[e]), 'D']
+                    reg = [int(aux[s]), int(aux[e]), 'D', 'NA', 'NA.', 'NA'] #Array regions does not have information about total_copy_number, low_copy_number, and logR
                 if chr in ar.keys() :
                     ar[chr].append(reg)
-                    ar_cn[chr].append(reg2)
                 else :
                     ar[chr] = [reg]
-                    ar_cn[chr] = [reg2]
 
-    return (ar, ar_cn)
+    #Extra information is not available from TCGA array files
+    ar["purity"] = 'NA'
+    ar["ploidy"] = 'NA'
+    ar["likelyhood"] = 'NA'
+    return ar
 
 def extractFacets(path) :
     """Read FACETS $cncf file table and return the interesting information in a specific variable format
@@ -100,12 +123,14 @@ def extractFacets(path) :
     If tcn==2, and lcn==1, the region is considered (N)ormal
     If tcn==2, and lcn==0, the region is considered Copy Number Neutral (L)oss of Heterozygosity
     If tcn<2, and lcn<=1, the region is considered (D)eleted
+    Additionally, it checks if *_basic.tsv file exists, to get the additional information to the REGION variable
 
     Parameters :
         path (str) : Path of the file to extract the data
 
     Returns :
-        dict : A dict where the key is the chromosome name and the value is a list of the regions in format [start, end, copy-number, tcn, lcn, logR]
+        REGION : A dict where the key is the chromosome name and the value is a list of the regions in format [start, end, copy-number, tcn, lcn, logR]. Additionally, "ploidy", "purity",
+            and "likelyhood" information in separated keys.
     """
     c = 0 #Chromosome column
     s = 9 #Start column
@@ -116,25 +141,45 @@ def extractFacets(path) :
     fa = {}
     with open(path, "r") as fi :
         for l in fi :
-            aux = l.split("\t")
-            chr = aux[c]
-            tcn = int(aux[t])
-            lcn = int(aux[l])
-            logR = float(aux[lR])
-            if chr == "23" :
-                chr = "X"
-            #Skip headers or columns without interesting information
-            if chr in lc.chromosomes :
-                reg = [int(aux[s]), int(aux[e]), getCN(tcn, lcn), tcn, lcn, logR]
+            if not l.startswith("chrom") :
+                aux = l.split("\t")
+                chr = aux[c]
+                tcn = int(aux[t])
+                lcn = int(aux[l])
+                logR = float(aux[lR])
+                if chr == "23" :
+                    chr = "X"
+                #Skip headers or columns without interesting information
+                if chr in lc.chromosomes :
+                    reg = [int(aux[s]), int(aux[e]), getCN(tcn, lcn), tcn, lcn, logR]
 
-                if chr in fa.keys() :
-                    fa[chr].append(reg)
+                    if chr in fa.keys() :
+                        fa[chr].append(reg)
+                    else :
+                        fa[chr] = [reg]
                 else :
-                    fa[chr] = [reg]
+                    print "WARNING: Chromosome {} not found in the chromosomes constant".format(chr)
             else :
-                print "WARNING: Chromosome {} not found in the chromosomes constant".format(chr)
-    return fa
+                print "INFO: Skiping header. Remove this line when the program is tested"
 
+    fa["likelyhood"] = 'NA'
+    fa["purity"] = 'NA'
+    fa["ploidy"] = 'NA'
+    basicPath = path.replace("_cncf.tsv", "_basic.tsv")
+    #TODO Provar si el parxe aquest funciona
+    if os.path.isfile(basicPath) :
+        with open(basicPath, "r") as fi :
+            header = fi.readline()
+            body = fi.readline()
+        data = body.split("\t")
+        fa["likelyhood"] = float(data[0])
+        fa["purity"] = float(data[1])
+        fa["ploidy"] = float(data[2])
+
+    if fa["ploidy"] == 'NA':
+        print "WARNING: {} not found. Information about ploidy, purity, and likelyhood not given".format(basicPath)
+
+    return fa
 
 def extractAscat(path) :
     """Read ascatNGS data and return the information in a specific format
@@ -152,22 +197,23 @@ def extractAscat(path) :
     If tcn==2, and lcn==1, the region is considered (N)ormal
     If tcn==2, and lcn==0, the region is considered Copy Number Neutral (L)oss of Heterozygosity
     If tcn<2, and lcn<=1, the region is considered (D)eleted
-    LogR is extracted from *copynumber.txt file. Function checks if the file exists. In case the file does not exist, then the logR is completed with 'NA' string
+    LogR median is extracted from *copynumber.txt file. Function checks if the file exists. In case the file does not exist, then the logR is completed with 'NA' string
+    Additionally, it checks if *.samplestatistics.txt file exists, to get the additional information to the REGION variable
 
     Parameters :
         path (str) : Path of the file to extract the data
 
     Returns :
-        dict : A dict where the key is the chromosome name and the value is a list of the regions in format [start, end, copy-number, tcn, lcn, logR]
+        REGION : A dict where the key is the chromosome name and the value is a list of the regions in format [start, end, copy-number, tcn, lcn, logR]. Additionally, "ploidy", "purity",
+            and "likelyhood" information in separated keys.
     """
-    #TODO Refer tota la funcio per adaptar al nou format de les variables
-    #TODO Eliminar la variable sc_cn
     col_c = 1
     col_s = 2
     col_e = 3
     col_tcn = 6 #Get tcn column. In case we need lcn column, change to 7
     col_lcn = 7
     sc = {}
+    mtLogR = {}
     with open(path, "r") as fi :
         for l in fi :
             aux = l.split(",")
@@ -182,15 +228,17 @@ def extractAscat(path) :
                 sc[chr] = [reg]
 
     #Search if copynumber.txt is available to get the logR values
-    #TODO continuar per aci per extraure la informacio de logR des de copynumer.txt
-    path2 = path.split(".copynumber")[0] + ".copynumber.txt"
+    path2 = path.replace(".copynumber.caveman.csv", ".copynumber.txt")
     cr = 1
     pos = 2
     logR = 4
-    mtLogR = {}
+
     cab = False
     if os.path.isfile(path2) :
         print "INFO: Extracting info from {}".format(path2)
+        """for cr in sc.keys() :
+            for reg in sc[cr] :
+                getAscatLogR(path2, reg, cr)"""
         with open(path2, "r") as fi :
             for l in fi :
                 if not cab :
@@ -204,21 +252,37 @@ def extractAscat(path) :
                         mtLogR[crom][int(aux[pos])] = float(aux[logR])
                     else :
                         mtLogR[crom] = {int(aux[pos]) : float(aux[logR])}
-        for cr in sc_cn :
-            for ps in sc_cn[cr] :
-                if cr in mtLogR.keys() :
-                    if ps[0] in mtLogR[cr].keys() :
-                        ps.append(mtLogR[cr][ps[0]])
-                    elif ps[1] in mtLogR[cr].keys() :
-                        ps.append(mtLogR[cr][ps[1]])
-                    else :
-                        print "WARNING: Region {}:{}-{} not found in {}".format(cr, ps[0], ps[1], path2)
 
+            for cr in sc :
+                for ps in sc[cr] :
+                    if cr in mtLogR.keys() :
+                        if ps[0] in mtLogR[cr].keys() :
+                            ps.append(mtLogR[cr][ps[0]])
+                        elif ps[1] in mtLogR[cr].keys() :
+                            ps.append(mtLogR[cr][ps[1]])
+                        else :
+                            #NOTE This function slows down a lot the execution. If possible avoid it
+                            pass
+                            #getAscatLogR(path2, ps, cr)
     else :
         print "WARNING: {} not found. LogR calculations could not be added to ASCAT".format(path2)
 
-    #NOTE need to sort the output from each subgroup??
-    return (sc, sc_cn)
+    path3 = path.replace(".copynumber.caveman.csv", ".samplestatistics.txt")
+    if os.path.isfile(path3) :
+        with open(path3, "r") as fi :
+            for l in fi :
+                aux = l.split(" ")
+                if aux[0].startswith("NormalContamination") :
+                    print "Purity = {}".format(1 - float(aux[1]))
+                if aux[0].startswith("Ploidy") :
+                    print "Ploidy = {}".format(float(aux[1]))
+                if aux[0].startswith("goodnessOfFit") :
+                    print "Likelyhood = {}".format(float(aux[1]))
+
+    else :
+        print "WARNING: {} not found. Ploidy, purity, and goodness of fit data could not be added to ASCAT".format(path3)
+    return sc
+
 
 def getCN(tcn, lcn) :
     """Get the copy number aberration, given the total copy number and the low copy number
@@ -226,11 +290,11 @@ def getCN(tcn, lcn) :
     Depending on the value of tcn and lcn, returns if there is an (A)mplification, (D)eletion, Copy number (N)ormal, or Copy Number Neutral (L)oss of Heterozygosity
 
     Parameters :
-    tcn (int) : Total copy number of the region
-    lcn (int) : Low copy number of the region
+        tcn (int) : Total copy number of the region
+        lcn (int) : Low copy number of the region
 
     Returns :
-    char : 'A' if there is an (Amplification), 'D' if there is a deletion, 'N' if the region is normal, 'L' if there is CNN-LOH
+        char : 'A' if there is an (Amplification), 'D' if there is a deletion, 'N' if the region is normal, 'L' if there is CNN-LOH
     """
     ret = ""
     if tcn > 2 :
@@ -243,5 +307,22 @@ def getCN(tcn, lcn) :
         ret = "L"
     elif tcn < 2 :
         ret = "D"
-        print "INFO: For tcn={}, and lcn={} returned {}".format(tcn, lcn, ret)
-        return ret
+
+    return ret
+
+def getAscatLogR(path, reg, chr) :
+    logR = 'NA'
+    with open(path) as fi :
+        reader = csv.DictReader(fi, delimiter="\t")
+        for r in reader :
+            auxCr = r['Chromosome']
+            if r['Chromosome'] == '23' :
+                auxCr = 'X'
+            if auxCr == chr and int(r['Position']) >= reg[0] and int(r['Position']) <= reg[1] :
+                logR = r['segmented LogR']
+                break
+    if logR == 'NA' :
+        print "Not found region"
+    return logR
+
+extractAscat("input_examples/TCGA-13-0887-01A-01W.copynumber.caveman.csv")
