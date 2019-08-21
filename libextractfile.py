@@ -15,7 +15,8 @@ FUNCTIONS
     - extractArray: Read TCGA copy number segments and convert the data to region format
     - extractFacets:  Read FACETS file information and convert the data to region format
     - extractAscat: Read ascatNGS file information and convert the data to region format
-
+    - getCN: Get the copy number aberration, given the total copy number and the low copy number
+    - getAscatLogR: Check in the ascatNGS copynumber file if there is a SNP in the region passed as parameter
 """
 
 """
@@ -140,12 +141,15 @@ def extractFacets(path) :
     lR = 4 #logR column
     fa = {}
     with open(path, "r") as fi :
-        for l in fi :
-            if not l.startswith("chrom") :
-                aux = l.split("\t")
+        for lin in fi :
+            if not lin.strip("\"").startswith("chrom") :
+                aux = lin.strip("\n").split("\t")
                 chr = aux[c]
                 tcn = int(aux[t])
-                lcn = int(aux[l])
+                if aux[l] == "NA" :
+                    lcn = -1
+                else :
+                    lcn = int(aux[l])
                 logR = float(aux[lR])
                 if chr == "23" :
                     chr = "X"
@@ -159,14 +163,11 @@ def extractFacets(path) :
                         fa[chr] = [reg]
                 else :
                     print "WARNING: Chromosome {} not found in the chromosomes constant".format(chr)
-            else :
-                print "INFO: Skiping header. Remove this line when the program is tested"
 
     fa["likelyhood"] = 'NA'
     fa["purity"] = 'NA'
     fa["ploidy"] = 'NA'
     basicPath = path.replace("_cncf.tsv", "_basic.tsv")
-    #TODO Provar si el parxe aquest funciona
     if os.path.isfile(basicPath) :
         with open(basicPath, "r") as fi :
             header = fi.readline()
@@ -235,10 +236,6 @@ def extractAscat(path) :
 
     cab = False
     if os.path.isfile(path2) :
-        print "INFO: Extracting info from {}".format(path2)
-        """for cr in sc.keys() :
-            for reg in sc[cr] :
-                getAscatLogR(path2, reg, cr)"""
         with open(path2, "r") as fi :
             for l in fi :
                 if not cab :
@@ -261,23 +258,26 @@ def extractAscat(path) :
                         elif ps[1] in mtLogR[cr].keys() :
                             ps.append(mtLogR[cr][ps[1]])
                         else :
-                            #NOTE This function slows down a lot the execution. If possible avoid it
                             pass
+                            #NOTE This function slows down a lot the execution. If possible avoid it
                             #getAscatLogR(path2, ps, cr)
     else :
         print "WARNING: {} not found. LogR calculations could not be added to ASCAT".format(path2)
 
     path3 = path.replace(".copynumber.caveman.csv", ".samplestatistics.txt")
+    sc["likelyhood"] = 'NA'
+    sc["purity"] = 'NA'
+    sc["ploidy"] = 'NA'
     if os.path.isfile(path3) :
         with open(path3, "r") as fi :
             for l in fi :
                 aux = l.split(" ")
                 if aux[0].startswith("NormalContamination") :
-                    print "Purity = {}".format(1 - float(aux[1]))
+                    sc["purity"] = 1 - float(aux[1])
                 if aux[0].startswith("Ploidy") :
-                    print "Ploidy = {}".format(float(aux[1]))
+                    sc["ploidy"] = float(aux[1])
                 if aux[0].startswith("goodnessOfFit") :
-                    print "Likelyhood = {}".format(float(aux[1]))
+                    sc["likelyhood"] = float(aux[1])
 
     else :
         print "WARNING: {} not found. Ploidy, purity, and goodness of fit data could not be added to ASCAT".format(path3)
