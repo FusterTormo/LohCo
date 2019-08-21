@@ -3,9 +3,79 @@
 import sys
 import os
 import math
+import libextractfile as ex
+import libgetters as ge
+import libconstants as cts
+
+"""
+MAIN: All functions to do a comparison between two LOH files
+"""
+
+"""
+FUNCTIONS:
+    - convert2region: Reads the output LOH files, and converts the data to REGION format
+    - getFragments: Gets a list of regions in common between both files
+    - checkCopyNumber: Compare both files. Returns the statistics as needed
+"""
+
+"""
+REGION FORMAT:
+{chr : [start, end, copy-number, total_copy_number, low_copy_number, logR_value]],
+ploidy : float,
+purity : float,
+likelyhood : float}
+"""
+
+def convert2region(path, filetype) :
+    """Read the output file from LOH program and convert the data to REGION format
+
+    Reads the file located in path passed as parameter and converts the data to REGION format. It is necessary to pass the type of output in order to call the corresponding function to extract the data
+
+    Parameters :
+        path (str) : Path to the file where the information is stored
+        filetype (str) : Type of program that has output the information passed as parameter. Available values: array, facets, ascat, ascatngs, sequenza, cnacs, titan, purple
+
+    Returns :
+        dict : A dict where the key is the chromosome name (chr1, ..., chrX, chrY) and the value is a list of the regions in pairs [start, end]. Additionally values of ploidy, purity and likelyhood.
+            Look REGION format
+    """
+    reg = {}
+    filetype = filetype.lower()
+    if filetype == "array" :
+        reg = ex.extractArray(path)
+    elif filetype == "facets" :
+        reg = ex.extractFacets(path)
+    elif filetype == "ascat" or filetype == "ascatngs" :
+        reg = ex.extractAscat(path)
+    elif filetype == "sequenza" :
+        print "ERROR: Sequenza is not implemented yet"
+        sys.exit()
+    elif filetype == "cnacs" :
+        print "ERROR: CNACS is not implemented yet"
+        sys.exit()
+    elif filetype == "titan" :
+        print "ERROR: Titan is not implemented yet"
+        sys.exit()
+    elif filetype == "purple" :
+        print "ERROR: Purple is not implemented yet"
+        sys.exit()
+    else :
+        raise IOError("ERROR: Type of file not found. Cannot continue")
+    return reg
 
 def getFragments(l1, l2) :
-    """Split the regions of both lists passed as parameter to get other list with all the regions"""
+    """Split the regions in REGION variables to get the regions with the same size of both
+
+    Split the regions of both lists passed as parameter to get other list with all the regions
+
+    Parameters:
+        l1 (dict) : Dictionary, in REGION format, with the output of one program
+        l2 (dict) : Dictionary, in REGION format, with the output of the other program
+
+    Returns:
+        dict : Using the name of the chromosome as key, and in each chromosome, a list of all the regions with the format [start, end]. The format is similar to REGION format,
+                but without the ploidy, purity, and likelyhood keys
+    """
     allregs = {}
     aux1 = []
     aux2 = []
@@ -21,91 +91,73 @@ def getFragments(l1, l2) :
     "19" : 58617616, "20" : 64444167, "21" : 46709983,
     "22" : 50818468, "X" : 156040895, "Y" : 999999999999999999999999999999999999999999999}
     iters = 0
-    for k in l1.keys() :
-        tmp1 = l1[k]
+    for k in  cts.chromosomes:
+        if k in l1.keys() :
+            tmp1 = l1[k]
+        else :
+            tmp1 = []
+
         if k in l2.keys() :
             tmp2 = l2[k]
         else :
             tmp2 = []
-        tmpregs = []
-        aux1 = []
-        aux2 = []
-        while len(tmp1) > 0 or len(tmp2) > 0 :
-            if len(aux1) == 0 :
-                if len(tmp1) > 0 :
-                    aux1 = tmp1.pop(0)
+        if tmp1 == [] and tmp2 == [] :
+            tmpregs = [[0, maxChr[k]]]
+        else :
+            tmpregs = []
+            aux1 = []
+            aux2 = []
+            while len(tmp1) > 0 or len(tmp2) > 0 :
+                if len(aux1) == 0 :
+                    if len(tmp1) > 0 :
+                        aux1 = ge.getRegion(tmp1.pop(0))
+                    else :
+                        aux1.append(maxChr[k])
+                if len(aux2) == 0 :
+                    if len(tmp2) > 0 :
+                        aux2 = ge.getRegion(tmp2.pop(0))
+                    else :
+                        aux2.append(maxChr[k])
+                reg = []
+                # Si els dos array estan buits, la regio comuna es la dels dos valors minims
+                if len(tmpregs) == 0 :
+                    reg = [0, min(aux1[0], aux2[0])]
+                    if min(aux1[0], aux2[0]) == aux1[0] :
+                        aux1.pop(0)
+                    else :
+                        aux2.pop(0)
                 else :
-                    aux1.append(maxChr[k])
-            if len(aux2) == 0 :
-                if len(tmp2) > 0 :
-                    aux2 = tmp2.pop(0)
-                else :
-                    aux2.append(maxChr[k])
-            reg = []
-            #1) Si els dos array estan buits, la regio comuna es la dels dos valors minims
-            if len(tmpregs) == 0 :
-                reg = [0, min(aux1[0], aux2[0])]
-                if min(aux1[0], aux2[0]) == aux1[0] :
-                    aux1.pop(0)
-                else :
-                    aux2.pop(0)
-            else :
-                if min(aux1[0], aux2[0]) == aux1[0] :
+                    if min(aux1[0], aux2[0]) == aux1[0] :
+                        reg = [last, aux1.pop(0)]
+                    else :
+                        reg = [last, aux2.pop(0)]
+                last = reg[1] + 1
+                tmpregs.append(reg)
+                iters += 1
+
+            while len(aux1) > 0 or len(aux2) > 0 :
+                reg = []
+                if len(aux1) == 0 :
+                    reg = [last, aux2.pop(0)]
+                elif len(aux2) == 0 :
                     reg = [last, aux1.pop(0)]
                 else :
-                    reg = [last, aux2.pop(0)]
+                    if min(aux1[0], aux2[0]) == aux1[0] :
+                        reg = [last, aux1.pop(0)]
+                    else :
+                        reg = [last, aux2.pop(0)]
+                last = reg[1] + 1
+                tmpregs.append(reg)
 
-            last = reg[1] + 1
-            tmpregs.append(reg)
-            iters += 1
+            if last < maxChr[k] :
+                tmpregs.append([last, maxChr[k]])
 
-        while len(aux1) > 0 or len(aux2) > 0 :
-            reg = []
-            if len(aux1) == 0 :
-                reg = [last, aux2.pop(0)]
-            elif len(aux2) == 0 :
-                reg = [last, aux1.pop(0)]
-            else :
-                if min(aux1[0], aux2[0]) == aux1[0] :
-                    reg = [last, aux1.pop(0)]
-                else :
-                    reg = [last, aux2.pop(0)]
-            last = reg[1] + 1
-            tmpregs.append(reg)
-
-        if last < maxChr[k] :
-            tmpregs.append([last, maxChr[k]])
-
+            del(aux1)
+            del(aux2)
         allregs[k] = tmpregs
 
         del(tmpregs)
-        del(aux1)
-        del(aux2)
-
-
     return allregs
-
-def getCopyNumber(reg, chr, dc) :
-    cnv = "N"
-    if chr in dc.keys() :
-        for r in dc[chr] :
-            if r[0] <= reg[0] and r[1] >= reg[1] :
-                cnv = r[2]
-                break
-    return cnv
-
-def getLogR(reg, chr, dc) :
-    logR = None
-    if chr in dc.keys() :
-        try :
-            for r in dc[chr] :
-                if r[0] <= reg[0] and r[1] >= reg[1] :
-                    logR = r[5]
-                    break
-        except IndexError :
-            logR = None
-    return logR
-
 
 def checkCopyNumber(regions, t1, t2, name1 = "tool1", name2 = "tool2") :
     """Checks, for each region in the fragments if the region is called as CNA or CNV.
@@ -188,79 +240,6 @@ def checkCopyNumber(regions, t1, t2, name1 = "tool1", name2 = "tool2") :
     extractStatistics(arDel_faDel, arNorm_faDel, arAmp_faDel, arDel_faNorm, arNorm_faNorm, arAmp_faNorm, arDel_faAmp, arNorm_faAmp, arAmp_faAmp, name1, name2)
 
 
-def extractStatistics(del_del, norm_del, amp_del, del_norm, norm_norm, amp_norm, del_amp, norm_amp, amp_amp, name1, name2) :
-    mt = "{}_{}_matrix3x3.tsv".format(name1, name2)
-    dl = "{}_{}_delVSno.tsv".format(name1, name2)
-    nm = "{}_{}_normVSno.tsv".format(name1, name2)
-    am = "{}_{}_ampVSno.tsv".format(name1, name2)
-    with open(mt, "w") as fi :
-        fi.write("\tDel_{0}\tNorm_{0}\tAmp_{0}\n".format(name1))
-        fi.write("Del_{}\t{}\t{}\t{}\n".format(name2, del_del, norm_del, amp_del))
-        fi.write("Norm_{}\t{}\t{}\t{}\n".format(name2, del_norm, norm_norm, norm_amp))
-        fi.write("Del_{}\t{}\t{}\t{}\n".format(name2 ,del_amp, norm_amp, amp_amp))
-    print "INFO: 3x3 matrix stored as {}".format(mt)
-    with open(dl, "w") as fi :
-        fi.write(getVariations(del_del, del_norm+del_amp, norm_del+amp_del, norm_norm+norm_amp+amp_norm+amp_amp))
-        fi.write("\n\n{}\t{}\n".format(del_del, del_norm+del_amp))
-        fi.write("{}\t{}\n".format(norm_del+amp_del, norm_norm+norm_amp+amp_norm+amp_amp))
-
-    print "INFO: Deletions vs no deletions confusion matrix stored as {}".format(dl)
-    with open(nm, "w") as fi :
-        fi.write(getVariations(norm_norm, norm_del+norm_amp, del_norm+amp_norm, del_del+del_amp+amp_del+amp_amp))
-        fi.write("\n\n{}\t{}\n".format(norm_norm, norm_del+norm_amp))
-        fi.write("{}\t{}\n".format(del_norm+amp_norm, del_del+del_amp+amp_del+amp_amp))
-
-    print "INFO: Normal vs no normal confusion matrix stored as {}".format(nm)
-    with open(am, "w") as fi :
-        fi.write(getVariations(amp_amp, amp_del+amp_norm, del_amp+norm_amp, del_del+del_norm+norm_del+norm_norm))
-        fi.write("\n\n{}\t{}\n".format(amp_amp, amp_del+amp_norm))
-        fi.write("{}\t{}\n".format(del_amp+norm_amp, del_del+del_norm+norm_del+norm_norm))
-
-    print "INFO: Amplifications vs no amplifications confusion matrix stored as {}".format(am)
-
-def getVariations(tp, fp, fn, tn) :
-    """
-    Get
-     - True Positive Rate (TPR), sensitivity
-     - True Negative Rate (TNR), specificity, selectivity
-     - Positive Predictive Value (PPV), precision
-     - Negative Predictive Value (NPR)
-     - False Negative Rate (FNR), miss rate
-     - False Positive Rate (FPR), fall out
-     - False Discovery Rate (FDR)
-     - False Omission Rate (FOR)
-     - Accuracy (ACC)
-    from 2x2 confusion matrix
-    """
-    tp = float(tp)
-    fp = float(fp)
-    fn = float(fn)
-    tn = float(tn)
-    tpr = tp/(tp+fn)
-    tnr = tn/(tn+fp)
-    ppv = tp/(tp+fp)
-    npv = tn/(tn+fn)
-    fnr = fn/(fn+tp)
-    fpr = fp/(fp+tn)
-    fdr = fp/(fp+tp)
-    fomr = fn/(fn+tn)
-    acc = (tp+tn)/(tp+fp+fn+tn)
-    return "TPR\tTNR\tPPV\tNPV\tFNR\tFPR\tFDR\tFOR\tACC\n{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n".format(tpr, tnr, ppv, npv, fnr, fpr, fdr, fomr, acc)
-
-
-def checkLogR(regions, t1, t2, name1 = "tool1", name2 = "tool2") :
-    txt = "{}\t{}\n".format(name1, name2)
-    fil = "{}_{}_logRcomp.tsv".format(name1, name2)
-    for chr, reg in regions.iteritems() :
-        for r in reg :
-            r1 = getLogR(r, chr, t1)
-            r2 = getLogR(r, chr, t2)
-            if r1 != None and r2 != None :
-                txt += "{}\t{}\n".format(r1, r2)
-    with open(fil, "w") as fi :
-        fi.write(txt)
-    print "INFO: File with the logR comparison stored as {}".format(fil)
-
 def print2Bed(regs1, prog1, regs2, prog2, regs3) :
     sr = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', 'X', 'Y']
     bedfile = "{}_{}_all_regions.bed".format(prog1, prog2)
@@ -320,3 +299,14 @@ def print2GGplot(dc1, dc2, prog1, prog2) :
 
     print "INFO: Tables for ggplot written as {} and {}. To create the ggplot".format(tcn, lcn)
     print "WARNING: NA values from lcn have been removed"
+
+
+if __name__ == "__main__" :
+    print "Reading FACETS example"
+    fa = convert2region("input_examples/facets_comp_cncf.tsv", "FACETS")
+    print "Reading AscatNGS example"
+    s = convert2region("input_examples/TCGA-13-0887-01A-01W.copynumber.caveman.csv", "ascatngs")
+    print "Read complete. Getting the fragments"
+    regs = getFragments(fa, s)
+    print regs.keys()
+    print regs["Y"]
