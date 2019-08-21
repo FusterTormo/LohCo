@@ -9,6 +9,7 @@ MAIN: All functions to return data from a REGION variable
 
 """
 FUNCTIONS:
+    - getRegion : Return the start and end position from the chr list
     - getCopyNumber : Return the copy number classification for the REGION passed as parameter in the region passed as parameter
     - getTotalCN : Return the total copy number value for the REGION passed as parameter in the region passed as parameter
     - getMinorCN : Return the minor copy number value for the REGION passed as parameter in the region passed as parameter
@@ -26,6 +27,20 @@ ploidy : float,
 purity : float,
 likelyhood : float}
 """
+
+def getRegion(l) :
+    """Return the start and end position from a chr list element in the REGION format
+
+    Returns the first and second element from the list passed as parameter. That corresponds to start and end position in the chromsomal region passed as parameter
+
+    Parameters:
+        l (list) : Element in REGION["chr"] list
+
+    Returns:
+        list : The start and end position from the region in the format [start, end]
+    """
+    print l[0:1]
+    return l[0:1]
 
 def getCopyNumber(reg, chr, dc) :
     """Return the copy-number classification of the REGION passed as parameter, in the region and chromosome passed as parameter
