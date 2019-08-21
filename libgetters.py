@@ -39,8 +39,8 @@ def getRegion(l) :
     Returns:
         list : The start and end position from the region in the format [start, end]
     """
-    print l[0:1]
-    return l[0:1]
+    print l[0:2]
+    return l[0:2]
 
 def getCopyNumber(reg, chr, dc) :
     """Return the copy-number classification of the REGION passed as parameter, in the region and chromosome passed as parameter
