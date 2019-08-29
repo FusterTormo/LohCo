@@ -93,12 +93,12 @@ def getFragments(l1, l2) :
     iters = 0
     for k in  cts.chromosomes:
         if k in l1.keys() :
-            tmp1 = l1[k]
+            tmp1 = list(l1[k])
         else :
             tmp1 = []
 
         if k in l2.keys() :
-            tmp2 = l2[k]
+            tmp2 = list(l2[k])
         else :
             tmp2 = []
         if tmp1 == [] and tmp2 == [] :
@@ -159,7 +159,27 @@ def getFragments(l1, l2) :
         del(tmpregs)
     return allregs
 
-def checkCopyNumber(regions, t1, t2, name1 = "tool1", name2 = "tool2") :
+def doComparison(regions, t1, t2) :
+    """
+    Checks the copy number for all the fragments in the region passed as parameter (regions) in each of the 2 tools passed as parameter
+    Returns a two-dimension dict with the data like a contingency table
+    TODO: end the function's documentation
+    """
+    tab = {"D" : {"D" : 0, "N" : 0, "L" : 0, "A" : 0}, "N" : {"D" : 0, "N" : 0, "L" : 0, "A" : 0}, "L" : {"D" : 0, "N" : 0, "L" : 0, "A" : 0}, "A" : {"D" : 0, "N" : 0, "L" : 0, "A" : 0}}
+    cont = 0
+    for chr in cts.chromosomes :
+        for r in regions[chr] :
+            cont += 1
+            c1 = ge.getCopyNumber(r, chr, t1)
+            c2 = ge.getCopyNumber(r, chr, t2)
+            tab[c1][c2] += 1
+
+
+    print tab
+    print cont
+
+
+def checkCopyNumber_old(regions, t1, t2, name1 = "tool1", name2 = "tool2") :
     """Checks, for each region in the fragments if the region is called as CNA or CNV.
     Outputs 3x3 contingency table with deletions, amplifications and CNN normal of all the regions.
     Outputs counts for each alteration in each program"""
@@ -302,11 +322,14 @@ def print2GGplot(dc1, dc2, prog1, prog2) :
 
 
 if __name__ == "__main__" :
+    """
+        UNIT TEST
+    """
     print "Reading FACETS example"
     fa = convert2region("input_examples/facets_comp_cncf.tsv", "FACETS")
     print "Reading AscatNGS example"
     s = convert2region("input_examples/TCGA-13-0887-01A-01W.copynumber.caveman.csv", "ascatngs")
     print "Read complete. Getting the fragments"
     regs = getFragments(fa, s)
-    print regs.keys()
-    print regs["Y"]
+    print "Got fragments. Checking the copy number"
+    doComparison(regs, fa, s)

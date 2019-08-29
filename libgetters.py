@@ -39,7 +39,6 @@ def getRegion(l) :
     Returns:
         list : The start and end position from the region in the format [start, end]
     """
-    print l[0:2]
     return l[0:2]
 
 def getCopyNumber(reg, chr, dc) :

@@ -307,6 +307,11 @@ def getCN(tcn, lcn) :
         ret = "L"
     elif tcn < 2 :
         ret = "D"
+    elif lcn == -1 : #In case low copy number value is calculated as "NA" by programs like FACETS, we only use the total copy number as a clue
+        if tcn == 2 :
+            ret = "N"
+    else :
+        print "WARNING: not found value for tcn -> {} and lcn -> {}".format(tcn, lcn)
 
     return ret
 
