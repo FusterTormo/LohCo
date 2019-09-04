@@ -1,8 +1,5 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-
-import libconstants as lc
-
 """
 MAIN: All functions to return data from a REGION variable
 """
@@ -27,6 +24,11 @@ ploidy : float,
 purity : float,
 likelyhood : float}
 """
+
+"""
+Libraries
+"""
+import libconstants as lc
 
 def getRegion(l) :
     """Return the start and end position from a chr list element in the REGION format

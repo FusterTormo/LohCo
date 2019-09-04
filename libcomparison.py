@@ -1,12 +1,5 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-import sys
-import os
-import math
-import libextractfile as ex
-import libgetters as ge
-import libconstants as cts
-
 """
 MAIN: All functions to do a comparison between two LOH files
 """
@@ -25,6 +18,16 @@ ploidy : float,
 purity : float,
 likelyhood : float}
 """
+
+"""
+Libraries
+"""
+import sys
+import os
+import math
+import libextractfile as ex
+import libgetters as ge
+import libconstants as cts
 
 def convert2region(path, filetype) :
     """Read the output file from LOH program and convert the data to REGION format
@@ -160,25 +163,31 @@ def getFragments(l1, l2) :
     return allregs
 
 def doComparison(regions, t1, t2) :
-    """
-    Checks the copy number for all the fragments in the region passed as parameter (regions) in each of the 2 tools passed as parameter
-    Returns a two-dimension dict with the data like a contingency table
-    TODO: end the function's documentation
+    """Compare the output from two tools (t1 and t2) passed as parameter, checking the LOH in the regions passed as parameter
+
+    Checks the copy number for all the fragments in the region passed as parameter (regions) in each of the 2 tools passed as parameter. The data is returned in a two-dimension dict
+
+    Parameters :
+        regions (dict) : List of regions in REGION format, but without the ploidy, purity and likelyhood keys
+        t1 (dict) : Output from tool 1 that is going to be compared against tool2 (t2). This output should be transformed to REGION format previously
+        t2 (dict) : Output from tool 2 that is going to be compared against tool1 (t1). This output should be transformed to REGION format previously
+
+    Returns :
+            dict : Two-dimension dict which keys are "D" for deletion, "L" for LOH, "A" for amplification, and "N" for normal copy-number
     """
     tab = {"D" : {"D" : 0, "N" : 0, "L" : 0, "A" : 0}, "N" : {"D" : 0, "N" : 0, "L" : 0, "A" : 0}, "L" : {"D" : 0, "N" : 0, "L" : 0, "A" : 0}, "A" : {"D" : 0, "N" : 0, "L" : 0, "A" : 0}}
-    cont = 0
     for chr in cts.chromosomes :
         for r in regions[chr] :
-            cont += 1
             c1 = ge.getCopyNumber(r, chr, t1)
             c2 = ge.getCopyNumber(r, chr, t2)
             tab[c1][c2] += 1
 
+    return tab
 
-    print tab
-    print cont
+def regs2Bed(regions, t1, t2) :
+    """Convert the regions to a bed """
 
-
+#TODO remove this function as it is not used
 def checkCopyNumber_old(regions, t1, t2, name1 = "tool1", name2 = "tool2") :
     """Checks, for each region in the fragments if the region is called as CNA or CNV.
     Outputs 3x3 contingency table with deletions, amplifications and CNN normal of all the regions.
@@ -258,68 +267,6 @@ def checkCopyNumber_old(regions, t1, t2, name1 = "tool1", name2 = "tool2") :
         fi.write("\tDel\tNorm\tAmp\n{}\t{}\t{}\t{}\n{}\t{}\t{}\t{}\n".format(name1, del_ar, norm_ar, amp_ar, name2, del_FA, norm_FA, amp_FA))
     print "INFO: Counts matrices stored as {}".format(ct)
     extractStatistics(arDel_faDel, arNorm_faDel, arAmp_faDel, arDel_faNorm, arNorm_faNorm, arAmp_faNorm, arDel_faAmp, arNorm_faAmp, arAmp_faAmp, name1, name2)
-
-
-def print2Bed(regs1, prog1, regs2, prog2, regs3) :
-    sr = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', 'X', 'Y']
-    bedfile = "{}_{}_all_regions.bed".format(prog1, prog2)
-    with open(bedfile, "w") as fi :
-        fi.write("track name=\"{0}\" description=\"{0}\" color=0,128,0 visibility=full db=hg38\n".format(prog1))
-        for r in sr :
-            if r in regs1.keys() :
-                for k in regs1[r] :
-                    fi.write("chr{}\t{}\t{}\n".format(r, k[0], k[1]))
-
-        fi.write("\ntrack name=\"{0}\" description=\"{0}\" color=128,0,0 visibility=full db=hg38\n".format(prog2))
-        for r in sr :
-            if r in regs2.keys() :
-                for k in regs2[r] :
-                    fi.write("chr{}\t{}\t{}\n".format(r, k[0], k[1]))
-
-        fi.write("\ntrack name=\"Regions split\" description=\"Splitted regions\" color=0,0,128 visibility=full db=hg38\n")
-        for r in sr :
-            if r in regs3.keys() :
-                for k in regs3[r] :
-                    fi.write("chr{}\t{}\t{}\n".format(r, k[0], k[1]))
-
-    print "INFO: Bed file with all the regions of all programs written as {}".format(bedfile)
-
-def print2GGplot(dc1, dc2, prog1, prog2) :
-    sr = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', 'X', 'Y']
-    longitud = 5 #Tamano que tiene que tener cada lista para poder sacer el CN necesario para crear la tabla para el ggplot
-    txtTCN = "chr\tstart\tend\tcn\ttype\n"
-    txtLCN = "chr\tstart\tend\tcn\ttype\n"
-    tcn = "{}_{}_tab4ggplot_TCN.tsv".format(prog1, prog2)
-    lcn = "{}_{}_tab4ggplot_lcn.tsv".format(prog1, prog2)
-
-    for r in sr :
-        if r in dc1.keys() :
-            for c in dc1[r] :
-                if len(c) < longitud :
-                    raise IndexError("ERROR: List from program {} is too short to find CN values".format(prog1))
-                else :
-                    txtTCN += "{}\t{}\t{}\t{}\t{}\n".format(r, c[0], c[1], c[3], prog1)
-                    if c[4] != 'NA' : #NOTE ruling out the regions with lcn == 'NA'
-                        txtLCN += "{}\t{}\t{}\t{}\t{}\n".format(r, c[0], c[1], c[4], prog1)
-    for r in sr :
-        if r in dc2.keys() :
-            for c in dc2[r] :
-                if len(c) < longitud :
-                    raise IndexError("ERROR: List from program {} is too short to find CN values".format(prog2))
-                else :
-                    txtTCN += "{}\t{}\t{}\t{}\t{}\n".format(r, c[0], c[1], c[3], prog2)
-                    if c[4] != 'NA' : #NOTE ruling out the regions with lcn == 'NA'
-                        txtLCN += "{}\t{}\t{}\t{}\t{}\n".format(r, c[0], c[1], c[4], prog2)
-
-
-    with open(tcn, "w") as fi :
-        fi.write(txtTCN)
-    with open (lcn, "w") as fi :
-        fi.write(txtLCN)
-
-    print "INFO: Tables for ggplot written as {} and {}. To create the ggplot".format(tcn, lcn)
-    print "WARNING: NA values from lcn have been removed"
-
 
 if __name__ == "__main__" :
     """
