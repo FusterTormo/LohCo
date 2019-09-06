@@ -21,7 +21,26 @@ import libcomparison as comp
 import libconstants as cts
 import math
 
+def countsXtool(regs1, regs2 = None) :
+    #Calcular els counts que ha reportat cada eina
+    t1 = {"A" : 0, "D" : 0, "L" : 0, "N" : 0}
+    if regs2 != None :
+        t2 = {"A" : 0, "D" : 0, "L" : 0, "N" : 0}
+    for a in cts.chromosomes :
+        if a in regs1.keys() :
+            for i in regs1[a] :
+                t1[i[2]] += 1
+        if regs2 != None :
+            if a in regs2.keys() :
+                for j in regs2[a] :
+                    t2[i[2]] += 1
+    if regs2 != None :
+        return (t1, t2)
+    else :
+        return t1
+
 def calculateCounts(tab) :
+    #Calcular les aberracions que ha reportat cada eina segons les regions en comu
     t1 = {"A" : 0, "D" : 0, "L" : 0, "N" : 0}
     t2 = {"A" : 0, "D" : 0, "L" : 0, "N" : 0}
     for a in cts.aberrations :
@@ -34,6 +53,7 @@ def calculateCounts(tab) :
         for b in cts.aberrations :
             cont += tab[b][a]
         t2[a] = cont
+
     return (t1, t2)
 
 #Guardar los datos para que puedan ser usados como un bed en el cual se comparan las regiones de cada una de las herramientas, junto con las regiones en comun.
@@ -233,12 +253,11 @@ if __name__ == "__main__" :
     print "Copy number done. Preparing some statistics"
     print "1) Counts"
     c1, c2 = calculateCounts(dc)
-    print "2) BED file"
+    print "2) Counts per tool"
+    counts1, count2 = countsXtool(fa, s)
+    print "3) BED file"
     #print2Bed(fa, pr1, s, pr2, regs)
-    print "3) 4x4 comparison table"
+    print "4) 4x4 comparison table"
     #printTable(dc, pr1, pr2)
-    print "4) Contingency table"
-    print c1
-    print c2
-    print dc
+    print "5) Contingency table"
     doContingency(dc, c1, c2)
