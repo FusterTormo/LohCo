@@ -89,7 +89,7 @@ def extractArray(path) :
             aux = l.split("\t")
             chr = aux[c]
             #Skip headers or columns without interesting information
-            if chr in chromosomes :
+            if chr in lc.chromosomes :
                 va = float(aux[cnv])
                 if va == 0 :
                     reg = [int(aux[s]), int(aux[e]), 'N', 'NA', 'NA.', 'NA'] #Array regions does not have information about total_copy_number, low_copy_number, and logR
