@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-MAIN: Example of comparison between a FACETS example agains the "silver standard" CNV array obtained from TCGA
+MAIN: Example of comparison between a FACETS example against the "silver standard" CNV array obtained from TCGA
 """
 
 """
