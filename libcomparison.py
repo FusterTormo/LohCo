@@ -13,7 +13,7 @@ FUNCTIONS:
 
 """
 REGION FORMAT:
-{chr : [start, end, copy-number, total_copy_number, low_copy_number, logR_value]],
+{chr : [start, end, copy-number, total_copy_number, low_copy_number, logR_value],
 ploidy : float,
 purity : float,
 likelyhood : float}
@@ -92,7 +92,7 @@ def getFragments(l1, l2) :
     "13" : 114364328, "14" : 107043718, "15" : 101991189,
     "16" : 90338345, "17" : 83257441, "18" : 80373285,
     "19" : 58617616, "20" : 64444167, "21" : 46709983,
-    "22" : 50818468, "X" : 156040895, "Y" : 999999999999999999999999999999999999999999999}
+    "22" : 50818468, "X" : 156040895, "Y" : 57227415}
     iters = 0
     for k in  cts.chromosomes:
         if k in l1.keys() :
@@ -184,8 +184,35 @@ def doComparison(regions, t1, t2) :
 
     return tab
 
+def doComparison2(regions, t1, t2) :
+    """Compare the output from two tools (t1 and 52) passed as parameter, checking the LOH in the regions passed as parameter
+
+    Checks the copy number in all the fragments  in the region tuple passed as parameter (regions) in each of the 2 tools passed as parameter. The data is returned in a two-dimension dict. However,
+    instead of count the number of regions that is reported, this function counts the number of bases in the region and adds the number of bases to the corresponding cell in the two-dimension dict.
+    For example a region that is 1000 bases long, and is reported as a 'A' by t1, and 'L' by t2 will add 1000 to dict['A']['L']
+
+    Parameters :
+        region (dict) : List of regions in REGION format, but without the ploidy, purity, and likelyhood keys
+        t1 (dict) : Output from tool1 that is going to be compared against tool2 (t2). This output must be transformed to REGION format previously
+        t2 (dict) : Output from tool2 that is going to be compared against tool1 (t1). This output must be transformed to REGION format previously
+
+    Returns :
+        dict : Two-dimension dict which keys ara "D" for deletion, "L" for LOH, "A" for amplification, and "N" for normal copy-number
+    """
+    tab = {"D" : {"D" : 0, "N" : 0, "L" : 0, "A" : 0}, "N" : {"D" : 0, "N" : 0, "L" : 0, "A" : 0}, "L" : {"D" : 0, "N" : 0, "L" : 0, "A" : 0}, "A" : {"D" : 0, "N" : 0, "L" : 0, "A" : 0}}
+    bases = 0
+    for chr in cts.chromosomes :
+        for r in regions[chr] :
+            bases = int(r[1]) - int(r[0])
+            c1 = ge.getCopyNumber(r, chr, t1)
+            c2 = ge.getCopyNumber(r, chr, t2)
+            tab[c1][c2] += bases
+
+    return tab
+
 def regs2Bed(regions, t1, t2) :
     """Convert the regions to a bed """
+    pass
 
 #TODO remove this function as it is not used
 def checkCopyNumber_old(regions, t1, t2, name1 = "tool1", name2 = "tool2") :
@@ -272,11 +299,15 @@ if __name__ == "__main__" :
     """
         UNIT TEST
     """
+    print "\n\n\t\tWELCOME TO libcomparison.py UNIT TEST\n\t\t-------------------------------------\n"
     print "Reading FACETS example"
     fa = convert2region("input_examples/facets_comp_cncf.tsv", "FACETS")
     print "Reading AscatNGS example"
     s = convert2region("input_examples/TCGA-13-0887-01A-01W.copynumber.caveman.csv", "ascatngs")
     print "Read complete. Getting the fragments"
     regs = getFragments(fa, s)
-    print "Got fragments. Checking the copy number"
-    doComparison(regs, fa, s)
+    print "Got fragments"
+    print "Calculating the number of regions that are reported with the different aberrations"
+    print doComparison(regs, fa, s)
+    print "Calculating the number of bases that are reported with the different tools"
+    print doComparison2(regs, fa, s)
