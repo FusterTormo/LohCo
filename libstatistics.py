@@ -8,7 +8,6 @@ MAIN: Functions to extract statistics from the LOH processed data
 FUNCTIONS
     PENDING TO BE REMODELED
     - print2Bed
-    - print2GGplot
     - extractStatistics
     - getVariations: Obtain TPR, TNR, PPV, NPR, FNR, FPR, FDR, FOR, ACC from 2x2 matrix
     - checkLogR
@@ -19,7 +18,10 @@ Libraries
 """
 import libcomparison as comp
 import libconstants as cts
+import libgetters as getlib
 import math
+import subprocess
+import os
 
 def countsXtool(regs1, regs2 = None) :
     #Calcular els counts que ha reportat cada eina
@@ -80,40 +82,45 @@ def print2Bed(regs1, prog1, regs2, prog2, regs3) :
                     fi.write("chr{}\t{}\t{}\n".format(r, k[0], k[1]))
         print "INFO: Created a bed file with the regions corresponding to {} output, {} output, and the regions in common".format(prog1, prog2)
 
-def printTable(dc, prog1, prog2) :
+def printTable(dc, prog1, prog2, print2file = True) :
     #Print a 4x4 table. Calculate the contingency
-    txt = "\t{}\n".format("\t".join(cts.aberrations))
+    txt = "{}\t\t{}\n".format(prog1, prog2)
+    txt += "\t{}\n".format("\t".join(cts.aberrations))
     for a in cts.aberrations :
         txt += "{}".format(a)
         for b in cts.aberrations :
             txt += "\t{}".format(dc[a][b])
         txt += "\n"
-    table = "{}_{}_4x4.tsv".format(prog1, prog2)
-    with open(table, "w") as fi :
-        fi.write(txt)
-    print "INFO: Created a tab-separated file 4x4 table comparing the output for both programs"
+    if print2file :
+        table = "{}_{}_4x4.tsv".format(prog1, prog2)
+        with open(table, "w") as fi :
+            fi.write(txt)
+        print "INFO: Created a tab-separated file called {}, with a 4x4 table comparing the output of both programs".format(table)
+    else :
+        return txt
 
-def doContingency(dc, counts1, counts2) :
+def doContingency(dc, counts1, counts2, aber = cts.aberrations) :
     allab = 0 #Count the total of regions to get the TN value easily
+    stats = {}
     sts = {}
-    for a in cts.aberrations :
-        for b in cts.aberrations :
+    for a in aber :
+        for b in aber :
             allab += dc[a][b]
 
-    for a in cts.aberrations :
+    for a in aber :
         tp = dc[a][a]
         fp = counts1[a] - tp
         fn = counts2[a] - tp
         tn = allab - tp - fp - fn
         sts = getConfusionStatistics(tp, fp, fn, tn)
-        print "TP={}".format(tp)
-        print "FP={}".format(fp)
-        print "FN={}".format(fn)
-        print "TN={}".format(tn)
-        print sts
+        sts["TP"] = tp
+        sts["FP"] = fp
+        sts["FN"] = fn
+        sts["TN"] = tn
+        stats[a] = sts
 
+    return stats
 
-#TODO remodelar
 #Extraer calculos a partir de una tabla de contingencia
 def getConfusionStatistics(tp, fp, fn, tn) :
     """
@@ -149,91 +156,80 @@ def getConfusionStatistics(tp, fp, fn, tn) :
     stats["MCC"] = ((tp*tn)-(fp*fn))/math.sqrt((tp+fp)*(tp+fn)*(tn+fp)*(tn+fn))
     return stats
 
+def jaccardIndex(mt, aber = cts.aberrations) :
+    total = 0
+    dic = {}
+    for a in aber :
+        for b in aber :
+            total += mt[a][b]
 
-#TODO remodelar
-#Preparar los datos para crear un archivo apto para el script doGGplot.R el cual hara un ggplot del copy number de los outputs de las herramientas
-def print2GGplot(dc1, dc2, prog1, prog2) :
-    sr = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', 'X', 'Y']
-    longitud = 5 #Tamano que tiene que tener cada lista para poder sacer el CN necesario para crear la tabla para el ggplot
+    for a in aber :
+        jc = float(mt[a][a]) / float(total)
+        dic[a] = jc
+
+    return dic
+
+def doGGplotFiles(reg1, reg2, prog1, prog2, plot = "both") :
+    #Preparar los datos para crear un archivo apto para el script doGGplot.R el cual hara un ggplot del copy number de los outputs de las herramientas
+    #Lanzar Rscript para crear dicho grafico
+    #La variable plot se usa para comprobar si el usuario quiere un grafico de TCN, LCN o de ambos
     txtTCN = "chr\tstart\tend\tcn\ttype\n"
     txtLCN = "chr\tstart\tend\tcn\ttype\n"
-    tcn = "{}_{}_tab4ggplot_TCN.tsv".format(prog1, prog2)
-    lcn = "{}_{}_tab4ggplot_lcn.tsv".format(prog1, prog2)
+    for a in cts.chromosomes :
+        if a in reg1.keys() :
+            for b in reg1[a] :
+                txtTCN += "{}\t{}\t{}\t{}\t{}\n".format(a, b[0], b[1], b[3], prog1)
+                txtLCN += "{}\t{}\t{}\t{}\t{}\n".format(a, b[0], b[1], b[4], prog1)
 
-    for r in sr :
-        if r in dc1.keys() :
-            for c in dc1[r] :
-                if len(c) < longitud :
-                    raise IndexError("ERROR: List from program {} is too short to find CN values".format(prog1))
-                else :
-                    txtTCN += "{}\t{}\t{}\t{}\t{}\n".format(r, c[0], c[1], c[3], prog1)
-                    if c[4] != 'NA' : #NOTE ruling out the regions with lcn == 'NA'
-                        txtLCN += "{}\t{}\t{}\t{}\t{}\n".format(r, c[0], c[1], c[4], prog1)
-    for r in sr :
-        if r in dc2.keys() :
-            for c in dc2[r] :
-                if len(c) < longitud :
-                    raise IndexError("ERROR: List from program {} is too short to find CN values".format(prog2))
-                else :
-                    txtTCN += "{}\t{}\t{}\t{}\t{}\n".format(r, c[0], c[1], c[3], prog2)
-                    if c[4] != 'NA' : #NOTE ruling out the regions with lcn == 'NA'
-                        txtLCN += "{}\t{}\t{}\t{}\t{}\n".format(r, c[0], c[1], c[4], prog2)
+    for a in cts.chromosomes :
+        if a in reg2.keys() :
+            for b in reg2[a] :
+                txtTCN += "{}\t{}\t{}\t{}\t{}\n".format(a, b[0], b[1], b[3], prog2)
+                txtLCN += "{}\t{}\t{}\t{}\t{}\n".format(a, b[0], b[1], b[4], prog2)
+
+    #Write the information in one file, or two depending on plot variable
+    if plot == "both" or plot == "tcn" :
+        filename = "TCN_ggplot.tsv"
+        with open(filename, "w") as fi :
+            fi.write(txtTCN)
+        print "INFO: Created tab-separated file for ggplot called TCN_ggplot.tsv with tcn copy number information from {} and {}".format(prog1, prog2)
+        pythonpath = os.path.dirname(os.path.realpath(__file__))
+        rpath = "{}/doGGplot.R {}".format(pythonpath, filename)
+        command = "Rscript {} {}_{}_tcn.png".format(rpath, prog1, prog2)
+        proc1 = subprocess.Popen(command, shell = True)
 
 
-    with open(tcn, "w") as fi :
-        fi.write(txtTCN)
-    with open (lcn, "w") as fi :
-        fi.write(txtLCN)
+    if plot == "both" or plot == "lcn" :
+        filename = "lcn_ggplot.tsv"
+        with open(filename, "w") as fi :
+            fi.write(txtLCN)
+        print "INFO: Created tab-separated file for ggplot called lcn_ggplot.tsv with lcn copy number information from {} and {}".format(prog1, prog2)
+        pythonpath = os.path.dirname(os.path.realpath(__file__))
+        rpath = "{}/doGGplot.R {}".format(pythonpath, filename)
+        command = "Rscript {} {}_{}_lcn.png".format(rpath, prog1, prog2)
+        proc2 = subprocess.Popen(command, shell = True)
 
-    print "INFO: Tables for ggplot written as {} and {}. To create the ggplot".format(tcn, lcn)
-    print "WARNING: NA values from lcn have been removed"
+    proc1.communicate()
+    proc2.communicate()
 
-#TODO remodelar
-#Datos para la tabla 3x3
-def extractStatistics(del_del, norm_del, amp_del, del_norm, norm_norm, amp_norm, del_amp, norm_amp, amp_amp, name1, name2) :
-    mt = "{}_{}_matrix3x3.tsv".format(name1, name2)
-    dl = "{}_{}_delVSno.tsv".format(name1, name2)
-    nm = "{}_{}_normVSno.tsv".format(name1, name2)
-    am = "{}_{}_ampVSno.tsv".format(name1, name2)
-    with open(mt, "w") as fi :
-        fi.write("\tDel_{0}\tNorm_{0}\tAmp_{0}\n".format(name1))
-        fi.write("Del_{}\t{}\t{}\t{}\n".format(name2, del_del, norm_del, amp_del))
-        fi.write("Norm_{}\t{}\t{}\t{}\n".format(name2, del_norm, norm_norm, norm_amp))
-        fi.write("Del_{}\t{}\t{}\t{}\n".format(name2 ,del_amp, norm_amp, amp_amp))
-    print "INFO: 3x3 matrix stored as {}".format(mt)
-    with open(dl, "w") as fi :
-        fi.write(getVariations(del_del, del_norm+del_amp, norm_del+amp_del, norm_norm+norm_amp+amp_norm+amp_amp))
-        fi.write("\n\n{}\t{}\n".format(del_del, del_norm+del_amp))
-        fi.write("{}\t{}\n".format(norm_del+amp_del, norm_norm+norm_amp+amp_norm+amp_amp))
-
-    print "INFO: Deletions vs no deletions confusion matrix stored as {}".format(dl)
-    with open(nm, "w") as fi :
-        fi.write(getVariations(norm_norm, norm_del+norm_amp, del_norm+amp_norm, del_del+del_amp+amp_del+amp_amp))
-        fi.write("\n\n{}\t{}\n".format(norm_norm, norm_del+norm_amp))
-        fi.write("{}\t{}\n".format(del_norm+amp_norm, del_del+del_amp+amp_del+amp_amp))
-
-    print "INFO: Normal vs no normal confusion matrix stored as {}".format(nm)
-    with open(am, "w") as fi :
-        fi.write(getVariations(amp_amp, amp_del+amp_norm, del_amp+norm_amp, del_del+del_norm+norm_del+norm_norm))
-        fi.write("\n\n{}\t{}\n".format(amp_amp, amp_del+amp_norm))
-        fi.write("{}\t{}\n".format(del_amp+norm_amp, del_del+del_norm+norm_del+norm_norm))
-
-    print "INFO: Amplifications vs no amplifications confusion matrix stored as {}".format(am)
-
-#TODO remodelar
 #Preparar datos para una comparacion entre logR
-def checkLogR(regions, t1, t2, name1 = "tool1", name2 = "tool2") :
+def logRcomp(regions, t1, t2, name1 = "tool1", name2 = "tool2") :
     txt = "{}\t{}\n".format(name1, name2)
     fil = "{}_{}_logRcomp.tsv".format(name1, name2)
     for chr, reg in regions.iteritems() :
         for r in reg :
-            r1 = getLogR(r, chr, t1)
-            r2 = getLogR(r, chr, t2)
+            r1 = getlib.getLogR(r, chr, t1)
+            r2 = getlib.getLogR(r, chr, t2)
             if r1 != None and r2 != None :
                 txt += "{}\t{}\n".format(r1, r2)
     with open(fil, "w") as fi :
         fi.write(txt)
-    print "INFO: File with the logR comparison stored as {}".format(fil)
+    print "INFO: Created a file with the logR comparison stored as {}".format(fil)
+    pythonpath = os.path.dirname(os.path.realpath(__file__))
+    rpath = "{}/compareLogR.R {}".format(pythonpath, fil)
+    command = "Rscript {}".format(rpath)
+    proc = subprocess.Popen(command, shell = True)
+    proc.communicate()
 
 if __name__ == "__main__" :
     """
@@ -241,6 +237,7 @@ if __name__ == "__main__" :
     """
     pr1 = "FACETS"
     pr2 = "ascatngs"
+    print "\n\n\t\tWELCOME TO libstatistics.py UNIT TEST\n\t\t-------------------------------------\n"
     print "Reading FACETS example"
     fa = comp.convert2region("input_examples/facets_comp_cncf.tsv", pr1)
     print "Reading AscatNGS example"
@@ -248,7 +245,6 @@ if __name__ == "__main__" :
     print "Read complete. Getting the fragments"
     regs = comp.getFragments(fa, s)
     print "Got fragments. Checking the copy number"
-    #NOTE Comprovar que la eina 1 es FACETS i que la eina 2 es ascatNGS
     dc = comp.doComparison(regs, fa, s)
     print "Copy number done. Preparing some statistics"
     print "1) Counts"
@@ -256,8 +252,13 @@ if __name__ == "__main__" :
     print "2) Counts per tool"
     counts1, count2 = countsXtool(fa, s)
     print "3) BED file"
-    #print2Bed(fa, pr1, s, pr2, regs)
+    print2Bed(fa, pr1, s, pr2, regs)
     print "4) 4x4 comparison table"
-    #printTable(dc, pr1, pr2)
+    printTable(dc, pr1, pr2)
     print "5) Contingency table"
-    doContingency(dc, c1, c2)
+    print doContingency(dc, c1, c2)
+    print "6) Jaccard index"
+    jci = comp.doComparison2(regs, fa, s)
+    print jaccardIndex(jci)
+    jci2 = comp.doComparison2(regs, s, fa)
+    print jaccardIndex(jci2)
