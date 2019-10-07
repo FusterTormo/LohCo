@@ -3,6 +3,7 @@
 import libcomparison as lc
 import sys
 
+#NOTE this function is already implemented in libcomparison
 def extractFromFile(tip, path) :
     tip = tip.lower()
     if tip == "array" :
