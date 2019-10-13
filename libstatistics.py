@@ -218,14 +218,38 @@ def getConfusionStatistics(tp, fp, fn, tn) :
     fp = float(fp)
     fn = float(fn)
     tn = float(tn)
-    stats["TPR"] = tp/(tp+fn)
-    stats["TNR"] = tn/(tn+fp)
-    stats["PPV"] = tp/(tp+fp)
-    stats["NPV"] = tn/(tn+fn)
-    stats["FNR"] = fn/(fn+tp)
-    stats["FPR"] = fp/(fp+tn)
-    stats["FDR"] = fp/(fp+tp)
-    stats["FOR"] = fn/(fn+tn)
+    try :
+        stats["TPR"] = tp/(tp+fn)
+    except ZeroDivisionError :
+        stats["TPR"] = "NA"
+    try :
+        stats["TNR"] = tn/(tn+fp)
+    except ZeroDivisionError :
+        stats["TNR"] = "NA"
+    try :
+        stats["PPV"] = tp/(tp+fp)
+    except ZeroDivisionError :
+        stats["PPV"] = "NA"
+    try :
+        stats["NPV"] = tn/(tn+fn)
+    except ZeroDivisionError :
+        stats["NPV"] = "NA"
+    try :
+        stats["FNR"] = fn/(fn+tp)
+    except ZeroDivisionError :
+        stats["FNR"] = "NA"
+    try :
+        stats["FPR"] = fp/(fp+tn)
+    except ZeroDivisionError :
+        stats["FPR"] = "NA"
+    try :
+        stats["FDR"] = fp/(fp+tp)
+    except ZeroDivisionError :
+        stats["FDR"] = "NA"
+    try :
+        stats["FOR"] = fn/(fn+tn)
+    except ZeroDivisionError :
+        stats["FOR"] = "NA"
     stats["ACC"] = (tp+tn)/(tp+fp+fn+tn)
     stats["F1"] = (2*tp)/(2*tp + fp + fn)
     try :

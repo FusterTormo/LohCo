@@ -23,6 +23,7 @@ import libconstants as cte
 def launchAnalysis(folder, array, ascat, facets) :
     pythonpath = os.path.dirname(os.path.realpath(__file__))
     #Go to the working directory to run the comparison analysis
+    print("INFO: Analysing {}".format(folder))
     os.chdir(folder)
     ascatReg = None
     facetsReg = None
@@ -143,5 +144,5 @@ for d in dirs :
                     facets = f
                 if f.endswith(ascatStruct) :
                     ascat = f
-            launchAnalysis(subpath, ar[0], ascat, facets) # TODO hi ha una mostra que te 3 arrays
+            launchAnalysis(subpath, arrays[0], ascat, facets) # TODO hi ha una mostra que te 3 arrays
         break
