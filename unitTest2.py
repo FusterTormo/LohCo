@@ -22,17 +22,17 @@ import libstatistics as sts
 import libconstants as cts
 import os
 
-print "INFO: Test unitario para comprobar graficas comparando un ejemplo de ascatNGS y uno de FACETS"
-print "TEST 1) Extraer los datos"
+print("INFO: Test unitario para comprobar graficas comparando un ejemplo de ascatNGS y uno de FACETS")
+print("TEST 1) Extraer los datos")
 ascat = compi.convert2region("/home/labs/solelab/ffuster2/Desktop/doctorat/cas_estudi/input_examples/TCGA-13-0887-01A-01W.copynumber.caveman.csv", "ascat")
 facets = compi.convert2region("/home/labs/solelab/ffuster2/Desktop/doctorat/cas_estudi/input_examples/facets_comp_cncf.tsv", "FACETS")
-print "TEST 2) Dividir las regiones para obtener regiones en comun"
+print("TEST 2) Dividir las regiones para obtener regiones en comun")
 regs = compi.getFragments(facets, ascat)
-print "TEST 3) Dibujar la concordancia entre los logR"
+print("TEST 3) Dibujar la concordancia entre los logR")
 sts.logRcomp(regs, facets, ascat, "FACETS", "ASCAT")
-print "TEST 4) Dibujar los copy number counts usando la libreria ggplot"
+print("TEST 4) Dibujar los copy number counts usando la libreria ggplot")
 sts.doGGplotFiles(facets, ascat, "FACETS", "ASCAT")
-print "INFO: Limpiando..."
+print("INFO: Limpiando...")
 os.remove("FACETS_ASCAT_lcn.png")
 os.remove("FACETS_ASCAT_logRcomp.tsv")
 os.remove("FACETS_ASCAT_tcn.png")
