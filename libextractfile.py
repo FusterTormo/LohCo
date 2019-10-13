@@ -221,7 +221,7 @@ def extractAscat(path) :
             chr = aux[col_c]
             tcn = int(aux[col_tcn])
             lcn = int(aux[col_lcn])
-            reg = [int(aux[col_s]), int(aux[col_e]), getCN(tcn, lcn), tcn, lcn]
+            reg = [int(float(aux[col_s])), int(float(aux[col_e])), getCN(tcn, lcn), tcn, lcn]
 
             if chr in sc.keys() :
                 sc[chr].append(reg)
