@@ -51,16 +51,16 @@ def convert2region(path, filetype) :
     elif filetype == "ascat" or filetype == "ascatngs" :
         reg = ex.extractAscat(path)
     elif filetype == "sequenza" :
-        print "ERROR: Sequenza is not implemented yet"
+        print("ERROR: Sequenza is not implemented yet")
         sys.exit()
     elif filetype == "cnacs" :
-        print "ERROR: CNACS is not implemented yet"
+        print("ERROR: CNACS is not implemented yet")
         sys.exit()
     elif filetype == "titan" :
-        print "ERROR: Titan is not implemented yet"
+        print("ERROR: Titan is not implemented yet")
         sys.exit()
     elif filetype == "purple" :
-        print "ERROR: Purple is not implemented yet"
+        print("ERROR: Purple is not implemented yet")
         sys.exit()
     else :
         raise IOError("ERROR: Type of file not found. Cannot continue")
@@ -254,7 +254,7 @@ def checkCopyNumber_old(regions, t1, t2, name1 = "tool1", name2 = "tool2") :
                     amp_FA += 1
                     del_ar += 1
                 else :
-                    print "ERROR: Valor no reconegut per T2 {}".format(c2)
+                    print("ERROR: Valor no reconegut per T2 {}".format(c2))
             elif c1 == 'N' :
                 if c2 == 'D' :
                     arNorm_faDel += 1
@@ -269,7 +269,7 @@ def checkCopyNumber_old(regions, t1, t2, name1 = "tool1", name2 = "tool2") :
                     norm_ar += 1
                     amp_FA += 1
                 else :
-                    print "ERROR: Valor no reconegut per T2 {}".format(c2)
+                    print("ERROR: Valor no reconegut per T2 {}".format(c2))
             elif c1 == 'A' :
                 if c2 == 'D' :
                     arAmp_faDel += 1
@@ -284,30 +284,30 @@ def checkCopyNumber_old(regions, t1, t2, name1 = "tool1", name2 = "tool2") :
                     amp_ar += 1
                     amp_FA += 1
                 else :
-                    print "ERROR: Valor no reconegut per T2 {}".format(c2)
+                    print("ERROR: Valor no reconegut per T2 {}".format(c2))
             else :
-                print "ERROR: Valor no reconegut per T1 {}".format(c1)
+                print("ERROR: Valor no reconegut per T1 {}".format(c1))
             cont += 1
 
     ct = "{}_{}_counts.tsv".format(name1, name2)
     with open(ct, "w") as fi :
         fi.write("\tDel\tNorm\tAmp\n{}\t{}\t{}\t{}\n{}\t{}\t{}\t{}\n".format(name1, del_ar, norm_ar, amp_ar, name2, del_FA, norm_FA, amp_FA))
-    print "INFO: Counts matrices stored as {}".format(ct)
+    print("INFO: Counts matrices stored as {}".format(ct))
     extractStatistics(arDel_faDel, arNorm_faDel, arAmp_faDel, arDel_faNorm, arNorm_faNorm, arAmp_faNorm, arDel_faAmp, arNorm_faAmp, arAmp_faAmp, name1, name2)
 
 if __name__ == "__main__" :
     """
         UNIT TEST
     """
-    print "\n\n\t\tWELCOME TO libcomparison.py UNIT TEST\n\t\t-------------------------------------\n"
-    print "Reading FACETS example"
+    print("\n\n\t\tWELCOME TO libcomparison.py UNIT TEST\n\t\t-------------------------------------\n")
+    print("Reading FACETS example")
     fa = convert2region("input_examples/facets_comp_cncf.tsv", "FACETS")
-    print "Reading AscatNGS example"
+    print("Reading AscatNGS example")
     s = convert2region("input_examples/TCGA-13-0887-01A-01W.copynumber.caveman.csv", "ascatngs")
-    print "Read complete. Getting the fragments"
+    print("Read complete. Getting the fragments")
     regs = getFragments(fa, s)
-    print "Got fragments"
-    print "Calculating the number of regions that are reported with the different aberrations"
-    print doComparison(regs, fa, s)
-    print "Calculating the number of bases that are reported with the different tools"
-    print doComparison2(regs, fa, s)
+    print("Got fragments")
+    print("Calculating the number of regions that are reported with the different aberrations")
+    print(doComparison(regs, fa, s))
+    print("Calculating the number of bases that are reported with the different tools")
+    print(doComparison2(regs, fa, s))

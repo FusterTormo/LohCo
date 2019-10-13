@@ -162,7 +162,7 @@ def extractFacets(path) :
                     else :
                         fa[chr] = [reg]
                 else :
-                    print "WARNING: Chromosome {} not found in the chromosomes constant".format(chr)
+                    print("WARNING: Chromosome {} not found in the chromosomes constant".format(chr))
 
     fa["likelyhood"] = 'NA'
     fa["purity"] = 'NA'
@@ -178,7 +178,7 @@ def extractFacets(path) :
         fa["ploidy"] = float(data[2])
 
     if fa["ploidy"] == 'NA':
-        print "WARNING: {} not found. Information about ploidy, purity, and likelyhood not given".format(basicPath)
+        print("WARNING: {} not found. Information about ploidy, purity, and likelyhood not given".format(basicPath))
 
     return fa
 
@@ -262,7 +262,7 @@ def extractAscat(path) :
                             #NOTE This function slows down a lot the execution. If possible avoid it
                             #getAscatLogR(path2, ps, cr)
     else :
-        print "WARNING: {} not found. LogR calculations could not be added to ASCAT".format(path2)
+        print("WARNING: {} not found. LogR calculations could not be added to ASCAT".format(path2))
 
     path3 = path.replace(".copynumber.caveman.csv", ".samplestatistics.txt")
     sc["likelyhood"] = 'NA'
@@ -280,7 +280,7 @@ def extractAscat(path) :
                     sc["likelyhood"] = float(aux[1])
 
     else :
-        print "WARNING: {} not found. Ploidy, purity, and goodness of fit data could not be added to ASCAT".format(path3)
+        print("WARNING: {} not found. Ploidy, purity, and goodness of fit data could not be added to ASCAT".format(path3))
     return sc
 
 
@@ -311,7 +311,7 @@ def getCN(tcn, lcn) :
         if tcn == 2 :
             ret = "N"
     else :
-        print "WARNING: not found value for tcn -> {} and lcn -> {}".format(tcn, lcn)
+        print("WARNING: not found value for tcn -> {} and lcn -> {}".format(tcn, lcn))
 
     return ret
 
@@ -331,8 +331,8 @@ def getAscatLogR(path, reg, chr) :
                 logR = r['segmented LogR']
                 break
     if logR == 'NA' :
-        print "Not found region"
+        print("Not found region")
     return logR
 
 if __name__ == "__main__" :
-    print "INFO:  This is a library file. Don't execute it alone"
+    print("INFO:  This is a library file. Don't execute it alone")

@@ -173,4 +173,4 @@ def getGoodness(dc) :
     return dc["likelyhood"]
 
 if __name__ == "__main__" :
-    print "INFO:  This is a library file. Not able to be executed alone"
+    print("INFO:  This is a library file. Not able to be executed alone")

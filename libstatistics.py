@@ -118,7 +118,7 @@ def print2Bed(regs1, prog1, regs2, prog2, regs3) :
             if r in regs3.keys() :
                 for k in regs3[r] :
                     fi.write("chr{}\t{}\t{}\n".format(r, k[0], k[1]))
-        print "INFO: Created a bed file with the regions corresponding to {} output, {} output, and the regions in common".format(prog1, prog2)
+        print("INFO: Created a bed file with the regions corresponding to {} output, {} output, and the regions in common".format(prog1, prog2))
 
 def printTable(dc, prog1, prog2, print2file = True) :
     """Print 4x4 comparison table.
@@ -146,7 +146,7 @@ def printTable(dc, prog1, prog2, print2file = True) :
         table = "{}_{}_4x4.tsv".format(prog1, prog2)
         with open(table, "w") as fi :
             fi.write(txt)
-        print "INFO: Created a tab-separated file called {}, with a 4x4 table comparing the output of both programs".format(table)
+        print("INFO: Created a tab-separated file called {}, with a 4x4 table comparing the output of both programs".format(table))
     else :
         return txt
 
@@ -290,7 +290,7 @@ def doGGplotFiles(reg1, reg2, prog1, prog2, plot = "both") :
         filename = "TCN_ggplot.tsv"
         with open(filename, "w") as fi :
             fi.write(txtTCN)
-        print "INFO: Created tab-separated file for ggplot called TCN_ggplot.tsv with tcn copy number information from {} and {}".format(prog1, prog2)
+        print("INFO: Created tab-separated file for ggplot called TCN_ggplot.tsv with tcn copy number information from {} and {}".format(prog1, prog2))
         pythonpath = os.path.dirname(os.path.realpath(__file__))
         rpath = "{}/doGGplot.R {}".format(pythonpath, filename)
         command = "Rscript {} {}_{}_tcn.png".format(rpath, prog1, prog2)
@@ -301,7 +301,7 @@ def doGGplotFiles(reg1, reg2, prog1, prog2, plot = "both") :
         filename = "lcn_ggplot.tsv"
         with open(filename, "w") as fi :
             fi.write(txtLCN)
-        print "INFO: Created tab-separated file for ggplot called lcn_ggplot.tsv with lcn copy number information from {} and {}".format(prog1, prog2)
+        print("INFO: Created tab-separated file for ggplot called lcn_ggplot.tsv with lcn copy number information from {} and {}".format(prog1, prog2))
         pythonpath = os.path.dirname(os.path.realpath(__file__))
         rpath = "{}/doGGplot.R {}".format(pythonpath, filename)
         command = "Rscript {} {}_{}_lcn.png".format(rpath, prog1, prog2)
@@ -332,7 +332,7 @@ def logRcomp(regions, t1, t2, name1 = "tool1", name2 = "tool2") :
                 txt += "{}\t{}\n".format(r1, r2)
     with open(fil, "w") as fi :
         fi.write(txt)
-    print "INFO: Created a file with the logR comparison stored as {}".format(fil)
+    print("INFO: Created a file with the logR comparison stored as {}".format(fil))
     pythonpath = os.path.dirname(os.path.realpath(__file__))
     rpath = "{}/compareLogR.R {}".format(pythonpath, fil)
     command = "Rscript {}".format(rpath)
@@ -345,26 +345,26 @@ if __name__ == "__main__" :
     """
     pr1 = "FACETS"
     pr2 = "ascatngs"
-    print "\n\n\t\tWELCOME TO libstatistics.py UNIT TEST\n\t\t-------------------------------------\n"
-    print "Reading FACETS example"
+    print("\n\n\t\tWELCOME TO libstatistics.py UNIT TEST\n\t\t-------------------------------------\n")
+    print("Reading FACETS example")
     fa = comp.convert2region("input_examples/facets_comp_cncf.tsv", pr1)
-    print "Reading AscatNGS example"
+    print("Reading AscatNGS example")
     s = comp.convert2region("input_examples/TCGA-13-0887-01A-01W.copynumber.caveman.csv", pr2)
-    print "Read complete. Getting the fragments"
+    print("Read complete. Getting the fragments")
     regs = comp.getFragments(fa, s)
-    print "Got fragments. Checking the copy number"
+    print("Got fragments. Checking the copy number")
     dc = comp.doComparison(regs, fa, s)
-    print "Copy number done. Preparing some statistics"
-    print "1) Counts"
+    print("Copy number done. Preparing some statistics")
+    print("1) Counts")
     c1, c2 = calculateCounts(dc)
-    print "2) Counts per tool"
+    print("2) Counts per tool")
     counts1, count2 = countsXtool(fa, s)
-    print "3) BED file"
+    print("3) BED file")
     print2Bed(fa, pr1, s, pr2, regs)
-    print "4) 4x4 comparison table"
+    print("4) 4x4 comparison table")
     printTable(dc, pr1, pr2)
-    print "5) Contingency table"
-    print doContingency(dc)
-    print "6) Jaccard index"
+    print("5) Contingency table")
+    print(doContingency(dc))
+    print("6) Jaccard index")
     jci = comp.doComparison2(regs, fa, s)
-    print jaccardIndex(jci)
+    print(jaccardIndex(jci))
