@@ -228,7 +228,10 @@ def getConfusionStatistics(tp, fp, fn, tn) :
     stats["FOR"] = fn/(fn+tn)
     stats["ACC"] = (tp+tn)/(tp+fp+fn+tn)
     stats["F1"] = (2*tp)/(2*tp + fp + fn)
-    stats["MCC"] = ((tp*tn)-(fp*fn))/math.sqrt((tp+fp)*(tp+fn)*(tn+fp)*(tn+fn))
+    try :
+        stats["MCC"] = ((tp*tn)-(fp*fn))/math.sqrt((tp+fp)*(tp+fn)*(tn+fp)*(tn+fn))
+    except ValueError :
+        stats["MCC"] = "NA"
     return stats
 
 def jaccardIndex(mt, aber = cts.aberrations) :
@@ -324,7 +327,7 @@ def logRcomp(regions, t1, t2, name1 = "tool1", name2 = "tool2") :
     """
     txt = "{}\t{}\n".format(name1, name2)
     fil = "{}_{}_logRcomp.tsv".format(name1, name2)
-    for chr, reg in regions.iteritems() :
+    for chr, reg in regions.items() :
         for r in reg :
             r1 = getlib.getLogR(r, chr, t1)
             r2 = getlib.getLogR(r, chr, t2)
