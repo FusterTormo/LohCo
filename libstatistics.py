@@ -254,7 +254,7 @@ def getConfusionStatistics(tp, fp, fn, tn) :
     stats["F1"] = (2*tp)/(2*tp + fp + fn)
     try :
         stats["MCC"] = ((tp*tn)-(fp*fn))/math.sqrt((tp+fp)*(tp+fn)*(tn+fp)*(tn+fn))
-    except ValueError :
+    except (ValueError, ZeroDivisionError) :
         stats["MCC"] = "NA"
     return stats
 
