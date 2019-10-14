@@ -43,16 +43,16 @@ def launchAnalysis(folder, array, ascat, facets) :
 
     if facetsReg != None and arrayReg != None :
         regAr_F = comp.getFragments(arrayReg, facetsReg)
-        mt1 = comp.doComparison2(regAr_F, arrayReg, facetsReg)
+        mt1 = comp.doComparison2(regAr_F, facetsReg, arrayReg)
         jc1 = st.jaccardIndex(mt1, ["A", "D"])
-        mt1 = comp.doComparison(regAr_F, arrayReg, facetsReg)
+        mt1 = comp.doComparison(regAr_F, facetsReg, arrayReg)
         cm1 = st.doContingency(mt1, ["A", "D"])
 
     if ascatReg != None and arrayReg != None :
         regAr_A = comp.getFragments(arrayReg, ascatReg)
-        mt2 = comp.doComparison2(regAr_F, arrayReg, ascatReg)
+        mt2 = comp.doComparison2(regAr_F, ascatReg, arrayReg)
         jc2 = st.jaccardIndex(mt2, ["A", "D"])
-        mt2 = comp.doComparison(regAr_F, arrayReg, ascatReg)
+        mt2 = comp.doComparison(regAr_F, ascatReg, arrayReg)
         cm2 = st.doContingency(mt2, ["A", "D"])
 
     #Return to current python path
