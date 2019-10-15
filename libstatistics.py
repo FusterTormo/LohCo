@@ -168,10 +168,10 @@ def doContingency(dc, aber = cts.aberrations) :
     stats = {}
     sts = {}
     counts1, counts2 = calculateCounts(dc)
-    for a in aber :
-        for b in aber :
+    for a in cts.aberrations :
+        for b in cts.aberrations :
             allab += dc[a][b]
-
+    
     for a in aber :
         tp = dc[a][a]
         fp = counts1[a] - tp

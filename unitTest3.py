@@ -37,9 +37,9 @@ def launchAnalysis(folder, array, ascat, facets) :
 
     arrayReg = comp.convert2region(arrayPath, "array")
 
-    if ascatReg != None and facetsReg != None : #Calculate logR between AscatNGS and FACETS
-        regA_F = comp.getFragments(ascatReg, facetsReg)
-        st.logRcomp(regA_F, ascatReg, facetsReg, "ascatNGS", "FACETS")
+    #if ascatReg != None and facetsReg != None : #Calculate logR between AscatNGS and FACETS
+        #regA_F = comp.getFragments(ascatReg, facetsReg)
+        #st.logRcomp(regA_F, ascatReg, facetsReg, "ascatNGS", "FACETS")
 
     if facetsReg != None and arrayReg != None :
         regAr_F = comp.getFragments(arrayReg, facetsReg)
@@ -54,6 +54,7 @@ def launchAnalysis(folder, array, ascat, facets) :
         jc2 = st.jaccardIndex(mt2, ["A", "D"])
         mt2 = comp.doComparison(regAr_F, ascatReg, arrayReg)
         cm2 = st.doContingency(mt2, ["A", "D"])
+
 
     #Return to current python path
     os.chdir(pythonpath)
@@ -118,7 +119,7 @@ def launchAnalysis(folder, array, ascat, facets) :
             fi.write("{}\t{}\n".format(id, cm1["D"]["ACC"]))
 
 #Get the samples in the directory. Each sample has its own directory
-path = "/home/ffuster/Desktop/compArrayAscatFacets"
+path = "/home/labs/solelab/ffuster2/Desktop/doctorat/cas_estudi/input_examples"
 facetsStruct = "facets_comp_cncf.tsv"
 ascatStruct = "copynumber.caveman.csv"
 for dirname, dirnames, filenames in os.walk(path) :
