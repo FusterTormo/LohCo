@@ -193,7 +193,7 @@ def extractAscat(path) :
             a copy neutral LOH
         [3] total copy number (tcn) (int)
         [4] low copy number (lcn) (int)
-        [5] logR (float) logR calculation by FACETS
+        [5] logR (float) logR calculation
     If tcn is bigger that 2, the region is considered (A)mplified
     If tcn==2, and lcn==1, the region is considered (N)ormal
     If tcn==2, and lcn==0, the region is considered Copy Number Neutral (L)oss of Heterozygosity
@@ -283,6 +283,81 @@ def extractAscat(path) :
         print("WARNING: {} not found. Ploidy, purity, and goodness of fit data could not be added to ASCAT".format(path3))
     return sc
 
+def extractSequenza(path) :
+    """Read Sequenza data and return the information in a specific format
+
+    Read Sequenza *_segments.txt file, which stores the raw information about copy number that has been calculated. From this file the information is converted to a list of regions for each chromosome. The
+    structure of the list is as this
+        [0] start position of the region (int)
+        [1] end position of the region (int)
+        [2] copy-number (enum) 'A' if region an amplification is considered in the region, 'D' if a deletion is considered in the region, 'N' if the region is considered copy number normal, 'L' if there is
+            a copy neutral LOH
+        [3] total copy number (tcn) (int). In Sequenza, this value is represented by the CNt column
+        [4] low copy number (lcn) (int). In Sequenza, this value is represented by the B column
+        [5] NA as Sequenza does not report logR
+    If tcn is bigger that 2, the region is considered (A)mplified
+    If tcn==2, and lcn==1, the region is considered (N)ormal
+    If tcn==2, and lcn==0, the region is considered Copy Number Neutral (L)oss of Heterozygosity
+    If tcn<2, and lcn<=1, the region is considered (D)eleted
+    Additionally, it checks if *.confints_CP.txt file exists, to get the additional information to the REGION variable
+
+    Parameters :
+        path (str) : Path of the file to extract the data
+
+    Returns :
+        REGION : A dict where the key is the chromosome name and the value is a list of the regions in format [start, end, copy-number, tcn, lcn, logR]. Additionally, "ploidy", "purity",
+            and "likelyhood" information in separated keys.
+    """
+    col_c = 0
+    col_s = 1
+    col_e = 2
+    col_tcn = 9
+    col_lcn = 11
+    seq = {}
+    with open(path, "r") as fi :
+        for l in fi :
+            if not l.startswith("chromosome") :
+                aux = l.strip("\n").split("\t")
+                chr = aux[col_c].replace("chr", "")
+                tcn = int(aux[col_tcn])
+                lcn = int(aux[col_lcn])
+                if chr in lc.chromosomes :
+                    reg = [int(aux[col_s]), int(aux[col_e]), getCN(tcn, lcn), tcn, lcn, "NA"]
+                    if chr in seq.keys() :
+                        seq[chr].append(reg)
+                    else :
+                        seq[chr] = [reg]
+                else :
+
+                    print("WARNING: Chromosome {} not found in the chromosomes constant".format(chr))
+    path2 = path.replace("_segments.txt", "_alternative_solutions.txt")
+    seq["ploidy"] = "NA"
+    seq["purity"] = "NA"
+    seq["likelyhood"] = "NA"
+    if os.path.isfile(path2) :
+        with open(path2, "r") as fi :
+            for l in fi :
+                if not l.startswith("cellularity") :
+                    aux = l.strip("\n").split("\t")
+                    seq["ploidy"] = float(aux[1])
+                    seq["purity"] = float(aux[0]) #NOTE: Sequenza uses the term "cellularity", instead of ploidy.
+    else :
+        print("WARNING: File {} not found. Cannot add the ploidy and purity values to sequenza variable".format(path2))
+    path3 = path.replace("_segments.txt", "_confints_CP.txt")
+    if os.path.isfile(path3) :
+        with open(path3, "r") as fi :
+            for l in fi :
+                if not l.startswith("cellularity") :
+                    aux = l.strip("\n").split("\t")
+                    if float(aux[0]) == seq["purity"] and float(aux[1]) == seq["ploidy"] :
+                        seq["likelyhood"] = float(aux[2])
+
+        if seq["likelyhood"] == "NA" :
+            print("WARNING: Confidence interval not found in {}".format(path3))
+    else :
+        print("WARNING: File {} not found. Cannot add likelyhood value to sequenza variable".format(path3))
+
+    return seq
 
 def getCN(tcn, lcn) :
     """Get the copy number aberration, given the total copy number and the low copy number

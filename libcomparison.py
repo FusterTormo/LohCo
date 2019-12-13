@@ -51,8 +51,7 @@ def convert2region(path, filetype) :
     elif filetype == "ascat" or filetype == "ascatngs" :
         reg = ex.extractAscat(path)
     elif filetype == "sequenza" :
-        print("ERROR: Sequenza is not implemented yet")
-        sys.exit()
+        reg = ex.extractSequenza(path)
     elif filetype == "cnacs" :
         print("ERROR: CNACS is not implemented yet")
         sys.exit()
