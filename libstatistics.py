@@ -171,7 +171,7 @@ def doContingency(dc, aber = cts.aberrations) :
     for a in cts.aberrations :
         for b in cts.aberrations :
             allab += dc[a][b]
-    
+
     for a in aber :
         tp = dc[a][a]
         fp = counts1[a] - tp
@@ -355,6 +355,8 @@ def logRcomp(regions, t1, t2, name1 = "tool1", name2 = "tool2") :
         for r in reg :
             r1 = getlib.getLogR(r, chr, t1)
             r2 = getlib.getLogR(r, chr, t2)
+            if r1 == None or r2 == None :
+                raise ValueError("NA found in the logR cannot create the plot")
             if r1 != None and r2 != None :
                 txt += "{}\t{}\n".format(r1, r2)
     with open(fil, "w") as fi :

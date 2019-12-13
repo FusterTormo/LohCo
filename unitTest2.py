@@ -29,16 +29,28 @@ facets = compi.convert2region("/home/labs/solelab/ffuster2/Desktop/doctorat/cas_
 print("TEST 2) Dividir las regiones para obtener regiones en comun")
 regs = compi.getFragments(facets, ascat)
 print("TEST 3) Dibujar la concordancia entre los logR")
-#sts.logRcomp(regs, facets, ascat, "FACETS", "ASCAT")
+try :
+    sts.logRcomp(regs, facets, ascat, "FACETS", "ASCAT")
+except ValueError :
+    print("ERROR: Cannot create the logR plot")
 print("TEST 4) Dibujar los copy number counts usando la libreria ggplot")
 sts.doGGplotFiles(facets, ascat, "FACETS", "ASCAT")
 print("TEST 5) Crear un bed con las regiones reportadas por cada archivo y las regiones en comun")
 sts.print2Bed(ascat, "ascatNGS", facets, "FACETS", regs)
 print("INFO: Limpiando...")
-os.remove("FACETS_ASCAT_lcn.png")
-#os.remove("FACETS_ASCAT_logRcomp.tsv")
-os.remove("FACETS_ASCAT_tcn.png")
-os.remove("lcn_ggplot.tsv")
-#os.remove("logRcorrelation.png")
-os.remove("Rplots.pdf")
-os.remove("TCN_ggplot.tsv")
+if os.path.isfile("FACETS_ASCAT_lcn.png") :
+    os.remove("FACETS_ASCAT_lcn.png")
+if os.path.isfile("FACETS_ASCAT_logRcomp.tsv") :
+    os.remove("FACETS_ASCAT_logRcomp.tsv")
+if os.path.isfile("FACETS_ASCAT_tcn.png") :
+    os.remove("FACETS_ASCAT_tcn.png")
+if os.path.isfile("lcn_ggplot.tsv") :
+    os.remove("lcn_ggplot.tsv")
+if os.path.isfile("logRcorrelation.png") :
+    os.remove("logRcorrelation.png")
+if os.path.isfile("Rplots.pdf") :
+    os.remove("Rplots.pdf")
+if os.path.isfile("TCN_ggplot.tsv") :
+    os.remove("TCN_ggplot.tsv")
+if os.path.isfile("ascatNGS_FACETS_all_regions.bed") :
+    os.remove("ascatNGS_FACETS_all_regions.bed")
