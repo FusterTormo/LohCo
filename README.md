@@ -6,13 +6,14 @@
 1. Read output example from array and FACETS.
 2. Fragment the regions to get a common group of regions.
 3. Calculate 4x4 table
+4. Extract confusion matrices for (A)mplification, (D)eletion, and (N)ormal copy number
+
 | Array/FACETS  | Amplification | LOH | Normal | Deletion |
 | ------------- | ------------- | --- | ------ | -------- |
 | Amplification | ------------- | --- | ------ | -------- |
 | LOH           | ------------- | --- | ------ | -------- |
 | Normal        | ------------- | --- | ------ | -------- |
 | Deletion      | ------------- | --- | ------ | -------- |
-4. Extract confusion matrices for (A)mplification, (D)eletion, and (N)ormal copy number
 
 ```
 import libcomparison as compi
