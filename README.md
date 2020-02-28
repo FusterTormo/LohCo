@@ -1,10 +1,12 @@
 # Comparing different tools for LOH analysis
 
 ## Examples
-### Test 1)
+### Test 1) Comparison between FACETS and CNV array obtained from TCGA
 
-1. Read output example from array and FACETS.
-2. Fragment the regions to get a common group of regions.
+This tests includes
+
+1. Read output example from array and FACETS
+2. Fragment the regions to get a common group of regions
 3. Calculate 4x4 table
 4. Extract confusion matrices for (A)mplification, (D)eletion, and (N)ormal copy number
 
@@ -15,7 +17,7 @@
 | Normal        | ------------- | --- | ------ | -------- |
 | Deletion      | ------------- | --- | ------ | -------- |
 
-```
+```python
 import libcomparison as compi
 import libstatistics as sts
 
@@ -40,3 +42,49 @@ print("\tAmplificacion\n\t{}\n\n".format(dicJaccard["A"]))
 print("\tDelecion\n\t{}\n\n".format(dicJaccard["D"]))
 print("\tNormal\n\t{}\n".format(dicJaccard["N"]))
 ```
+
+### Test 2) Comparison between FACETS and ascatNGS output
+
+This test includes
+
+1. Read FACETS and ascatNGS example outputs
+2. Fragment the regions to get a common group of regions
+3. Get ploidy and purity from each output
+4. Plot the correlation between logR
+5. ggplot of total copy number
+6. ggplot of minor copy number
+7. Write a bed file with the regions got in each file and the common regions
+
+```python
+import libcomparison as compi
+import libstatistics as sts
+import libgetters as gt
+import os
+
+print("TEST 1) Extract data")
+ascat = compi.convert2region("/home/labs/solelab/ffuster2/Desktop/doctorat/cas_estudi/input_examples/TCGA-09-0369/TCGA-09-0369_40e311a4_VS_f4441d6e/H_GP-09-0369-01A-01W-0372-09-1.copynumber.caveman.csv", "ascat")
+facets = compi.convert2region("/home/labs/solelab/ffuster2/Desktop/doctorat/cas_estudi/input_examples/TCGA-09-0369/TCGA-09-0369_40e311a4_VS_f4441d6e/facets_comp_cncf.tsv", "FACETS")
+print("TEST 2) Divide the regions to get common regions")
+regs = compi.getFragments(facets, ascat)
+print("TEST 3) Get the ploidy")
+print("\tFACETS: {}".format(gt.getPloidy(facets))
+print("\tascatNGS: {}".format(gt.getPloidy(ascat)))
+print("TEST 3) Get the purity")
+print("\tFACETS: {}".format(gt.getPurity(facets))
+print("\tascatNGS: {}".format(gt.getPurity(ascat)))
+print("TEST 4) Plot logR concordance")
+try :
+    sts.logRcomp(regs, facets, ascat, "FACETS", "ASCAT")
+except ValueError :
+    print("ERROR: Cannot create the logR plot")
+print("TEST 5) Plot copy number counts using ggplot")
+sts.doGGplotFiles(facets, ascat, "FACETS", "ASCAT")
+print("TEST 6) Write a bed file with all the reported regions and the common regions")
+sts.print2Bed(ascat, "ascatNGS", facets, "FACETS", regs)
+```
+To get more examples, check the unitTest files:
+
+* [unitTest1](../blob/master/unitTest1.py)
+* [unitTest2](../blob/master/unitTest2.py)
+* [unitTest3](../blob/master/unitTest3.py)
+* [unitTest4](../blob/master/unitTest4.py)
