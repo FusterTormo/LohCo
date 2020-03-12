@@ -84,7 +84,11 @@ sts.print2Bed(ascat, "ascatNGS", facets, "FACETS", regs)
 ```
 To get more examples, check the unitTest files:
 
-* [unitTest1](../blob/master/unitTest1.py)
-* [unitTest2](../blob/master/unitTest2.py)
-* [unitTest3](../blob/master/unitTest3.py)
-* [unitTest4](../blob/master/unitTest4.py)
+* [unitTest1](../master/unitTest1.py)
+* [unitTest2](../master/unitTest2.py)
+* [unitTest3](../master/unitTest3.py)
+* [unitTest4](../master/unitTest4.py)
+
+Or to the main files:
+
+* [main1](../master/main1.py)
