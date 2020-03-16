@@ -15,6 +15,7 @@ The test includes:
 
 import libcomparison as lc
 import libgetters as lg
+import libstatistics as ls
 
 # Open the output for the sample TCGA-04-1332 output from all the tools
 sequenza = lc.convert2region("../9793255c_VS_21fc93b7_Sequenza/TCGA-04-1332_segments.txt", "sequenza")
@@ -28,8 +29,8 @@ print("INFO: Comparant les dades amb els arrays")
 # TODO mostrar les comparacions entre cadascun dels arrays. Mostrar taules 4x4 i algunes estadistiques
 fragments = lc.getFragments(array, sequenza)
 tab = lc.doComparison(fragments, array, sequenza)
-c1, c2 = sts.calculateCounts(tab)
-contingency = sts.doContingency(tab, ["A", "D", "N"])
+c1, c2 = ls.calculateCounts(tab)
+contingency = ls.doContingency(tab, ["A", "D", "N"])
 print(contingency)
 
 #Regions d'interes. Dades obtingudes des de biogps
