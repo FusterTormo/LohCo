@@ -36,21 +36,21 @@ atm = ["11", 108222484, 108369102]
 # TODO Consultar summary.md per vore si la mostra te mutacions en BRCA
 
 print("INFO: Comparant el LOH en BRCA1")
-print(lg.getCopyNumber(brca1[1:3], brca1[0], sequenza))
-print(lg.getCopyNumber(brca1[1:3], brca1[0], facets))
-print(lg.getCopyNumber(brca1[1:3], brca1[0], ascat))
+print("Sequenza output: {}".format(lg.getCopyNumber(brca1[1:3], brca1[0], sequenza)))
+print("FACETS output: {}".format(lg.getCopyNumber(brca1[1:3], brca1[0], facets)))
+print("ascatNGS output: {}".format(lg.getCopyNumber(brca1[1:3], brca1[0], ascat)))
 
 print("INFO: Comparant el LOH en BRCA2")
-print(lg.getCopyNumber(brca2[1:3], brca2[0], sequenza))
-print(lg.getCopyNumber(brca2[1:3], brca2[0], facets))
-print(lg.getCopyNumber(brca2[1:3], brca2[0], ascat))
+print("Sequenza output: {}".format(lg.getCopyNumber(brca2[1:3], brca2[0], sequenza)))
+print("FACETS output: {}".format(lg.getCopyNumber(brca2[1:3], brca2[0], facets)))
+print("ascatNGS output: {}".format(lg.getCopyNumber(brca2[1:3], brca2[0], ascat)))
 
 print("INFO: Comparant el LOH ATM")
-print(lg.getCopyNumber(atm[1:3], atm[0], sequenza))
-print(lg.getCopyNumber(atm[1:3], atm[0], facets))
-print(lg.getCopyNumber(atm[1:3], atm[0], ascat))
+print("Sequenza output: {}".format(lg.getCopyNumber(atm[1:3], atm[0], sequenza)))
+print("FACETS output: {}".format(lg.getCopyNumber(atm[1:3], atm[0], facets)))
+print("ascatNGS output: {}".format(lg.getCopyNumber(atm[1:3], atm[0], ascat)))
 
 print("INFO: Comparant el LOH en PALB2")
-print(lg.getCopyNumber(palb2[1:3], palb2[0], sequenza))
-print(lg.getCopyNumber(palb2[1:3], palb2[0], facets))
-print(lg.getCopyNumber(palb2[1:3], palb2[0], ascat))
+print("Sequenza output: {}".format(lg.getCopyNumber(palb2[1:3], palb2[0], sequenza)))
+print("FACETS output: {}".format(lg.getCopyNumber(palb2[1:3], palb2[0], facets)))
+print("ascatNGS output: {}".format(lg.getCopyNumber(palb2[1:3], palb2[0], ascat)))
