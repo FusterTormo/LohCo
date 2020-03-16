@@ -24,14 +24,19 @@ ascat = lc.convert2region("../90cf56c6_VS_f4b549d0_ASCAT/H_GP-04-1332-01A-01W-04
 array = lc.convert2region("../73a3a9bb-7dfc-4fc5-9f31-b2630c82010b_Array/QUANT_p_TCGA_Batch12_AFFX_GenomeWideSNP_6_F05_437768.grch38.seg.v2.txt", "array")
 print("INFO: Arxius oberts satisfactoriament")
 
-print("INFO: Comparant les dades amb els arrays")
+print("\nINFO: Resum de les dades obteses en cada eina")
+print("Arrays\n-----------\n{}".format(ls.countsXtool(array)))
+print("Sequenza\n-----------\n{}".format(ls.countsXtool(sequenza)))
+print("FACETS\n-----------\n{}".format(ls.countsXtool(facets)))
+print("ascatNGS\n-----------\n{}".format(ls.countsXtool(ascat)))
 
+print("INFO: Comparant les dades amb els arrays")
 # TODO mostrar les comparacions entre cadascun dels arrays. Mostrar taules 4x4 i algunes estadistiques
 fragments = lc.getFragments(array, sequenza)
 tab = lc.doComparison(fragments, array, sequenza)
 c1, c2 = ls.calculateCounts(tab)
 contingency = ls.doContingency(tab, ["A", "D", "N"])
-print(ls.printTable(fragments, array, sequenza, False))
+
 
 #Regions d'interes. Dades obtingudes des de biogps
 brca1 = ["17", 43044295, 43170245]
