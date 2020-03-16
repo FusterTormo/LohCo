@@ -16,17 +16,21 @@ The test includes:
 import libcomparison as lc
 import libgetters as lg
 
+# Open the output for the sample TCGA-04-1332 output from all the tools
 sequenza = lc.convert2region("../9793255c_VS_21fc93b7_Sequenza/TCGA-04-1332_segments.txt", "sequenza")
 facets = lc.convert2region("../9793255c_VS_f4b549d0_FACETS/facets_comp_cncf.tsv", "facets")
 ascat = lc.convert2region("../90cf56c6_VS_f4b549d0_ASCAT/H_GP-04-1332-01A-01W-0488-09-1.copynumber.caveman.csv", "ascatngs")
 array = lc.convert2region("../73a3a9bb-7dfc-4fc5-9f31-b2630c82010b_Array/QUANT_p_TCGA_Batch12_AFFX_GenomeWideSNP_6_F05_437768.grch38.seg.v2.txt", "array")
 print("INFO: Arxius oberts satisfactoriament")
-print(array)
 
 print("INFO: Comparant les dades amb els arrays")
 
 # TODO mostrar les comparacions entre cadascun dels arrays. Mostrar taules 4x4 i algunes estadistiques
-# IDEA: usar lc.getFragments primer
+fragments = lc.getFragments(array, sequenza)
+tab = lc.doComparison(fragments, array, sequenza)
+c1, c2 = sts.calculateCounts(tab)
+contingency = sts.doContingency(tab, ["A", "D", "N"])
+print(contingency)
 
 #Regions d'interes. Dades obtingudes des de biogps
 brca1 = ["17", 43044295, 43170245]
@@ -37,21 +41,25 @@ atm = ["11", 108222484, 108369102]
 # TODO Consultar summary.md per vore si la mostra te mutacions en BRCA
 
 print("\nINFO: Comparant el LOH en BRCA1")
+print("Array output: {}".format(lg.getCopyNumber(brca1[1:3], brca1[0], array)))
 print("Sequenza output: {}".format(lg.getCopyNumber(brca1[1:3], brca1[0], sequenza)))
 print("FACETS output: {}".format(lg.getCopyNumber(brca1[1:3], brca1[0], facets)))
 print("ascatNGS output: {}".format(lg.getCopyNumber(brca1[1:3], brca1[0], ascat)))
 
 print("\nINFO: Comparant el LOH en BRCA2")
+print("Array output: {}".format(lg.getCopyNumber(brca2[1:3], brca2[0], array)))
 print("Sequenza output: {}".format(lg.getCopyNumber(brca2[1:3], brca2[0], sequenza)))
 print("FACETS output: {}".format(lg.getCopyNumber(brca2[1:3], brca2[0], facets)))
 print("ascatNGS output: {}".format(lg.getCopyNumber(brca2[1:3], brca2[0], ascat)))
 
 print("\nINFO: Comparant el LOH ATM")
+print("Array output: {}".format(lg.getCopyNumber(atm[1:3], atm[0], array)))
 print("Sequenza output: {}".format(lg.getCopyNumber(atm[1:3], atm[0], sequenza)))
 print("FACETS output: {}".format(lg.getCopyNumber(atm[1:3], atm[0], facets)))
 print("ascatNGS output: {}".format(lg.getCopyNumber(atm[1:3], atm[0], ascat)))
 
 print("\nINFO: Comparant el LOH en PALB2")
+print("Array output: {}".format(lg.getCopyNumber(palb2[1:3], palb2[0], array)))
 print("Sequenza output: {}".format(lg.getCopyNumber(palb2[1:3], palb2[0], sequenza)))
 print("FACETS output: {}".format(lg.getCopyNumber(palb2[1:3], palb2[0], facets)))
 print("ascatNGS output: {}".format(lg.getCopyNumber(palb2[1:3], palb2[0], ascat)))
