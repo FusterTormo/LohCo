@@ -31,7 +31,7 @@ fragments = lc.getFragments(array, sequenza)
 tab = lc.doComparison(fragments, array, sequenza)
 c1, c2 = ls.calculateCounts(tab)
 contingency = ls.doContingency(tab, ["A", "D", "N"])
-print(contingency)
+print(ls.printTable(fragments, array, sequenza, False))
 
 #Regions d'interes. Dades obtingudes des de biogps
 brca1 = ["17", 43044295, 43170245]
