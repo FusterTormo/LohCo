@@ -30,13 +30,40 @@ print("FACETS\n-----------\n{}".format(ls.countsXtool(facets)))
 print("ascatNGS\n-----------\n{}".format(ls.countsXtool(ascat)))
 
 print("INFO: Comparant les dades amb els arrays")
-# TODO mostrar les comparacions entre cadascun dels arrays. Mostrar taules 4x4 i algunes estadistiques
+print("Array vs Sequenza")
 fragments = lc.getFragments(array, sequenza)
 tab = lc.doComparison(fragments, array, sequenza)
 c1, c2 = ls.calculateCounts(tab)
 contingency = ls.doContingency(tab, ["A", "D", "N"])
 print(ls.printTable(tab, "Array", "Sequenza", False))
+print(contingency)
+print(c1)
+print(c2)
 
+print("\nArray vs FACETS")
+fragments = lc.getFragments(array, facets)
+tab = lc.doComparison(fragments, array, facets)
+contingency = ls.doContingency(tab, ["A", "D", "N"])
+print(ls.printTable(tab, "Array", "FACETS", False))
+print(contingency)
+print(c1)
+print(c2)
+
+print("\nArray vs ascatNGS")
+fragments = lc.getFragments(array, ascat)
+tab = lc.doComparison(fragments, array, ascat)
+contingency = ls.doContingency(tab, ["A", "D", "N"])
+print(ls.printTable(tab, "Array", "ascatNGS", False))
+print(contingency)
+print(c1)
+print(c2)
+
+summaryFile = "../summary.md"
+with open(summaryFile, "r") as fi :
+	for l in fi :
+		if l.startswith("TCGA-04-1332") :
+			print(l)
+	
 
 #Regions d'interes. Dades obtingudes des de biogps
 brca1 = ["17", 43044295, 43170245]
