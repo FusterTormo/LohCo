@@ -353,7 +353,7 @@ def extractSequenza(path) :
                         seq["likelyhood"] = float(aux[2])
 
         if seq["likelyhood"] == "NA" :
-            print("WARNING: Confidence interval not found in {}".format(path3))
+            print("WARNING: Confidence interval not found in {path} for ploidy {ploidy} and purity {purity}".format(path = path3, ploidy = seq["ploidy"], purity = seq["purity"]))
     else :
         print("WARNING: File {} not found. Cannot add likelyhood value to sequenza variable".format(path3))
 

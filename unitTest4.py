@@ -15,12 +15,9 @@ The test includes:
 import libcomparison as lc
 import libgetters as lg
 import libstatistics as ls
-import libconstants
 
 # Open the output for the sample TCGA-04-1332 output from all the tools
 sequenza = lc.convert2region("../9793255c_VS_21fc93b7_Sequenza/TCGA-04-1332_segments.txt", "sequenza")
-print(sequenza["purity"])
-print(sequenza["ploidy"])
 facets = lc.convert2region("../9793255c_VS_f4b549d0_FACETS/facets_comp_cncf.tsv", "facets")
 ascat = lc.convert2region("../90cf56c6_VS_f4b549d0_ASCAT/H_GP-04-1332-01A-01W-0488-09-1.copynumber.caveman.csv", "ascatngs")
 array = lc.convert2region("../73a3a9bb-7dfc-4fc5-9f31-b2630c82010b_Array/QUANT_p_TCGA_Batch12_AFFX_GenomeWideSNP_6_F05_437768.grch38.seg.v2.txt", "array")
