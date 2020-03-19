@@ -23,46 +23,52 @@ ascat = lc.convert2region("../90cf56c6_VS_f4b549d0_ASCAT/H_GP-04-1332-01A-01W-04
 array = lc.convert2region("../73a3a9bb-7dfc-4fc5-9f31-b2630c82010b_Array/QUANT_p_TCGA_Batch12_AFFX_GenomeWideSNP_6_F05_437768.grch38.seg.v2.txt", "array")
 print("INFO: Arxius oberts satisfactoriament")
 
+# Print the counts in each file
 print("\nINFO: Resum de les dades obteses en cada eina")
 print("Arrays\n-----------\n{}".format(ls.countsXtool(array)))
 print("Sequenza\n-----------\n{}".format(ls.countsXtool(sequenza)))
 print("FACETS\n-----------\n{}".format(ls.countsXtool(facets)))
 print("ascatNGS\n-----------\n{}".format(ls.countsXtool(ascat)))
 
-print("INFO: Comparant les dades amb els arrays")
+# Compare the output from each tool against the array
+print("\nINFO: Comparant les dades amb els arrays")
 print("Array vs Sequenza")
 fragments = lc.getFragments(array, sequenza)
 tab = lc.doComparison(fragments, array, sequenza)
 c1, c2 = ls.calculateCounts(tab)
 contingency = ls.doContingency(tab, ["A", "D", "N"])
-print(ls.printTable(tab, "Array", "Sequenza", False))
-print(contingency)
 print(c1)
 print(c2)
+print(ls.printTable(tab, "Array", "Sequenza", False))
+print(contingency)
 
 print("\nArray vs FACETS")
 fragments = lc.getFragments(array, facets)
 tab = lc.doComparison(fragments, array, facets)
+c1, c2 = ls.calculateCounts(tab)
 contingency = ls.doContingency(tab, ["A", "D", "N"])
-print(ls.printTable(tab, "Array", "FACETS", False))
-print(contingency)
 print(c1)
 print(c2)
+print(ls.printTable(tab, "Array", "FACETS", False))
+print(contingency)
 
 print("\nArray vs ascatNGS")
 fragments = lc.getFragments(array, ascat)
 tab = lc.doComparison(fragments, array, ascat)
+c1, c2 = ls.calculateCounts(tab)
 contingency = ls.doContingency(tab, ["A", "D", "N"])
-print(ls.printTable(tab, "Array", "ascatNGS", False))
-print(contingency)
 print(c1)
 print(c2)
+print(ls.printTable(tab, "Array", "ascatNGS", False))
+print(contingency)
 
+# Get the interesting information from the variant calling summary file
 summaryFile = "../summary.md"
+data = []
 with open(summaryFile, "r") as fi :
 	for l in fi :
 		if l.startswith("TCGA-04-1332") :
-			print(l)
+			data.append(l)
 	
 
 #Regions d'interes. Dades obtingudes des de biogps
@@ -71,7 +77,6 @@ brca2 = ["13", 32315086, 32400266]
 palb2 = ["16", 23603160, 23641310]
 atm = ["11", 108222484, 108369102]
 
-# TODO Consultar summary.md per vore si la mostra te mutacions en BRCA
 
 print("\nINFO: Comparant el LOH en BRCA1")
 print("Array output: {}".format(lg.getCopyNumber(brca1[1:3], brca1[0], array)))
