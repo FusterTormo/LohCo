@@ -6,6 +6,7 @@ MAIN: Programa principal. Muestra los pasos a seguir para poder hacer el analisi
 """
 
 import creaLog as cl
+import subprocess
 
 def GUI() :
     """
@@ -15,6 +16,7 @@ def GUI() :
     # IDEA: Crear un menu amb els passos que es volen seguir per fer l'analisi mes personalitzat
     ruta = input("Introducir el path absoluto de la carpeta donde estan los FASTQ a analizar")
     cl.prepararScript(ruta)
+    # TODO: Preguntar si executar la pipeline usant subprocess
 
 
 if __name__ == "__main__" :
