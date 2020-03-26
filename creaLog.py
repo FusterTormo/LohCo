@@ -17,12 +17,13 @@ import os
 CONSTANTS:
     Rutas de los programas y parametros de cada uno de los pasos dentro de la pipeline
 """
-fastqc = "/opt/FastQC/fastqc" #Ruta al FastQC (control de calidad de los FASTQ)
-pfqc = "-o fastqc/ -f fastq -extract -q -t 6 {input}" # Parametros en la ejecucion dels fastqc
-bwa = "bwa"
-pbwa = ""
+fastqc = "/opt/FastQC/fastqc -o fastqc/ -f fastq -extract -q -t 6 {fastq}" #Comando para ejecutar FastQC (control de calidad de los FASTQ). Los parametros indican -o ruta donde se guardaran los archivos de salida. -f que el archivo de entrada es un FASTQ -extract descomprimir el archivo de salida -q omite los mensajes de progreso (log) -t 6 el numero de hilos (threads) que usa el programa para ejcutarse en paralelo
+bwa = "/opt/bwa.kit/bwa mem -M -t 6 -R {rg} {ref} {fw} {rv} > bwa.sam" # Comando para ejecutar BWA (alineamiento). Los parametros indican -M para compatibilidad con Picard tools y GATk -t numero de hilos (threads) que usa el programa para ejecutarse -R Read Group que se pondra en el sam de salida. Este Read Group es necesario para poder ejecutar GATK (post-alineamiento)
+picardSort = "java -jar /opt/picard-tools-2.21.8/picard.jar SortSam INPUT=bwa.sam OUTPUT=bwa.sort.bam SORT_ORDER=coordinate" # Comando para ordenar el bam
+picardIndex = "java -jar /opt/picard-tools-2.21.8/picard.jar BuildBamIndex INPUT=bwa.sort.bam" # Comando para crear un indice en el bam ordenado
+bedtoolsBam2Bed = "bedtools bamtobed -i bwa.sort.bam > bwa.bed" #Comando para crear un bed con todas las regiones donde se han alineado reads
 gatk = ""
-picard = ""
+
 vc = "" #Ruta al variant caller que se va a usar (Strelka2)
 anno = "" #Ruta al ANNOVAR (anotador de variantes)
 cov = "" #Script de coverage que se va a hacer
@@ -193,8 +194,24 @@ def prepararScript(ruta) :
         fi.write("\tforward=$1\n\treverse=$2\n\treadgroup=$3\n\talias=$4\n")
         fi.write("\tmkdir $alias\n")
         fi.write("\tcd $alias\n")
-        fi.write("\t$HOME/anpanmds/fastqc.sh ../$forward ../$reverse\n")
-        fi.write("bamtobed per fer els analisis de ON TARGET")
+        fi.write("\t# Control de calidad. FastQC\n")
+        fi.write("\tmkdir fastqc # Carpeta donde se guardara el control de calidad\n")
+        # La cadena fastqc tiene una variable (fastq) que se usa para introducir el archivo FASTQ para el analisis
+        fi.write("\t" + fastqc.format(fastq = "../$forward") + "\n")
+        fi.write("\t" + fastqc.format(fastq = "../$reverse") + "\n")
+        fi.write("\trm fastqc/*zip # Eliminar los archivos comprimidos, ya se han descomprimido al finalizar FastQC\n")
+        fi.write("# Alineamiento. BWA")
+        # La cadena align tiene cuatro variables: rg es para introducir el read group, fw es para el fastq forward, rv es para el fastq reverse y ref es para el genoma de referencia
+        fi.write("\t" + align.format(rg = "$readgroup", ref = referencia, fw = "../$forward", rv = "../$reverse") + "\n")
+        fi.write("\t" + picardSort + "\n")
+        fi.write("\t" + picardIndex + "\n")
+        fi.write("\tmkdir bwaAlign\n")
+        fi.write("\tmv bwa.sam *bam *bai bwaAlign/\n")
+        # Convertir el bam ordenado en un bed para poder hacer un control de calidad posterior
+        fi.write("\tcd bwaAlign\n")
+        fi.write("\t" + bedtools + "\n")
+        fi.write("cd ..")
+
         fi.write("\t$HOME/anpanmds/align.sh $reference ../$forward ../$reverse $readgroup\n")
         fi.write("\t$HOME/anpanmds/postAlign.sh recalibrate bwaAlign/bwa.sort.bam\n")
         fi.write("coverage")
