@@ -121,6 +121,7 @@ def comprobarArchivos() :
     """
     Comprueba si los archivos necesarios para el analisis existen en la ruta especificada en las constantes
     """
+    print("INFO: Buscant els arxius necessaris per executar la pipeline")
     if not os.path.isfile(referencia) :
         raise IOError("No se encuentra el genoma de referencia")
     if not os.path.isfile(manifest) :
@@ -158,8 +159,8 @@ def prepararScript(ruta) :
     arxiu = "logTanda{tanda}.sh".format(tanda = tnd)
     # TODO: Tasques a fer abans de començar analisi
     print("INFO: Els resultats de l'analisi es guardaran en {path}/{tanda}".format(path = pathAnalisi, tanda = tanda))
-    print("INFO: Creant el bash per la tanda {}".format(arx))
     comprobarArchivos() # Esta funcion dispara una excepcion en caso de que no se encuentre alguno de los archivos necesarios para el analisis
+    print("INFO: Creant el bash per la tanda {}".format(tnd))
     with open(arx, "w") as fi :
         fi.write("#!/bin/bash\n\n") # Shebang del bash
         fi.write("#Referencias usadas en este analisis\n")
