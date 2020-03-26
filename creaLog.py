@@ -154,50 +154,55 @@ def prepararScript(ruta) :
             Ruta absoluta donde esta la carpeta con los FASTQ que se van a analizar en esta pipeline
     """
     os.chdir(pathAnalisi) # Cambiar el directorio de trabajo a la carpeta de analisis
-    tnd = getTanda()
+    tnd = getTanda() # Crear el nombre de la carpeta donde se guardaran los analisis y el nombre del bash con todos los comandos
     tanda = "{prefijo}{tanda}".format(prefijo = prefijoTanda, tanda = tnd)
     arxiu = "logTanda{tanda}.sh".format(tanda = tnd)
-    # TODO: Tasques a fer abans de començar analisi
+
     print("INFO: Els resultats de l'analisi es guardaran en {path}/{tanda}".format(path = pathAnalisi, tanda = tanda))
     comprobarArchivos() # Esta funcion dispara una excepcion en caso de que no se encuentre alguno de los archivos necesarios para el analisis
-    print("INFO: Creant el bash per la tanda {}".format(tnd))
-    with open(arx, "w") as fi :
-        fi.write("#!/bin/bash\n\n") # Shebang del bash
-        fi.write("#Referencias usadas en este analisis\n")
-        fi.write("ref={}\n".format(referencia))
-        fi.write("mani={}\n".format(manifest))
-        fi.write("indels={}\n".format(indels))
-        fi.write("sites={}\n".format(dbsnp))
-        fi.write("gens={}\n\n".format(genes))
+    fastqs = getFASTQnames(ruta)
+    if len(fastqs) == 0 :
+        print("ERROR: No s'han trobat arxius FASTQ en {}".format(ruta))
+        sys.exit(1)
+    else :
+        print("INFO: Creant el bash per la tanda {}".format(tnd))
+        with open(arxiu, "w") as fi :
+            fi.write("#!/bin/bash\n\n") # Shebang del bash
+            fi.write("#Referencias usadas en este analisis\n")
+            fi.write("ref={}\n".format(referencia))
+            fi.write("mani={}\n".format(manifest))
+            fi.write("indels={}\n".format(indels))
+            fi.write("sites={}\n".format(dbsnp))
+            fi.write("gens={}\n\n".format(genes))
 
-        #Crear la funcion que copia los datos (FASTQs) en la carpeta de analisis
-        fi.write("function copiar {\n")
-        fi.write("\tcd {}\n".format(pathAnalisi))
-        fi.write("\tmkdir {tanda} ; cd {tanda}\n\n".format(tanda = tanda))
-        fi.write("\techo -e \"################################\\n\\tCopiant dades\\n################################\\n\"\n")
-        for f in fastqs :
-            patx = f.replace(" ", "\\ ") #Parche para leer los espacios en la terminal bash
-            fi.write("\trsync -aP {} .\n".format(patx))
+            #Crear la funcion que copia los datos (FASTQs) en la carpeta de analisis
+            fi.write("function copiar {\n")
+            fi.write("\tcd {}\n".format(pathAnalisi))
+            fi.write("\tmkdir {tanda} ; cd {tanda}\n\n".format(tanda = tanda))
+            fi.write("\techo -e \"################################\\n\\tCopiant dades\\n################################\\n\"\n")
+            for f in fastqs :
+                patx = f.replace(" ", "\\ ") #Parche para leer los espacios en la terminal bash
+                fi.write("\trsync -aP {} .\n".format(patx))
 
-        fi.write("\tmv ../{} .\n".format(arxiu))
-        fi.write("}\n\n")
+            fi.write("\tmv ../{} .\n".format(arxiu))
+            fi.write("}\n\n")
 
-        # TODO Crear les comandes per cadascuna de les etapes de l'analisi
-        # TODO: Esta part es com si posara analizar.sh dins del log
-        fi.write("function analisi {\n")
-        fi.write("\tforward=$1\n\treverse=$2\n\treadgroup=$3\n\talias=$4\n")
-        fi.write("\tmkdir $alias\n")
-        fi.write("\tcd $alias\n")
-        fi.write("\t$HOME/anpanmds/fastqc.sh ../$forward ../$reverse\n")
-        fi.write("bamtobed per fer els analisis de ON TARGET")
-        fi.write("\t$HOME/anpanmds/align.sh $reference ../$forward ../$reverse $readgroup\n")
-        fi.write("\t$HOME/anpanmds/postAlign.sh recalibrate bwaAlign/bwa.sort.bam\n")
-        fi.write("coverage")
-        fi.write("estadistiques de l'analisi: on target, off target, % bases amb X coverage, resum dels tests, % duplicats (si cal), grafiques de coverage")
-        fi.write("\t$HOME/anpanmds/variantCalling.sh $manifest bwaAlign/bwa.recalibrate.bam\n")
-        fi.write("\T$HOME/anpanmds/variantAnnotation.sh variants.vcf")
-        fi.write("Script per re-anotar")
-        fi.write("Script per filtrar")
-        fi.write("}\n\n")
+            # TODO Crear les comandes per cadascuna de les etapes de l'analisi
+            # TODO: Esta part es com si posara analizar.sh dins del log
+            fi.write("function analisi {\n")
+            fi.write("\tforward=$1\n\treverse=$2\n\treadgroup=$3\n\talias=$4\n")
+            fi.write("\tmkdir $alias\n")
+            fi.write("\tcd $alias\n")
+            fi.write("\t$HOME/anpanmds/fastqc.sh ../$forward ../$reverse\n")
+            fi.write("bamtobed per fer els analisis de ON TARGET")
+            fi.write("\t$HOME/anpanmds/align.sh $reference ../$forward ../$reverse $readgroup\n")
+            fi.write("\t$HOME/anpanmds/postAlign.sh recalibrate bwaAlign/bwa.sort.bam\n")
+            fi.write("coverage")
+            fi.write("estadistiques de l'analisi: on target, off target, % bases amb X coverage, resum dels tests, % duplicats (si cal), grafiques de coverage")
+            fi.write("\t$HOME/anpanmds/variantCalling.sh $manifest bwaAlign/bwa.recalibrate.bam\n")
+            fi.write("\T$HOME/anpanmds/variantAnnotation.sh variants.vcf")
+            fi.write("Script per re-anotar")
+            fi.write("Script per filtrar")
+            fi.write("}\n\n")
 
         # TODO: Crear les comandes per analitzar de la mateixa manera a com s'esta fent en els panells d'ALL
