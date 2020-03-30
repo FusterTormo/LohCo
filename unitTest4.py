@@ -66,9 +66,9 @@ summaryFile = "../summary.md"
 data = {}
 with open(summaryFile, "r") as fi :
 	for l in fi :
-		if l.startswith("TCGA-04-1332") :
-			aux = l.split("|")
-            if (aux[1].startswith("9793") or aux[1].startswith("21fc")) and aux[3] == "Platypus":
+        if l.startswith("TCGA-04-1332") :
+            aux = l.split("|")
+            if (aux[1].startswith("9793") or aux[1].startswith("21fc")) and aux[3] == "Platypus" :
                 aux2 = aux[6].strip().split("&rarr;")
                 data[aux[1]] = {"variant" : aux2[1], "gene" : aux2[0]}
 
