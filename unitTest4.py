@@ -72,35 +72,42 @@ with open(summaryFile, "r") as fi :
                 aux2 = aux[6].strip().split("&rarr;")
                 data[aux[1]] = {"variant" : aux2[1], "gene" : aux2[0]}
 
-print(data)
-
-#Regions d'interes. Dades obtingudes des de biogps
+#Regions of interest. Data extracted from biogps
 brca1 = ["17", 43044295, 43170245]
 brca2 = ["13", 32315086, 32400266]
 palb2 = ["16", 23603160, 23641310]
 atm = ["11", 108222484, 108369102]
 
-
-print("\nINFO: Comparant el LOH en BRCA1")
-print("Array output: {}".format(lg.getCopyNumber(brca1[1:3], brca1[0], array)))
-print("Sequenza output: {}".format(lg.getCopyNumber(brca1[1:3], brca1[0], sequenza)))
-print("FACETS output: {}".format(lg.getCopyNumber(brca1[1:3], brca1[0], facets)))
-print("ascatNGS output: {}".format(lg.getCopyNumber(brca1[1:3], brca1[0], ascat)))
-
-print("\nINFO: Comparant el LOH en BRCA2")
-print("Array output: {}".format(lg.getCopyNumber(brca2[1:3], brca2[0], array)))
-print("Sequenza output: {}".format(lg.getCopyNumber(brca2[1:3], brca2[0], sequenza)))
-print("FACETS output: {}".format(lg.getCopyNumber(brca2[1:3], brca2[0], facets)))
-print("ascatNGS output: {}".format(lg.getCopyNumber(brca2[1:3], brca2[0], ascat)))
-
-print("\nINFO: Comparant el LOH ATM")
-print("Array output: {}".format(lg.getCopyNumber(atm[1:3], atm[0], array)))
-print("Sequenza output: {}".format(lg.getCopyNumber(atm[1:3], atm[0], sequenza)))
-print("FACETS output: {}".format(lg.getCopyNumber(atm[1:3], atm[0], facets)))
-print("ascatNGS output: {}".format(lg.getCopyNumber(atm[1:3], atm[0], ascat)))
-
-print("\nINFO: Comparant el LOH en PALB2")
-print("Array output: {}".format(lg.getCopyNumber(palb2[1:3], palb2[0], array)))
-print("Sequenza output: {}".format(lg.getCopyNumber(palb2[1:3], palb2[0], sequenza)))
-print("FACETS output: {}".format(lg.getCopyNumber(palb2[1:3], palb2[0], facets)))
-print("ascatNGS output: {}".format(lg.getCopyNumber(palb2[1:3], palb2[0], ascat)))
+print("|Cas|Variant|     |Tipus|FACETS|    |   |     |ascatNGS|  |   |     |Sequenza|  |   |     |")
+print("|Cas|Tumor|Control|Tipus|BRCA1|BRCA2|ATM|PALB2|BRCA1|BRCA2|ATM|PALB2|BRCA1|BRCA2|ATM|PALB2|")
+print("|---|-----|-------|-----|-----|-----|---|-----|-----|-----|---|-----|-----|-----|---|-----|")
+print("TCGA-04-1332|{tm}|{cn}|{type}|{f1}|{f2}|{f3}|{f4}|{a1}|{a2}|{a3}|{a4}|{s1}|{s2}|{s3}|{s4}|".format(tm = , cn = , type = "?",
+    f1 = lg.getCopyNumber(brca1[1:3], brca1[0], facets), f2 = lg.getCopyNumber(brca2[1:3], brca2[0], facets), f3 = lg.getCopyNumber(atm[1:3], atm[0], facets),
+    f4 = lg.getCopyNumber(palb2[1:3], palb2[0], facets),
+    a1 = lg.getCopyNumber(brca1[1:3], brca1[0], ascat), a2 = lg.getCopyNumber(brca2[1:3], brca2[0], ascat), a3 = lg.getCopyNumber(atm[1:3], atm[0], ascat),
+    a4 = lg.getCopyNumber(palb2[1:3], palb2[0], ascat),
+    s1 = lg.getCopyNumber(brca1[1:3], brca1[0], sequenza), s2 = lg.getCopyNumber(brca2[1:3], brca2[0], sequenza), s3 = lg.getCopyNumber(atm[1:3], atm[0], sequenza),
+    s4 = lg.getCopyNumber(palb2[1:3], palb2[0], sequenza)))
+# print("\nINFO: Comparant el LOH en BRCA1")
+# print("Array output: {}".format(lg.getCopyNumber(brca1[1:3], brca1[0], array)))
+# print("Sequenza output: {}".format(lg.getCopyNumber(brca1[1:3], brca1[0], sequenza)))
+# print("FACETS output: {}".format(lg.getCopyNumber(brca1[1:3], brca1[0], facets)))
+# print("ascatNGS output: {}".format(lg.getCopyNumber(brca1[1:3], brca1[0], ascat)))
+#
+# print("\nINFO: Comparant el LOH en BRCA2")
+# print("Array output: {}".format(lg.getCopyNumber(brca2[1:3], brca2[0], array)))
+# print("Sequenza output: {}".format(lg.getCopyNumber(brca2[1:3], brca2[0], sequenza)))
+# print("FACETS output: {}".format(lg.getCopyNumber(brca2[1:3], brca2[0], facets)))
+# print("ascatNGS output: {}".format(lg.getCopyNumber(brca2[1:3], brca2[0], ascat)))
+#
+# print("\nINFO: Comparant el LOH ATM")
+# print("Array output: {}".format(lg.getCopyNumber(atm[1:3], atm[0], array)))
+# print("Sequenza output: {}".format(lg.getCopyNumber(atm[1:3], atm[0], sequenza)))
+# print("FACETS output: {}".format(lg.getCopyNumber(atm[1:3], atm[0], facets)))
+# print("ascatNGS output: {}".format(lg.getCopyNumber(atm[1:3], atm[0], ascat)))
+#
+# print("\nINFO: Comparant el LOH en PALB2")
+# print("Array output: {}".format(lg.getCopyNumber(palb2[1:3], palb2[0], array)))
+# print("Sequenza output: {}".format(lg.getCopyNumber(palb2[1:3], palb2[0], sequenza)))
+# print("FACETS output: {}".format(lg.getCopyNumber(palb2[1:3], palb2[0], facets)))
+# print("ascatNGS output: {}".format(lg.getCopyNumber(palb2[1:3], palb2[0], ascat)))
