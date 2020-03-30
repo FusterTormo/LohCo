@@ -17,7 +17,7 @@ import libgetters as lg
 import libstatistics as ls
 
 # Open the output for the sample TCGA-04-1332 output from all the tools
-sequenza = lc.convert2region("../9793255c_VS_21fc93b7_Sequenza/TCGA-04-1332_segments.txt", "sequenza")
+sequenza = lc.convert2region("../9793255c_VS_f4b549d0_Sequenza/TCGA-04-1332_segments.txt", "sequenza")
 facets = lc.convert2region("../9793255c_VS_f4b549d0_FACETS/facets_comp_cncf.tsv", "facets")
 ascat = lc.convert2region("../90cf56c6_VS_f4b549d0_ASCAT/H_GP-04-1332-01A-01W-0488-09-1.copynumber.caveman.csv", "ascatngs")
 array = lc.convert2region("../73a3a9bb-7dfc-4fc5-9f31-b2630c82010b_Array/QUANT_p_TCGA_Batch12_AFFX_GenomeWideSNP_6_F05_437768.grch38.seg.v2.txt", "array")
@@ -25,51 +25,54 @@ print("INFO: Arxius oberts satisfactoriament")
 
 # Print the counts in each file
 print("\nINFO: Resum de les dades obteses en cada eina")
-print("Arrays\n-----------\n{}".format(ls.countsXtool(array)))
-print("Sequenza\n-----------\n{}".format(ls.countsXtool(sequenza)))
-print("FACETS\n-----------\n{}".format(ls.countsXtool(facets)))
-print("ascatNGS\n-----------\n{}".format(ls.countsXtool(ascat)))
+car = ls.countsXtool(array)
+cs = ls.countsXtool(sequenza)
+cf = ls.countsXtool(facets)
+cas = ls.countsXtool(ascat)
+print("\t A\t| N \t| L \t| D")
+print("Array \t {amp}\t| {normal}\t| {loh}\t| {dele}".format(amp = car["A"], normal = car["N"], loh = car["L"], dele = car["D"]))
+print("FACETS\t {amp}\t| {normal}\t| {loh}\t| {dele}".format(amp = cf["A"], normal = cf["N"], loh = cf["L"], dele = cf["D"]))
+print("ascatN\t {amp}\t| {normal}\t| {loh}\t| {dele}".format(amp = cas["A"], normal = cas["N"], loh = cas["L"], dele = cas["D"]))
+print("Sequen\t {amp}\t| {normal}\t| {loh}\t| {dele}".format(amp = cs["A"], normal = cs["N"], loh = cs["L"], dele = cs["D"]))
 
-# Compare the output from each tool against the array
 print("\nINFO: Comparant les dades amb els arrays")
-print("Array vs Sequenza")
-fragments = lc.getFragments(array, sequenza)
-tab = lc.doComparison(fragments, array, sequenza)
-c1, c2 = ls.calculateCounts(tab)
-contingency = ls.doContingency(tab, ["A", "D", "N"])
-print(c1)
-print(c2)
-print(ls.printTable(tab, "Array", "Sequenza", False))
-print(contingency)
-
-print("\nArray vs FACETS")
 fragments = lc.getFragments(array, facets)
 tab = lc.doComparison(fragments, array, facets)
 c1, c2 = ls.calculateCounts(tab)
-contingency = ls.doContingency(tab, ["A", "D", "N"])
-print(c1)
-print(c2)
-print(ls.printTable(tab, "Array", "FACETS", False))
-print(contingency)
+cAvF = ls.doContingency(tab, ["A", "D", "N"])
+tabAvF = ls.printTable(tab, "Array", "FACETS", False).split("\n")
 
-print("\nArray vs ascatNGS")
 fragments = lc.getFragments(array, ascat)
 tab = lc.doComparison(fragments, array, ascat)
-c1, c2 = ls.calculateCounts(tab)
-contingency = ls.doContingency(tab, ["A", "D", "N"])
-print(c1)
-print(c2)
-print(ls.printTable(tab, "Array", "ascatNGS", False))
-print(contingency)
+cAvA = ls.doContingency(tab, ["A", "D", "N"])
+tabAvA = ls.printTable(tab, "Array", "ascatNGS", False).split("\n")
+
+fragments = lc.getFragments(array, sequenza)
+tab = lc.doComparison(fragments, array, sequenza)
+cAvS = ls.doContingency(tab, ["A", "D", "N"])
+tabAvS = ls.printTable(tab, "Array", "Sequenza", False).split("\n")
+print("{}\t\t\t\t||{}\t\t\t||{}".format(tabAvF[0], tabAvA[0], tabAvS[0]))
+print("{}\t\t||{}\t\t||{}".format(tabAvF[1], tabAvA[1], tabAvS[1]))
+print("{}\t\t||{}\t\t||{}".format(tabAvF[2], tabAvA[2], tabAvS[2]))
+print("{}\t\t||{}\t\t||{}".format(tabAvF[3], tabAvA[3], tabAvS[3]))
+print("{}\t\t||{}\t\t||{}".format(tabAvF[4], tabAvA[4], tabAvS[4]))
+print("{}\t\t||{}\t\t||{}".format(tabAvF[5], tabAvA[5], tabAvS[5]))
+print("=====================================================================")
+print("TODO: Add information regarding the contingency table for the alterations (A, D, N)")
+
 
 # Get the interesting information from the variant calling summary file
 summaryFile = "../summary.md"
-data = []
+data = {}
 with open(summaryFile, "r") as fi :
 	for l in fi :
 		if l.startswith("TCGA-04-1332") :
-			data.append(l)
-	
+			aux = l.split("|")
+            if (aux[1].startswith("9793") or aux[1].startswith("21fc")) and aux[3] == "Platypus":
+                aux2 = aux[6].strip().split("&rarr;")
+                data[aux[1]] = {"variant" : aux2[1], "gene" : aux2[0]}
+
+print(data)
 
 #Regions d'interes. Dades obtingudes des de biogps
 brca1 = ["17", 43044295, 43170245]
