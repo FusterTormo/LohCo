@@ -66,22 +66,22 @@ summaryFile = "../summary.md"
 data = {}
 with open(summaryFile, "r") as fi :
 	for l in fi :
-        if l.startswith("TCGA-04-1332") :
-            aux = l.split("|")
-            if (aux[1].startswith("9793") or aux[1].startswith("21fc")) and aux[3] == "Platypus" :
-                aux2 = aux[6].strip().split("&rarr;")
-                data[aux[1]] = {"variant" : aux2[1], "gene" : aux2[0]}
+            if l.startswith("TCGA-04-1332") :
+                aux = l.split("|")
+                if (aux[1].startswith("9793") or aux[1].startswith("21fc")) and aux[3] == "Platypus" :
+                    aux2 = aux[6].strip().split("&rarr;")
+                    data[aux[1]] = {"variant" : aux2[1], "gene" : aux2[0]}
 
 #Regions of interest. Data extracted from biogps
 brca1 = ["17", 43044295, 43170245]
 brca2 = ["13", 32315086, 32400266]
 palb2 = ["16", 23603160, 23641310]
 atm = ["11", 108222484, 108369102]
-
+print(data)
 print("|Cas|Variant|     |Tipus|FACETS|    |   |     |ascatNGS|  |   |     |Sequenza|  |   |     |")
 print("|Cas|Tumor|Control|Tipus|BRCA1|BRCA2|ATM|PALB2|BRCA1|BRCA2|ATM|PALB2|BRCA1|BRCA2|ATM|PALB2|")
 print("|---|-----|-------|-----|-----|-----|---|-----|-----|-----|---|-----|-----|-----|---|-----|")
-print("TCGA-04-1332|{tm}|{cn}|{type}|{f1}|{f2}|{f3}|{f4}|{a1}|{a2}|{a3}|{a4}|{s1}|{s2}|{s3}|{s4}|".format(tm = , cn = , type = "?",
+print("TCGA-04-1332|{tm}|{cn}|{tipo}|{f1}|{f2}|{f3}|{f4}|{a1}|{a2}|{a3}|{a4}|{s1}|{s2}|{s3}|{s4}|".format(tm = "a" , cn = "C", tipo = "?",
     f1 = lg.getCopyNumber(brca1[1:3], brca1[0], facets), f2 = lg.getCopyNumber(brca2[1:3], brca2[0], facets), f3 = lg.getCopyNumber(atm[1:3], atm[0], facets),
     f4 = lg.getCopyNumber(palb2[1:3], palb2[0], facets),
     a1 = lg.getCopyNumber(brca1[1:3], brca1[0], ascat), a2 = lg.getCopyNumber(brca2[1:3], brca2[0], ascat), a3 = lg.getCopyNumber(atm[1:3], atm[0], ascat),
