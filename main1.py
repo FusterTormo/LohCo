@@ -44,12 +44,12 @@ for c in cases :
 			# Comprovar l'status de l'analisi de Sequenza
 			aux = "{}_Sequenza".format(folder)
 			print("Comprovant {}".format(aux))
-			if os.path.isfolder("{}_Sequenza".format(folder)) :
+			if os.path.isdir("{}_Sequenza".format(folder)) :
 				# Si existeix la carpeta es que s'ha fet el seqz de la mostra. Comprovar si s'ha fet el sequenza
 				aux = "{}_Sequenza".format(folder)
-				if not os.path.isfile("{}/{}_segments.txt".format(aux, c[0])) :
+				if not os.path.exists("{}/{}_segments.txt".format(aux, c[0])) :
 					aux = "{}/{}_segments.txt".format(aux, c[0])
 					print("Executar plotSequenza en {}".format(aux))
-					break
+					sys.exit()
 			else :
 				print("{} no existeix".format(aux))
