@@ -25,7 +25,8 @@ import subprocess
 # Vore l'estatus de les mostres i executar sequenza en aquelles que no s'haja executat
 dbcon = sqlite3.connect("/g/strcombio/fsupek_cancer2/TCGA_bam/info/info.db")
 wd = "/g/strcombio/fsupek_cancer2/TCGA_bam/OV"
-sequenza = "/home/ffuster/scripts/plotSequenza.R"
+sequenza = "/home/ffuster/Scripts/plotSequenza.R"
+cont = 0
 with dbcon :
 	cur = dbcon.cursor()
 	q = cur.execute("SELECT submitter FROM patient WHERE cancer='OV'")
@@ -33,6 +34,7 @@ with dbcon :
 
 print("INFO: {} cases found".format(len(cases)))
 for c in cases :
+	cont += 1
 	# Recollir la informacio dels bams i el sexe que te el cas registrats
 	with dbcon :
 		cur = dbcon.cursor()
@@ -53,10 +55,14 @@ for c in cases :
 				aux = "{}_Sequenza".format(folder)
 				if not os.path.exists("{}/{}_segments.txt".format(aux, c[0])) :
 					cmd = "Rscript {seqScript} {cas} {folder} {gender}".format(cas = c[0], folder = aux, gender = gender, seqScript = sequenza)
+					print("INFO: Checked {cases} cases. Running {com}".format(cases = cont, com = cmd))
 					proc = subprocess.Popen(cmd, shell = True, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
-					out, err = subprocess.communicate()
-					print(proc.returncode)
-					sys.exit()
+					out, err = proc.communicate()
+					if proc.returncode != 0 :
+						print("ERROR: While runing {}\nDescription:\n{}".format(cmd, err))
+						sys.exit()
+					if cont > 10 :
+						sys.exit()
 
 			else :
 				print("INFO: Analisi no fet: {}".format("{}_Sequenza".format(folder)))
