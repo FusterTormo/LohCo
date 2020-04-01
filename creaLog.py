@@ -22,7 +22,8 @@ bwa = "/opt/bwa.kit/bwa mem -M -t 6 -R {rg} {ref} {fw} {rv} > bwa.sam" # Comando
 picardSort = "java -jar /opt/picard-tools-2.21.8/picard.jar SortSam INPUT=bwa.sam OUTPUT=bwa.sort.bam SORT_ORDER=coordinate" # Comando para ordenar el bam
 picardIndex = "java -jar /opt/picard-tools-2.21.8/picard.jar BuildBamIndex INPUT=bwa.sort.bam" # Comando para crear un indice en el bam ordenado
 bedtoolsBam2Bed = "bedtools bamtobed -i bwa.sort.bam > bwa.bed" #Comando para crear un bed con todas las regiones donde se han alineado reads
-gatk = ""
+gatk1 = "/opt/gatk-4.1.4.1/gatk BaseRecalibrator -I bwa.sort.bam -R {ref} --known-sites {dbsnp} -O recaldata.table" # Comando para realizar el primer paso de la recalibracion de bases sugerida por GATK
+gatk2 = "/opt/gatk-4.1.4.1/gatk ApplyBQSR -I bwa.sort.bam -R {ref} -bqsr-recal-file recaldata.table -O bwa.recal.bam" # Comando para realizar el segundo paso de la recalibracion de bases sugerida por GATK
 
 vc = "" #Ruta al variant caller que se va a usar (Strelka2)
 anno = "" #Ruta al ANNOVAR (anotador de variantes)
@@ -30,8 +31,9 @@ cov = "" #Script de coverage que se va a hacer
 
 referencia = "/home/ffuster/panalisi/referencies/gatkHg19.fa"
 manifest = "/home/ffuster/panalisi/resultats/manifest.bed"
-indels = "/home/ffuster/panalisi/referencies/gold_indels.vcf"
-dbsnp = "/home/ffuster/panalisi/referencies/dbsnp_138.hg19.vcf"
+# Descargado desde https://gnomad.broadinstitute.org/downloads
+indels = "/home/ffuster/panalisi/referencies/gold_indels.vcf" # TODO: Arxiu a eliminar
+dbsnp = "/home/ffuster/share/biodata/solelab/referencies/gnomad.exomes.r2.1.1.sites.vcf"
 genes = "/home/ffuster/panalisi/resultats/gensAestudi.txt"
 
 pathAnalisi = "/home/ffuster/panalisi/resultats" # Ruta donde se ejecutan y guardan los analisis
@@ -210,6 +212,10 @@ def prepararScript(ruta) :
         # Convertir el bam ordenado en un bed para poder hacer un control de calidad posterior
         fi.write("\tcd bwaAlign\n")
         fi.write("\t" + bedtools + "\n")
+        # Recalibrar las bases
+        fi.write("\t" + gatk1.format(ref = referencia, dbsnp = dbsnp) + "\n")
+        fi.write("\t" + gatk2.format(ref = referencia) + "\n")
+        # Aqui puede ir el marcar duplicados, en caso de necesitarse
         fi.write("cd ..")
 
         fi.write("\t$HOME/anpanmds/align.sh $reference ../$forward ../$reverse $readgroup\n")
