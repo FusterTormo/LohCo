@@ -30,11 +30,11 @@ print("INFO: {} cases found".format(len(cases)))
 for c in cases :
 	with dbcon :
 		cur = dbcon.cursor()
-		q = cur.execute("SELECT uuid FROM sample WHERE submitter='{}' AND tumor LIKE '%Tumor%'")
+		q = cur.execute("SELECT uuid FROM sample WHERE submitter='{}' AND tumor LIKE '%Tumor%'".format(c[0]))
 		tumors = q.fetchall()
-		q = cur.execute("SELECT uuid FROM sample WHERE submitter='{}' AND tumor LIKE '%Normal%'")
+		q = cur.execute("SELECT uuid FROM sample WHERE submitter='{}' AND tumor LIKE '%Normal%'".format(c[0]))
 		controls = q.fetchall()
 	print(c)
 	print(tumors)
 	print(controls)
-	break
+	
