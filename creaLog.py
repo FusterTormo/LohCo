@@ -22,7 +22,7 @@ fastqc = "/opt/FastQC/fastqc -o fastqc/ -f fastq -extract -q -t 6 {fastq}" #Coma
 bwa = "/opt/bwa.kit/bwa mem -M -t 6 -R {rg} {ref} {fw} {rv} > bwa.sam" # Comando para ejecutar BWA (alineamiento). Los parametros indican -M para compatibilidad con Picard tools y GATk -t numero de hilos (threads) que usa el programa para ejecutarse -R Read Group que se pondra en el sam de salida. Este Read Group es necesario para poder ejecutar GATK (post-alineamiento)
 picardSort = "java -jar /opt/picard-tools-2.21.8/picard.jar SortSam INPUT=bwa.sam OUTPUT=bwa.sort.bam SORT_ORDER=coordinate" # Comando para ordenar el bam
 picardIndex = "java -jar /opt/picard-tools-2.21.8/picard.jar BuildBamIndex INPUT={bam}" # Comando para crear un indice en el bam ordenado
-bedtoolsBam2Bed = "bedtools bamtobed -i bwa.sort.bam > bwa.bed" #Comando para crear un bed con todas las regiones donde se han alineado reads
+bedtoolsBam2Bed = "bedtools bamtobed -i {bam} > bwa.bed" #Comando para crear un bed con todas las regiones donde se han alineado reads
 gatk1 = "/opt/gatk-4.1.4.1/gatk BaseRecalibrator -I {bam} -R {ref} --known-sites {dbsnp} -O recaldata.table" # Comando para realizar el primer paso de la recalibracion de bases sugerida por GATK
 gatk2 = "/opt/gatk-4.1.4.1/gatk ApplyBQSR -I {bam} -R {ref} -bqsr-recal-file recaldata.table -O bwa.recal.bam" # Comando para realizar el segundo paso de la recalibracion de bases sugerida por GATK
 markDup = "java -jar /opt/picard-tools-2.21.8/picard.jar MarkDuplicates INPUT={bam} OUTPUT=bwa.nodup.bam METRICS_FILE=dups_bam.txt" # Comando para marcar duplicados usando Picard tools
@@ -214,7 +214,7 @@ def prepararScript(ruta) :
         fi.write("\tmv bwa.sam *bam *bai bwaAlign/\n")
         # Convertir el bam ordenado en un bed para poder hacer un control de calidad posterior
         fi.write("\tcd bwaAlign\n")
-        fi.write("\t" + bedtools + "\n")
+        fi.write("\t" + bedtoolsBam2Bed.format(bam = "bwa.sort.bam") + "\n")
         # Recalibrar las bases
         fi.write("\t" + gatk1.format(bam = "bwa.sort.bam", ref = "$ref", dbsnp = "$sites") + "\n")
         fi.write("\t" + gatk2.format(bam = "bwa.sort.bam", ref = "$ref") + "\n")
