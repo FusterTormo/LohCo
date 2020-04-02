@@ -17,13 +17,16 @@ import os
 CONSTANTS:
     Rutas de los programas y parametros de cada uno de los pasos dentro de la pipeline
 """
+# IDEA: Podrien ser getters amb els parametres per defecte. Seria mes llegible
 fastqc = "/opt/FastQC/fastqc -o fastqc/ -f fastq -extract -q -t 6 {fastq}" #Comando para ejecutar FastQC (control de calidad de los FASTQ). Los parametros indican -o ruta donde se guardaran los archivos de salida. -f que el archivo de entrada es un FASTQ -extract descomprimir el archivo de salida -q omite los mensajes de progreso (log) -t 6 el numero de hilos (threads) que usa el programa para ejcutarse en paralelo
 bwa = "/opt/bwa.kit/bwa mem -M -t 6 -R {rg} {ref} {fw} {rv} > bwa.sam" # Comando para ejecutar BWA (alineamiento). Los parametros indican -M para compatibilidad con Picard tools y GATk -t numero de hilos (threads) que usa el programa para ejecutarse -R Read Group que se pondra en el sam de salida. Este Read Group es necesario para poder ejecutar GATK (post-alineamiento)
 picardSort = "java -jar /opt/picard-tools-2.21.8/picard.jar SortSam INPUT=bwa.sam OUTPUT=bwa.sort.bam SORT_ORDER=coordinate" # Comando para ordenar el bam
-picardIndex = "java -jar /opt/picard-tools-2.21.8/picard.jar BuildBamIndex INPUT=bwa.sort.bam" # Comando para crear un indice en el bam ordenado
+picardIndex = "java -jar /opt/picard-tools-2.21.8/picard.jar BuildBamIndex INPUT={bam}" # Comando para crear un indice en el bam ordenado
 bedtoolsBam2Bed = "bedtools bamtobed -i bwa.sort.bam > bwa.bed" #Comando para crear un bed con todas las regiones donde se han alineado reads
-gatk1 = "/opt/gatk-4.1.4.1/gatk BaseRecalibrator -I bwa.sort.bam -R {ref} --known-sites {dbsnp} -O recaldata.table" # Comando para realizar el primer paso de la recalibracion de bases sugerida por GATK
-gatk2 = "/opt/gatk-4.1.4.1/gatk ApplyBQSR -I bwa.sort.bam -R {ref} -bqsr-recal-file recaldata.table -O bwa.recal.bam" # Comando para realizar el segundo paso de la recalibracion de bases sugerida por GATK
+gatk1 = "/opt/gatk-4.1.4.1/gatk BaseRecalibrator -I {bam} -R {ref} --known-sites {dbsnp} -O recaldata.table" # Comando para realizar el primer paso de la recalibracion de bases sugerida por GATK
+gatk2 = "/opt/gatk-4.1.4.1/gatk ApplyBQSR -I {bam} -R {ref} -bqsr-recal-file recaldata.table -O bwa.recal.bam" # Comando para realizar el segundo paso de la recalibracion de bases sugerida por GATK
+markDup = "java -jar /opt/picard-tools-2.21.8/picard.jar MarkDuplicates INPUT={bam} OUTPUT=bwa.nodup.bam METRICS_FILE=dups_bam.txt" # Comando para marcar duplicados usando Picard tools
+
 
 vc = "" #Ruta al variant caller que se va a usar (Strelka2)
 anno = "" #Ruta al ANNOVAR (anotador de variantes)
@@ -206,23 +209,23 @@ def prepararScript(ruta) :
         # La cadena align tiene cuatro variables: rg es para introducir el read group, fw es para el fastq forward, rv es para el fastq reverse y ref es para el genoma de referencia
         fi.write("\t" + align.format(rg = "$readgroup", ref = referencia, fw = "../$forward", rv = "../$reverse") + "\n")
         fi.write("\t" + picardSort + "\n")
-        fi.write("\t" + picardIndex + "\n")
+        fi.write("\t" + picardIndex.format(bam = "bwa.sort.bam") + "\n")
         fi.write("\tmkdir bwaAlign\n")
         fi.write("\tmv bwa.sam *bam *bai bwaAlign/\n")
         # Convertir el bam ordenado en un bed para poder hacer un control de calidad posterior
         fi.write("\tcd bwaAlign\n")
         fi.write("\t" + bedtools + "\n")
         # Recalibrar las bases
-        fi.write("\t" + gatk1.format(ref = referencia, dbsnp = dbsnp) + "\n")
-        fi.write("\t" + gatk2.format(ref = referencia) + "\n")
+        fi.write("\t" + gatk1.format(bam = "bwa.sort.bam", ref = "$ref", dbsnp = "$sites") + "\n")
+        fi.write("\t" + gatk2.format(bam = "bwa.sort.bam", ref = "$ref") + "\n")
         # Aqui puede ir el marcar duplicados, en caso de necesitarse
+        fi.write("\t" + markDup.format(bam = "bwa.recal.bam") + "\n")
+        fi.write("\t" + picardIndex.format(bam = "bwa.nodup.bam") + "\n")
         fi.write("cd ..")
-
-        fi.write("\t$HOME/anpanmds/align.sh $reference ../$forward ../$reverse $readgroup\n")
-        fi.write("\t$HOME/anpanmds/postAlign.sh recalibrate bwaAlign/bwa.sort.bam\n")
-        fi.write("coverage")
-        fi.write("estadistiques de l'analisi: on target, off target, % bases amb X coverage, resum dels tests, % duplicats (si cal), grafiques de coverage")
-        fi.write("\t$HOME/anpanmds/variantCalling.sh $manifest bwaAlign/bwa.recalibrate.bam\n")
+        # TODO: Estudios de coverage, on target, off target, porcentaje de bases con X coverage...
+        fi.write("\n\tCOVERAGE\n")
+        fi.write("\testadistiques de l'analisi: on target, off target, % bases amb X coverage, resum dels tests, % duplicats (si cal), grafiques de coverage")
+        fi.write("\t" + vc.format(bam = "bwa.nodup.bam") + "\n")
         fi.write("\T$HOME/anpanmds/variantAnnotation.sh variants.vcf")
         fi.write("Script per re-anotar")
         fi.write("Script per filtrar")
