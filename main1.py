@@ -62,10 +62,21 @@ for c in cases :
 					if proc.returncode != 0 :
 						print("ERROR: While runing {}\nDescription:\n{}".format(cmd, err))
 						sys.exit()
-					if cont > 10 :
-						sys.exit()
-
 			else :
-				cmd = "/home/ffuster/Scripts/runSequenza.sh {tumor} {control} {dir}".format(dir = seq, tumor = tm[1], control = cn[1])
-				print(cmd)
-				sys.exit()
+				aux = "{wd}/{sub}/{uuid}/{bam}".format(wd = wd, sub = c[0], uuid = tm[0], bam = tm[1])
+				aux2 = "{wd}/{sub}/{uuid}/{bam}".format(wd = wd, sub = c[0], uuid = cn[0], bam = cn[1])
+				cmd = "/home/ffuster/Scripts/runSequenza.sh {tumor} {control} {dir}".format(dir = seq, tumor = aux, control = aux2)
+				# print(cmd)
+				# sys.exit()
+				proc = subprocess.Popen(cmd, shell = True, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+				out, err = proc.communicate()
+				if proc.returncode != 0 :
+					print("ERROR: While running {}\nDescription:\n{}".format(cmd, err))
+					sys.exit()
+				else :
+					cmd = "Rscript {seqScript} {cas} {folder} {gender}".format(cas = c[0], folder = aux, gender = gender, seqScript = sequenza)
+					proc = subprocess.Popen(cmd, shell = True, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+					out, err = proc.communicate()
+					if proc.returncode != 0 :
+						print("ERROR: While runing {}\nDescription:\n{}".format(cmd, err))
+						sys.exit()
