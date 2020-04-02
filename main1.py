@@ -38,9 +38,9 @@ for c in cases :
 	# Recollir la informacio dels bams i el sexe que te el cas registrats
 	with dbcon :
 		cur = dbcon.cursor()
-		q = cur.execute("SELECT uuid FROM sample WHERE submitter='{}' AND tumor LIKE '%Tumor%'".format(c[0]))
+		q = cur.execute("SELECT uuid, bamName FROM sample WHERE submitter='{}' AND tumor LIKE '%Tumor%'".format(c[0]))
 		tumors = q.fetchall()
-		q = cur.execute("SELECT uuid FROM sample WHERE submitter='{}' AND tumor LIKE '%Normal%'".format(c[0]))
+		q = cur.execute("SELECT uuid, bamName FROM sample WHERE submitter='{}' AND tumor LIKE '%Normal%'".format(c[0]))
 		controls = q.fetchall()
 		q = cur.execute("SELECT gender FROM patient WHERE submitter='{}'".format(c[0]))
 		gender = q.fetchone()[0]
@@ -49,8 +49,9 @@ for c in cases :
 			aux = tm[0].split("-")[0]
 			aux2 = cn[0].split("-")[0]
 			folder = "{wd}/{sub}/{tumor}_VS_{control}".format(wd = wd, sub = c[0], tumor = aux, control = aux2)
+			seq = "{}_Sequenza".format(folder)
 			# Comprovar l'status de l'analisi de Sequenza
-			if os.path.isdir("{}_Sequenza".format(folder)) :
+			if os.path.isdir(seq) :
 				# Si existeix la carpeta es que s'ha fet el seqz de la mostra. Comprovar si s'ha fet el sequenza
 				aux = "{}_Sequenza".format(folder)
 				if not os.path.exists("{}/{}_segments.txt".format(aux, c[0])) :
@@ -65,4 +66,6 @@ for c in cases :
 						sys.exit()
 
 			else :
-				print("INFO: Analisi no fet: {}".format("{}_Sequenza".format(folder)))
+				cmd = "/home/ffuster/Scripts/runSequenza.sh {tumor} {control} {dir}".format(dir = seq, tumor = tm[1], control = cn[1])
+				print(cmd)
+				sys.exit()
