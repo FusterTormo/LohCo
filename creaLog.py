@@ -26,14 +26,17 @@ bedtoolsBam2Bed = "bedtools bamtobed -i {bam} > bwa.bed" #Comando para crear un 
 gatk1 = "/opt/gatk-4.1.4.1/gatk BaseRecalibrator -I {bam} -R {ref} --known-sites {dbsnp} -O recaldata.table" # Comando para realizar el primer paso de la recalibracion de bases sugerida por GATK
 gatk2 = "/opt/gatk-4.1.4.1/gatk ApplyBQSR -I {bam} -R {ref} -bqsr-recal-file recaldata.table -O bwa.recal.bam" # Comando para realizar el segundo paso de la recalibracion de bases sugerida por GATK
 markDup = "java -jar /opt/picard-tools-2.21.8/picard.jar MarkDuplicates INPUT={bam} OUTPUT=bwa.nodup.bam METRICS_FILE=dups_bam.txt" # Comando para marcar duplicados usando Picard tools
+vc1 = "configureStrelkaGermlineWorkflow.py --bam {bam} --referenceFasta {ref} --exome --runDir variantCalling --callRegions {mani}" # Comando para ejecutar el variant caller que se va a usar (Strelka2)
+vc2 = "./runWorkflow.py -m local -j 6 --quiet"
 
 
-vc = "" #Ruta al variant caller que se va a usar (Strelka2)
 anno = "" #Ruta al ANNOVAR (anotador de variantes)
 cov = "" #Script de coverage que se va a hacer
 
 referencia = "/home/ffuster/panalisi/referencies/gatkHg19.fa"
 manifest = "/home/ffuster/panalisi/resultats/manifest.bed"
+gzmanifest = "/home/ffuster/panalisi/resultats/manifest.bed.gz"
+manifestidx = "/home/ffuster/panalisi/resultats/manifest.bed.gz.tbi"
 # Descargado desde https://gnomad.broadinstitute.org/downloads
 indels = "/home/ffuster/panalisi/referencies/gold_indels.vcf" # TODO: Arxiu a eliminar
 dbsnp = "/home/ffuster/share/biodata/solelab/referencies/gnomad.exomes.r2.1.1.sites.vcf"
@@ -132,6 +135,11 @@ def comprobarArchivos() :
         raise IOError("No se encuentra el genoma de referencia")
     if not os.path.isfile(manifest) :
         raise IOError("No se encuentra el manifest")
+    else : #Strelka2 quiere que el bam este comprimido e indexado. Comprobar si estas archivos existen
+        if not os.path.isfile(gzmanifest) :
+            raise IOError("ERROR: No se encuentra el bgzip del manifest, necesario para Strelka2. Ejecuta manifest.sh para crearlo")
+        if not os.path.isfile(manifestidx) :
+            raise IOError("ERROR: No se encuentra el indice del manifest, necesario para Strelka2. Ejecuta manifest.sh para crearlo")
     if not os.path.isfile(indels) :
         raise IOError("No se encuentra el archivo para poder realizar el realineamiento de indels")
     if not os.path.isfile(dbsnp) :
@@ -197,17 +205,18 @@ def prepararScript(ruta) :
         # TODO: Esta part es com si posara analizar.sh dins del log
         fi.write("function analisi {\n")
         fi.write("\tforward=$1\n\treverse=$2\n\treadgroup=$3\n\talias=$4\n")
+        fi.write("\techo -e \"################################\\n\\tAnalitzant $alias\\n################################\\n\"\n")
         fi.write("\tmkdir $alias\n")
         fi.write("\tcd $alias\n")
-        fi.write("\t# Control de calidad. FastQC\n")
+        fi.write("\n\t# Control de calidad. FastQC\n")
         fi.write("\tmkdir fastqc # Carpeta donde se guardara el control de calidad\n")
         # La cadena fastqc tiene una variable (fastq) que se usa para introducir el archivo FASTQ para el analisis
         fi.write("\t" + fastqc.format(fastq = "../$forward") + "\n")
         fi.write("\t" + fastqc.format(fastq = "../$reverse") + "\n")
         fi.write("\trm fastqc/*zip # Eliminar los archivos comprimidos, ya se han descomprimido al finalizar FastQC\n")
-        fi.write("# Alineamiento. BWA")
+        fi.write("\n\t# Alineamiento. BWA\n")
         # La cadena align tiene cuatro variables: rg es para introducir el read group, fw es para el fastq forward, rv es para el fastq reverse y ref es para el genoma de referencia
-        fi.write("\t" + bwa.format(rg = "$readgroup", ref = referencia, fw = "../$forward", rv = "../$reverse") + "\n")
+        fi.write("\t" + bwa.format(rg = "$readgroup", ref = "$ref", fw = "../$forward", rv = "../$reverse") + "\n")
         fi.write("\t" + picardSort + "\n")
         fi.write("\t" + picardIndex.format(bam = "bwa.sort.bam") + "\n")
         fi.write("\tmkdir bwaAlign\n")
@@ -221,11 +230,13 @@ def prepararScript(ruta) :
         # Aqui puede ir el marcar duplicados, en caso de necesitarse
         fi.write("\t" + markDup.format(bam = "bwa.recal.bam") + "\n")
         fi.write("\t" + picardIndex.format(bam = "bwa.nodup.bam") + "\n")
-        fi.write("cd ..")
+        fi.write("\tcd ..")
         # TODO: Estudios de coverage, on target, off target, porcentaje de bases con X coverage...
         fi.write("\n\tCOVERAGE\n")
         fi.write("\testadistiques de l'analisi: on target, off target, % bases amb X coverage, resum dels tests, % duplicats (si cal), grafiques de coverage")
-        fi.write("\t" + vc.format(bam = "bwa.nodup.bam") + "\n")
+        fi.write("\t" + vc1.format(bam = "bwa.nodup.bam") + "\n")
+        fi.write("\tcd variantCalling\n")
+        fi.write("\t" + vc2 + "\n")
         fi.write("\T$HOME/anpanmds/variantAnnotation.sh variants.vcf")
         fi.write("Script per re-anotar")
         fi.write("Script per filtrar")
