@@ -207,7 +207,7 @@ def prepararScript(ruta) :
         fi.write("\trm fastqc/*zip # Eliminar los archivos comprimidos, ya se han descomprimido al finalizar FastQC\n")
         fi.write("# Alineamiento. BWA")
         # La cadena align tiene cuatro variables: rg es para introducir el read group, fw es para el fastq forward, rv es para el fastq reverse y ref es para el genoma de referencia
-        fi.write("\t" + align.format(rg = "$readgroup", ref = referencia, fw = "../$forward", rv = "../$reverse") + "\n")
+        fi.write("\t" + bwa.format(rg = "$readgroup", ref = referencia, fw = "../$forward", rv = "../$reverse") + "\n")
         fi.write("\t" + picardSort + "\n")
         fi.write("\t" + picardIndex.format(bam = "bwa.sort.bam") + "\n")
         fi.write("\tmkdir bwaAlign\n")
