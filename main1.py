@@ -66,15 +66,14 @@ for c in cases :
 				aux = "{wd}/{sub}/{uuid}/{bam}".format(wd = wd, sub = c[0], uuid = tm[0], bam = tm[1])
 				aux2 = "{wd}/{sub}/{uuid}/{bam}".format(wd = wd, sub = c[0], uuid = cn[0], bam = cn[1])
 				cmd = "/home/ffuster/Scripts/runSequenza.sh {tumor} {control} {dir}".format(dir = seq, tumor = aux, control = aux2)
-				# print(cmd)
-				# sys.exit()
+				print("INFO: Executing {}".format(cmd))
 				proc = subprocess.Popen(cmd, shell = True, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
 				out, err = proc.communicate()
 				if proc.returncode != 0 :
 					print("ERROR: While running {}\nDescription:\n{}".format(cmd, err))
 					sys.exit()
 				else :
-					cmd = "Rscript {seqScript} {cas} {folder} {gender}".format(cas = c[0], folder = aux, gender = gender, seqScript = sequenza)
+					cmd = "Rscript {seqScript} {cas} {folder} {gender}".format(cas = c[0], folder = seq, gender = gender, seqScript = sequenza)
 					proc = subprocess.Popen(cmd, shell = True, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
 					out, err = proc.communicate()
 					if proc.returncode != 0 :
