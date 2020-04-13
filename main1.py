@@ -21,6 +21,7 @@ import sqlite3
 import os
 import sys
 import subprocess
+import libgetters as lg
 
 # Constants
 dbcon = sqlite3.connect("/g/strcombio/fsupek_cancer2/TCGA_bam/info/info.db")
@@ -97,16 +98,16 @@ def checkSequenza() :
 # Buscar la pitjor variant reportada en el gen passat per parametre
 def getWorst(vcf, gene) :
 	found = False
-	classifier = ["synonymous SNV", "nonsynonymous SNV", "nonframeshift substitution", "nonframeshift deletion",  "frameshift deletion", "frameshift insertion", "stopgain"]
+	classifier = ["NA", "synonymous SNV", "nonsynonymous SNV", "nonframeshift substitution", "nonframeshift deletion",  "frameshift deletion", "frameshift insertion", "stopgain"]
 	level = -1
 	order = []
 	worst = ""
 	with open(vcf, "r") as fi :
 		for l in fi :
 			aux = l.split("\t") # Get the gene name
-			print(l)
 			if aux[6] == gene :
 				found = True
+				print(l)
 				if classifier.index(aux[8]) > level :
 					level = classifier.index(aux[8])
 					worst = l
@@ -117,6 +118,11 @@ def getWorst(vcf, gene) :
 # Preparar la taula amb les mostres, les seues variants en els gens a estudi (BRCA1, BRCA2, ATM i PALB2) i el Copy number associat en cadascuna de les regions
 def prepareTable() :
 	cont = 0
+	#Regions of interest. Data extracted from biogps
+	brca1 = ["17", 43044295, 43170245]
+	brca2 = ["13", 32315086, 32400266]
+	palb2 = ["16", 23603160, 23641310]
+	atm = ["11", 108222484, 108369102]
 	with dbcon :
 		cur = dbcon.cursor()
 		q = cur.execute("SELECT submitter FROM patient WHERE cancer='OV'")
@@ -135,8 +141,18 @@ def prepareTable() :
 			for cn in controls :
 				print("Checking Case {}. Tumor id {}. Control id {}".format(c[0], tm[0], cn[0]))
 				tf = "{wd}/{sub}/{tumor}".format(wd = wd, sub = c[0], tumor = tm[0])
-				platypus = "{}/platypusGerm/platypus.hg38_multianno.txt".format(tf)
-				variant = getWorst(platypus, "ATM") # TODO: Fer per tots els gens
+				cf = "{wd}/{sub}/{control}".format(wd = wd, sub = c[0], control = cn[0])
+				platypust = "{}/platypusGerm/platypus.hg38_multianno.txt".format(tf)
+				platypusc = "{}/platypusGerm/platypus.hg38_multianno.txt".format(cf)
+				vpt1 = getWorst(platypust, "BRCA1")
+				vpc1 = getWorst(platypusc, "BRCA1")
+				print("{case}\t{tID}\t{cID}\tBRCA1\t{mt}\t{mc}\t{lohF}\t{lohA}\t{lohS}".format(case = c[0], tID = tm[0], cID = cn[0], mt = vpt1, mc = vpc1, lohF = "Pending", lohA = "Pending", lohS = "Pending"))
+				sys.exit()
+				vp2 = getWorst(platypust, "BRCA2")
+				vp3 = getWorst(platypust, "ATM")
+				vp4 = getWorst(platypust, "PALB2")
+				strelka = "{}/strelkaGerm/results/variants/strelka.hg38_multianno.txt".format(tf)
+				vs = getWorst(strelka, "ATM")
 				cf = "{wd}/{sub}/{control}".format(wd = wd, sub = c[0], control = cn[0])
 
 prepareTable()
