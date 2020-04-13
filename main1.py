@@ -117,12 +117,19 @@ def getWorst(vcf, gene) :
 
 def getLOH(path, program, gene) :
 	sol = "Not found"
-	print(path)
 	if os.path.isfile(path):
 		reg = lc.convert2region(path, program)
 		sol = lg.getCopyNumber(gene[1:3], gene[0], reg)
 
 	return sol
+
+def findAscatName(path) :
+	ret = "Not found"
+	if os.path.isdir(path) :
+		for root, dirs, files in os.walk(path) :
+			break
+		print(files)
+		sys.exit()
 
 # Preparar la taula amb les mostres, les seues variants en els gens a estudi (BRCA1, BRCA2, ATM i PALB2) i el Copy number associat en cadascuna de les regions
 def prepareTable() :
@@ -160,9 +167,11 @@ def prepareTable() :
 				analysis = "{}_VS_{}".format(tm[0].split("-")[0], cn[0].split("-")[0]) # The folder format for FACETS, ascatNGS, and Sequenza is "[tumorUUID]_VS_[controlUUID]"
 				facets = "{wd}/{sub}/{folder}_FACETS/facets_comp_cncf.tsv".format(wd = wd, sub = c[0], folder = analysis)
 				loh1 = getLOH(facets, "facets", brca1)
+				ascat = findAscatName("{folder}_ASCAT/".format(folder = analysis))
+				
 				sequenza = "{wd}/{case}/{folder}_Sequenza/{case}_segments.txt".format(folder = analysis, case = c[0], wd = wd)
 				loh3 = getLOH(sequenza, "sequenza", brca1)
-				ascat = "{folder}_ASCAT/{bamName}.copynumber.caveman.csv".format(folder = analysis, bamName = "Not known")
+
 				print("{case}\t{tID}\t{cID}\tBRCA1\t{mt}\t{mc}\t{lohF}\t{lohA}\t{lohS}".format(case = c[0], tID = tm[0], cID = cn[0], mt = vpt1, mc = vpc1, lohF = loh1, lohA = "Pending", lohS = loh3))
 
 				# vp2 = getWorst(platypust, "BRCA2")
