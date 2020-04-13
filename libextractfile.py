@@ -319,8 +319,14 @@ def extractSequenza(path) :
             if not l.startswith("chromosome") :
                 aux = l.strip("\n").split("\t")
                 chr = aux[col_c].replace("chr", "")
-                tcn = int(aux[col_tcn])
-                lcn = int(aux[col_lcn])
+                if aux[col_tcn] == "NA" :
+                    tcn = -1
+                else :
+                    tcn = int(aux[col_tcn])
+                if aux[col_lcn] == "NA" :
+                    lcn = -1
+                else :
+                    lcn = int(aux[col_lcn])
                 if chr in lc.chromosomes :
                     reg = [int(aux[col_s]), int(aux[col_e]), getCN(tcn, lcn), tcn, lcn, "NA"]
                     if chr in seq.keys() :
