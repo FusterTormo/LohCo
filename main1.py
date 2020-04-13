@@ -22,6 +22,7 @@ import os
 import sys
 import subprocess
 import libgetters as lg
+import libcomparison as lc
 
 # Constants
 dbcon = sqlite3.connect("/g/strcombio/fsupek_cancer2/TCGA_bam/info/info.db")
@@ -114,6 +115,14 @@ def getWorst(vcf, gene) :
 				break
 	return worst
 
+def getLOH(path, program, gene) :
+	sol = "Not found"
+	if os.path.isfile(path):
+		reg = lc.convert2region(path, program)
+		sol = lg.getCopyNumber(gene[1:3], gene[0], reg)
+
+	return sol
+
 # Preparar la taula amb les mostres, les seues variants en els gens a estudi (BRCA1, BRCA2, ATM i PALB2) i el Copy number associat en cadascuna de les regions
 def prepareTable() :
 	cont = 0
@@ -143,15 +152,23 @@ def prepareTable() :
 				cf = "{wd}/{sub}/{control}".format(wd = wd, sub = c[0], control = cn[0])
 				platypust = "{}/platypusGerm/platypus.hg38_multianno.txt".format(tf)
 				platypusc = "{}/platypusGerm/platypus.hg38_multianno.txt".format(cf)
+				# Get the information regarding the worst variant in BRCA1 found in platypus variant calling
 				vpt1 = getWorst(platypust, "BRCA1").split("\t")
 				vpc1 = getWorst(platypusc, "BRCA1").split("\t")
-				print("{case}\t{tID}\t{cID}\tBRCA1\t{mt}\t{mc}\t{lohF}\t{lohA}\t{lohS}".format(case = c[0], tID = tm[0], cID = cn[0], mt = vpt1[8], mc = vpc1[8], lohF = "Pending", lohA = "Pending", lohS = "Pending"))
-				sys.exit()
-				vp2 = getWorst(platypust, "BRCA2")
-				vp3 = getWorst(platypust, "ATM")
-				vp4 = getWorst(platypust, "PALB2")
-				strelka = "{}/strelkaGerm/results/variants/strelka.hg38_multianno.txt".format(tf)
-				vs = getWorst(strelka, "ATM")
-				cf = "{wd}/{sub}/{control}".format(wd = wd, sub = c[0], control = cn[0])
+				# Get the LOH information from the different programs
+				analysis = "{}_VS_{}".format(tm[0].split("-")[0], cn[0].split("-")[0]) # The folder format for FACETS, ascatNGS, and Sequenza is "[tumorUUID]_VS_[controlUUID]"
+				facets = "{}_FACETS/facets_comp_cncf.tsv".format(analysis)
+				loh1 = getLOH(facets, "facets", brca1)
+				ascat = "{folder}_ASCAT/{bamName}.copynumber.caveman.csv".format(folder = analysis, bamName = "Not known")
+				sequenza = "{folder}_Sequenza/{case}_segments.txt".format(folder = analysis, case = c[0])
+				print("{case}\t{tID}\t{cID}\tBRCA1\t{mt}\t{mc}\t{lohF}\t{lohA}\t{lohS}".format(case = c[0], tID = tm[0], cID = cn[0], mt = vpt1[8], mc = vpc1[8], lohF = loh1, lohA = "Pending", lohS = "Pending"))
+				if loh1 != "Not found" :
+					sys.exit()
+				# vp2 = getWorst(platypust, "BRCA2")
+				# vp3 = getWorst(platypust, "ATM")
+				# vp4 = getWorst(platypust, "PALB2")
+				# strelka = "{}/strelkaGerm/results/variants/strelka.hg38_multianno.txt".format(tf)
+				# vs = getWorst(strelka, "ATM")
+				# cf = "{wd}/{sub}/{control}".format(wd = wd, sub = c[0], control = cn[0])
 
 prepareTable()
