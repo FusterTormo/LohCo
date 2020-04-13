@@ -158,13 +158,13 @@ def prepareTable() :
 				vpc1 = getWorst(platypusc, "BRCA1")
 				# Get the LOH information from the different programs
 				analysis = "{}_VS_{}".format(tm[0].split("-")[0], cn[0].split("-")[0]) # The folder format for FACETS, ascatNGS, and Sequenza is "[tumorUUID]_VS_[controlUUID]"
-				facets = "{}_FACETS/facets_comp_cncf.tsv".format(analysis)
+				facets = "{wd}/{sub}/{folder}_FACETS/facets_comp_cncf.tsv".format(wd = wd, c[0], folder = analysis)
 				loh1 = getLOH(facets, "facets", brca1)
+				sequenza = "{wd}/{case}/{folder}_Sequenza/{case}_segments.txt".format(folder = analysis, case = c[0], wd = wd)
+				loh3 = getLOH(sequenza, "sequenza", brca1)
 				ascat = "{folder}_ASCAT/{bamName}.copynumber.caveman.csv".format(folder = analysis, bamName = "Not known")
-				sequenza = "{folder}_Sequenza/{case}_segments.txt".format(folder = analysis, case = c[0])
-				print("{case}\t{tID}\t{cID}\tBRCA1\t{mt}\t{mc}\t{lohF}\t{lohA}\t{lohS}".format(case = c[0], tID = tm[0], cID = cn[0], mt = vpt1, mc = vpc1, lohF = loh1, lohA = "Pending", lohS = "Pending"))
-				if loh1 != "Not found" :
-					sys.exit()
+				print("{case}\t{tID}\t{cID}\tBRCA1\t{mt}\t{mc}\t{lohF}\t{lohA}\t{lohS}".format(case = c[0], tID = tm[0], cID = cn[0], mt = vpt1, mc = vpc1, lohF = loh1, lohA = "Pending", lohS = loh3))
+				
 				# vp2 = getWorst(platypust, "BRCA2")
 				# vp3 = getWorst(platypust, "ATM")
 				# vp4 = getWorst(platypust, "PALB2")
