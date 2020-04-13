@@ -107,7 +107,6 @@ def getWorst(vcf, gene) :
 			aux = l.split("\t") # Get the gene name
 			if aux[6] == gene :
 				found = True
-				print(l)
 				if classifier.index(aux[8]) > level :
 					level = classifier.index(aux[8])
 					worst = l
@@ -144,9 +143,9 @@ def prepareTable() :
 				cf = "{wd}/{sub}/{control}".format(wd = wd, sub = c[0], control = cn[0])
 				platypust = "{}/platypusGerm/platypus.hg38_multianno.txt".format(tf)
 				platypusc = "{}/platypusGerm/platypus.hg38_multianno.txt".format(cf)
-				vpt1 = getWorst(platypust, "BRCA1")
-				vpc1 = getWorst(platypusc, "BRCA1")
-				print("{case}\t{tID}\t{cID}\tBRCA1\t{mt}\t{mc}\t{lohF}\t{lohA}\t{lohS}".format(case = c[0], tID = tm[0], cID = cn[0], mt = vpt1, mc = vpc1, lohF = "Pending", lohA = "Pending", lohS = "Pending"))
+				vpt1 = getWorst(platypust, "BRCA1").split("\t")
+				vpc1 = getWorst(platypusc, "BRCA1").split("\t")
+				print("{case}\t{tID}\t{cID}\tBRCA1\t{mt}\t{mc}\t{lohF}\t{lohA}\t{lohS}".format(case = c[0], tID = tm[0], cID = cn[0], mt = vpt1[8], mc = vpc1[8], lohF = "Pending", lohA = "Pending", lohS = "Pending"))
 				sys.exit()
 				vp2 = getWorst(platypust, "BRCA2")
 				vp3 = getWorst(platypust, "ATM")
