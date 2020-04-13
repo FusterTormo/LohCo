@@ -128,8 +128,11 @@ def findAscatName(path) :
 	if os.path.isdir(path) :
 		for root, dirs, files in os.walk(path) :
 			break
-		print(files)
-		sys.exit()
+		for f in files :
+			if f.endswith("copynumber.caveman.csv") :
+				ret = "{}/{}".format(path, f)
+
+	return ret
 
 # Preparar la taula amb les mostres, les seues variants en els gens a estudi (BRCA1, BRCA2, ATM i PALB2) i el Copy number associat en cadascuna de les regions
 def prepareTable() :
@@ -145,7 +148,7 @@ def prepareTable() :
 		cases = q.fetchall()
 	for c in cases :
 		cont += 1
-		print("INFO: {} cases checked".format(cont))
+		#print("INFO: {} cases checked".format(cont))
 		# Recollir la informacio dels bams i el sexe que te el cas registrats
 		with dbcon :
 			cur = dbcon.cursor()
@@ -155,7 +158,7 @@ def prepareTable() :
 			controls = q.fetchall()
 		for tm in tumors :
 			for cn in controls :
-				print("Checking Case {}. Tumor id {}. Control id {}".format(c[0], tm[0], cn[0]))
+				#print("Checking Case {}. Tumor id {}. Control id {}".format(c[0], tm[0], cn[0]))
 				tf = "{wd}/{sub}/{tumor}".format(wd = wd, sub = c[0], tumor = tm[0])
 				cf = "{wd}/{sub}/{control}".format(wd = wd, sub = c[0], control = cn[0])
 				platypust = "{}/platypusGerm/platypus.hg38_multianno.txt".format(tf)
@@ -167,12 +170,15 @@ def prepareTable() :
 				analysis = "{}_VS_{}".format(tm[0].split("-")[0], cn[0].split("-")[0]) # The folder format for FACETS, ascatNGS, and Sequenza is "[tumorUUID]_VS_[controlUUID]"
 				facets = "{wd}/{sub}/{folder}_FACETS/facets_comp_cncf.tsv".format(wd = wd, sub = c[0], folder = analysis)
 				loh1 = getLOH(facets, "facets", brca1)
-				ascat = findAscatName("{folder}_ASCAT/".format(folder = analysis))
-				
+				ascat = findAscatName("{wd}/{case}/{folder}_ASCAT/".format(wd = wd, case = c[0], folder = analysis))
+				if ascat != "Not found" :
+					loh2 = getLOH(ascat, "ascatngs", brca1)
+				else :
+					loh2 = "Not found"
 				sequenza = "{wd}/{case}/{folder}_Sequenza/{case}_segments.txt".format(folder = analysis, case = c[0], wd = wd)
 				loh3 = getLOH(sequenza, "sequenza", brca1)
 
-				print("{case}\t{tID}\t{cID}\tBRCA1\t{mt}\t{mc}\t{lohF}\t{lohA}\t{lohS}".format(case = c[0], tID = tm[0], cID = cn[0], mt = vpt1, mc = vpc1, lohF = loh1, lohA = "Pending", lohS = loh3))
+				print("{case}\t{tID}\t{cID}\tBRCA1\t{mt}\t{mc}\t{lohF}\t{lohA}\t{lohS}".format(case = c[0], tID = tm[0], cID = cn[0], mt = vpt1, mc = vpc1, lohF = loh1, lohA = loh2, lohS = loh3))
 
 				# vp2 = getWorst(platypust, "BRCA2")
 				# vp3 = getWorst(platypust, "ATM")
