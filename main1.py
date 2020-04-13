@@ -102,7 +102,7 @@ def getWorst(vcf, gene) :
 	classifier = ["NA", "synonymous SNV", "nonsynonymous SNV", "nonframeshift substitution", "nonframeshift deletion",  "frameshift deletion", "frameshift insertion", "stopgain"]
 	level = -1
 	order = []
-	worst = ""
+	worst = "Not found"
 	with open(vcf, "r") as fi :
 		for l in fi :
 			aux = l.split("\t") # Get the gene name
@@ -110,13 +110,14 @@ def getWorst(vcf, gene) :
 				found = True
 				if classifier.index(aux[8]) > level :
 					level = classifier.index(aux[8])
-					worst = l
+					worst = aux[8]
 			elif found :
 				break
 	return worst
 
 def getLOH(path, program, gene) :
 	sol = "Not found"
+	print(path)
 	if os.path.isfile(path):
 		reg = lc.convert2region(path, program)
 		sol = lg.getCopyNumber(gene[1:3], gene[0], reg)
@@ -153,15 +154,15 @@ def prepareTable() :
 				platypust = "{}/platypusGerm/platypus.hg38_multianno.txt".format(tf)
 				platypusc = "{}/platypusGerm/platypus.hg38_multianno.txt".format(cf)
 				# Get the information regarding the worst variant in BRCA1 found in platypus variant calling
-				vpt1 = getWorst(platypust, "BRCA1").split("\t")
-				vpc1 = getWorst(platypusc, "BRCA1").split("\t")
+				vpt1 = getWorst(platypust, "BRCA1")
+				vpc1 = getWorst(platypusc, "BRCA1")
 				# Get the LOH information from the different programs
 				analysis = "{}_VS_{}".format(tm[0].split("-")[0], cn[0].split("-")[0]) # The folder format for FACETS, ascatNGS, and Sequenza is "[tumorUUID]_VS_[controlUUID]"
 				facets = "{}_FACETS/facets_comp_cncf.tsv".format(analysis)
 				loh1 = getLOH(facets, "facets", brca1)
 				ascat = "{folder}_ASCAT/{bamName}.copynumber.caveman.csv".format(folder = analysis, bamName = "Not known")
 				sequenza = "{folder}_Sequenza/{case}_segments.txt".format(folder = analysis, case = c[0])
-				print("{case}\t{tID}\t{cID}\tBRCA1\t{mt}\t{mc}\t{lohF}\t{lohA}\t{lohS}".format(case = c[0], tID = tm[0], cID = cn[0], mt = vpt1[8], mc = vpc1[8], lohF = loh1, lohA = "Pending", lohS = "Pending"))
+				print("{case}\t{tID}\t{cID}\tBRCA1\t{mt}\t{mc}\t{lohF}\t{lohA}\t{lohS}".format(case = c[0], tID = tm[0], cID = cn[0], mt = vpt1, mc = vpc1, lohF = loh1, lohA = "Pending", lohS = "Pending"))
 				if loh1 != "Not found" :
 					sys.exit()
 				# vp2 = getWorst(platypust, "BRCA2")
