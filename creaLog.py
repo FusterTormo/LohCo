@@ -26,8 +26,11 @@ bedtoolsBam2Bed = "bedtools bamtobed -i {bam} > bwa.bed" #Comando para crear un 
 gatk1 = "/opt/gatk-4.1.4.1/gatk BaseRecalibrator -I {bam} -R {ref} --known-sites {dbsnp} -O recaldata.table" # Comando para realizar el primer paso de la recalibracion de bases sugerida por GATK
 gatk2 = "/opt/gatk-4.1.4.1/gatk ApplyBQSR -I {bam} -R {ref} -bqsr-recal-file recaldata.table -O bwa.recal.bam" # Comando para realizar el segundo paso de la recalibracion de bases sugerida por GATK
 markDup = "java -jar /opt/picard-tools-2.21.8/picard.jar MarkDuplicates INPUT={bam} OUTPUT=bwa.nodup.bam METRICS_FILE=dups_bam.txt" # Comando para marcar duplicados usando Picard tools
-vc1 = "configureStrelkaGermlineWorkflow.py --bam {bam} --referenceFasta {ref} --exome --runDir variantCalling --callRegions {mani}" # Comando para ejecutar el variant caller que se va a usar (Strelka2)
+vc1 = "/opt/strelka-2.9.10/bin/configureStrelkaGermlineWorkflow.py --bam {bam} --referenceFasta {ref} --exome --runDir {variantDir} --callRegions {mani}" # Comando para ejecutar el variant caller que se va a usar (Strelka2)
 vc2 = "./runWorkflow.py -m local -j 6 --quiet"
+annovar = "/opt/annovar20180416/convert2annovar.pl -format vcf4 -outfile {out} -includeinfo {vcf}"
+annovar2 = "/opt/annovar20180416/annotate_variation.pl -geneanno -buildver hg19 -hgvs -separate -out {output} {input} /opt/annovar20180416/humandb/"
+annovar3 = "/opt/annovar20180416/table_annovar.pl {input} /opt/annovar20180416/humandb/ -buildver hg19 -out {output} -remove -protocol refGene,avsnp150,1000g2015aug_all,1000g2015aug_afr,1000g2015aug_amr,1000g2015aug_eas,1000g2015aug_eur,1000g2015aug_sas,exac03,gnomad211_exome,gnomad211_genome,esp6500siv2_all,esp6500siv2_ea,esp6500siv2_aa,clinvar_20190305,cosmic70,dbnsfp35a --operation g,f,f,f,f,f,f,f,f,f,f,f,f,f,f,f,f -nastring NA -otherinfo"
 
 
 anno = "" #Ruta al ANNOVAR (anotador de variantes)
@@ -234,11 +237,19 @@ def prepararScript(ruta) :
         # TODO: Estudios de coverage, on target, off target, porcentaje de bases con X coverage...
         fi.write("\n\tCOVERAGE\n")
         fi.write("\testadistiques de l'analisi: on target, off target, % bases amb X coverage, resum dels tests, % duplicats (si cal), grafiques de coverage")
-        fi.write("\t" + vc1.format(bam = "bwa.nodup.bam") + "\n")
-        fi.write("\tcd variantCalling\n")
+        # Variant calling. La carpeta donde se guardan los datos se llama variantCalling. En caso de queren cambiarse, modificar las dos siguientes lineas
+        fi.write("\t" + vc1.format(bam = "bwa.nodup.bam", ref = "$ref", variantDir = "variantCalling", mani = "$mani") + "\n")
+        fi.write("\tcd {}\n".format("variantCalling"))
         fi.write("\t" + vc2 + "\n")
-        fi.write("\T$HOME/anpanmds/variantAnnotation.sh variants.vcf")
-        fi.write("Script per re-anotar")
+        fi.write("\trsync -aP results/variants/variants.vcf.gz .\n")
+        fi.write("\tgunzip variants.vcf.gz\n")
+        # Anotacion de variantes usando ANNOVAR
+        fi.write("\t" + annovar.format(vcf = "variants.vcf", out = "raw.av") + "\n")
+        fi.write("\t" + annovar2.format(input = "raw.av", output = "raw") + "\n")
+        fi.write("\t" + annovar3.format(input = "raw.av", output = "raw") + "\n")
+        # Re-anotacion y filtrado de variantes usando myvariant.info
+
+        fi.write("\n\tScript per re-anotar")
         fi.write("Script per filtrar")
         fi.write("}\n\n")
 
