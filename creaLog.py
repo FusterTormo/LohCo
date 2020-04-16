@@ -36,12 +36,11 @@ annovar3 = "/opt/annovar20180416/table_annovar.pl {input} /opt/annovar20180416/h
 anno = "" #Ruta al ANNOVAR (anotador de variantes)
 cov = "" #Script de coverage que se va a hacer
 
-referencia = "/home/ffuster/panalisi/referencies/gatkHg19.fa"
+referencia = "/home/ffuster/share/biodata/solelab/referencies/ucsc/hg19.fa"
 manifest = "/home/ffuster/panalisi/resultats/manifest.bed"
 gzmanifest = "/home/ffuster/panalisi/resultats/manifest.bed.gz"
 manifestidx = "/home/ffuster/panalisi/resultats/manifest.bed.gz.tbi"
 # Descargado desde https://gnomad.broadinstitute.org/downloads
-indels = "/home/ffuster/panalisi/referencies/gold_indels.vcf" # TODO: Arxiu a eliminar
 dbsnp = "/home/ffuster/share/biodata/solelab/referencies/gnomad.exomes.r2.1.1.sites.vcf"
 genes = "/home/ffuster/panalisi/resultats/gensAestudi.txt"
 
@@ -188,6 +187,7 @@ def prepararScript(ruta) :
         fi.write("#Referencias usadas en este analisis\n")
         fi.write("ref={}\n".format(referencia))
         fi.write("mani={}\n".format(manifest))
+        fi.write("gzmani={}\n".format(gzmanifest))
         fi.write("indels={}\n".format(indels))
         fi.write("sites={}\n".format(dbsnp))
         fi.write("gens={}\n\n".format(genes))
@@ -238,7 +238,7 @@ def prepararScript(ruta) :
         fi.write("\n\tCOVERAGE\n")
         fi.write("\testadistiques de l'analisi: on target, off target, % bases amb X coverage, resum dels tests, % duplicats (si cal), grafiques de coverage")
         # Variant calling. La carpeta donde se guardan los datos se llama variantCalling. En caso de queren cambiarse, modificar las dos siguientes lineas
-        fi.write("\t" + vc1.format(bam = "bwa.nodup.bam", ref = "$ref", variantDir = "variantCalling", mani = "$mani") + "\n")
+        fi.write("\t" + vc1.format(bam = "bwaAlign/bwa.recal.bam", ref = "$ref", variantDir = "variantCalling", mani = "$gzmani") + "\n")
         fi.write("\tcd {}\n".format("variantCalling"))
         fi.write("\t" + vc2 + "\n")
         fi.write("\trsync -aP results/variants/variants.vcf.gz .\n")
