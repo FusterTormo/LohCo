@@ -252,4 +252,4 @@ def prepareTable() :
 				# vs = getWorst(strelka, "ATM")
 				# cf = "{wd}/{sub}/{control}".format(wd = wd, sub = c[0], control = cn[0])
 
-checkFacets
+checkFacets()
