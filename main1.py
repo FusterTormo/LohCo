@@ -96,6 +96,71 @@ def checkSequenza() :
 
 	print("Total errors: {}".format(errors))
 
+# Vore l'estatus de les mostres i executar FACETS en aquelles que no s'haja executat
+def checkFacets() :
+	rfacets = "/home/ffuster/Scripts/plotFacets.R"
+	bfacets = "/home/ffuster/Scripts/runFacets.sh"
+	cont = 0
+	errors = 0
+	messages = []
+	with dbcon :
+		cur = dbcon.cursor()
+		q = cur.execute("SELECT submitter FROM patient WHERE cancer='OV'")
+		cases = q.fetchall()
+
+	print("INFO: {} cases found".format(len(cases)))
+	for c in cases :
+		cont += 1
+		with dbcon :
+			cur = dbcon.cursor()
+			q = cur.execute("SELECT uuid, bamName FROM sample WHERE submitter='{}' AND tumor LIKE '%Tumor%'".format(c[0]))
+			tumors = q.fetchall()
+			q = cur.execute("SELECT uuid, bamName FROM sample WHERE submitter='{}' AND tumor LIKE '%Normal%'".format(c[0]))
+			controls = q.fetchall()
+		for tm in tumors :
+			for cn in controls :
+				aux = tm[0].split("-")[0]
+				aux2 = cn[0].split("-")[0]
+				folder = "{wd}/{sub}/{tumor}_VS_{control}".format(wd = wd, sub = c[0], tumor = aux, control = aux2)
+				fac = "{}_FACETS".format(folder)
+				# Comprovar si existeix la carpeta de l'analisi de FACETS
+				if os.path.isdir(fac) :
+					# Si existeix, comprovar si s'ha executat FACETS en la carpeta
+					if not os.path.isfile("{folder}/facets_comp_cncf.tsv".format(folder = fac)) :
+						cmd = "Rscript {plot} {folder}".format(plot = rfacets, folder = fac)
+						print("INFO: Checked {cases}. Running {com}".format(cases = cont, com = cmd))
+						proc = subprocess.Popen(cmd, shell = True, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+						out, err = proc.communicate()
+						if proc.returncode != 0 :
+							errors += 1
+							messages.append(cmd)
+							print("ERROR: While runing {}\nDescription:\n{}".format(cmd, err))
+				else :
+					bam1 = "{wd}/{sub}/{uuid}/{bam}".format(wd = wd, sub = c[0], uuid = cn[0], bam = cn[1])
+					bam2 = "{wd}/{sub}/{uuid}/{bam}".format(wd = wd, sub = c[0], uuid = tm[0], bam = tm[1])
+					cmd = "{com} {normal} {tumor} {folder}".format(com = bfacets, normal = bam1, tumor = bam2, folder = fac)
+					print("INFO: Checked {cases}. Running {com}".format(cases = cont, com = cmd))
+					proc = subprocess.Popen(cmd, shell = True, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+					out, err = proc.communicate()
+					if proc.returncode != 0 :
+						errors += 1
+						messages.append(cmd)
+						print("ERROR: While running {}\nDescription:\n{}".format(cmd, err))
+					else :
+						cmd = "Rscript {plot} {folder}".format(plot = rfacets, folder = fac)
+						proc = subprocess.Popen(cmd, shell = True, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+						out, err = proc.communicate()
+						if proc.returncode != 0 :
+							errors += 1
+							messages.append(cmd)
+							print("ERROR: While runing {}\nDescription:\n{}".format(cmd, err))
+
+	print("WARNING: Commands failed:".format(errors))
+	for m in messages :
+		print("-> {}".format(m))
+
+	print("Total errors: {}".format(m))
+
 # Buscar la pitjor variant reportada en el gen passat per parametre
 def getWorst(vcf, gene) :
 	found = False
@@ -187,4 +252,4 @@ def prepareTable() :
 				# vs = getWorst(strelka, "ATM")
 				# cf = "{wd}/{sub}/{control}".format(wd = wd, sub = c[0], control = cn[0])
 
-prepareTable()
+checkFacets
