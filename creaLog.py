@@ -239,14 +239,13 @@ def prepararScript(ruta) :
         fi.write("\t" + markDup.format(bam = "bwa.recal.bam") + "\n")
         fi.write("\t" + picardIndex.format(bam = "bwa.nodup.bam") + "\n")
         fi.write("\tcd ..")
-        # TODO: Estudios de on target, off target, porcentaje de bases con X coverage...
+        # Estudios de coverage, on target, off target, porcentaje de bases con X coverage...
         fi.write("\t" + bedtoolsCoverageAll.format(mani = "$mani", bam = "bwaAlign/bwa.recal.bam", output = "coverage.txt") + "\n")
         fi.write("\t" + bedtoolsCoverageBase.format(mani = "$mani", bam = "bwaAlign/bwa.recal.bam", output = "coverageBase.txt") + "\n")
         fi.write("\tgrep '^all' coverage.txt > coverageAll.txt\n")
         fi.write("\trm coverage.txt\n")
         fi.write("\tRscript coveragePanells.R\n")
-        fi.write("\tpython3 {}/bamQC.py\n".format(wd))
-        fi.write("\testadistiques de l'analisi: on target, off target, % bases amb X coverage, resum dels tests, % duplicats (si cal), grafiques de coverage")
+        fi.write("\tpython3 {}/bamQC.py\n".format(wd)) # Hay una opcion de lanzar pctDups (calcular porcentaje de duplicados) en caso de exomas
         # Variant calling. La carpeta donde se guardan los datos se llama variantCalling. En caso de queren cambiarse, modificar las dos siguientes lineas
         fi.write("\t" + vc1.format(bam = "bwaAlign/bwa.recal.bam", ref = "$ref", variantDir = "variantCalling", mani = "$gzmani") + "\n")
         fi.write("\tcd {}\n".format("variantCalling"))
