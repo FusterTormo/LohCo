@@ -12,6 +12,7 @@ bed = "bwaAlign/bwa.bed"
 fastqc = "fastqc"
 fastqcFI = "fastqc_data.txt"
 manifest = "/home/ffuster/panalisi/resultats/manifest.bed"
+output = "alnQC.txt"
 
 def convertirManifest() :
     m = {}
@@ -48,6 +49,7 @@ def main() :
     reads = []
 
     # Comprobar si existe la carpeta de FASTQC. Extraer la informacion necesaria de los FASTQ en tal caso
+    print("INFO: Leyendo FASTQ")
     if os.path.isdir(fastqc) :
         for dir, dirnames, filenames in os.walk(fastqc) :
             break
@@ -60,12 +62,14 @@ def main() :
                         break
 
     # Comprobar si existe el manifest. Convertirlo en un diccionario para acceder a los reads mas rapidamente
+    print("INFO: Leyendo manifest")
     if os.path.isfile(manifest) :
-        manifest = convertirManifest()
+        dic = convertirManifest()
+        print("INFO: Leyendo alineamiento")
         if os.path.isfile(bed) :
             with open(bed, "r") as fi :
                 for l in fi :
-                    if enManifest(l, manifest) :
+                    if enManifest(l, dic) :
                         on += 1
                     else :
                         off += 1
@@ -76,9 +80,12 @@ def main() :
 
     fqreads = sum(reads)
     breads = on + off
-    print("INFO: {} reads en FASTQ".format(fqreads))
-    print("INFO: {} reads en bam")
-    print("INFO: {} ON target, {} OFF target".format(on, off))
+    print("INFO: Escribiendo resultados en {}".format(output))
+    with open(output, "w") as fi :
+        fi.write("FASTQ: {}\n".format(fqreads))
+        fi.write("BAM: {}\n".format(breads))
+        fi.write("ON: {}\n".format(on))
+        fi.write("OFF: {}\n".format(off))
 
 if __name__ == "__main__" :
     main()
