@@ -2,6 +2,8 @@ import httplib2
 import requests
 import sys
 
+"""
+WARNING - Funcion desechada temporalmente. La informacion del VEP por ahora no es necesaria y puede que este script este obsoleto
 def getVep() :
     #Recoger datos de ENSEMBL VEP (solo datos de splicing)
     #http://grch37.rest.ensembl.org/vep/human/hgvs/ZRSR2:c.827+1G>A?content-type=application/json&MaxEntScan=true&GeneSplicer=true&dbscSNV=true
@@ -18,15 +20,49 @@ def getVep() :
 
     decoded = r.json()
     print repr(decoded)
+"""
 
 def getMyVariant(chr, pos, ref, alt, na='NA') :
+    """
+    Recoger los datos desde myvariant.info para una mutacion puntual dada
+
+    Consulta en myvariant.info la informacion disponible de base de datos poblacionales de la variante que se ha pasado por parametro. Recoge los datos de
+    1000genomes (desde CADD y dbNSFP)
+    EVS (desde CADD y dbNSFP)
+    ExAC (desde ExAC y dbNSFP)
+    gNOMAD (genome y exome)
+    dbSNP
+
+    Parameters
+    ----------
+        chr : str
+            Nombre del cromosoma. Se valida/corrige en caso de que el formato no sea correcto para myvariant.info
+        pos : str
+            Posicion donde esta la variante que se quiere consultar
+        ref : str
+            Base de referencia que ha sido modificada. Se comprueba que sea un unico caracter (A, C, T o G)
+        alt : str
+            Base observada en lugar de la de referencia. Se comprueba que sea un unico caracter (A, C, T o G)
+        na : str, optional
+            Texto que aparecera cuando no se encuentra informacion en un campo. Por defecto 'NA'
+    Returns
+    -------
+        dict
+            Diccionario con todos los datos recogidos para la variable. Los nombres de los indices se pueden ver en la variable siguiente
+    """
     mv = {'CADD_1000g_all' : na, 'CADD_1000g_afr' : na, 'CADD_1000g_amr' : na, 'CADD_1000g_eur' : na, 'CADD_1000g_eas' : na, 'CADD_1000g_sas' : na,
     'dbNSFP_1000g_all' : na, 'dbNSFP_1000g_afr' : na, 'dbNSFP_1000g_amr' : na, 'dbNSFP_1000g_eur' : na, 'dbNSFP_1000g_eas' : na, 'dbNSFP_1000g_sas' : na,
     'CADD_ESP6500_all' : na, 'CADD_ESP6500_ea' : na, 'CADD_ESP6500_aa' : na,
     'dbNSFP_esp6500_all' : na, 'dbNSFP_esp6500_ea' : na, 'dbNSFP_esp6500_aa' : na,
     'ExAC_ExAC_all' : na, 'ExAC_ExAC_afr' : na, 'ExAC_ExAC_amr' : na, 'ExAC_ExAC_eas' : na, 'ExAC_ExAC_fin' : na, 'ExAC_ExAC_nfe' : na, 'ExAC_ExAC_oth' : na, 'ExAC_ExAC_sas' : na,
     'dbNSFP_ExAC_all' : na, 'dbNSFP_ExAC_afr' : na, 'dbNSFP_ExAC_amr' : na, 'dbNSFP_ExAC_eas' : na, 'dbNSFP_ExAC_fin' : na, 'dbNSFP_ExAC_nfe' : na, 'dbNSFP_ExAC_oth' : na, 'dbNSFP_ExAC_sas' : na,
+    'gNOMAD_Exome_all' : na, 'gNOMAD_Exome_afr'  : na, 'gNOMAD_Exome_amr' : 'gNOMAD_Exome_asj' : na, 'gNOMAD_Exome_eas' : na, 'gNOMAD_Exome_fin' : na, 'gNOMAD_Exome_nfe' : na, 'gNOMAD_Exome_oth' : na, 'gNOMAD_Exome_popmax' : na, 'gNOMAD_Exome_raw' : na, 'gNOMAD_Exome_sas' : na,
+    'gNOMAD_Genome_all' : na, 'gNOMAD_Genome_afr'  : na, 'gNOMAD_Genome_amr' : 'gNOMAD_Genome_asj' : na, 'gNOMAD_Genome_eas' : na, 'gNOMAD_Genome_fin' : na, 'gNOMAD_Genome_nfe' : na, 'gNOMAD_Genome_oth' : na, 'gNOMAD_Genome_popmax' : na, 'gNOMAD_Genome_raw' : na,
     'dbSNP_MAF' : na}
+
+    # Comrpobar si el cromosoma tiene el formato adecuado
+    if not chr.startswith('chr') :
+        chr = "chr{}".format(chr)
 
     if len(ref) == 1 and len(alt) == 1 and ref in ['A','C','G','T'] and alt in ['A','C','G','T'] :
         hgvs = chr + ':g.' + pos + ref + '>' + alt
@@ -38,6 +74,7 @@ def getMyVariant(chr, pos, ref, alt, na='NA') :
         campos = "cadd.1000g,dbnsfp.1000gp3,"
         campos += "cadd.esp,dbnsfp.esp6500,"
         campos += "exac,dbnsfp.exac,"
+        campos += "gnomad_exome,gnomad_genome,"
         campos += "dbsnp.gmaf"
         #cadd.esp,dbnsfp.esp6500,dbnsfp.1000gp3,dbnsfp.exac,dbsnp.rsid,dbsnp.gmaf,exac,exac_nontcga,snpeff"
         params = 'ids=' + hgvs + '&fields=%s' % (campos)
@@ -109,6 +146,52 @@ def getMyVariant(chr, pos, ref, alt, na='NA') :
                     #No hay datos para la poblacion Other en dbNSFP actualmente
                     if 'sas_af' in a['dbnsfp']['exac'] :
                         mv['dbNSFP_ExAC_sas'] = str(a['dbnsfp']['exac']['sas_af'])
+            if 'gnomad_exome' in a :
+                if 'af' in a['gnomad_exome'] :
+                    if 'af' in a['gnomad_exome']['af'] :
+                        mv['gNOMAD_Exome_all'] = a['gnomad_exome']['af']['af']
+                    if 'af_afr' in a['gnomad_exome']['af'] :
+                        mv['gNOMAD_Exome_afr'] = a['gnomad_exome']['af']['af_afr']
+                    if 'af_amr' in a['gnomad_exome']['af'] :
+                        mv['gNOMAD_Exome_amr'] = a['gnomad_exome']['af']['af_amr']
+                    if 'af_asj' in a['gnomad_exome']['af'] :
+                        mv['gNOMAD_Exome_asj'] = a['gnomad_exome']['af']['af_asj']
+                    if 'af_eas' in a['gnomad_exome']['af'] :
+                        mv['gNOMAD_Exome_eas'] = a['gnomad_exome']['af']['af_eas']
+                    if 'af_fin' in a['gnomad_exome']['af'] :
+                        mv['gNOMAD_Exome_fin'] = a['gnomad_exome']['af']['af_fin']
+                    if 'af_nfe' in a['gnomad_exome']['af'] :
+                        mv['gNOMAD_Exome_nfe'] = a['gnomad_exome']['af']['af_nfe']
+                    if 'af_oth' in a['gnomad_exome']['af'] :
+                        mv['gNOMAD_Exome_oth'] = a['gnomad_exome']['af']['af_oth']
+                    if 'af_popmax' in a['gnomad_exome']['af'] :
+                        mv['gNOMAD_Exome_popmax'] = a['gnomad_exome']['af']['af_popmax']
+                    if 'af_raw' in a['gnomad_exome']['af'] :
+                        mv['gNOMAD_Exome_raw'] = a['gnomad_exome']['af']['af_raw']
+                    if 'af_sas' in a['gnomad_exome']['af'] :
+                        mv['gNOMAD_Exome_sas'] = a['gnomad_exome']['af']['af_sas']
+            if 'gnomad_genome' in a :
+                if 'af' in a['gnomad_genome'] :
+                    if 'af' in a['gnomad_genome']['af'] :
+                        mv['gNOMAD_Genome_all'] = a['gnomad_genome']['af']['af']
+                    if 'af_afr' in a['gnomad_genome']['af'] :
+                        mv['gNOMAD_Genome_afr'] = a['gnomad_genome']['af']['af_afr']
+                    if 'af_amr' in a['gnomad_genome']['af'] :
+                        mv['gNOMAD_Genome_amr'] = a['gnomad_genome']['af']['af_amr']
+                    if 'af_asj' in a['gnomad_genome']['af'] :
+                        mv['gNOMAD_Genome_asj'] = a['gnomad_genome']['af']['af_asj']
+                    if 'af_eas' in a['gnomad_genome']['af'] :
+                        mv['gNOMAD_Genome_eas'] = a['gnomad_genome']['af']['af_eas']
+                    if 'af_fin' in a['gnomad_genome']['af'] :
+                        mv['gNOMAD_Genome_fin'] = a['gnomad_genome']['af']['af_fin']
+                    if 'af_nfe' in a['gnomad_genome']['af'] :
+                        mv['gNOMAD_Genome_nfe'] = a['gnomad_genome']['af']['af_nfe']
+                    if 'af_oth' in a['gnomad_genome']['af'] :
+                        mv['gNOMAD_Genome_oth'] = a['gnomad_genome']['af']['af_oth']
+                    if 'af_popmax' in a['gnomad_genome']['af'] :
+                        mv['gNOMAD_Genome_popmax'] = a['gnomad_genome']['af']['af_popmax']
+                    if 'af_raw' in a['gnomad_genome']['af'] :
+                        mv['gNOMAD_Genome_raw'] = a['gnomad_genome']['af']['af_raw']
             if 'exac' in a :
                 #La base de datos de exac no devuelve frecuencias alelicas, sino numero de veces que el alelo aparece en sus bases de datos y numero de veces del alelo normal
                 #Si en la posicion hay variantes multialelicas, exac devuelve el contaje de todos los alelos. Hay que comprobar cual es el alelo que se busca
@@ -187,6 +270,7 @@ def getMyVariant(chr, pos, ref, alt, na='NA') :
 
 
 def main() :
+    # Dummy unitary test
     header = False
     with open("MO739/filtro4.allInfo","r") as fi :
         for l in fi :
