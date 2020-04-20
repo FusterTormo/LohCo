@@ -25,6 +25,8 @@ picardIndex = "java -jar /opt/picard-tools-2.21.8/picard.jar BuildBamIndex INPUT
 bedtoolsBam2Bed = "bedtools bamtobed -i {bam} > bwa.bed" #Comando para crear un bed con todas las regiones donde se han alineado reads
 gatk1 = "/opt/gatk-4.1.4.1/gatk BaseRecalibrator -I {bam} -R {ref} --known-sites {dbsnp} -O recaldata.table" # Comando para realizar el primer paso de la recalibracion de bases sugerida por GATK
 gatk2 = "/opt/gatk-4.1.4.1/gatk ApplyBQSR -I {bam} -R {ref} -bqsr-recal-file recaldata.table -O bwa.recal.bam" # Comando para realizar el segundo paso de la recalibracion de bases sugerida por GATK
+bedtoolsCoverageAll = "bedtools coverage -hist -a {mani} -b {bam} > {output}" # Comando para calcular el coverage agrupado del bam en las regiones del manifest
+bedtoolsCoverageBase = "bedtools coverage -d -a {mani} -b {bam} > {output}" # Comando para calcular el coverage de cada una de las bases dentro de la region de interes
 markDup = "java -jar /opt/picard-tools-2.21.8/picard.jar MarkDuplicates INPUT={bam} OUTPUT=bwa.nodup.bam METRICS_FILE=dups_bam.txt" # Comando para marcar duplicados usando Picard tools
 vc1 = "/opt/strelka-2.9.10/bin/configureStrelkaGermlineWorkflow.py --bam {bam} --referenceFasta {ref} --exome --runDir {variantDir} --callRegions {mani}" # Comando para ejecutar el variant caller que se va a usar (Strelka2)
 vc2 = "./runWorkflow.py -m local -j 6 --quiet"
@@ -204,7 +206,6 @@ def prepararScript(ruta) :
         fi.write("\tmv ../{} .\n".format(arxiu))
         fi.write("}\n\n")
 
-        # TODO Crear les comandes per cadascuna de les etapes de l'analisi
         # TODO: Esta part es com si posara analizar.sh dins del log
         fi.write("function analisi {\n")
         fi.write("\tforward=$1\n\treverse=$2\n\treadgroup=$3\n\talias=$4\n")
@@ -234,8 +235,13 @@ def prepararScript(ruta) :
         fi.write("\t" + markDup.format(bam = "bwa.recal.bam") + "\n")
         fi.write("\t" + picardIndex.format(bam = "bwa.nodup.bam") + "\n")
         fi.write("\tcd ..")
-        # TODO: Estudios de coverage, on target, off target, porcentaje de bases con X coverage...
-        fi.write("\n\tCOVERAGE\n")
+        # TODO: Estudios de on target, off target, porcentaje de bases con X coverage...
+        fi.write("\t" + bedtoolsCoverageAll.format(mani = "$mani", bam = "bwaAlign/bwa.recal.bam", output = "coverage.txt") + "\n")
+        fi.write("\t" + bedtoolsCoverageBase.format(mani = "$mani", bam = "bwaAlign/bwa.recal.bam", output = "coverageBase.txt") + "\n")
+        fi.write("\tgrep '^all' coverage.txt > coverageAll.txt\n")
+        fi.write("\trm coverage.txt\n")
+        fi.write("\tRscript coveragePanells.R\n")
+        fi.write("\tpython3 bamQC.py\n")
         fi.write("\testadistiques de l'analisi: on target, off target, % bases amb X coverage, resum dels tests, % duplicats (si cal), grafiques de coverage")
         # Variant calling. La carpeta donde se guardan los datos se llama variantCalling. En caso de queren cambiarse, modificar las dos siguientes lineas
         fi.write("\t" + vc1.format(bam = "bwaAlign/bwa.recal.bam", ref = "$ref", variantDir = "variantCalling", mani = "$gzmani") + "\n")

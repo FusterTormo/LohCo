@@ -1,12 +1,12 @@
+# Constantes. Nombres esperados de los archivos para hacer los graficos y los calculos de coverage
+lista <- 'gensAestudi.txt'
+base <- 'coveragePerBase.txt'
+all <- 'coverageAll.txt'
+salida <- 'coverage.txt' # Archivo donde se guardan las estadisticas de coverage
+
 #Crear un grafico con el porcentaje de bases que tienen un coverage X. En el eje X se dibuja el coverage y en el eje Y el porcentaje de bases que tienen dicho coverage
-coverageGeneral <- function(){
-  # Esta funcion asume que, en el directorio de trabajo, existen los archivos coveragePerBase.txt y coverageAll.txt
-  base <- 'coveragePerBase.txt'
-  all <- 'coverageAll.txt'
-  
+coverageGeneral <- function(cov){
   #Calcular coverage maximo a dibujar a partir del coverage medio
-  cov <- read.table(base)
-  colnames(cov) <- c("chr","start","end","gen","base","coverage")
   maxCov <- round(max(cov$coverage)*1.5)
   
   #Leer los datos
@@ -34,15 +34,10 @@ coverageGeneral <- function(){
 }
 
 # Dibuja un grafico con el coverage que tiene cada uno de los genes que hay en el archivo gensAestudi.txt. Asume que existen, en el directorio de trabajo, los archivos gensAestudi.txt y coveragePerBase.txt
-coveragePerGen <- function(){
-  lista <- 'gensAestudi.txt'
-  base <- 'coveragePerBase.txt'
+coveragePerGen <- function(cov){
   # Leer la lista de genes. Se crea un grafico por cada fila
   gens <- read.table(lista)
   colnames(gens) <- c("nom")
-  # Leer el archivo de coverage por base
-  cov <- read.table(base)
-  colnames(cov) <- c("chr","start","end","gen","base","coverage")
   
   # Crear los graficos. Uno por cada gen que hay en la lista de genes (gensAestudi.txt)
   for(it in 1:length(gens$nom)) {
@@ -51,13 +46,38 @@ coveragePerGen <- function(){
     maxCov <- max(aux$coverage)
     plot(aux$coverage, type="l", xlab="Bases", ylab="Coverage", ylim=c(0,maxCov), col="deepskyblue1", lwd=2, main=paste("Coverage", "de", gens$nom[it]))
     abline(h=0.0, col = "gray20")
-    abline(h=100, col = "gray30")
-    abline(h=500, col = "gray40")
-    abline(h=1000, col = "gray50")
+    abline(h=100, col = "firebrick1") # Rojo
+    abline(h=500, col = "darkorange") # Naranja
+    abline(h=1000, col = "forestgreen") # Verde
     dev.off()
   }
 }
 
+estadisticas <- function(cov) {
+  minimo <- min(cov$coverage)
+  maximo <- max(cov$coverage)
+  media <- mean(cov$coverage)
+  mediana <- median(cov$coverage)
+  total <- length(cov$coverage)
+  cov0 <- length(cov[cov$coverage == 0,]$coverage)
+  cov30 <- length(cov[cov$coverage <= 30,]$coverage)
+  cov100 <- length(cov[cov$coverage <= 100,]$coverage)
+  cov500 <- length(cov[cov$coverage <= 500,]$coverage)
+  cov1000 <- length(cov[cov$coverage <= 1000,]$coverage)
+  cat("minimo:", minimo, "\n", file = salida)
+  cat("maximo:", maximo, "\n", file = salida, append = TRUE)
+  cat("media:", media, "\n", file = salida, append = TRUE)
+  cat("mediana:", mediana, "\n", file = salida, append = TRUE)
+  cat("bases0:", cov0/total*100, "\n", file = salida, append = TRUE)
+  cat("bases30:", cov30/total*100, "\n", file = salida, append = TRUE)
+  cat("bases100:", cov100/total*100, "\n", file = salida, append = TRUE)
+  cat("bases500:", cov500/total*100, "\n", file = salida, append = TRUE)
+  cat("bases1000:", cov1000/total*100, "\n", file = salida, append = TRUE)
+}
+
 #Programa principal
-coverageGeneral()
-coveragePerGen()
+cov <- read.table(base)
+colnames(cov) <- c("chr","start","end","gen","base","coverage")
+estadisticas(cov)
+coverageGeneral(cov)
+coveragePerGen(cov)
