@@ -11,6 +11,7 @@ import os
 bed = "bwaAlign/bwa.bed"
 fastqc = "fastqc"
 fastqcFI = "fastqc_data.txt"
+manifest = "/home/ffuster/panalisi/resultats/manifest.bed"
 
 def convertirManifest() :
     m = {}
@@ -78,6 +79,6 @@ def main() :
     print("INFO: {} reads en FASTQ".format(fqreads))
     print("INFO: {} reads en bam")
     print("INFO: {} ON target, {} OFF target".format(on, off))
-    
+
 if __name__ == "__main__" :
     main()

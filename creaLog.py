@@ -34,20 +34,24 @@ annovar = "/opt/annovar20180416/convert2annovar.pl -format vcf4 -outfile {out} -
 annovar2 = "/opt/annovar20180416/annotate_variation.pl -geneanno -buildver hg19 -hgvs -separate -out {output} {input} /opt/annovar20180416/humandb/"
 annovar3 = "/opt/annovar20180416/table_annovar.pl {input} /opt/annovar20180416/humandb/ -buildver hg19 -out {output} -remove -protocol refGene,avsnp150,1000g2015aug_all,1000g2015aug_afr,1000g2015aug_amr,1000g2015aug_eas,1000g2015aug_eur,1000g2015aug_sas,exac03,gnomad211_exome,gnomad211_genome,esp6500siv2_all,esp6500siv2_ea,esp6500siv2_aa,clinvar_20190305,cosmic70,dbnsfp35a --operation g,f,f,f,f,f,f,f,f,f,f,f,f,f,f,f,f -nastring NA -otherinfo"
 
-
-anno = "" #Ruta al ANNOVAR (anotador de variantes)
-cov = "" #Script de coverage que se va a hacer
-
 referencia = "/home/ffuster/share/biodata/solelab/referencies/ucsc/hg19.fa"
 manifest = "/home/ffuster/panalisi/resultats/manifest.bed"
 gzmanifest = "/home/ffuster/panalisi/resultats/manifest.bed.gz"
 manifestidx = "/home/ffuster/panalisi/resultats/manifest.bed.gz.tbi"
+"""Comandos para generar los manifest tal y como los necesitan los programas
+    mv manifest.bed manifest_original.bed # Mantener una copia del original
+    sort -k1,1 -k2,2n manifest_original.bed > manifestaux.bed
+    sed 's/chr//g' manifestaux.bed > manifest.bed # Eliminar los 'chr'
+    bgzip -c manifest.bed > manifest.bed.gz # Comprimir el archivo para Strelka2. Puede que la ruta original de bgzip sea /opt/htslib-1.10.2/bin/bgzip
+    tabix -p bed manifest.bed.gz # Crear un indice para el manifest. Puede que la ruta original de tabix sea /opt/htslib-1.10.2/bin/tabix
+"""
 # Descargado desde https://gnomad.broadinstitute.org/downloads
 dbsnp = "/home/ffuster/share/biodata/solelab/referencies/gnomad.exomes.r2.1.1.sites.vcf"
 genes = "/home/ffuster/panalisi/resultats/gensAestudi.txt"
 
 pathAnalisi = "/home/ffuster/panalisi/resultats" # Ruta donde se ejecutan y guardan los analisis
 prefijoTanda = "tanda" # Prefijo que tiene todas las tandas analizadas
+wd = "~/AUP" # Directorio de trabajo donde estan los scripts
 
 def extraerRG(fastq) :
     """
@@ -241,7 +245,7 @@ def prepararScript(ruta) :
         fi.write("\tgrep '^all' coverage.txt > coverageAll.txt\n")
         fi.write("\trm coverage.txt\n")
         fi.write("\tRscript coveragePanells.R\n")
-        fi.write("\tpython3 bamQC.py\n")
+        fi.write("\tpython3 {}/bamQC.py\n".format(wd))
         fi.write("\testadistiques de l'analisi: on target, off target, % bases amb X coverage, resum dels tests, % duplicats (si cal), grafiques de coverage")
         # Variant calling. La carpeta donde se guardan los datos se llama variantCalling. En caso de queren cambiarse, modificar las dos siguientes lineas
         fi.write("\t" + vc1.format(bam = "bwaAlign/bwa.recal.bam", ref = "$ref", variantDir = "variantCalling", mani = "$gzmani") + "\n")
