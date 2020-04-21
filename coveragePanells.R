@@ -8,7 +8,7 @@ salida <- 'coverage.txt' # Archivo donde se guardan las estadisticas de coverage
 coverageGeneral <- function(cov){
   #Calcular coverage maximo a dibujar a partir del coverage medio
   maxCov <- round(max(cov$coverage)*1.5)
-  
+
   #Leer los datos
   cov <- read.table(all)
   colnames(cov) <- c("etiqueta","coverage","bases amb aquest coverage","total bases","% de bases amb aquest coverage")
@@ -38,7 +38,7 @@ coveragePerGen <- function(cov){
   # Leer la lista de genes. Se crea un grafico por cada fila
   gens <- read.table(lista)
   colnames(gens) <- c("nom")
-  
+
   # Crear los graficos. Uno por cada gen que hay en la lista de genes (gensAestudi.txt)
   for(it in 1:length(gens$nom)) {
     png(filename=paste("coverage",gens$nom[it],".png",sep=""),width=500,height=600)
@@ -53,6 +53,7 @@ coveragePerGen <- function(cov){
   }
 }
 
+# Extraer el minimo, maximo, la media, la mediana de coverage, así como el porcentaje de bases cubiertos a 0, 30, 100, 500 y 1000 de coverage. Los datos se guardan en un archivo de texto llamado coverage.txt
 estadisticas <- function(cov) {
   minimo <- min(cov$coverage)
   maximo <- max(cov$coverage)

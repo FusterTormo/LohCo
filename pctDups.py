@@ -6,7 +6,19 @@ import sys
 import os
 import re
 
+output = "alnQC.txt"
+
 def pct(bam = "bwaAlign/bwa.nodup.bam") :
+    """
+    Extraer el porcentaje de duplicados de un bam pasado por parametro
+
+    Ejecuta samtools flagstat para extraer el numero de reads considerados duplicados y luego calcula el porcentaje de duplicados que contiene el bam pasado por parametro. El resultado se guarda en un archivo de texto
+
+    Parameters
+    ----------
+        bam : str, optional
+            Ruta donde se encuentra el bam en el cual se quiere calcular el porcentaje de duplicados
+    """
     cmd = "samtools flagstat {}".format(bam)
     dups = -1
     reads = -1
@@ -24,14 +36,12 @@ def pct(bam = "bwaAlign/bwa.nodup.bam") :
             if reads > -1 and dups > -1 :
                 pct = dups/reads
                 pct *= 100
-                with open(output = "alnQC.txt", "a") as fi :
+                with open(output, "a") as fi :
                     fi.write("DUPS: {}".format(pct))
         else :
             print("ERROR: Samtools no se ejecuto correctamente. Descripcion: {}".print(err))
     else :
         print("ERROR: Bam no encontrado. Ruta de busqueda: {}".format(bam))
-
-
 
 if __name__ == "__main__" :
     bam = sys.argv[1]
