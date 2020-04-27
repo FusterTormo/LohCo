@@ -272,6 +272,8 @@ def getMyVariant(chr, pos, ref, alt, na='NA') :
 def main() :
     # Dummy unitary test
     header = False
+    print(getMyVariant("6", "26093141", "26093141", "G", "A"))
+    """
     with open("MO739/filtro4.allInfo","r") as fi :
         for l in fi :
             if not header :
@@ -285,6 +287,7 @@ def main() :
                     ref = e[3]
                     alt = e[4]
                     val = getMyVariant(crom, start, ref, alt)
+    """
 
 if __name__ == "__main__" :
     main()
