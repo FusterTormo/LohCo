@@ -148,8 +148,6 @@ def comprobarArchivos() :
             raise IOError("ERROR: No se encuentra el bgzip del manifest, necesario para Strelka2. Ejecuta manifest.sh para crearlo")
         if not os.path.isfile(manifestidx) :
             raise IOError("ERROR: No se encuentra el indice del manifest, necesario para Strelka2. Ejecuta manifest.sh para crearlo")
-    if not os.path.isfile(indels) :
-        raise IOError("No se encuentra el archivo para poder realizar el realineamiento de indels")
     if not os.path.isfile(dbsnp) :
         raise IOError("No se encuentra el archivo de SNPs")
     if not os.path.isfile(genes) :
@@ -194,7 +192,6 @@ def prepararScript(ruta) :
         fi.write("ref={}\n".format(referencia))
         fi.write("mani={}\n".format(manifest))
         fi.write("gzmani={}\n".format(gzmanifest))
-        fi.write("indels={}\n".format(indels))
         fi.write("sites={}\n".format(dbsnp))
         fi.write("gens={}\n\n".format(genes))
 
