@@ -17,7 +17,7 @@ def addFORMAT(dic) :
     #Separar los datos de la columna FORMAT en distintas columnas
     for c in claves :
         if c in dic.keys() :
-            print "WARNING: Clau {} repetida en {}".format(c, dic.keys())
+            print("WARNING: Clau {} repetida en {}".format(c, dic.keys()))
             sys.exit()
         else :
             minidic[c] = valores[i]
@@ -29,19 +29,18 @@ def addFORMAT(dic) :
         aux = d.split("=")
         aux[0] = "{}_INFO".format(aux[0])
         if aux[0] in dic.keys() or aux[0] in minidic.keys():
-            print "WARNING: Clau {} repetida al muntar INFO"
+            print("WARNING: Clau {} repetida al muntar INFO".format(aux[0]))
             sys.exit()
         if len(aux) == 1 :
             minidic[aux[0]] = aux[0]
         else :
             minidic[aux[0]] = aux[1]
-    dic.update(minidic)
-
-
+    return minidic
 
 def convertirData(path) :
     """Abrir un archivo con formato table_annovar y guardar todo el contenido en un diccionario"""
     cabecera = True
+    temp = {}
     # Columnas dentro del table_annovar
     claves = ["Chr", "Start", "End", "Ref", "Alt", "Func.refGene", "Gene.refGene", "GeneDetail.refGene", "ExonicFunc.refGene", "AAChange.refGene", "avsnp150", "1000g2015aug_all",
     "1000g2015aug_afr", "1000g2015aug_amr", "1000g2015aug_eas", "1000g2015aug_eur", "1000g2015aug_sas", "ExAC_ALL", "ExAC_AFR", "ExAC_AMR", "ExAC_EAS", "ExAC_FIN", "ExAC_NFE", "ExAC_OTH",
@@ -65,14 +64,16 @@ def convertirData(path) :
         dc = []
         for l in fi :
             if cabecera :
-                header = False
+                cabecera = False
             else :
+                aux = split("\t")
                 i = 0
                 for c in claves :
                     temp[c] = aux[i]
                     i += 1
 
-                addFORMAT(temp)
+                aux2 = addFORMAT(temp)
+                temp.update(aux2)
                 dc.append(temp)
                 temp = {}
     return temp
@@ -214,7 +215,7 @@ def getVAF(l, somatic) :
             dp = float(l["TIR_TUMOR"].split(",")[0]) / (float(l["TIR_TUMOR"].split(",")[0]) + float(l["TAR_TUMOR"].split(",")[0])) * 100
 
     except ZeroDivisionError :
-        print "ERROR: La variant {} te cobertura 0".format([l["Chr"], l["Start"], l["End"], l["Ref"], l["Alt"]])
+        print("ERROR: La variant {} te cobertura 0".format([l["Chr"], l["Start"], l["End"], l["Ref"], l["Alt"]]))
 
     return dp
 
