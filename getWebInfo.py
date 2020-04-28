@@ -56,7 +56,7 @@ def getMyVariant(chr, pos, ref, alt, na='NA') :
     mv = {'CADD_1000g_all' : na, 'CADD_1000g_afr' : na, 'CADD_1000g_amr' : na, 'CADD_1000g_eur' : na, 'CADD_1000g_eas' : na, 'CADD_1000g_sas' : na,
     'dbNSFP_1000g_all' : na, 'dbNSFP_1000g_afr' : na, 'dbNSFP_1000g_amr' : na, 'dbNSFP_1000g_eur' : na, 'dbNSFP_1000g_eas' : na, 'dbNSFP_1000g_sas' : na,
     'CADD_ESP6500_all' : na, 'CADD_ESP6500_ea' : na, 'CADD_ESP6500_aa' : na,'dbNSFP_esp6500_all' : na, 'dbNSFP_esp6500_ea' : na, 'dbNSFP_esp6500_aa' : na,
-    'ExAC_ExAC_all' : na, 'ExAC_ExAC_afr' : na,'ExAC_ExAC_amr' : na, 'ExAC_ExAC_eas' : na, 'ExAC_ExAC_fin' : na, 'ExAC_ExAC_nfe' : na, 'ExAC_ExAC_oth' : na, 'ExAC_ExAC_sas' : na,
+    'ExAC_all' : na, 'ExAC_afr' : na,'ExAC_amr' : na, 'ExAC_eas' : na, 'ExAC_fin' : na, 'ExAC_nfe' : na, 'ExAC_oth' : na, 'ExAC_sas' : na,
     'dbNSFP_ExAC_all' : na, 'dbNSFP_ExAC_afr' : na, 'dbNSFP_ExAC_amr' : na, 'dbNSFP_ExAC_eas' : na, 'dbNSFP_ExAC_fin' : na, 'dbNSFP_ExAC_nfe' : na, 'dbNSFP_ExAC_oth' : na,
     'dbNSFP_ExAC_sas' : na,
     'gNOMAD_Exome_all' : na, 'gNOMAD_Exome_afr' : na, 'gNOMAD_Exome_amr' : na, 'gNOMAD_Exome_asj' : na, 'gNOMAD_Exome_eas' : na, 'gNOMAD_Exome_fin' : na, 'gNOMAD_Exome_nfe' : na,
@@ -269,7 +269,7 @@ def getMyVariant(chr, pos, ref, alt, na='NA') :
                             mv['ExAC_oth'] = "=%s/%s" % (a['exac']['ac']['ac_oth'], a['exac']['an']['an_oth'])
 
         else :
-            print res
+            print(res)
     return mv
 
 
