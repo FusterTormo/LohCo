@@ -6,41 +6,76 @@ MAIN: Re-anotar y filtrar el archivo de salida de table_annovar
 """
 import sys
 
-def addFORMAT(dic, somatic) :
+def addFORMAT(dic) :
     """
     Separar los datos de las columnas INFO y FORMAT del vcf en columnas. Se devuelven los datos separados en un diccionario. Se comprueba si alguna clave esta ya presente en el diccionario
     """
-    pass # Recogida desde strelka-allinfo2excel
+    claves = dic["FORMAT"].split(":")
+    valores = dic["SAMPLE"].split(":")
+    minidic = {}
+    i = 0
+    #Separar los datos de la columna FORMAT en distintas columnas
+    for c in claves :
+        if c in dic.keys() :
+            print "WARNING: Clau {} repetida en {}".format(c, dic.keys())
+            sys.exit()
+        else :
+            minidic[c] = valores[i]
+        i += 1
+
+    #Separar los datos de la columna INFO en distintas columnas
+    datos = dic["INFO"].split(";")
+    for d in datos :
+        aux = d.split("=")
+        aux[0] = "{}_INFO".format(aux[0])
+        if aux[0] in dic.keys() or aux[0] in minidic.keys():
+            print "WARNING: Clau {} repetida al muntar INFO"
+            sys.exit()
+        if len(aux) == 1 :
+            minidic[aux[0]] = aux[0]
+        else :
+            minidic[aux[0]] = aux[1]
+    dic.update(minidic)
+
+
 
 def convertirData(path) :
     """Abrir un archivo con formato table_annovar y guardar todo el contenido en un diccionario"""
     cabecera = True
     # Columnas dentro del table_annovar
-    claves = ['Chr', 'Start', 'End', 'Ref', 'Alt', 'Func.refGene', 'Gene.refGene', 'GeneDetail.refGene', 'ExonicFunc.refGene', 'AAChange.refGene', 'avsnp150', '1000g2015aug_all', '1000g2015aug_afr',
-    '1000g2015aug_amr', '1000g2015aug_eas', '1000g2015aug_eur', '1000g2015aug_sas', 'ExAC_ALL', 'ExAC_AFR', 'ExAC_AMR', 'ExAC_EAS', 'ExAC_FIN', 'ExAC_NFE', 'ExAC_OTH', 'ExAC_SAS',
-    'gnomad_exome_AF', 'gnomad_exome_AF_popmax', 'gnomad_exome_AF_male', 'gnomad_exome_AF_female', 'gnomad_exome_AF_raw', 'gnomad_exome_AF_afr', 'gnomad_exome_AF_sas', 'gnomad_exome_AF_amr',
-    'gnomad_exome_AF_eas', 'gnomad_exome_AF_nfe', 'gnomad_exome_AF_fin', 'gnomad_exome_AF_asj', 'gnomad_exome_AF_oth', 'gnomad_exome_non_topmed_AF_popmax', 'gnomad_exome_non_neuro_AF_popmax',
-    'gnomad_exome_non_cancer_AF_popmax', 'gnomad_exome_controls_AF_popmax',
-    'gnomad_genome_AF', 'gnomad_genome_AF_popmax', 'gnomad_genome_AF_male', 'gnomad_genome_AF_female', 'gnomad_genome_AF_raw', 'gnomad_genome_AF_afr', 'gnomad_genome_AF_sas', 'gnomad_genome_AF_amr',
-    'gnomad_genome_AF_eas', 'gnomad_genome_AF_nfe', 'gnomad_genome_AF_fin', 'gnomad_genome_AF_asj', 'gnomad_genome_AF_oth', 'gnomad_genome_non_topmed_AF_popmax', 'gnomad_genome_non_neuro_AF_popmax',
-    'gnomad_genome_non_cancer_AF_popmax', 'controls_AF_popmax', 'esp6500siv2_all', 'esp6500siv2_ea', 'esp6500siv2_aa', 'CLNALLELEID', 'CLNDN', 'CLNDISDB',
-    'CLNREVSTAT', 'CLNSIG', 'cosmic70', 'SIFT_score', 'SIFT_converted_rankscore', 'SIFT_pred', 'Polyphen2_HDIV_score', 'Polyphen2_HDIV_rankscore', 'Polyphen2_HDIV_pred', 'Polyphen2_HVAR_score',
-    'Polyphen2_HVAR_rankscore', 'Polyphen2_HVAR_pred', 'LRT_score', 'LRT_converted_rankscore', 'LRT_pred', 'MutationTaster_score', 'MutationTaster_converted_rankscore', 'MutationTaster_pred',
-    'MutationAssessor_score', 'MutationAssessor_score_rankscore', 'MutationAssessor_pred', 'FATHMM_score', 'FATHMM_converted_rankscore', 'FATHMM_pred', 'PROVEAN_score', 'PROVEAN_converted_rankscore',
-    'PROVEAN_pred', 'VEST3_score', 'VEST3_rankscore', 'MetaSVM_score', 'MetaSVM_rankscore', 'MetaSVM_pred', 'MetaLR_score', 'MetaLR_rankscore', 'MetaLR_pred', 'M-CAP_score', 'M-CAP_rankscore',
-    'M-CAP_pred', 'REVEL_score', 'REVEL_rankscore', 'MutPred_score', 'MutPred_rankscore', 'CADD_raw', 'CADD_raw_rankscore', 'CADD_phred', 'DANN_score', 'DANN_rankscore', 'fathmm-MKL_coding_score',
-    'fathmm-MKL_coding_rankscore', 'fathmm-MKL_coding_pred', 'Eigen_coding_or_noncoding', 'Eigen-raw', 'Eigen-PC-raw', 'GenoCanyon_score', 'GenoCanyon_score_rankscore', 'integrated_fitCons_score',
-    'integrated_fitCons_score_rankscore', 'integrated_confidence_value', 'GERP++_RS', 'GERP++_RS_rankscore', 'phyloP100way_vertebrate', 'phyloP100way_vertebrate_rankscore', 'phyloP20way_mammalian',
-    'phyloP20way_mammalian_rankscore', 'phastCons100way_vertebrate', 'phastCons100way_vertebrate_rankscore', 'phastCons20way_mammalian', 'phastCons20way_mammalian_rankscore', 'SiPhy_29way_logOdds',
-    'SiPhy_29way_logOdds_rankscore', 'Interpro_domain', 'GTEx_V6p_gene', 'GTEx_V6p_tissue', 'CHROM', 'POS', 'ID', 'REFERENCE', 'ALTERATED', 'QUAL', 'FILTER', 'INFO', 'FORMAT', 'SAMPLE']
+    claves = ["Chr", "Start", "End", "Ref", "Alt", "Func.refGene", "Gene.refGene", "GeneDetail.refGene", "ExonicFunc.refGene", "AAChange.refGene", "avsnp150", "1000g2015aug_all",
+    "1000g2015aug_afr", "1000g2015aug_amr", "1000g2015aug_eas", "1000g2015aug_eur", "1000g2015aug_sas", "ExAC_ALL", "ExAC_AFR", "ExAC_AMR", "ExAC_EAS", "ExAC_FIN", "ExAC_NFE", "ExAC_OTH",
+    "ExAC_SAS", "gnomad_exome_AF", "gnomad_exome_AF_popmax", "gnomad_exome_AF_male", "gnomad_exome_AF_female", "gnomad_exome_AF_raw", "gnomad_exome_AF_afr", "gnomad_exome_AF_sas",
+    "gnomad_exome_AF_amr", "gnomad_exome_AF_eas", "gnomad_exome_AF_nfe", "gnomad_exome_AF_fin", "gnomad_exome_AF_asj", "gnomad_exome_AF_oth", "gnomad_exome_non_topmed_AF_popmax",
+    "gnomad_exome_non_neuro_AF_popmax", "gnomad_exome_non_cancer_AF_popmax", "gnomad_exome_controls_AF_popmax", "gnomad_genome_AF", "gnomad_genome_AF_popmax", "gnomad_genome_AF_male",
+    "gnomad_genome_AF_female", "gnomad_genome_AF_raw", "gnomad_genome_AF_afr", "gnomad_genome_AF_sas", "gnomad_genome_AF_amr", "gnomad_genome_AF_eas", "gnomad_genome_AF_nfe",
+    "gnomad_genome_AF_fin", "gnomad_genome_AF_asj", "gnomad_genome_AF_oth", "gnomad_genome_non_topmed_AF_popmax", "gnomad_genome_non_neuro_AF_popmax", "gnomad_genome_non_cancer_AF_popmax",
+    "gnomad_genome_controls_AF_popmax", "esp6500siv2_all", "esp6500siv2_ea", "esp6500siv2_aa", "CLNALLELEID", "CLNDN", "CLNDISDB", "CLNREVSTAT", "CLNSIG", "cosmic70", "SIFT_score",
+    "SIFT_converted_rankscore", "SIFT_pred", "Polyphen2_HDIV_score", "Polyphen2_HDIV_rankscore", "Polyphen2_HDIV_pred", "Polyphen2_HVAR_score", "Polyphen2_HVAR_rankscore", "Polyphen2_HVAR_pred",
+    "LRT_score", "LRT_converted_rankscore", "LRT_pred", "MutationTaster_score", "MutationTaster_converted_rankscore", "MutationTaster_pred", "MutationAssessor_score",
+    "MutationAssessor_score_rankscore", "MutationAssessor_pred", "FATHMM_score", "FATHMM_converted_rankscore", "FATHMM_pred", "PROVEAN_score", "PROVEAN_converted_rankscore", "PROVEAN_pred",
+    "VEST3_score", "VEST3_rankscore", "MetaSVM_score", "MetaSVM_rankscore", "MetaSVM_pred", "MetaLR_score", "MetaLR_rankscore", "MetaLR_pred", "M-CAP_score", "M-CAP_rankscore", "M-CAP_pred",
+    "REVEL_score", "REVEL_rankscore", "MutPred_score", "MutPred_rankscore", "CADD_raw", "CADD_raw_rankscore", "CADD_phred", "DANN_score", "DANN_rankscore", "fathmm-MKL_coding_score",
+    "fathmm-MKL_coding_rankscore", "fathmm-MKL_coding_pred", "Eigen_coding_or_noncoding", "Eigen-raw", "Eigen-PC-raw", "GenoCanyon_score", "GenoCanyon_score_rankscore", "integrated_fitCons_score",
+    "integrated_fitCons_score_rankscore", "integrated_confidence_value", "GERP++_RS", "GERP++_RS_rankscore", "phyloP100way_vertebrate", "phyloP100way_vertebrate_rankscore",
+    "phyloP20way_mammalian", "phyloP20way_mammalian_rankscore", "phastCons100way_vertebrate", "phastCons100way_vertebrate_rankscore",  "phastCons20way_mammalian",
+    "phastCons20way_mammalian_rankscore", "SiPhy_29way_logOdds", "SiPhy_29way_logOdds_rankscore", "Interpro_domain", "GTEx_V6p_gene", "GTEx_V6p_tissue", 'CHROM', 'POS', 'ID', 'REFERENCE',
+    'ALTERATED', 'QUAL', 'FILTER', 'INFO', 'FORMAT', 'SAMPLE']
     with open(path, "r") as fi :
+        dc = []
         for l in fi :
             if cabecera :
-                print(l)
-                break
+                header = False
             else :
-                pass
+                i = 0
+                for c in claves :
+                    temp[c] = aux[i]
+                    i += 1
 
+                addFORMAT(temp)
+                dc.append(temp)
+                temp = {}
+    return temp
 
 def addWebInfo(dc) :
     """Agregar la informacion de myvariant.info a aquellas variantes que sean exonicas"""
@@ -273,7 +308,9 @@ def resumPredictors(d) :
 
 def main(ruta) :
     # Leer el archivo multianno de ANNOVAR y guardar los datos en un diccionario
-    convertirData(ruta)
+    todas = convertirData(ruta)
+    print(len(todas))
+    print(len(todas.keys()))
     # Separar las variantes que han pasado todos los filtros de STrelka2
     # Guardar en un archivo de text todas las variantes (filtro0)
     # Separar las variantes exonicas (consecuencia) y las splicing en un diccionario aparte

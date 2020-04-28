@@ -56,7 +56,7 @@ def getMyVariant(chr, pos, ref, alt, na='NA') :
     mv = {'CADD_1000g_all' : na, 'CADD_1000g_afr' : na, 'CADD_1000g_amr' : na, 'CADD_1000g_eur' : na, 'CADD_1000g_eas' : na, 'CADD_1000g_sas' : na,
     'dbNSFP_1000g_all' : na, 'dbNSFP_1000g_afr' : na, 'dbNSFP_1000g_amr' : na, 'dbNSFP_1000g_eur' : na, 'dbNSFP_1000g_eas' : na, 'dbNSFP_1000g_sas' : na,
     'CADD_ESP6500_all' : na, 'CADD_ESP6500_ea' : na, 'CADD_ESP6500_aa' : na,'dbNSFP_esp6500_all' : na, 'dbNSFP_esp6500_ea' : na, 'dbNSFP_esp6500_aa' : na,
-    'ExAC_all' : na, 'ExAC_afr' : na,'ExAC_amr' : na, 'ExAC_eas' : na, 'ExAC_fin' : na, 'ExAC_nfe' : na, 'ExAC_oth' : na, 'ExAC_sas' : na,
+    'ExAC_ExAC_all' : na, 'ExAC_ExAC_afr' : na,'ExAC_ExAC_amr' : na, 'ExAC_ExAC_eas' : na, 'ExAC_ExAC_fin' : na, 'ExAC_ExAC_nfe' : na, 'ExAC_ExAC_oth' : na, 'ExAC_ExAC_sas' : na,
     'dbNSFP_ExAC_all' : na, 'dbNSFP_ExAC_afr' : na, 'dbNSFP_ExAC_amr' : na, 'dbNSFP_ExAC_eas' : na, 'dbNSFP_ExAC_fin' : na, 'dbNSFP_ExAC_nfe' : na, 'dbNSFP_ExAC_oth' : na,
     'dbNSFP_ExAC_sas' : na,
     'gNOMAD_Exome_all' : na, 'gNOMAD_Exome_afr' : na, 'gNOMAD_Exome_amr' : na, 'gNOMAD_Exome_asj' : na, 'gNOMAD_Exome_eas' : na, 'gNOMAD_Exome_fin' : na, 'gNOMAD_Exome_nfe' : na,
@@ -207,66 +207,66 @@ def getMyVariant(chr, pos, ref, alt, na='NA') :
                         if isinstance(a['exac']['ac']['ac'],(list, tuple)) : #ExAC ha devuelto una lista de alelos, buscamos el que corresponde a nuestra variante y lo guardamos
                             for it in range(0,len(a['exac']['alleles'])) :
                                 if (a['exac']['alleles'][it] == alt) :
-                                    mv['ExAC_all'] = "=%s/%s" % (a['exac']['ac']['ac'][it], a['exac']['an']['an'])
+                                    mv['ExAC_ExAC_all'] = "=%s/%s" % (a['exac']['ac']['ac'][it], a['exac']['an']['an'])
                                     break
                         else :
-                            mv['ExAC_all'] = "=%s/%s" % (a['exac']['ac']['ac'], a['exac']['an']['an'])
+                            mv['ExAC_ExAC_all'] = "=%s/%s" % (a['exac']['ac']['ac'], a['exac']['an']['an'])
                     if 'ac_afr' in a['exac']['ac'] and 'an_afr' in a['exac']['an'] :
                         if isinstance(a['exac']['ac']['ac_afr'],(list, tuple)) :
                             for it in range(0,len(a['exac']['alleles'])) :
                                 if (a['exac']['alleles'][it] == alt) :
-                                    mv['ExAC_afr'] = "=%s/%s" % (a['exac']['ac']['ac_afr'][it], a['exac']['an']['an_afr'])
+                                    mv['ExAC_ExAC_afr'] = "=%s/%s" % (a['exac']['ac']['ac_afr'][it], a['exac']['an']['an_afr'])
                                     break
                         else :
-                            mv['ExAC_afr'] = "=%s/%s" % (a['exac']['ac']['ac_afr'], a['exac']['an']['an_afr'])
+                            mv['ExAC_ExAC_afr'] = "=%s/%s" % (a['exac']['ac']['ac_afr'], a['exac']['an']['an_afr'])
                     if 'ac_amr' in a['exac']['ac'] and 'an_amr' in a['exac']['an'] :
                         if isinstance(a['exac']['ac']['ac_amr'],(list, tuple)) :
                             for it in range(0,len(a['exac']['alleles'])) :
                                 if (a['exac']['alleles'][it] == alt) :
-                                    mv['ExAC_amr'] = "=%s/%s" % (a['exac']['ac']['ac_amr'][it], a['exac']['an']['an_amr'])
+                                    mv['ExAC_ExAC_amr'] = "=%s/%s" % (a['exac']['ac']['ac_amr'][it], a['exac']['an']['an_amr'])
                                     break
                         else :
-                            mv['ExAC_amr'] = "=%s/%s" % (a['exac']['ac']['ac_amr'], a['exac']['an']['an_amr'])
+                            mv['ExAC_ExAC_amr'] = "=%s/%s" % (a['exac']['ac']['ac_amr'], a['exac']['an']['an_amr'])
                     if 'ac_eas' in a['exac']['ac'] and 'an_eas' in a['exac']['an'] :
                         if isinstance(a['exac']['ac']['ac_eas'],(list, tuple)) :
                             for it in range(0,len(a['exac']['alleles'])) :
                                 if (a['exac']['alleles'][it] == alt) :
-                                    mv['ExAC_eas'] = "=%s/%s" % (a['exac']['ac']['ac_eas'][it], a['exac']['an']['an_eas'])
+                                    mv['ExAC_ExAC_eas'] = "=%s/%s" % (a['exac']['ac']['ac_eas'][it], a['exac']['an']['an_eas'])
                                     break
                         else :
-                            mv['ExAC_eas'] = "=%s/%s" % (a['exac']['ac']['ac_eas'], a['exac']['an']['an_eas'])
+                            mv['ExAC_ExAC_eas'] = "=%s/%s" % (a['exac']['ac']['ac_eas'], a['exac']['an']['an_eas'])
                     if 'ac_fin' in a['exac']['ac'] and 'an_fin' in a['exac']['an'] :
                         if isinstance(a['exac']['ac']['ac_fin'],(list, tuple)) :
                             for it in range(0,len(a['exac']['alleles'])) :
                                 if (a['exac']['alleles'][it] == alt) :
-                                    mv['ExAC_fin'] = "=%s/%s" % (a['exac']['ac']['ac_fin'][it], a['exac']['an']['an_fin'])
+                                    mv['ExAC_ExAC_fin'] = "=%s/%s" % (a['exac']['ac']['ac_fin'][it], a['exac']['an']['an_fin'])
                                     break
                         else :
-                            mv['ExAC_fin'] = "=%s/%s" % (a['exac']['ac']['ac_fin'], a['exac']['an']['an_fin'])
+                            mv['ExAC_ExAC_fin'] = "=%s/%s" % (a['exac']['ac']['ac_fin'], a['exac']['an']['an_fin'])
                     if 'ac_nfe' in a['exac']['ac'] and 'an_nfe' in a['exac']['an'] :
                         if isinstance(a['exac']['ac']['ac_nfe'],(list, tuple)) :
                             for it in range(0,len(a['exac']['alleles'])) :
                                 if (a['exac']['alleles'][it] == alt) :
-                                    mv['ExAC_nfe'] = "=%s/%s" % (a['exac']['ac']['ac_nfe'][it], a['exac']['an']['an_nfe'])
+                                    mv['ExAC_ExAC_nfe'] = "=%s/%s" % (a['exac']['ac']['ac_nfe'][it], a['exac']['an']['an_nfe'])
                                     break
                         else :
-                            mv['ExAC_nfe'] = "=%s/%s" % (a['exac']['ac']['ac_nfe'], a['exac']['an']['an_nfe'])
+                            mv['ExAC_ExAC_nfe'] = "=%s/%s" % (a['exac']['ac']['ac_nfe'], a['exac']['an']['an_nfe'])
                     if 'ac_sas' in a['exac']['ac'] and 'an_sas' in a['exac']['an'] :
                         if isinstance(a['exac']['ac']['ac_sas'],(list, tuple)) :
                             for it in range(0,len(a['exac']['alleles'])) :
                                 if (a['exac']['alleles'][it] == alt) :
-                                    mv['ExAC_sas'] = "=%s/%s" % (a['exac']['ac']['ac_sas'][it], a['exac']['an']['an_sas'])
+                                    mv['ExAC_ExAC_sas'] = "=%s/%s" % (a['exac']['ac']['ac_sas'][it], a['exac']['an']['an_sas'])
                                     break
                         else :
-                            mv['ExAC_sas'] = "=%s/%s" % (a['exac']['ac']['ac_sas'], a['exac']['an']['an_sas'])
+                            mv['ExAC_ExAC_sas'] = "=%s/%s" % (a['exac']['ac']['ac_sas'], a['exac']['an']['an_sas'])
                     if 'ac_oth' in a['exac']['ac'] and 'an_oth' in a['exac']['an'] :
                         if isinstance(a['exac']['ac']['ac_oth'],(list, tuple)) :
                             for it in range(0,len(a['exac']['alleles'])) :
                                 if (a['exac']['alleles'][it] == alt) :
-                                    mv['ExAC_oth'] = "=%s/%s" % (a['exac']['ac']['ac_oth'][it], a['exac']['an']['an_oth'])
+                                    mv['ExAC_ExAC_oth'] = "=%s/%s" % (a['exac']['ac']['ac_oth'][it], a['exac']['an']['an_oth'])
                                     break
                         else :
-                            mv['ExAC_oth'] = "=%s/%s" % (a['exac']['ac']['ac_oth'], a['exac']['an']['an_oth'])
+                            mv['ExAC_ExAC_oth'] = "=%s/%s" % (a['exac']['ac']['ac_oth'], a['exac']['an']['an_oth'])
 
         else :
             print(res)
