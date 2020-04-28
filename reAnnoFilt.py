@@ -66,14 +66,17 @@ def convertirData(path) :
             if cabecera :
                 cabecera = False
             else :
-                aux = split("\t")
+                aux = l.split("\t")
                 i = 0
                 for c in claves :
                     temp[c] = aux[i]
                     i += 1
-
+                print(len(temp.keys()))
                 aux2 = addFORMAT(temp)
+                print(len(aux2.keys()))
                 temp.update(aux2)
+                print(len(temp.keys()))
+                sys.exit()
                 dc.append(temp)
                 temp = {}
     return temp
