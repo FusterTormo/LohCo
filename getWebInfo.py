@@ -55,11 +55,15 @@ def getMyVariant(chr, pos, ref, alt, na='NA') :
     """
     mv = {'CADD_1000g_all' : na, 'CADD_1000g_afr' : na, 'CADD_1000g_amr' : na, 'CADD_1000g_eur' : na, 'CADD_1000g_eas' : na, 'CADD_1000g_sas' : na,
     'dbNSFP_1000g_all' : na, 'dbNSFP_1000g_afr' : na, 'dbNSFP_1000g_amr' : na, 'dbNSFP_1000g_eur' : na, 'dbNSFP_1000g_eas' : na, 'dbNSFP_1000g_sas' : na,
-    'CADD_ESP6500_all' : na, 'CADD_ESP6500_ea' : na, 'CADD_ESP6500_aa' : na,
-    'dbNSFP_esp6500_all' : na, 'dbNSFP_esp6500_ea' : na, 'dbNSFP_esp6500_aa' : na,
-    'ExAC_ExAC_all' : na, 'ExAC_ExAC_afr' : na, 'ExAC_ExAC_amr' : na, 'ExAC_ExAC_eas' : na, 'ExAC_ExAC_fin' : na, 'ExAC_ExAC_nfe' : na, 'ExAC_ExAC_oth' : na, 'ExAC_ExAC_sas' : na,
-    'dbNSFP_ExAC_all' : na, 'dbNSFP_ExAC_afr' : na, 'dbNSFP_ExAC_amr' : na, 'dbNSFP_ExAC_eas' : na, 'dbNSFP_ExAC_fin' : na, 'dbNSFP_ExAC_nfe' : na, 'dbNSFP_ExAC_oth' : na, 'dbNSFP_ExAC_sas' : na,
-    'gNOMAD_Exome_all' : na, 'gNOMAD_Exome_afr'  : na, 'gNOMAD_Exome_amr' : 'gNOMAD_Exome_asj' : na, 'gNOMAD_Exome_eas' : na, 'gNOMAD_Exome_fin' : na, 'gNOMAD_Exome_nfe' : na,'gNOMAD_Exome_oth' : na, 'gNOMAD_Exome_popmax' : na, 'gNOMAD_Exome_raw' : na, 'gNOMAD_Exome_sas' : na, 'gNOMAD_Genome_all' : na, 'gNOMAD_Genome_afr'  : na, 'gNOMAD_Genome_amr' : 'gNOMAD_Genome_asj' : na, 'gNOMAD_Genome_eas' : na, 'gNOMAD_Genome_fin' : na, 'gNOMAD_Genome_nfe' : na, 'gNOMAD_Genome_oth' : na, 'gNOMAD_Genome_popmax' : na, 'gNOMAD_Genome_raw' : na, 'dbSNP_MAF' : na}
+    'CADD_ESP6500_all' : na, 'CADD_ESP6500_ea' : na, 'CADD_ESP6500_aa' : na,'dbNSFP_esp6500_all' : na, 'dbNSFP_esp6500_ea' : na, 'dbNSFP_esp6500_aa' : na,
+    'ExAC_ExAC_all' : na, 'ExAC_ExAC_afr' : na,'ExAC_ExAC_amr' : na, 'ExAC_ExAC_eas' : na, 'ExAC_ExAC_fin' : na, 'ExAC_ExAC_nfe' : na, 'ExAC_ExAC_oth' : na, 'ExAC_ExAC_sas' : na,
+    'dbNSFP_ExAC_all' : na, 'dbNSFP_ExAC_afr' : na, 'dbNSFP_ExAC_amr' : na, 'dbNSFP_ExAC_eas' : na, 'dbNSFP_ExAC_fin' : na, 'dbNSFP_ExAC_nfe' : na, 'dbNSFP_ExAC_oth' : na,
+    'dbNSFP_ExAC_sas' : na,
+    'gNOMAD_Exome_all' : na, 'gNOMAD_Exome_afr' : na, 'gNOMAD_Exome_amr' : na, 'gNOMAD_Exome_asj' : na, 'gNOMAD_Exome_eas' : na, 'gNOMAD_Exome_fin' : na, 'gNOMAD_Exome_nfe' : na,
+    'gNOMAD_Exome_oth' : na, 'gNOMAD_Exome_popmax' : na, 'gNOMAD_Exome_raw' : na, 'gNOMAD_Exome_sas' : na,
+    'gNOMAD_Genome_all' : na, 'gNOMAD_Genome_afr'  : na, 'gNOMAD_Genome_amr' : na, 'gNOMAD_Genome_asj' : na, 'gNOMAD_Genome_eas' : na, 'gNOMAD_Genome_fin' : na, 'gNOMAD_Genome_nfe' : na,
+    'gNOMAD_Genome_oth' : na, 'gNOMAD_Genome_popmax' : na, 'gNOMAD_Genome_raw' : na,
+    'dbSNP_MAF' : na}
 
     # Comrpobar si el cromosoma tiene el formato adecuado
     if not chr.startswith('chr') :
