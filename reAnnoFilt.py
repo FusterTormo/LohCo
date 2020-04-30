@@ -1,11 +1,56 @@
-#!/usr/bin/python
 # -*- coding: utf-8 -*-
+#!/usr/bin/python
 
 """
 MAIN: Re-anotar y filtrar el archivo de salida de table_annovar
 """
 import sys
 import getWebInfo as gw
+
+#Todas las claves con la informacion que se guardara en los archivos de texto
+allkeys = ["Chr", "Start", "End", "Ref", "Alt", "Func.refGene", "Gene.refGene", "GeneDetail.refGene", "ExonicFunc.refGene", "AAChange.refGene", "avsnp150", "1000g2015aug_all",
+"1000g2015aug_afr", "1000g2015aug_amr", "1000g2015aug_eas", "1000g2015aug_eur", "1000g2015aug_sas", "ExAC_ALL", "ExAC_AFR", "ExAC_AMR", "ExAC_EAS", "ExAC_FIN", "ExAC_NFE", "ExAC_OTH",
+"ExAC_SAS", "gnomad_exome_AF", "gnomad_exome_AF_popmax", "gnomad_exome_AF_male", "gnomad_exome_AF_female", "gnomad_exome_AF_raw", "gnomad_exome_AF_afr", "gnomad_exome_AF_sas",
+"gnomad_exome_AF_amr", "gnomad_exome_AF_eas", "gnomad_exome_AF_nfe", "gnomad_exome_AF_fin", "gnomad_exome_AF_asj", "gnomad_exome_AF_oth", "gnomad_exome_non_topmed_AF_popmax",
+"gnomad_exome_non_neuro_AF_popmax", "gnomad_exome_non_cancer_AF_popmax", "gnomad_exome_controls_AF_popmax", "gnomad_genome_AF", "gnomad_genome_AF_popmax", "gnomad_genome_AF_male",
+"gnomad_genome_AF_female", "gnomad_genome_AF_raw", "gnomad_genome_AF_afr", "gnomad_genome_AF_sas", "gnomad_genome_AF_amr", "gnomad_genome_AF_eas", "gnomad_genome_AF_nfe",
+"gnomad_genome_AF_fin", "gnomad_genome_AF_asj", "gnomad_genome_AF_oth", "gnomad_genome_non_topmed_AF_popmax", "gnomad_genome_non_neuro_AF_popmax", "gnomad_genome_non_cancer_AF_popmax",
+"gnomad_genome_controls_AF_popmax", "esp6500siv2_all", "esp6500siv2_ea", "esp6500siv2_aa", "CLNALLELEID", "CLNDN", "CLNDISDB", "CLNREVSTAT", "CLNSIG", "cosmic70", "SIFT_score",
+"SIFT_converted_rankscore", "SIFT_pred", "Polyphen2_HDIV_score", "Polyphen2_HDIV_rankscore", "Polyphen2_HDIV_pred", "Polyphen2_HVAR_score", "Polyphen2_HVAR_rankscore", "Polyphen2_HVAR_pred",
+"LRT_score", "LRT_converted_rankscore", "LRT_pred", "MutationTaster_score", "MutationTaster_converted_rankscore", "MutationTaster_pred", "MutationAssessor_score",
+"MutationAssessor_score_rankscore", "MutationAssessor_pred", "FATHMM_score", "FATHMM_converted_rankscore", "FATHMM_pred", "PROVEAN_score", "PROVEAN_converted_rankscore", "PROVEAN_pred",
+"VEST3_score", "VEST3_rankscore", "MetaSVM_score", "MetaSVM_rankscore", "MetaSVM_pred", "MetaLR_score", "MetaLR_rankscore", "MetaLR_pred", "M-CAP_score", "M-CAP_rankscore", "M-CAP_pred",
+"REVEL_score", "REVEL_rankscore", "MutPred_score", "MutPred_rankscore", "CADD_raw", "CADD_raw_rankscore", "CADD_phred", "DANN_score", "DANN_rankscore", "fathmm-MKL_coding_score",
+"fathmm-MKL_coding_rankscore", "fathmm-MKL_coding_pred", "Eigen_coding_or_noncoding", "Eigen-raw", "Eigen-PC-raw", "GenoCanyon_score", "GenoCanyon_score_rankscore", "integrated_fitCons_score",
+"integrated_fitCons_score_rankscore", "integrated_confidence_value", "GERP++_RS", "GERP++_RS_rankscore", "phyloP100way_vertebrate", "phyloP100way_vertebrate_rankscore",
+"phyloP20way_mammalian", "phyloP20way_mammalian_rankscore", "phastCons100way_vertebrate", "phastCons100way_vertebrate_rankscore",  "phastCons20way_mammalian",
+"phastCons20way_mammalian_rankscore", "SiPhy_29way_logOdds", "SiPhy_29way_logOdds_rankscore", "Interpro_domain", "GTEx_V6p_gene", "GTEx_V6p_tissue", "CHROM", "POS", "ID", "REFERENCE",
+"ALTERATED", "QUAL", "FILTER", "INFO", "FORMAT", "SAMPLE", "END", "BLOCKAVG", "SNVHPOL", "CIGAR", "RU", "REFPREP", "IDREP", "MQ", "GT", "GQ", "GQX", "DP", "DPF", "MIN_DP", "AD",
+"ADF", "ADR", "FT", "DPI", "PL", "PS", "SB", "population_max", "predictor_summary". "Strand_bias_score", "Ref_depth", "Alt_depth", "VAF", "IGV_link", "sample", "CADD_1000g_all",
+"CADD_1000g_afr", "CADD_1000g_amr", "CADD_1000g_eur", "CADD_1000g_eas", "CADD_1000g_sas", "dbNSFP_1000g_all", "dbNSFP_1000g_afr", "dbNSFP_1000g_amr", "dbNSFP_1000g_eur", "dbNSFP_1000g_eas",
+"dbNSFP_1000g_sas", "CADD_ESP6500_all", "CADD_ESP6500_ea", "CADD_ESP6500_aa","dbNSFP_esp6500_all", "dbNSFP_esp6500_ea", "dbNSFP_esp6500_aa", "ExAC_ExAC_all", "ExAC_ExAC_afr","ExAC_ExAC_amr",
+"ExAC_ExAC_eas", "ExAC_ExAC_fin", "ExAC_ExAC_nfe", "ExAC_ExAC_oth", "ExAC_ExAC_sas", "dbNSFP_ExAC_all", "dbNSFP_ExAC_afr", "dbNSFP_ExAC_amr", "dbNSFP_ExAC_eas", "dbNSFP_ExAC_fin",
+"dbNSFP_ExAC_nfe", "dbNSFP_ExAC_oth", "dbNSFP_ExAC_sas", "gNOMAD_Exome_all", "gNOMAD_Exome_afr", "gNOMAD_Exome_amr", "gNOMAD_Exome_asj", "gNOMAD_Exome_eas", "gNOMAD_Exome_fin",
+"gNOMAD_Exome_nfe", "gNOMAD_Exome_oth", "gNOMAD_Exome_popmax", "gNOMAD_Exome_raw", "gNOMAD_Exome_sas", "gNOMAD_Genome_all", "gNOMAD_Genome_afr", "gNOMAD_Genome_amr", "gNOMAD_Genome_asj",
+"gNOMAD_Genome_eas", "gNOMAD_Genome_fin", "gNOMAD_Genome_nfe", "gNOMAD_Genome_oth", "gNOMAD_Genome_popmax", "gNOMAD_Genome_raw", "dbSNP_MAF"]
+
+# Cuando un dato no este disponible se guarda el siguinte caracter
+vacio = "--"
+
+#Columnas que contienen informacion de MAF
+mafCols = ["1000g2015aug_all", "1000g2015aug_afr", "1000g2015aug_amr", "1000g2015aug_eas", "1000g2015aug_eur", "1000g2015aug_sas", "ExAC_ALL", "ExAC_AFR", "ExAC_AMR", "ExAC_EAS", "ExAC_FIN",
+"ExAC_NFE", "ExAC_OTH", "ExAC_SAS", "gnomad_exome_AF", "gnomad_exome_AF_popmax", "gnomad_exome_AF_male", "gnomad_exome_AF_female", "gnomad_exome_AF_raw", "gnomad_exome_AF_afr",
+"gnomad_exome_AF_sas", "gnomad_exome_AF_amr", "gnomad_exome_AF_eas", "gnomad_exome_AF_nfe", "gnomad_exome_AF_fin", "gnomad_exome_AF_asj", "gnomad_exome_AF_oth", "gnomad_exome_non_topmed_AF_popmax",
+"gnomad_exome_non_neuro_AF_popmax", "gnomad_exome_non_cancer_AF_popmax", "gnomad_exome_controls_AF_popmax", "gnomad_genome_AF", "gnomad_genome_AF_popmax", "gnomad_genome_AF_male",
+"gnomad_genome_AF_female", "gnomad_genome_AF_raw", "gnomad_genome_AF_afr", "gnomad_genome_AF_sas", "gnomad_genome_AF_amr", "gnomad_genome_AF_eas", "gnomad_genome_AF_nfe",
+"gnomad_genome_AF_fin", "gnomad_genome_AF_asj", "gnomad_genome_AF_oth", "gnomad_genome_non_topmed_AF_popmax", "gnomad_genome_non_neuro_AF_popmax", "gnomad_genome_non_cancer_AF_popmax",
+"gnomad_genome_controls_AF_popmax", "esp6500siv2_all", "esp6500siv2_ea", "esp6500siv2_aa", "CADD_1000g_all", "CADD_1000g_afr", "CADD_1000g_amr", "CADD_1000g_eur", "CADD_1000g_eas",
+"CADD_1000g_sas", "dbNSFP_1000g_all", "dbNSFP_1000g_afr", "dbNSFP_1000g_amr", "dbNSFP_1000g_eur", "dbNSFP_1000g_eas", "dbNSFP_1000g_sas", "CADD_ESP6500_all", "CADD_ESP6500_ea", "CADD_ESP6500_aa",
+"dbNSFP_esp6500_all", "dbNSFP_esp6500_ea", "dbNSFP_esp6500_aa", "ExAC_ExAC_all", "ExAC_ExAC_afr","ExAC_ExAC_amr", "ExAC_ExAC_eas", "ExAC_ExAC_fin", "ExAC_ExAC_nfe", "ExAC_ExAC_oth",
+"ExAC_ExAC_sas", "dbNSFP_ExAC_all", "dbNSFP_ExAC_afr", "dbNSFP_ExAC_amr", "dbNSFP_ExAC_eas", "dbNSFP_ExAC_fin", "dbNSFP_ExAC_nfe", "dbNSFP_ExAC_oth", "dbNSFP_ExAC_sas", "gNOMAD_Exome_all",
+"gNOMAD_Exome_afr", "gNOMAD_Exome_amr", "gNOMAD_Exome_asj", "gNOMAD_Exome_eas", "gNOMAD_Exome_fin", "gNOMAD_Exome_nfe", "gNOMAD_Exome_oth", "gNOMAD_Exome_popmax", "gNOMAD_Exome_raw",
+"gNOMAD_Exome_sas", "gNOMAD_Genome_all", "gNOMAD_Genome_afr", "gNOMAD_Genome_amr", "gNOMAD_Genome_asj", "gNOMAD_Genome_eas", "gNOMAD_Genome_fin", "gNOMAD_Genome_nfe", "gNOMAD_Genome_oth",
+"gNOMAD_Genome_popmax", "gNOMAD_Genome_raw", "dbSNP_MAF"]
 
 def addFORMAT(dic) :
     """
@@ -59,8 +104,8 @@ def convertirData(path) :
     "fathmm-MKL_coding_rankscore", "fathmm-MKL_coding_pred", "Eigen_coding_or_noncoding", "Eigen-raw", "Eigen-PC-raw", "GenoCanyon_score", "GenoCanyon_score_rankscore", "integrated_fitCons_score",
     "integrated_fitCons_score_rankscore", "integrated_confidence_value", "GERP++_RS", "GERP++_RS_rankscore", "phyloP100way_vertebrate", "phyloP100way_vertebrate_rankscore",
     "phyloP20way_mammalian", "phyloP20way_mammalian_rankscore", "phastCons100way_vertebrate", "phastCons100way_vertebrate_rankscore",  "phastCons20way_mammalian",
-    "phastCons20way_mammalian_rankscore", "SiPhy_29way_logOdds", "SiPhy_29way_logOdds_rankscore", "Interpro_domain", "GTEx_V6p_gene", "GTEx_V6p_tissue", 'CHROM', 'POS', 'ID', 'REFERENCE',
-    'ALTERATED', 'QUAL', 'FILTER', 'INFO', 'FORMAT', 'SAMPLE']
+    "phastCons20way_mammalian_rankscore", "SiPhy_29way_logOdds", "SiPhy_29way_logOdds_rankscore", "Interpro_domain", "GTEx_V6p_gene", "GTEx_V6p_tissue", "CHROM", "POS", "ID", "REFERENCE",
+    "ALTERATED", "QUAL", "FILTER", "INFO", "FORMAT", "SAMPLE"]
     with open(path, "r") as fi :
         dc = []
         for l in fi :
@@ -78,7 +123,7 @@ def convertirData(path) :
                 temp = {}
     return dc
 
-def filtroPas(dc) :
+def filtroPAS(dc) :
     """Seleccionar solo las variantes que tengan como filtro PASS segun Strelka2"""
     nuevo = []
     for d in dc :
@@ -86,12 +131,43 @@ def filtroPas(dc) :
             nuevo.append(d)
     return nuevo
 
+def filtroConseq(dc) :
+    """Selecciona aquellas variantes que son exonicas (excluye sinonimas) y splicing"""
+    nuevo = []
+    for d in dc :
+        if d["Func.refGene"] == "splicing" :
+            nuevo.append(d)
+        elif d["Func.refGene"] == "exonic" and d["ExonicFunc.refGene"] != "synonymous SNV" :
+            nuevo.append(d)
+            return nuevo
+
+def filtrarMAF(dc) :
+    """Clasificar las variantes por su Minor Allele Frequency"""
+    baja = []
+    alta = []
+    for l in dc :
+        if l["population_max"] != "NA" and l["population_max"] >= 0.01 :
+            alta.append(l)
+        else :
+            baja.append(l)
+    return alta, baja
+
+def filtrarVAF(dc) :
+    """Clasificar las variantes por su Variant Allele Frequency"""
+    alta = []
+    baja = []
+    for l in dc :
+        if l["VAF"] > 10 :
+            alta.append(l)
+        else :
+            baja.append(l)
+    return alta, baja
+
 def addWebInfo(dc) :
     """Agregar la informacion de myvariant.info a aquellas variantes que sean exonicas"""
     for d in dc :
         aux = gw.getMyVariant(d["Chr"], d["Start"], d["Ref"], d["Alt"])
         d.update(aux)
-    print(len(dc[0].keys()))
     return dc
 
 def guardarTabla(dc, prefijo) :
@@ -102,166 +178,29 @@ def guardarTabla(dc, prefijo) :
         fi.write("\t".join(orden))
         fi.write("\n")
         for d in dc :
-            for o in orden :
-                fi.write("{}\t".format(d[o]))
+            for o in allkeys :
+                if o in d.keys() :
+                    fi.write("{}\t".format(d[o]))
+                else :
+                    fi.write("{}\t".format(vacio))
             fi.write("\n")
     print("INFO: Guardado archivo {}".format(filename))
 
-def filtroConseq(dc) :
-    """Selecciona aquellas variantes que son exonicas (excluye sinonimas) y splicing"""
-    nuevo = []
-    for d in dc :
-        if d["Func.refGene"] == "splicing" :
-            nuevo.append(d)
-        elif d["Func.refGene"] == "exonic" and d["ExonicFunc.refGene"] != "synonymous SNV" :
-            nuevo.append(d)
-    return nuevo
 
-def calcularStrandBias(l, somatic) :
+def calcularStrandBias(l) :
+    """Calcular el numero total de reads en forward - numero total de reads en reverse"""
     coef = "NP"
-    if somatic == "germinal" :
-        auxF = l["ADF"].split(",")
-        auxR = l["ADR"].split(",")
-        coef = int(auxF[0]) + int(auxF[1]) - int(auxR[0]) - int(auxR[1])
-    elif somatic == "somatico" and "SNVSB_INFO" in l.keys() :
-        coef = l["SNVSB_INFO"]
-    # Las indels somaticas no tienen ninguna forma de calcular el strand bias
+    auxF = l["ADF"].split(",")
+    auxR = l["ADR"].split(",")
+    forward = 0
+    reverse = 0
+    for a in auxF :
+        forward += int(a)
+    for a in auxR :
+        reverse += int(a)
+    coef = forward - reverse
+
     return str(coef)
-
-def getGenomeType(l, somatic) :
-    """
-    Devolver el tipo de variante que ha detectado el vcf. En caso de que la muestra a anotar sea somatica, se devolvera siempre 0/1 (heterozigoto). Si la muestra es germinal, se devuelve
-    el valor de la columna GT del vcf.
-    """
-    ret = "NP"
-    if somatic == "somatico" :
-        ret = "0/1"
-    else :
-        ret = l["GT"]
-    return ret
-
-def getGenomeQuality(l, somatic) :
-    """
-    Devolver la calidad de la variante que ha detectado el variant caller. Strelka2 devuelve la calidad genomica en caso de variant calling somatico y la calidad de la variante en caso de variantes
-    somaticas. El nombre de la columna de la variante somatica depende de si la variante es una SNV o una indel.
-    """
-    ret = "NP"
-    if somatic == "germinal" :
-        ret = l["GQX"]
-    elif somatic == "somatico" and "QSS" in l.keys() : #Calidad de la variante en SNVs somaticas
-        ret = l["QSS_INFO"]
-    elif somatic == "somatico" and "QSI" in l.keys() : #Calidad de la variante en indels somaticas
-        ret = l["QSI_INFO"]
-    return ret
-
-def getRegionDepth(l, somatic) :
-    """
-    Devolver la profundidad (coverage) en la region donde esta la variante. Para variantes germinales, Strelka2 devuelve el dato en las columnas DP, DPF y AD. Como el dato de AD separa las
-    coberturas entre referencia y alterado, uso esta columna para calcular la cobertura total. Para variantes somaticas, uso la suma de las coberturas de cada una de las bases, en caso de SNV y
-    la suma de las coberturas de referencia y alteradas en caso de indels
-    """
-    dp = "NP"
-    if somatic == "germinal" :
-        aux = l["AD"].split(",")
-        dp = int(aux[0]) + int(aux[1])
-    elif somatic == "somatico" and "AU" in l.keys() :
-        dp = int(l["AU_TUMOR"].split(",")[0]) + int(l["CU_TUMOR"].split(",")[0]) + int(l["GU_TUMOR"].split(",")[0]) + int(l["TU_TUMOR"].split(",")[0])
-    elif somatic == "somatico" and "TAR" in l.keys() :
-        dp = int(l["TAR_TUMOR"].split(",")[0]) + int(l["TIR_TUMOR"].split(",")[0])
-
-    return str(dp)
-
-def getReferenceDepth(l, somatic) :
-    """
-    Devolver la profundidad (coverage) de reads con la base de referencia. Uso los mismos datos que en getRegionDepth para ahorrarme inconsistencias en el calculo de datos
-    """
-    dp = "NP"
-    if somatic == "germinal" :
-        dp = l["AD"].split(",")[0]
-    elif somatic == "somatico" and "AU_TUMOR" in l.keys() : #Comprobar si la variante es una SNV somatica
-        if l["Ref"] == "A" :
-            dp = l["AU_TUMOR"].split(",")[0]
-        elif l["Ref"] == "C" :
-            dp = l["CU_TUMOR"].split(",")[0]
-        elif l["Ref"] == "G" :
-            dp = l["GU_TUMOR"].split(",")[0]
-        elif l["Ref"] == "T" :
-            dp = l["TU_TUMOR"].split(",")[0]
-    elif somatic == "somatico" and "TAR_TUMOR" in l.keys() : #Comprobar si la variante es una indel somatica
-        dp = l["TAR_TUMOR"].split(",")[0]
-
-    return dp
-
-def getAlteratedDepth(l, somatic) :
-    """
-    Devolver la profundidad (coverage) de reads con la base alterada. Uso los mismos datos que en getRegionDepth y en getReferenceDepth para ahorrarme inconsistencias en el calculo de datos
-    """
-    dp = "NP"
-    if somatic == "germinal" :
-        dp = l["AD"].split(",")[1]
-    elif somatic == "somatico" and "AU_TUMOR" in l.keys() : #Comprobar si la variante es una SNV somatica
-        if l["Alt"] == "A" :
-            dp = l["AU_TUMOR"].split(",")[0]
-        elif l["Alt"] == "C" :
-            dp = l["CU_TUMOR"].split(",")[0]
-        elif l["Alt"] == "G" :
-            dp = l["GU_TUMOR"].split(",")[0]
-        elif l["Alt"] == "T" :
-            dp = l["TU_TUMOR"].split(",")[0]
-    elif somatic == "somatico" and "TIR_TUMOR" in l.keys() : #Comprobar si la variante es una indel somatica
-        dp = l["TIR_TUMOR"].split(",")[0]
-
-    return dp
-
-def getVAF(l, somatic) :
-    """
-    Calcula la Variant Allele Frequency VAF usando los datos de coverages de la forma en que se recogen en las funciones anteriores (getRegionDepth, getReferenceDepth, getAlteratedDepth)
-    """
-    dp = "NP"
-    try :
-        if somatic == "germinal" :
-            aux = l["AD"].split(",")
-            dp = float(aux[1]) / (float(aux[0]) + float(aux[1])) * 100
-        elif somatic == "somatico" and "AU" in l.keys() :
-            ref = 0
-            alt = 0
-            if l["Ref"] == "A" :
-                ref = l["AU_TUMOR"].split(",")[0]
-            elif l["Ref"] == "C" :
-                ref = l["CU_TUMOR"].split(",")[0]
-            elif l["Ref"] == "G" :
-                ref = l["GU_TUMOR"].split(",")[0]
-            elif l["Ref"] == "T" :
-                ref = l["TU_TUMOR"].split(",")[0]
-
-            if l["Alt"] == "A" :
-                alt = l["AU_TUMOR"].split(",")[0]
-            elif l["Alt"] == "C" :
-                alt = l["CU_TUMOR"].split(",")[0]
-            elif l["Alt"] == "G" :
-                alt = l["GU_TUMOR"].split(",")[0]
-            elif l["Alt"] == "T" :
-                alt = l["TU_TUMOR"].split(",")[0]
-
-            dp = float(alt) / (float(alt) + float(ref)) * 100
-        elif somatic == "somatico" and "TAR" in l.keys() :
-            dp = float(l["TIR_TUMOR"].split(",")[0]) / (float(l["TIR_TUMOR"].split(",")[0]) + float(l["TAR_TUMOR"].split(",")[0])) * 100
-
-    except ZeroDivisionError :
-        print("ERROR: La variant {} te cobertura 0".format([l["Chr"], l["Start"], l["End"], l["Ref"], l["Alt"]]))
-
-    return dp
-
-def getMutationType(l, somatic) :
-    ret = ""
-    if somatic == "germinal" :
-        ret = "GERMLINE"
-    else :
-        if "SOMATIC" in l.keys() :
-            ret = l["SOMATIC"]
-        else :
-            ret = "SOMATIC"
-    return ret
 
 def maximMaf(dc) :
     maxim = -1
@@ -340,50 +279,61 @@ def resumPredictors(d) :
 
     return "{}D, {}T, {}U".format(deleterious, tolerated, unknown)
 
-def main(ruta) :
+def main(ruta, samplename = "noName") :
+    webInfo = False
     # Leer el archivo multianno de ANNOVAR y guardar los datos en un diccionario
     todas = convertirData(ruta)
     print(len(todas)) # Total de variantes reportadas por Strelka2
     # Separar las variantes que han pasado todos los filtros de STrelka2
     pas = filtroPAS(todas)
     print(len(pas))
+    if len(pas) <= 200 :
+        pas = addWebInfo(pas)
+        webInfo = True
     # Guardar en un archivo de text todas las variantes (filtro0)
-    #guardarTabla(todas, "filtro0")
-    #del(todas)
+    guardarTabla(todas, "filtro0")
+    del(todas)
+    # Agregar las columnas adicionales: "population_max", "predictor_summary". "Strand_bias_score", "Ref_depth", "Alt_depth", "VAF", "IGV_link", "sample"
+    for p in pas :
+        p["population_max"] = maximMaf(p)
+        p["predictor_summary"] = resumPredictors(p)
+        p["Strand_bias_score"] = calcularStrandBias(p)
+        p["Ref_depth"] = p["AD"].split(",")[0]
+        p["Alt_depth"] = p["AD"].split(",")[1]
+        p["VAF"] = float(p["Alt_depth"])/(p["DP"]) * 100
+        p["IGV_link"] = "http://localhost:60151/goto?locus={}:{}".format(p["Chr"], p["Start"])
+        p["sample"] = samplename
+
     # Separar las variantes exonicas (consecuencia) y las splicing en un diccionario aparte
     conseq = filtroConseq(pas)
     print(len(conseq))
     # Si el total de variantes es menor de 200 (numero arbitrario) re-anotar todas las variantes. En caso contrario, solo re-anotar las conseq
-    if len(pas) <= 200 :
-        addWebInfo(pas)
-    else :
-        addWebInfo(conseq)
-    # Agregar las columnas adicionales: population_max, predictor_summary, Strand_bias_score, GT, GQ, DP, RFD, ALD, VAF, MT, IGV, IGV_analisis, muestra
-    # Guardar en un archivo de texto las variantes que pasan  (filtro0)
-    # Guardar en un archivo de texto las variantes con consecuencia (filtro1)
+    if not webInfo :
+        conseq = addWebInfo(conseq)
+    # Guardar en un archivo de texto las variantes que pasan  (filtro1)
+    guardarTabla(pas, "filtro1")
+    del(pas)
+    # Guardar en un archivo de texto las variantes con consecuencia (filtro2)
+    guardarTabla(conseq, "filtro2")
     # Filtrar por MAF
-    # Guardar en un archivo de texto las variantes con MAF>0.01 (filtro2)
+    mafAlta, mafBaja = filtrarMAF(conseq)
+    print(len(mafAlta))
+    print(lan(mafBaja))
+    # Guardar en un archivo de texto las variantes con MAF>=0.01 (filtro3)
+    guardarTabla(mafAlta, "filtro3")
+    del(conseq)
+    del(mafAlta)
     # Filtrar por VAF
-    # Guardar en un archivo de texto las variantes con VAF <= 0.1 (filtro3)
-    # Guardar en un archivo de texto las variantes con VAF > 0.1 (filtro4)
+    vafAlta, vafBaja = filtrarVAF(mafBaja)
+    print(len(vafBaja))
+    print(len(vafAlta))
+    # Guardar en un archivo de texto las variantes con VAF <= 10 (filtro4)
+    guardarTabla(vafBaja, "filtro4")
+    # Guardar en un archivo de texto las variantes con VAF > 10 (filtro5)
+    guardarTabla(vafAlta, "filtro5")
     # TODO: Anadir estadisticas de los tipos de variantes recogidos en el panel a la pestaña QC
 
 if __name__ == "__main__" :
     path = sys.argv[1]
-    main(path)
-"""
-Columnas extra
-l["population_max"] = maximMaf(l)
-l["predictor_summary"] = resumPredictors(l)
-l["Strand_bias_score"] = calcularStrandBias(l, somatic)
-l["GT"] = getGenomeType(l, somatic)
-l["GQ"] = getGenomeQuality(l, somatic)
-l["DP"] = getRegionDepth(l, somatic)
-l["RFD"] = getReferenceDepth(l, somatic)
-l["ALD"] = getAlteratedDepth(l, somatic)
-l["VAF"] = getVAF(l, somatic)
-l["MT"] = getMutationType(l, somatic)
-l["IGV"] = "http://localhost:60151/goto?locus={}:{}".format(l["Chr"], l["Start"])
-l["IGV_analisis"] = ""
-l["muestra"] = mostra
-"""
+    sample = sys.argv[1]
+    main(path, sample)
