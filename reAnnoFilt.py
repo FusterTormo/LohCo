@@ -71,21 +71,47 @@ def convertirData(path) :
                 for c in claves :
                     temp[c] = aux[i]
                     i += 1
-                print(len(temp.keys()))
                 aux2 = addFORMAT(temp)
-                print(len(aux2.keys()))
                 temp.update(aux2)
-                print(len(temp.keys()))
-                sys.exit()
                 dc.append(temp)
                 temp = {}
-    return temp
+    return dc
+
+def filtroPas(dc) :
+    """Seleccionar solo las variantes que tengan como filtro PASS segun Strelka2"""
+    nuevo = []
+    for d in dc :
+        if d["FILTER"] == "PASS" :
+            nuevo.append(d)
+    return nuevo
 
 def addWebInfo(dc) :
     """Agregar la informacion de myvariant.info a aquellas variantes que sean exonicas"""
     # TODO: Anadir estadisticas de los tipos de variantes recogidos en el panel a la pestaña QC
     pass # Recodigda de strelka2excel
 
+def guardarTabla(dc, prefijo) :
+    """Guardar el diccionario pasado por parametro en un archivo de texto con formato de tabla. El prefijo es el nombre que tendra el archivo"""
+    sufijo = "hg19_multianno.txt"
+    filename = "{}.{}".format(prefijo, sufijo)
+    with open(filename, "w") as fi :
+        fi.write("\t".join(orden))
+        fi.write("\n")
+        for d in dc :
+            for o in orden :
+                fi.write("{}\t".format(d[o]))
+            fi.write("\n")
+    print("INFO: Guardado archivo {}".format(filename))
+
+def filtroConseq(dc) :
+    """Selecciona aquellas variantes que son exonicas (excluye sinonimas) y splicing"""
+    nuevo = []
+    for d in dc :
+        if d["Func.refGene"] == "splicing" :
+            nuevo.append(d)
+        elif d["Func.refGene"] == "exonic" and d["ExonicFunc.refGene"] != "synonymous SNV" :
+            nuevo.append(d)
+    return nuevo
 
 def calcularStrandBias(l, somatic) :
     coef = "NP"
@@ -313,12 +339,21 @@ def resumPredictors(d) :
 def main(ruta) :
     # Leer el archivo multianno de ANNOVAR y guardar los datos en un diccionario
     todas = convertirData(ruta)
-    print(len(todas))
-    print(len(todas.keys()))
+    print(len(todas)) # Total de variantes reportadas por Strelka2
     # Separar las variantes que han pasado todos los filtros de STrelka2
+    pas = filtroPAS(todas)
+    print(len(pas))
     # Guardar en un archivo de text todas las variantes (filtro0)
+    guardarTabla(todas, "filtro0")
+    del(todas)
     # Separar las variantes exonicas (consecuencia) y las splicing en un diccionario aparte
+    conseq = filtroConseq(pas)
+    print(len(conseq))
     # Si el total de variantes es menor de 200 (numero arbitrario) re-anotar todas las variantes. En caso contrario, solo re-anotar las conseq
+    if len(pas) <= 200 :
+        addWebInfo(pas)
+    else :
+        addWebInfo(conseq)
     # Agregar las columnas adicionales: population_max, predictor_summary, Strand_bias_score, GT, GQ, DP, RFD, ALD, VAF, MT, IGV, IGV_analisis, muestra
     # Guardar en un archivo de texto las variantes que pasan  (filtro0)
     # Guardar en un archivo de texto las variantes con consecuencia (filtro1)
