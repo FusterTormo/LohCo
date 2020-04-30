@@ -5,6 +5,7 @@
 MAIN: Re-anotar y filtrar el archivo de salida de table_annovar
 """
 import sys
+import getWebInfo as gw
 
 def addFORMAT(dic) :
     """
@@ -87,8 +88,11 @@ def filtroPas(dc) :
 
 def addWebInfo(dc) :
     """Agregar la informacion de myvariant.info a aquellas variantes que sean exonicas"""
-    # TODO: Anadir estadisticas de los tipos de variantes recogidos en el panel a la pestaña QC
-    pass # Recodigda de strelka2excel
+    for d in dc :
+        aux = gw.getMyVariant(d["Chr"], d["Start"], d["Ref"], d["Alt"])
+        d.update(aux)
+    print(len(dc[0].keys()))
+    return dc
 
 def guardarTabla(dc, prefijo) :
     """Guardar el diccionario pasado por parametro en un archivo de texto con formato de tabla. El prefijo es el nombre que tendra el archivo"""
@@ -344,8 +348,8 @@ def main(ruta) :
     pas = filtroPAS(todas)
     print(len(pas))
     # Guardar en un archivo de text todas las variantes (filtro0)
-    guardarTabla(todas, "filtro0")
-    del(todas)
+    #guardarTabla(todas, "filtro0")
+    #del(todas)
     # Separar las variantes exonicas (consecuencia) y las splicing en un diccionario aparte
     conseq = filtroConseq(pas)
     print(len(conseq))
@@ -362,6 +366,7 @@ def main(ruta) :
     # Filtrar por VAF
     # Guardar en un archivo de texto las variantes con VAF <= 0.1 (filtro3)
     # Guardar en un archivo de texto las variantes con VAF > 0.1 (filtro4)
+    # TODO: Anadir estadisticas de los tipos de variantes recogidos en el panel a la pestaña QC
 
 if __name__ == "__main__" :
     path = sys.argv[1]
