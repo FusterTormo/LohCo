@@ -23,8 +23,8 @@ bwa = "/opt/bwa.kit/bwa mem -M -t 6 -R {rg} {ref} {fw} {rv} > bwa.sam" # Comando
 picardSort = "java -jar /opt/picard-tools-2.21.8/picard.jar SortSam INPUT=bwa.sam OUTPUT=bwa.sort.bam SORT_ORDER=coordinate" # Comando para ordenar el bam
 picardIndex = "java -jar /opt/picard-tools-2.21.8/picard.jar BuildBamIndex INPUT={bam}" # Comando para crear un indice en el bam ordenado
 bedtoolsBam2Bed = "bedtools bamtobed -i {bam} > bwa.bed" #Comando para crear un bed con todas las regiones donde se han alineado reads
-gatk1 = "/opt/gatk-4.1.4.1/gatk BaseRecalibrator -I {bam} -R {ref} --known-sites {dbsnp} -O recaldata.table" # Comando para realizar el primer paso de la recalibracion de bases sugerida por GATK
-gatk2 = "/opt/gatk-4.1.4.1/gatk ApplyBQSR -I {bam} -R {ref} -bqsr-recal-file recaldata.table -O bwa.recal.bam" # Comando para realizar el segundo paso de la recalibracion de bases sugerida por GATK
+gatk1 = "/opt/gatk-4.1.4.1/gatk BaseRecalibrator -I {bam} -R {ref} --known-sites {dbsnp} -O recaldata.table -L {mani}" # Comando para realizar el primer paso de la recalibracion de bases sugerida por GATK
+gatk2 = "/opt/gatk-4.1.4.1/gatk ApplyBQSR -I {bam} -R {ref} -bqsr-recal-file recaldata.table -O bwa.recal.bam -L {mani}" # Comando para realizar el segundo paso de la recalibracion de bases sugerida por GATK
 bedtoolsCoverageAll = "bedtools coverage -hist -a {mani} -b {bam} > {output}" # Comando para calcular el coverage agrupado del bam en las regiones del manifest
 bedtoolsCoverageBase = "bedtools coverage -d -a {mani} -b {bam} > {output}" # Comando para calcular el coverage de cada una de las bases dentro de la region de interes
 markDup = "java -jar /opt/picard-tools-2.21.8/picard.jar MarkDuplicates INPUT={bam} OUTPUT=bwa.nodup.bam METRICS_FILE=dups_bam.txt" # Comando para marcar duplicados usando Picard tools
@@ -230,8 +230,8 @@ def prepararScript(ruta) :
         fi.write("\tcd bwaAlign\n")
         fi.write("\t" + bedtoolsBam2Bed.format(bam = "bwa.sort.bam") + "\n")
         # Recalibrar las bases
-        fi.write("\t" + gatk1.format(bam = "bwa.sort.bam", ref = "$ref", dbsnp = "$sites") + "\n")
-        fi.write("\t" + gatk2.format(bam = "bwa.sort.bam", ref = "$ref") + "\n")
+        fi.write("\t" + gatk1.format(bam = "bwa.sort.bam", ref = "$ref", dbsnp = "$sites", mani = "$mani") + "\n")
+        fi.write("\t" + gatk2.format(bam = "bwa.sort.bam", ref = "$ref", mani = "$mani") + "\n")
         # Aqui puede ir el marcar duplicados, en caso de necesitarse
         fi.write("\t" + markDup.format(bam = "bwa.recal.bam") + "\n")
         fi.write("\t" + picardIndex.format(bam = "bwa.nodup.bam") + "\n")

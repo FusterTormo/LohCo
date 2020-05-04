@@ -283,10 +283,10 @@ def main(ruta, samplename = "noName") :
     webInfo = False
     # Leer el archivo multianno de ANNOVAR y guardar los datos en un diccionario
     todas = convertirData(ruta)
-    print(len(todas)) # Total de variantes reportadas por Strelka2
+    print("Totes les variants {}".format(len(todas))) # Total de variantes reportadas por Strelka2
     # Separar las variantes que han pasado todos los filtros de STrelka2
     pas = filtroPAS(todas)
-    print(len(pas))
+    print("Variants amb filtres=PASS {}".format(len(pas)))
     if len(pas) <= 200 :
         pas = addWebInfo(pas)
         webInfo = True
@@ -306,7 +306,7 @@ def main(ruta, samplename = "noName") :
 
     # Separar las variantes exonicas (consecuencia) y las splicing en un diccionario aparte
     conseq = filtroConseq(pas)
-    print(len(conseq))
+    print("Variants conseq: {}".format(len(conseq)))
     # Si el total de variantes es menor de 200 (numero arbitrario) re-anotar todas las variantes. En caso contrario, solo re-anotar las conseq
     if not webInfo :
         conseq = addWebInfo(conseq)
@@ -317,16 +317,16 @@ def main(ruta, samplename = "noName") :
     guardarTabla(conseq, "filtro2")
     # Filtrar por MAF
     mafAlta, mafBaja = filtrarMAF(conseq)
-    print(len(mafAlta))
-    print(lan(mafBaja))
+    print("MAF >= 0.1: {}".format(len(mafAlta)))
+    print("MAF < 0.1: {}".format(len(mafBaja)))
     # Guardar en un archivo de texto las variantes con MAF>=0.01 (filtro3)
     guardarTabla(mafAlta, "filtro3")
     del(conseq)
     del(mafAlta)
     # Filtrar por VAF
     vafAlta, vafBaja = filtrarVAF(mafBaja)
-    print(len(vafBaja))
-    print(len(vafAlta))
+    print("Baixa VAF: {}".format(len(vafBaja)))
+    print("Variants candidates: {}".format(len(vafAlta)))
     # Guardar en un archivo de texto las variantes con VAF <= 10 (filtro4)
     guardarTabla(vafBaja, "filtro4")
     # Guardar en un archivo de texto las variantes con VAF > 10 (filtro5)
