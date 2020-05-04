@@ -203,86 +203,110 @@ def getMyVariant(chr, pos, ref, alt, na='NA') :
                 #Para sacar la frecuencia hay que dividir el campo ac (allele count) entre el campo an (allele number)
                 if 'ac' in a['exac'] and 'an' in a['exac']:
                     if 'ac' in a['exac']['ac'] and 'an' in a['exac']['an'] :
-                        #Guarda los datos en formato formula de Excel, para asi no perder los datos de contaje alelico
-                        if isinstance(a['exac']['ac']['ac'],(list, tuple)) : #ExAC ha devuelto una lista de alelos, buscamos el que corresponde a nuestra variante y lo guardamos
-                            for it in range(0,len(a['exac']['alleles'])) :
-                                if (a['exac']['alleles'][it] == alt) :
-                                    aux = 100*float(a['exac']['ac']['ac'][it])/float(a['exac']['an']['an'])
-                                    mv['ExAC_ExAC_all'] = "{:.2f}".format(aux)
-                                    break
-                        else :
-                            aux = 100*float(a['exac']['ac']['ac'])/float(a['exac']['an']['an'])
-                            mv['ExAC_ExAC_all'] = "{:.2f}".format(aux)
+                        try :
+                            #Guarda los datos en formato formula de Excel, para asi no perder los datos de contaje alelico
+                            if isinstance(a['exac']['ac']['ac'],(list, tuple)) : #ExAC ha devuelto una lista de alelos, buscamos el que corresponde a nuestra variante y lo guardamos
+                                for it in range(0,len(a['exac']['alleles'])) :
+                                    if (a['exac']['alleles'][it] == alt) :
+                                        aux = 100*float(a['exac']['ac']['ac'][it])/float(a['exac']['an']['an'])
+                                        mv['ExAC_ExAC_all'] = "{:.2f}".format(aux)
+                                        break
+                            else :
+                                aux = 100*float(a['exac']['ac']['ac'])/float(a['exac']['an']['an'])
+                                mv['ExAC_ExAC_all'] = "{:.2f}".format(aux)
+                        except ZeroDivisionError :
+                            mv['ExAC_ExAC_all'] = "0"
                     if 'ac_afr' in a['exac']['ac'] and 'an_afr' in a['exac']['an'] :
-                        if isinstance(a['exac']['ac']['ac_afr'],(list, tuple)) :
-                            for it in range(0,len(a['exac']['alleles'])) :
-                                if (a['exac']['alleles'][it] == alt) :
-                                    aux = 100*float(a['exac']['ac']['ac_afr'][it])/float(a['exac']['an']['an_afr'])
-                                    mv['ExAC_ExAC_afr'] = "{:.2f}".format(aux)
-                                    break
-                        else :
-                            aux = 100*float(a['exac']['ac']['ac_afr'])/float(a['exac']['an']['an_afr'])
-                            mv['ExAC_ExAC_afr'] = "{:.2f}".format(aux)
+                        try :
+                            if isinstance(a['exac']['ac']['ac_afr'],(list, tuple)) :
+                                for it in range(0,len(a['exac']['alleles'])) :
+                                    if (a['exac']['alleles'][it] == alt) :
+                                        aux = 100*float(a['exac']['ac']['ac_afr'][it])/float(a['exac']['an']['an_afr'])
+                                        mv['ExAC_ExAC_afr'] = "{:.2f}".format(aux)
+                                        break
+                            else :
+                                aux = 100*float(a['exac']['ac']['ac_afr'])/float(a['exac']['an']['an_afr'])
+                                mv['ExAC_ExAC_afr'] = "{:.2f}".format(aux)
+                        except ZeroDivisionError :
+                            mv['ExAC_ExAC_afr'] = "0"
                     if 'ac_amr' in a['exac']['ac'] and 'an_amr' in a['exac']['an'] :
-                        if isinstance(a['exac']['ac']['ac_amr'],(list, tuple)) :
-                            for it in range(0,len(a['exac']['alleles'])) :
-                                if (a['exac']['alleles'][it] == alt) :
-                                    aux = 100*float(a['exac']['ac']['ac_amr'][it])/float(a['exac']['an']['an_amr'])
-                                    mv['ExAC_ExAC_amr'] = "{:.2f}".format(aux)
-                                    break
-                        else :
-                            aux = 100*float(a['exac']['ac']['ac_amr'])/float(a['exac']['an']['an_amr'])
-                            mv['ExAC_ExAC_amr'] = "{:.2f}".format(aux)
+                        try :
+                            if isinstance(a['exac']['ac']['ac_amr'],(list, tuple)) :
+                                for it in range(0,len(a['exac']['alleles'])) :
+                                    if (a['exac']['alleles'][it] == alt) :
+                                        aux = 100*float(a['exac']['ac']['ac_amr'][it])/float(a['exac']['an']['an_amr'])
+                                        mv['ExAC_ExAC_amr'] = "{:.2f}".format(aux)
+                                        break
+                            else :
+                                aux = 100*float(a['exac']['ac']['ac_amr'])/float(a['exac']['an']['an_amr'])
+                                mv['ExAC_ExAC_amr'] = "{:.2f}".format(aux)
+                        except ZeroDivisionError :
+                            mv['ExAC_ExAC_amr'] = "0"
                     if 'ac_eas' in a['exac']['ac'] and 'an_eas' in a['exac']['an'] :
-                        if isinstance(a['exac']['ac']['ac_eas'],(list, tuple)) :
-                            for it in range(0,len(a['exac']['alleles'])) :
-                                if (a['exac']['alleles'][it] == alt) :
-                                    aux = 100*float(a['exac']['ac']['ac_eas'][it])/float(a['exac']['an']['an_eas'])
-                                    mv['ExAC_ExAC_eas'] = "{:.2f}".format(aux)
-                                    break
-                        else :
-                            aux = 100*float(a['exac']['ac']['ac_eas'])/float(a['exac']['an']['an_eas'])
-                            mv['ExAC_ExAC_eas'] = "{:.2f}".format(aux)
+                        try :
+                            if isinstance(a['exac']['ac']['ac_eas'],(list, tuple)) :
+                                for it in range(0,len(a['exac']['alleles'])) :
+                                    if (a['exac']['alleles'][it] == alt) :
+                                        aux = 100*float(a['exac']['ac']['ac_eas'][it])/float(a['exac']['an']['an_eas'])
+                                        mv['ExAC_ExAC_eas'] = "{:.2f}".format(aux)
+                                        break
+                            else :
+                                aux = 100*float(a['exac']['ac']['ac_eas'])/float(a['exac']['an']['an_eas'])
+                                mv['ExAC_ExAC_eas'] = "{:.2f}".format(aux)
+                        except ZeroDivisionError :
+                            mv['ExAC_ExAC_eas'] = "0"
                     if 'ac_fin' in a['exac']['ac'] and 'an_fin' in a['exac']['an'] :
-                        if isinstance(a['exac']['ac']['ac_fin'],(list, tuple)) :
-                            for it in range(0,len(a['exac']['alleles'])) :
-                                if (a['exac']['alleles'][it] == alt) :
-                                    aux = 100*float(a['exac']['ac']['ac_fin'][it])/float()
-                                    mv['ExAC_ExAC_fin'] = "{:.2f}".format(aux)
-                                    break
-                        else :
-                            aux = 100*float(a['exac']['ac']['ac_fin'])/float(a['exac']['an']['an_fin'])
-                            mv['ExAC_ExAC_fin'] = "{:.2f}".format(aux)
+                        try :
+                            if isinstance(a['exac']['ac']['ac_fin'],(list, tuple)) :
+                                for it in range(0,len(a['exac']['alleles'])) :
+                                    if (a['exac']['alleles'][it] == alt) :
+                                        aux = 100*float(a['exac']['ac']['ac_fin'][it])/float()
+                                        mv['ExAC_ExAC_fin'] = "{:.2f}".format(aux)
+                                        break
+                            else :
+                                aux = 100*float(a['exac']['ac']['ac_fin'])/float(a['exac']['an']['an_fin'])
+                                mv['ExAC_ExAC_fin'] = "{:.2f}".format(aux)
+                        except ZeroDivisionError :
+                            mv['ExAC_ExAC_fin'] = "0"
                     if 'ac_nfe' in a['exac']['ac'] and 'an_nfe' in a['exac']['an'] :
-                        if isinstance(a['exac']['ac']['ac_nfe'],(list, tuple)) :
-                            for it in range(0,len(a['exac']['alleles'])) :
-                                if (a['exac']['alleles'][it] == alt) :
-                                    aux = 100*float(a['exac']['ac']['ac_nfe'][it])/float(a['exac']['an']['an_nfe'])
-                                    mv['ExAC_ExAC_nfe'] = "{:.2f}".format(aux)
-                                    break
-                        else :
-                            aux = 100*float(a['exac']['ac']['ac_nfe'])/float(a['exac']['an']['an_nfe'])
-                            mv['ExAC_ExAC_nfe'] = "{:.2f}".format(aux)
+                        try :
+                            if isinstance(a['exac']['ac']['ac_nfe'],(list, tuple)) :
+                                for it in range(0,len(a['exac']['alleles'])) :
+                                    if (a['exac']['alleles'][it] == alt) :
+                                        aux = 100*float(a['exac']['ac']['ac_nfe'][it])/float(a['exac']['an']['an_nfe'])
+                                        mv['ExAC_ExAC_nfe'] = "{:.2f}".format(aux)
+                                        break
+                            else :
+                                aux = 100*float(a['exac']['ac']['ac_nfe'])/float(a['exac']['an']['an_nfe'])
+                                mv['ExAC_ExAC_nfe'] = "{:.2f}".format(aux)
+                        except ZeroDivisionError :
+                            mv['ExAC_ExAC_nfe'] = "0"
                     if 'ac_sas' in a['exac']['ac'] and 'an_sas' in a['exac']['an'] :
-                        if isinstance(a['exac']['ac']['ac_sas'],(list, tuple)) :
-                            for it in range(0,len(a['exac']['alleles'])) :
-                                if (a['exac']['alleles'][it] == alt) :
-                                    aux = 100*float(a['exac']['ac']['ac_sas'][it])/float(a['exac']['an']['an_sas'])
-                                    mv['ExAC_ExAC_sas'] = "{:.2f}".format(aux)
-                                    break
-                        else :
-                            aux = 100*float(a['exac']['ac']['ac_sas'])/float(a['exac']['an']['an_sas'])
-                            mv['ExAC_ExAC_sas'] = "{:.2f}".format(aux)
+                        try :
+                            if isinstance(a['exac']['ac']['ac_sas'],(list, tuple)) :
+                                for it in range(0,len(a['exac']['alleles'])) :
+                                    if (a['exac']['alleles'][it] == alt) :
+                                        aux = 100*float(a['exac']['ac']['ac_sas'][it])/float(a['exac']['an']['an_sas'])
+                                        mv['ExAC_ExAC_sas'] = "{:.2f}".format(aux)
+                                        break
+                            else :
+                                aux = 100*float(a['exac']['ac']['ac_sas'])/float(a['exac']['an']['an_sas'])
+                                mv['ExAC_ExAC_sas'] = "{:.2f}".format(aux)
+                        except ZeroDivisionError :
+                            mv['ExAC_ExAC_sas'] = "0"
                     if 'ac_oth' in a['exac']['ac'] and 'an_oth' in a['exac']['an'] :
-                        if isinstance(a['exac']['ac']['ac_oth'],(list, tuple)) :
-                            for it in range(0,len(a['exac']['alleles'])) :
-                                if (a['exac']['alleles'][it] == alt) :
-                                    aux = 100*float(a['exac']['ac']['ac_oth'][it])/float(a['exac']['an']['an_oth'])
-                                    mv['ExAC_ExAC_oth'] = "{:.2f}".format(aux)
-                                    break
-                        else :
-                            aux = 100*float(a['exac']['ac']['ac_oth'])/float(a['exac']['an']['an_oth'])
-                            mv['ExAC_ExAC_oth'] = "{:.2f}".format(aux)
+                        try :
+                            if isinstance(a['exac']['ac']['ac_oth'],(list, tuple)) :
+                                for it in range(0,len(a['exac']['alleles'])) :
+                                    if (a['exac']['alleles'][it] == alt) :
+                                        aux = 100*float(a['exac']['ac']['ac_oth'][it])/float(a['exac']['an']['an_oth'])
+                                        mv['ExAC_ExAC_oth'] = "{:.2f}".format(aux)
+                                        break
+                            else :
+                                aux = 100*float(a['exac']['ac']['ac_oth'])/float(a['exac']['an']['an_oth'])
+                                mv['ExAC_ExAC_oth'] = "{:.2f}".format(aux)
+                        except ZeroDivisionError :
+                            mv['ExAC_ExAC_oth'] = "0"
 
         else :
             print(res)
