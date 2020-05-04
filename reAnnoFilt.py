@@ -26,7 +26,7 @@ allkeys = ["Chr", "Start", "End", "Ref", "Alt", "Func.refGene", "Gene.refGene", 
 "phyloP20way_mammalian", "phyloP20way_mammalian_rankscore", "phastCons100way_vertebrate", "phastCons100way_vertebrate_rankscore",  "phastCons20way_mammalian",
 "phastCons20way_mammalian_rankscore", "SiPhy_29way_logOdds", "SiPhy_29way_logOdds_rankscore", "Interpro_domain", "GTEx_V6p_gene", "GTEx_V6p_tissue", "CHROM", "POS", "ID", "REFERENCE",
 "ALTERATED", "QUAL", "FILTER", "INFO", "FORMAT", "SAMPLE", "END", "BLOCKAVG", "SNVHPOL", "CIGAR", "RU", "REFPREP", "IDREP", "MQ", "GT", "GQ", "GQX", "DP", "DPF", "MIN_DP", "AD",
-"ADF", "ADR", "FT", "DPI", "PL", "PS", "SB", "population_max", "predictor_summary". "Strand_bias_score", "Ref_depth", "Alt_depth", "VAF", "IGV_link", "sample", "CADD_1000g_all",
+"ADF", "ADR", "FT", "DPI", "PL", "PS", "SB", "population_max", "predictor_summary", "Strand_bias_score", "Ref_depth", "Alt_depth", "VAF", "IGV_link", "sample", "CADD_1000g_all",
 "CADD_1000g_afr", "CADD_1000g_amr", "CADD_1000g_eur", "CADD_1000g_eas", "CADD_1000g_sas", "dbNSFP_1000g_all", "dbNSFP_1000g_afr", "dbNSFP_1000g_amr", "dbNSFP_1000g_eur", "dbNSFP_1000g_eas",
 "dbNSFP_1000g_sas", "CADD_ESP6500_all", "CADD_ESP6500_ea", "CADD_ESP6500_aa","dbNSFP_esp6500_all", "dbNSFP_esp6500_ea", "dbNSFP_esp6500_aa", "ExAC_ExAC_all", "ExAC_ExAC_afr","ExAC_ExAC_amr",
 "ExAC_ExAC_eas", "ExAC_ExAC_fin", "ExAC_ExAC_nfe", "ExAC_ExAC_oth", "ExAC_ExAC_sas", "dbNSFP_ExAC_all", "dbNSFP_ExAC_afr", "dbNSFP_ExAC_amr", "dbNSFP_ExAC_eas", "dbNSFP_ExAC_fin",
@@ -175,7 +175,7 @@ def guardarTabla(dc, prefijo) :
     sufijo = "hg19_multianno.txt"
     filename = "{}.{}".format(prefijo, sufijo)
     with open(filename, "w") as fi :
-        fi.write("\t".join(orden))
+        fi.write("\t".join(allkeys))
         fi.write("\n")
         for d in dc :
             for o in allkeys :
