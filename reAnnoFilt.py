@@ -148,10 +148,8 @@ def filtrarMAF(dc) :
     for l in dc :
         print("Probando {}".format(l["population_max"]))
         if l["population_max"] != "NA" and l["population_max"] >= 0.01 :
-            print("\tMAF ALTA")
             alta.append(l)
         else :
-            print("\tmaf baja")
             baja.append(l)
     return alta, baja
 
@@ -175,7 +173,7 @@ def addWebInfo(dc) :
 
 def guardarTabla(dc, prefijo) :
     """Guardar el diccionario pasado por parametro en un archivo de texto con formato de tabla. El prefijo es el nombre que tendra el archivo"""
-    sufijo = "hg19_multianno.txt"
+    sufijo = "reanno.tsv"
     filename = "{}.{}".format(prefijo, sufijo)
     with open(filename, "w") as fi :
         fi.write("\t".join(allkeys))
@@ -286,16 +284,11 @@ def main(ruta, samplename = "noName") :
     webInfo = False
     # Leer el archivo multianno de ANNOVAR y guardar los datos en un diccionario
     todas = convertirData(ruta)
-    print("Totes les variants {}".format(len(todas))) # Total de variantes reportadas por Strelka2
     # Separar las variantes que han pasado todos los filtros de STrelka2
     pas = filtroPAS(todas)
-    print("Variants amb filtres=PASS {}".format(len(pas)))
-    # if len(pas) <= 200 :
-    #     pas = addWebInfo(pas)
-    #     webInfo = True
-    # Guardar en un archivo de text todas las variantes (filtro0)
-    guardarTabla(todas, "filtro0")
-    del(todas)
+    if len(pas) <= 200 :
+        pas = addWebInfo(pas)
+        webInfo = True
     # Agregar las columnas adicionales: "population_max", "predictor_summary". "Strand_bias_score", "Ref_depth", "Alt_depth", "VAF", "IGV_link", "sample"
     for p in pas :
         p["population_max"] = maximMaf(p)
@@ -316,32 +309,46 @@ def main(ruta, samplename = "noName") :
 
     # Separar las variantes exonicas (consecuencia) y las splicing en un diccionario aparte
     conseq = filtroConseq(pas)
-    print("Variants conseq: {}".format(len(conseq)))
     # Si el total de variantes es menor de 200 (numero arbitrario) re-anotar todas las variantes. En caso contrario, solo re-anotar las conseq
     if not webInfo :
         conseq = addWebInfo(conseq)
-    # Guardar en un archivo de texto las variantes que pasan  (filtro1)
-    guardarTabla(pas, "filtro1")
-    del(pas)
-    # Guardar en un archivo de texto las variantes con consecuencia (filtro2)
-    guardarTabla(conseq, "filtro2")
     # Filtrar por MAF
     mafAlta, mafBaja = filtrarMAF(conseq)
-    print("MAF >= 0.1: {}".format(len(mafAlta)))
-    print("MAF < 0.1: {}".format(len(mafBaja)))
-    # Guardar en un archivo de texto las variantes con MAF>=0.01 (filtro3)
-    guardarTabla(mafAlta, "filtro3")
-    del(conseq)
-    del(mafAlta)
     # Filtrar por VAF
     vafAlta, vafBaja = filtrarVAF(mafBaja)
+
+    # Guardar los filtros en archivos de texto
+    guardarTabla(todas, "raw") # Todas las variantes recogidas en el vcf
+    guardarTabla(pas, "pass") # Variantes que Strelka2 considera que han pasado todos sus filtros
+    guardarTabla(conseq, "conseq") # Variantes en regiones de splicing o exonicas (exluyendo sinonimas)
+    guardarTabla(mafAlta, "highMAF") # Variantes con una MAF>=0.01 en alguna columna de base de datos poblacional
+    guardarTabla(vafBaja, "lowVAF") # Variantes con una frecuencia alelica menor de 0.1
+    guardarTabla(vafAlta, "cand") # Variantes que han pasado todos los filtros anteriores
+
+    # Mostrar por pantalla estadisticas basicas
+    print("Totes les variants {}".format(len(todas))) # Total de variantes reportadas por Strelka2
+    print("Variants amb filtres=PASS {}".format(len(pas)))
+    print("Variants conseq: {}".format(len(conseq)))
+    print("MAF >= 0.1: {}".format(len(mafAlta)))
+    print("MAF < 0.1: {}".format(len(mafBaja)))
     print("Baixa VAF: {}".format(len(vafBaja)))
     print("Variants candidates: {}".format(len(vafAlta)))
-    # Guardar en un archivo de texto las variantes con VAF <= 10 (filtro4)
-    guardarTabla(vafBaja, "filtro4")
-    # Guardar en un archivo de texto las variantes con VAF > 10 (filtro5)
-    guardarTabla(vafAlta, "filtro5")
-    # TODO: Anadir estadisticas de los tipos de variantes recogidos en el panel a la pestaña QC
+
+    # Agregar estadisticas de los tipos de variantes recogidos en el panel a la pestaña QC
+    with open("variants.stats.tsv", "w") as fi :
+        fi.write("{Totales : {},".format(len(todas)))
+        fi.write("Filtro=PASS : {},".format(len(pas)))
+        fi.write("Conseq : {},".format(len(conseq)))
+        fi.write("MAF_alta : {},".format(len(mafAlta)))
+        fi.write("VAF_baja : {},".format(len(vafBaja)))
+        fi.write("Candidatas : {}}".format(len(vafAlta)))
+
+    with open("variants.stats.tsv", "r") as fi :
+        aux = fi.read()
+
+    d = eval(aux)
+    print(d)
+    print(d["Totales"])
 
 if __name__ == "__main__" :
     path = sys.argv[1]
