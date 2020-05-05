@@ -135,11 +135,9 @@ def filtroConseq(dc) :
     """Selecciona aquellas variantes que son exonicas (excluye sinonimas) y splicing"""
     nuevo = []
     for d in dc :
-        print("Probando {} - {}".format(d["Func.refGene"], d["ExonicFunc.refGene"]))
         if d["Func.refGene"] == "splicing" :
             nuevo.append(d)
         elif d["Func.refGene"] == "exonic" and d["ExonicFunc.refGene"] != "synonymous SNV" :
-            print("\tCogida")
             nuevo.append(d)
     return nuevo
 
@@ -148,9 +146,12 @@ def filtrarMAF(dc) :
     baja = []
     alta = []
     for l in dc :
+        print("Probando {}".format(l["population_max"]))
         if l["population_max"] != "NA" and l["population_max"] >= 0.01 :
+            print("\tMAF ALTA")
             alta.append(l)
         else :
+            print("\tmaf baja")
             baja.append(l)
     return alta, baja
 
