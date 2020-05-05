@@ -146,7 +146,6 @@ def filtrarMAF(dc) :
     baja = []
     alta = []
     for l in dc :
-        print("Probando {}".format(l["population_max"]))
         if l["population_max"] != "NA" and l["population_max"] >= 0.01 :
             alta.append(l)
         else :
@@ -205,13 +204,16 @@ def calcularStrandBias(l) :
 
 def maximMaf(dc) :
     maxim = -1
+    poblacio = ""
     for i in mafCols :
         if i in dc.keys() and dc[i] != 'NA' and dc[i] != '.' and float(dc[i]) > maxim:
             maxim = float(dc[i])
+            maxim = i
     if maxim == -1 :
         maxim = 'NA'
-
-    return maxim
+    else :
+        print("La poblacio escollida es: {}".format(poblacio))
+    return maxim, poblacio
 
 def resumPredictors(d) :
     deleterious = 0
@@ -291,7 +293,7 @@ def main(ruta, samplename = "noName") :
         webInfo = True
     # Agregar las columnas adicionales: "population_max", "predictor_summary". "Strand_bias_score", "Ref_depth", "Alt_depth", "VAF", "IGV_link", "sample"
     for p in pas :
-        p["population_max"] = maximMaf(p)
+        p["population_max"], p["population_max_name"] = maximMaf(p)
         p["predictor_summary"] = resumPredictors(p)
         p["Strand_bias_score"] = calcularStrandBias(p)
         p["Ref_depth"] = p["AD"].split(",")[0]
