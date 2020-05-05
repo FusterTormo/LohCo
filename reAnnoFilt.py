@@ -135,9 +135,11 @@ def filtroConseq(dc) :
     """Selecciona aquellas variantes que son exonicas (excluye sinonimas) y splicing"""
     nuevo = []
     for d in dc :
+        print("Probando {} - {}".format(d["Func.refGene"], d["ExonicFunc.refGene"]))
         if d["Func.refGene"] == "splicing" :
             nuevo.append(d)
         elif d["Func.refGene"] == "exonic" and d["ExonicFunc.refGene"] != "synonymous SNV" :
+            print("\tCogida")
             nuevo.append(d)
             return nuevo
 
@@ -287,9 +289,9 @@ def main(ruta, samplename = "noName") :
     # Separar las variantes que han pasado todos los filtros de STrelka2
     pas = filtroPAS(todas)
     print("Variants amb filtres=PASS {}".format(len(pas)))
-    if len(pas) <= 200 :
-        pas = addWebInfo(pas)
-        webInfo = True
+    # if len(pas) <= 200 :
+    #     pas = addWebInfo(pas)
+    #     webInfo = True
     # Guardar en un archivo de text todas las variantes (filtro0)
     guardarTabla(todas, "filtro0")
     del(todas)
