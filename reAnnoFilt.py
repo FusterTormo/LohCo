@@ -350,15 +350,9 @@ def main(ruta, samplename = "noName") :
         aux = fi.read()
 
     print(aux)
-<<<<<<< HEAD
-    #x = eval(aux)
-    #print("----------------------")
-    #print(x)
-=======
-    x = eval(aux)
-    print("----------------------")
-    print(x)
->>>>>>> 406c272e9c1c94c2e8c7cce6f0097dc5a77ff972
+    # x = eval(aux)
+    # print("----------------------")
+    # print(x)
 
 
 if __name__ == "__main__" :
