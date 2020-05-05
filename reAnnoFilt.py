@@ -338,21 +338,21 @@ def main(ruta, samplename = "noName") :
     # Agregar estadisticas de los tipos de variantes recogidos en el panel a la pestaña QC
     with open("variants.stats.tsv", "w") as fi :
         fi.write("{")
-        fi.write("'Totales' : {},".format(len(todas)))
-        fi.write("'sonPASS' : {},".format(len(pas)))
-        fi.write("'Conseq' : {},".format(len(conseq)))
-        fi.write("'MAF_alta' : {},".format(len(mafAlta)))
-        fi.write("'VAF_baja' : {},".format(len(vafBaja)))
-        fi.write("'Candidatas' : {}".format(len(vafAlta)))
+        fi.write("\'Totales\' : {},".format(len(todas)))
+        fi.write("\'sonPASS\' : {},".format(len(pas)))
+        fi.write("\'Conseq\' : {},".format(len(conseq)))
+        fi.write("\'MAF_alta\' : {},".format(len(mafAlta)))
+        fi.write("\'VAF_baja\' : {},".format(len(vafBaja)))
+        fi.write("\'Candidatas\' : {}".format(len(vafAlta)))
         fi.write("}")
 
     with open("variants.stats.tsv", "r") as fi :
         aux = fi.read()
 
     print(aux)
-    x = eval(aux)
-    print("----------------------")
-    print(x)
+    #x = eval(aux)
+    #print("----------------------")
+    #print(x)
 
 
 if __name__ == "__main__" :
