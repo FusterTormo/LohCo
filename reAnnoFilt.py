@@ -141,7 +141,7 @@ def filtroConseq(dc) :
         elif d["Func.refGene"] == "exonic" and d["ExonicFunc.refGene"] != "synonymous SNV" :
             print("\tCogida")
             nuevo.append(d)
-            return nuevo
+    return nuevo
 
 def filtrarMAF(dc) :
     """Clasificar las variantes por su Minor Allele Frequency"""
