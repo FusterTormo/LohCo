@@ -300,7 +300,7 @@ def main(ruta, samplename = "noName") :
         p["Strand_bias_score"] = calcularStrandBias(p)
         p["Ref_depth"] = p["AD"].split(",")[0]
         p["Alt_depth"] = p["AD"].split(",")[1]
-        p["VAF"] = float(p["Alt_depth"])/(p["DP"]) * 100
+        p["VAF"] = float(p["Alt_depth"])/float((p["DP"])) * 100
         p["IGV_link"] = "http://localhost:60151/goto?locus={}:{}".format(p["Chr"], p["Start"])
         p["sample"] = samplename
 
