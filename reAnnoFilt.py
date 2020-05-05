@@ -206,10 +206,9 @@ def maximMaf(dc) :
     maxim = -1
     poblacio = ""
     for i in mafCols :
-        print("Probando {} - {}".format(i, dc[i]))
         if i in dc.keys() and dc[i] != 'NA' and dc[i] != '.' and float(dc[i]) > maxim:
             maxim = float(dc[i])
-            maxim = i
+            poblacio = i
     if maxim == -1 :
         maxim = 'NA'
     else :
