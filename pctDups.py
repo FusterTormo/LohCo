@@ -36,8 +36,12 @@ def pct(bam = "bwaAlign/bwa.nodup.bam") :
             if reads > -1 and dups > -1 :
                 pct = dups/reads
                 pct *= 100
-                with open(output, "a") as fi :
-                    fi.write("DUPS: {}".format(pct))
+                with open(output, "r") as fi :
+                    aux = fi.read().strip("}")
+                aux += ",\'DUPS\': {}".format(pct)
+                aux += "}"
+                with open(output, "w") as fi :
+                    fi.write(aux)
         else :
             print("ERROR: Samtools no se ejecuto correctamente. Descripcion: {}".print(err))
     else :

@@ -108,18 +108,20 @@ def main() :
                     else :
                         off += 1
         else :
-            print("ERROR: Bed no encontrado. Buscando en ruta {}")
+            print("ERROR: Bed no encontrado en ruta {}".format(bed))
     else :
-        print("ERROR: Manifest no encontrado. Buscando en ruta {}")
+        print("ERROR: Manifest no encontrado en ruta {}".format(manifest))
 
     fqreads = sum(reads)
     breads = on + off
     print("INFO: Escribiendo resultados en {}".format(output))
     with open(output, "w") as fi :
-        fi.write("FASTQ: {}\n".format(fqreads))
-        fi.write("BAM: {}\n".format(breads))
-        fi.write("ON: {}\n".format(on))
-        fi.write("OFF: {}\n".format(off))
+        fi.write("{")
+        fi.write("\'FASTQ\': {}\n".format(fqreads))
+        fi.write("\'BAM': {}\n".format(breads))
+        fi.write("\'ON\': {}\n".format(on))
+        fi.write("\'OFF\': {}\n".format(off))
+        fi.write("}")
 
 if __name__ == "__main__" :
     main()
