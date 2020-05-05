@@ -13,6 +13,7 @@ FUNCTIONS:
 """
 import os
 import re
+import sys
 
 """
 CONSTANTS:
@@ -291,5 +292,5 @@ def prepararScript(ruta) :
                     print("WARNING: Formato de FASTQ no reconocido para el archivo: {}. Se debera montar la orden para analizar manualmente".format(f))
                 else :
                     if id not in hechos :
-                        fi.write("analizar {params}\n".format(params = params))
+                        fi.write("analisi {params}\n".format(params = params))
                         hechos.append(id)
