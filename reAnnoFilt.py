@@ -211,8 +211,7 @@ def maximMaf(dc) :
             poblacio = i
     if maxim == -1 :
         maxim = 'NA'
-    else :
-        print("La poblacio escollida es: {}".format(poblacio))
+
     return maxim, poblacio
 
 def resumPredictors(d) :
@@ -350,9 +349,10 @@ def main(ruta, samplename = "noName") :
     with open("variants.stats.tsv", "r") as fi :
         aux = fi.read()
 
-    d = eval(aux)
-    print(d)
-    print(d["Totales"])
+    x = eval(aux)
+    print("----------------------")
+    print(x)
+
 
 if __name__ == "__main__" :
     path = sys.argv[1]
