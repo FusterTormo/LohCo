@@ -287,9 +287,9 @@ def main(ruta, samplename = "noName") :
     todas = convertirData(ruta)
     # Separar las variantes que han pasado todos los filtros de STrelka2
     pas = filtroPAS(todas)
-    if len(pas) <= 200 :
-        pas = addWebInfo(pas)
-        webInfo = True
+    # if len(pas) <= 200 :
+    #     pas = addWebInfo(pas)
+    #     webInfo = True
     # Agregar las columnas adicionales: "population_max", "predictor_summary". "Strand_bias_score", "Ref_depth", "Alt_depth", "VAF", "IGV_link", "sample"
     for p in pas :
         p["population_max"], p["population_max_name"] = maximMaf(p)
@@ -349,6 +349,7 @@ def main(ruta, samplename = "noName") :
     with open("variants.stats.tsv", "r") as fi :
         aux = fi.read()
 
+    print(aux)
     x = eval(aux)
     print("----------------------")
     print(x)
