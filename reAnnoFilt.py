@@ -340,7 +340,7 @@ def main(ruta, samplename = "noName") :
     with open("variants.stats.tsv", "w") as fi :
         fi.write("{")
         fi.write("Totales : {},".format(len(todas)))
-        fi.write("Filtro=PASS : {},".format(len(pas)))
+        fi.write("sonPASS : {},".format(len(pas)))
         fi.write("Conseq : {},".format(len(conseq)))
         fi.write("MAF_alta : {},".format(len(mafAlta)))
         fi.write("VAF_baja : {},".format(len(vafBaja)))
