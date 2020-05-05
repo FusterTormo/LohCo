@@ -77,7 +77,7 @@ def extraerRG(fastq) :
     # Formato esperado ID_SAMPLE_L001_R1.fastq.gz
     aux = fastq.split("_")
     reg = "_S[\d]+_L001_R[\d]?_001\.fastq\.gz"
-    if re.search(reg) :
+    if re.search(reg, fastq) :
         rgid = aux[0]
         sample = aux[1]
         fq1 = "{id}_{samp}_L001_R1_001.fastq.gz".format(id = rgid, samp = sample)
