@@ -286,7 +286,7 @@ def prepararScript(ruta) :
             fi.write("copiar\n")
             hechos = []
             for f in fastqs :
-                params, id = extraerRG(f)
+                params, id = extraerRG(os.path.basename(f))
                 if params == "No valido" :
                     print("WARNING: Formato de FASTQ no reconocido para el archivo: {}. Se debera montar la orden para analizar manualmente".format(f))
                 else :
