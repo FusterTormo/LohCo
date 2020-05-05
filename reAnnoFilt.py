@@ -350,9 +350,10 @@ def main(ruta, samplename = "noName") :
         aux = fi.read()
 
     print(aux)
-    # x = eval(aux)
-    # print("----------------------")
-    # print(x)
+    x = eval(aux)
+    print("----------------------")
+    print(x["Totales"])
+    print(x.keys())
 
 
 if __name__ == "__main__" :
