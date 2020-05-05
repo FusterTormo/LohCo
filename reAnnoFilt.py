@@ -287,9 +287,9 @@ def main(ruta, samplename = "noName") :
     todas = convertirData(ruta)
     # Separar las variantes que han pasado todos los filtros de STrelka2
     pas = filtroPAS(todas)
-    if len(pas) <= 200 :
-        pas = addWebInfo(pas)
-        webInfo = True
+    # if len(pas) <= 200 :
+    #     pas = addWebInfo(pas)
+    #     webInfo = True
     # Agregar las columnas adicionales: "population_max", "predictor_summary". "Strand_bias_score", "Ref_depth", "Alt_depth", "VAF", "IGV_link", "sample"
     for p in pas :
         p["population_max"], p["population_max_name"] = maximMaf(p)
@@ -338,17 +338,18 @@ def main(ruta, samplename = "noName") :
     # Agregar estadisticas de los tipos de variantes recogidos en el panel a la pestaña QC
     with open("variants.stats.tsv", "w") as fi :
         fi.write("{")
-        fi.write("Totales : {},".format(len(todas)))
-        fi.write("sonPASS : {},".format(len(pas)))
-        fi.write("Conseq : {},".format(len(conseq)))
-        fi.write("MAF_alta : {},".format(len(mafAlta)))
-        fi.write("VAF_baja : {},".format(len(vafBaja)))
-        fi.write("Candidatas : {}".format(len(vafAlta)))
+        fi.write("'Totales' : {},".format(len(todas)))
+        fi.write("'sonPASS' : {},".format(len(pas)))
+        fi.write("'Conseq' : {},".format(len(conseq)))
+        fi.write("'MAF_alta' : {},".format(len(mafAlta)))
+        fi.write("'VAF_baja' : {},".format(len(vafBaja)))
+        fi.write("'Candidatas' : {}".format(len(vafAlta)))
         fi.write("}")
 
     with open("variants.stats.tsv", "r") as fi :
         aux = fi.read()
 
+    print(aux)
     x = eval(aux)
     print("----------------------")
     print(x)
