@@ -4,3 +4,5 @@
 """
 MAIN: Recoge todos los datos del analisis y los guarda en un excel
 """
+
+qc = 
