@@ -327,15 +327,26 @@ def main(ruta, samplename = "noName") :
     guardarTabla(vafAlta, "cand") # Variantes que han pasado todos los filtros anteriores
 
     # Mostrar por pantalla estadisticas basicas
-    print("Totes les variants {}".format(len(todas))) # Total de variantes reportadas por Strelka2
-    print("Variants amb filtres=PASS {}".format(len(pas)))
-    print("Variants conseq: {}".format(len(conseq)))
-    print("MAF >= 0.1: {}".format(len(mafAlta)))
-    print("MAF < 0.1: {}".format(len(mafBaja)))
-    print("Baixa VAF: {}".format(len(vafBaja)))
-    print("Variants candidates: {}".format(len(vafAlta)))
+    print("INFO: Totes les variants {}".format(len(todas))) # Total de variantes reportadas por Strelka2
+    print("INFO: Variants amb filtres=PASS {}".format(len(pas)))
+    print("INFO: Variants conseq: {}".format(len(conseq)))
+    print("INFO: MAF >= 0.1: {}".format(len(mafAlta)))
+    print("INFO: MAF < 0.1: {}".format(len(mafBaja)))
+    print("INFO: Baixa VAF: {}".format(len(vafBaja)))
+    print("INFO: Variants candidates: {}".format(len(vafAlta)))
 
     # Agregar estadisticas de los tipos de variantes recogidos en el panel a la pestaña QC
+    tiposVariantes = {}
+    for t in todas :
+        if t["Func.refGene"] == "exonic" :
+            clave = "exonic_{}".format(t["ExonicFunc.refGene"])
+        else :
+            clave = t["Func.refGene"]
+        if clave in tiposVariantes.keys() :
+            tiposVariantes[clave] += 1
+        else :
+            tiposVariantes[clave] = 1
+    print(tiposVariantes)
     with open("variants.stats.tsv", "w") as fi :
         fi.write("{")
         fi.write("\'Totales\' : {},".format(len(todas)))
@@ -344,16 +355,11 @@ def main(ruta, samplename = "noName") :
         fi.write("\'MAF_alta\' : {},".format(len(mafAlta)))
         fi.write("\'VAF_baja\' : {},".format(len(vafBaja)))
         fi.write("\'Candidatas\' : {}".format(len(vafAlta)))
+        for k, v in tiposVariantes.items() :
+            fi.write("\'{}\' : {}".format(k, v))
+
         fi.write("}")
 
-    with open("variants.stats.tsv", "r") as fi :
-        aux = fi.read()
-
-    print(aux)
-    x = eval(aux)
-    print("----------------------")
-    print(x["Totales"])
-    print(x.keys())
 
 
 if __name__ == "__main__" :
