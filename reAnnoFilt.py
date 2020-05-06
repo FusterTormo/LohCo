@@ -346,8 +346,8 @@ def main(ruta, samplename = "noName") :
             tiposVariantes[clave] += 1
         else :
             tiposVariantes[clave] = 1
-    print(tiposVariantes)
-    with open("variants.stats.tsv", "w") as fi :
+    
+    with open("variants.stats.txt", "w") as fi :
         fi.write("{")
         fi.write("\'Totales\' : {},".format(len(todas)))
         fi.write("\'sonPASS\' : {},".format(len(pas)))
@@ -356,7 +356,7 @@ def main(ruta, samplename = "noName") :
         fi.write("\'VAF_baja\' : {},".format(len(vafBaja)))
         fi.write("\'Candidatas\' : {}".format(len(vafAlta)))
         for k, v in tiposVariantes.items() :
-            fi.write("\'{}\' : {}".format(k, v))
+            fi.write(",\'{}\' : {}".format(k, v))
 
         fi.write("}")
 

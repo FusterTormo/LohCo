@@ -117,10 +117,10 @@ def main() :
     print("INFO: Escribiendo resultados en {}".format(output))
     with open(output, "w") as fi :
         fi.write("{")
-        fi.write("\'FASTQ\': {}\n".format(fqreads))
-        fi.write("\'BAM': {}\n".format(breads))
-        fi.write("\'ON\': {}\n".format(on))
-        fi.write("\'OFF\': {}\n".format(off))
+        fi.write("\'FASTQ\': {},".format(fqreads))
+        fi.write("\'BAM': {},".format(breads))
+        fi.write("\'ON\': {},".format(on))
+        fi.write("\'OFF\': {}".format(off))
         fi.write("}")
 
 if __name__ == "__main__" :
