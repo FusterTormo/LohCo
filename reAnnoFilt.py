@@ -212,6 +212,7 @@ def maximMaf(dc) :
     if maxim == -1 :
         maxim = 'NA'
 
+    print("MAF maxima: {} reportada per {}".format(maxim, poblacio))
     return maxim, poblacio
 
 def resumPredictors(d) :
