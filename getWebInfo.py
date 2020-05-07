@@ -208,11 +208,11 @@ def getMyVariant(chr, pos, ref, alt, na='NA') :
                             if isinstance(a['exac']['ac']['ac'],(list, tuple)) : #ExAC ha devuelto una lista de alelos, buscamos el que corresponde a nuestra variante y lo guardamos
                                 for it in range(0,len(a['exac']['alleles'])) :
                                     if (a['exac']['alleles'][it] == alt) :
-                                        aux = 100*float(a['exac']['ac']['ac'][it])/float(a['exac']['an']['an'])
+                                        aux = float(a['exac']['ac']['ac'][it])/float(a['exac']['an']['an'])
                                         mv['ExAC_ExAC_all'] = "{:.2f}".format(aux)
                                         break
                             else :
-                                aux = 100*float(a['exac']['ac']['ac'])/float(a['exac']['an']['an'])
+                                aux = float(a['exac']['ac']['ac'])/float(a['exac']['an']['an'])
                                 mv['ExAC_ExAC_all'] = "{:.2f}".format(aux)
                         except ZeroDivisionError :
                             mv['ExAC_ExAC_all'] = "0"
@@ -221,11 +221,11 @@ def getMyVariant(chr, pos, ref, alt, na='NA') :
                             if isinstance(a['exac']['ac']['ac_afr'],(list, tuple)) :
                                 for it in range(0,len(a['exac']['alleles'])) :
                                     if (a['exac']['alleles'][it] == alt) :
-                                        aux = 100*float(a['exac']['ac']['ac_afr'][it])/float(a['exac']['an']['an_afr'])
+                                        aux = float(a['exac']['ac']['ac_afr'][it])/float(a['exac']['an']['an_afr'])
                                         mv['ExAC_ExAC_afr'] = "{:.2f}".format(aux)
                                         break
                             else :
-                                aux = 100*float(a['exac']['ac']['ac_afr'])/float(a['exac']['an']['an_afr'])
+                                aux = float(a['exac']['ac']['ac_afr'])/float(a['exac']['an']['an_afr'])
                                 mv['ExAC_ExAC_afr'] = "{:.2f}".format(aux)
                         except ZeroDivisionError :
                             mv['ExAC_ExAC_afr'] = "0"
@@ -234,11 +234,11 @@ def getMyVariant(chr, pos, ref, alt, na='NA') :
                             if isinstance(a['exac']['ac']['ac_amr'],(list, tuple)) :
                                 for it in range(0,len(a['exac']['alleles'])) :
                                     if (a['exac']['alleles'][it] == alt) :
-                                        aux = 100*float(a['exac']['ac']['ac_amr'][it])/float(a['exac']['an']['an_amr'])
+                                        aux = float(a['exac']['ac']['ac_amr'][it])/float(a['exac']['an']['an_amr'])
                                         mv['ExAC_ExAC_amr'] = "{:.2f}".format(aux)
                                         break
                             else :
-                                aux = 100*float(a['exac']['ac']['ac_amr'])/float(a['exac']['an']['an_amr'])
+                                aux = float(a['exac']['ac']['ac_amr'])/float(a['exac']['an']['an_amr'])
                                 mv['ExAC_ExAC_amr'] = "{:.2f}".format(aux)
                         except ZeroDivisionError :
                             mv['ExAC_ExAC_amr'] = "0"
@@ -247,11 +247,11 @@ def getMyVariant(chr, pos, ref, alt, na='NA') :
                             if isinstance(a['exac']['ac']['ac_eas'],(list, tuple)) :
                                 for it in range(0,len(a['exac']['alleles'])) :
                                     if (a['exac']['alleles'][it] == alt) :
-                                        aux = 100*float(a['exac']['ac']['ac_eas'][it])/float(a['exac']['an']['an_eas'])
+                                        aux = float(a['exac']['ac']['ac_eas'][it])/float(a['exac']['an']['an_eas'])
                                         mv['ExAC_ExAC_eas'] = "{:.2f}".format(aux)
                                         break
                             else :
-                                aux = 100*float(a['exac']['ac']['ac_eas'])/float(a['exac']['an']['an_eas'])
+                                aux = float(a['exac']['ac']['ac_eas'])/float(a['exac']['an']['an_eas'])
                                 mv['ExAC_ExAC_eas'] = "{:.2f}".format(aux)
                         except ZeroDivisionError :
                             mv['ExAC_ExAC_eas'] = "0"
@@ -260,11 +260,11 @@ def getMyVariant(chr, pos, ref, alt, na='NA') :
                             if isinstance(a['exac']['ac']['ac_fin'],(list, tuple)) :
                                 for it in range(0,len(a['exac']['alleles'])) :
                                     if (a['exac']['alleles'][it] == alt) :
-                                        aux = 100*float(a['exac']['ac']['ac_fin'][it])/float()
+                                        aux = float(a['exac']['ac']['ac_fin'][it])/float()
                                         mv['ExAC_ExAC_fin'] = "{:.2f}".format(aux)
                                         break
                             else :
-                                aux = 100*float(a['exac']['ac']['ac_fin'])/float(a['exac']['an']['an_fin'])
+                                aux = float(a['exac']['ac']['ac_fin'])/float(a['exac']['an']['an_fin'])
                                 mv['ExAC_ExAC_fin'] = "{:.2f}".format(aux)
                         except ZeroDivisionError :
                             mv['ExAC_ExAC_fin'] = "0"
@@ -273,11 +273,11 @@ def getMyVariant(chr, pos, ref, alt, na='NA') :
                             if isinstance(a['exac']['ac']['ac_nfe'],(list, tuple)) :
                                 for it in range(0,len(a['exac']['alleles'])) :
                                     if (a['exac']['alleles'][it] == alt) :
-                                        aux = 100*float(a['exac']['ac']['ac_nfe'][it])/float(a['exac']['an']['an_nfe'])
+                                        aux = float(a['exac']['ac']['ac_nfe'][it])/float(a['exac']['an']['an_nfe'])
                                         mv['ExAC_ExAC_nfe'] = "{:.2f}".format(aux)
                                         break
                             else :
-                                aux = 100*float(a['exac']['ac']['ac_nfe'])/float(a['exac']['an']['an_nfe'])
+                                aux = float(a['exac']['ac']['ac_nfe'])/float(a['exac']['an']['an_nfe'])
                                 mv['ExAC_ExAC_nfe'] = "{:.2f}".format(aux)
                         except ZeroDivisionError :
                             mv['ExAC_ExAC_nfe'] = "0"
@@ -286,11 +286,11 @@ def getMyVariant(chr, pos, ref, alt, na='NA') :
                             if isinstance(a['exac']['ac']['ac_sas'],(list, tuple)) :
                                 for it in range(0,len(a['exac']['alleles'])) :
                                     if (a['exac']['alleles'][it] == alt) :
-                                        aux = 100*float(a['exac']['ac']['ac_sas'][it])/float(a['exac']['an']['an_sas'])
+                                        aux = float(a['exac']['ac']['ac_sas'][it])/float(a['exac']['an']['an_sas'])
                                         mv['ExAC_ExAC_sas'] = "{:.2f}".format(aux)
                                         break
                             else :
-                                aux = 100*float(a['exac']['ac']['ac_sas'])/float(a['exac']['an']['an_sas'])
+                                aux = float(a['exac']['ac']['ac_sas'])/float(a['exac']['an']['an_sas'])
                                 mv['ExAC_ExAC_sas'] = "{:.2f}".format(aux)
                         except ZeroDivisionError :
                             mv['ExAC_ExAC_sas'] = "0"
@@ -299,11 +299,11 @@ def getMyVariant(chr, pos, ref, alt, na='NA') :
                             if isinstance(a['exac']['ac']['ac_oth'],(list, tuple)) :
                                 for it in range(0,len(a['exac']['alleles'])) :
                                     if (a['exac']['alleles'][it] == alt) :
-                                        aux = 100*float(a['exac']['ac']['ac_oth'][it])/float(a['exac']['an']['an_oth'])
+                                        aux = float(a['exac']['ac']['ac_oth'][it])/float(a['exac']['an']['an_oth'])
                                         mv['ExAC_ExAC_oth'] = "{:.2f}".format(aux)
                                         break
                             else :
-                                aux = 100*float(a['exac']['ac']['ac_oth'])/float(a['exac']['an']['an_oth'])
+                                aux = float(a['exac']['ac']['ac_oth'])/float(a['exac']['an']['an_oth'])
                                 mv['ExAC_ExAC_oth'] = "{:.2f}".format(aux)
                         except ZeroDivisionError :
                             mv['ExAC_ExAC_oth'] = "0"

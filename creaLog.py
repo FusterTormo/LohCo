@@ -224,7 +224,7 @@ def prepararScript(ruta) :
                 patx = f.replace(" ", "\\ ") #Parche para leer los espacios en la terminal bash
                 fi.write("\trsync -aP {} .\n".format(patx))
 
-            fi.write("\trsync -aP {} .".format(genes))
+            fi.write("\trsync -aP {} .\n".format(genes))
             fi.write("\tmv ../{} .\n".format(arxiu))
             fi.write("}\n\n")
 
@@ -295,5 +295,5 @@ def prepararScript(ruta) :
                     if id not in hechos :
                         fi.write("analisi {params}\n".format(params = params))
                         hechos.append(id)
-        print("Log guardat com a {}".format(arxiu))
+        print("INFO: Log guardat com a {}".format(arxiu))
         os.chmod(arxiu, 0o754)
