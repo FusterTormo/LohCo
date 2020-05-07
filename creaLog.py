@@ -266,7 +266,7 @@ def prepararScript(ruta) :
             fi.write("\trm coverage.txt\n")
             fi.write("\tRscript {}/coveragePanells.R\n".format(wd))
             fi.write("\tmkdir coverage\n")
-            fi.write("\tmv *png coverageAll.txt coverageBase.txt coverage/")
+            fi.write("\tmv *png coverageAll.txt coverageBase.txt coverage/\n")
             fi.write("\tpython3 {}/bamQC.py\n".format(wd)) # Hay una opcion de lanzar pctDups (calcular porcentaje de duplicados) en caso de exomas
             # Variant calling. La carpeta donde se guardan los datos se llama variantCalling. En caso de queren cambiarse, modificar las dos siguientes lineas
             fi.write("\n\t# Variant calling. Strelka2\n")
