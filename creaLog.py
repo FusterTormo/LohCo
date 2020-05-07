@@ -263,8 +263,7 @@ def prepararScript(ruta) :
             fi.write("\t" + bedtoolsCoverageBase.format(mani = "$mani", bam = "bwaAlign/bwa.recal.bam", output = "coverageBase.txt") + "\n")
             fi.write("\tgrep '^all' coverage.txt > coverageAll.txt\n")
             fi.write("\trm coverage.txt\n")
-            """FATAL ERROR no existe el archivo o directorio"""
-            fi.write("\tRscript {wd}/coveragePanells.R\n".format(wd))
+            fi.write("\tRscript {}/coveragePanells.R\n".format(wd))
             fi.write("\tpython3 {}/bamQC.py\n".format(wd)) # Hay una opcion de lanzar pctDups (calcular porcentaje de duplicados) en caso de exomas
             # Variant calling. La carpeta donde se guardan los datos se llama variantCalling. En caso de queren cambiarse, modificar las dos siguientes lineas
             fi.write("\n\t# Variant calling. Strelka2\n")
