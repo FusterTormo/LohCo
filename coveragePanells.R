@@ -1,5 +1,5 @@
 # Constantes. Nombres esperados de los archivos para hacer los graficos y los calculos de coverage
-lista <- 'gensAestudi.txt'
+lista <- '../gensAestudi.txt'
 base <- 'coverageBase.txt'
 all <- 'coverageAll.txt'
 salida <- 'coverage.txt' # Archivo donde se guardan las estadisticas de coverage

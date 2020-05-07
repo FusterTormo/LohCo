@@ -255,8 +255,8 @@ def prepararScript(ruta) :
             fi.write("\t" + gatk1.format(bam = "bwa.sort.bam", ref = "$ref", dbsnp = "$sites", mani = "$mani") + "\n")
             fi.write("\t" + gatk2.format(bam = "bwa.sort.bam", ref = "$ref", mani = "$mani") + "\n")
             # Aqui puede ir el marcar duplicados, en caso de necesitarse
-            fi.write("\t" + markDup.format(bam = "bwa.recal.bam") + "\n")
-            fi.write("\t" + picardIndex.format(bam = "bwa.nodup.bam") + "\n")
+            # fi.write("\t" + markDup.format(bam = "bwa.recal.bam") + "\n")
+            # fi.write("\t" + picardIndex.format(bam = "bwa.nodup.bam") + "\n")
             fi.write("\tcd ..")
             # Estudios de coverage, on target, off target, porcentaje de bases con X coverage...
             fi.write("\n\t# Control de calidad del alineamiento y estudio de coverage\n")
