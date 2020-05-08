@@ -308,8 +308,10 @@ def main(ruta, samplename = "noName") :
     conseq = filtroConseq(pas)
     # Si el total de variantes es menor de 200 (numero arbitrario) re-anotar todas las variantes. En caso contrario, solo re-anotar las conseq
     if len(pas) <= 200 :
+        print("INFO: Recogiendo informacion web para {} variantes".format(len(pas)))
         pas = addWebInfo(pas)
     else :
+        print("INFO: Recogiendo informacion web para {} variantes".format(len(conseq)))
         conseq = addWebInfo(conseq)
     # Filtrar por MAF
     mafAlta, mafBaja = filtrarMAF(conseq)
