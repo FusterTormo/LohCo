@@ -12,7 +12,7 @@ import xlsxwriter
 # Archivos que se usaran para recoger la informacion que se guardara en el excel final
 qc = "../alnQC.txt"
 cov = "../coverage.txt"
-arxius = ["raw.reanno.tsv", "pass.reanno.tsv", "conseq.reanno.tsv", "highMAF.reanno.tsv", "lowVAF.reanno.tsv", "cand.reanno.tsv"]
+arxius = ["cand.reanno.tsv", "lowVAF.reanno.tsv", "highMAF.reanno.tsv", "conseq.reanno.tsv", "pass.reanno.tsv", "raw.reanno.tsv"]
 stats = "variants.stats.txt"
 # Orden de las columnas en que se colocaran en cada una de las pestanas del excel
 orden = ["sample", "IGV_link", "Gene.refGene", "Chr", "Start", "End", "Ref", "Alt", "GT", "GQ", "GQX", "MQ", "Func.refGene", "GeneDetail.refGene", "ExonicFunc.refGene", "AAChange.refGene",
@@ -76,6 +76,7 @@ def crearCabecera(hoja, libro) :
     for n in cabecera :
         hoja.write(nextLine, cols, n, titulo)
         cols += 1
+    nextLine += 1
     return nextLine
 
 def escribirVariantes(hoja, libro, cnt, empiezaEn) :
@@ -87,41 +88,42 @@ def escribirVariantes(hoja, libro, cnt, empiezaEn) :
     empiezaEn : int
         Fila por la que se empezara a escribir el excel"""
     # Estilos para los predictores
-    rojo = excel.add_format({"bg_color" : "#FF4D4D"})
-    verde = excel.add_format({"bg_color" : "#43F906"})
-    amarillo = excel.add_format({"bg_color" : "#FFFF00"})
-    naranja = excel.add_format({"bg_color" : "#FF8000"})
+    rojo = libro.add_format({"bg_color" : "#FF4D4D"})
+    verde = libro.add_format({"bg_color" : "#43F906"})
+    amarillo = libro.add_format({"bg_color" : "#FFFF00"})
+    naranja = libro.add_format({"bg_color" : "#FF8000"})
     predictors = ["SIFT_pred", "Polyphen2_HDIV_pred", "Polyphen2_HVAR_pred", "LRT_pred", "MutationTaster_pred", "MutationAssessor_pred", "FATHMM_pred", "PROVEAN_pred", "MetaSVM_pred", "MetaLR_pred"]
     fila = empiezaEn
-    columna = 0
+    columna = 2
     for dic in cnt :
-        columna = 0
+        columna = 2
         for o in orden :
-            if o in predictors :
-                if dic[o] == 'D' : #Todos los predictores anotan una D como deleterea
-                    hoja.write(fila, columna, dic[o], rojo)
-                elif dic[o] == 'T' : #SIFT, Provean, MetaSVM, MetaLR y FATHMM anotan una T como tolerado
-                    hoja.write(fila, columna, dic[o], verde)
-                elif dic[o] == 'N' : #LRT, MutationTaster y MutationAssessor anotan una N como tolerado
-                    hoja.write(fila, columna, dic[o], verde)
-                elif (o == "Polyphen2_HDIV_pred" or o == "Polyphen2_HVAR_pred") and dic[o] == 'P' :
-                    hoja.write(fila, columna, dic[o], naranja)
-                elif (o == "Polyphen2_HDIV_pred" or o == "Polyphen2_HVAR_pred") and dic[o] == 'B' :
-                    hoja.write(fila, columna, dic[o], verde)
-                elif o == "MutationTaster_pred" and dic[o] == 'A' :
-                    hoja.write(fila, columna, dic[o], rojo)
-                elif o == "MutationTaster_pred" and dic[o] == 'P' :
-                    hoja.write(fila, columna, dic[o], verde)
-                elif o == "MutationAssessor_pred" and dic[o] == 'H' :
-                    hoja.write(fila, columna, dic[o], rojo)
-                elif o == "MutationAssessor_pred" and dic[o] == 'M' :
-                    hoja.write(fila, columna, dic[o], naranja)
-                elif o == "MutationAssessor_pred" and dic[o] == 'L' :
-                    hoja.write(fila, columna, dic[o], verde)
+            if columna != 4 :
+                if o in predictors :
+                    if dic[o] == 'D' : #Todos los predictores anotan una D como deleterea
+                        hoja.write(fila, columna, dic[o], rojo)
+                    elif dic[o] == 'T' : #SIFT, Provean, MetaSVM, MetaLR y FATHMM anotan una T como tolerado
+                        hoja.write(fila, columna, dic[o], verde)
+                    elif dic[o] == 'N' : #LRT, MutationTaster y MutationAssessor anotan una N como tolerado
+                        hoja.write(fila, columna, dic[o], verde)
+                    elif (o == "Polyphen2_HDIV_pred" or o == "Polyphen2_HVAR_pred") and dic[o] == 'P' :
+                        hoja.write(fila, columna, dic[o], naranja)
+                    elif (o == "Polyphen2_HDIV_pred" or o == "Polyphen2_HVAR_pred") and dic[o] == 'B' :
+                        hoja.write(fila, columna, dic[o], verde)
+                    elif o == "MutationTaster_pred" and dic[o] == 'A' :
+                        hoja.write(fila, columna, dic[o], rojo)
+                    elif o == "MutationTaster_pred" and dic[o] == 'P' :
+                        hoja.write(fila, columna, dic[o], verde)
+                    elif o == "MutationAssessor_pred" and dic[o] == 'H' :
+                        hoja.write(fila, columna, dic[o], rojo)
+                    elif o == "MutationAssessor_pred" and dic[o] == 'M' :
+                        hoja.write(fila, columna, dic[o], naranja)
+                    elif o == "MutationAssessor_pred" and dic[o] == 'L' :
+                        hoja.write(fila, columna, dic[o], verde)
+                    else :
+                        hoja.write(fila, columna, dic[o])
                 else :
                     hoja.write(fila, columna, dic[o])
-            else :
-                hoja.write(fila, columna, dic[o])
             columna += 1
         fila += 1
     return fila
