@@ -35,7 +35,7 @@ vc2 = "./runWorkflow.py -m local -j 6 --quiet"
 annovar = "/opt/annovar20180416/convert2annovar.pl -format vcf4 -outfile {out} -includeinfo {vcf}"
 annovar2 = "/opt/annovar20180416/annotate_variation.pl -geneanno -buildver hg19 -hgvs -separate -out {output} {input} /opt/annovar20180416/humandb/"
 annovar3 = "/opt/annovar20180416/table_annovar.pl {input} /opt/annovar20180416/humandb/ -buildver hg19 -out {output} -remove -protocol refGene,avsnp150,1000g2015aug_all,1000g2015aug_afr,1000g2015aug_amr,1000g2015aug_eas,1000g2015aug_eur,1000g2015aug_sas,exac03,gnomad211_exome,gnomad211_genome,esp6500siv2_all,esp6500siv2_ea,esp6500siv2_aa,clinvar_20190305,cosmic70,dbnsfp35a --operation g,f,f,f,f,f,f,f,f,f,f,f,f,f,f,f,f -nastring NA -otherinfo"
-reano = "python3 {wd}/reAnnoFilt.py {input}"
+reano = "python3 {wd}/reAnnoFilt.py {input} {samplename}"
 toExcel = "python3 {wd}/data2excel.py {output}"
 
 referencia = "/home/ffuster/share/biodata/solelab/referencies/ucsc/hg19.fa"
@@ -282,7 +282,7 @@ def prepararScript(ruta) :
             fi.write("\t" + annovar2.format(input = "raw.av", output = "raw") + "\n")
             fi.write("\t" + annovar3.format(input = "raw.av", output = "raw") + "\n")
             # Re-anotacion y filtrado de variantes usando myvariant.info
-            fi.write("\t" + reano.format(wd = wd, input = "raw.hg19_multianno.txt" + "\n"))
+            fi.write("\t" + reano.format(wd = wd, input = "raw.hg19_multianno.txt", samplename = "$alias") + "\n")
             fi.write("\t" + toExcel.format(wd = wd, output = "$alias") + "\n")
 
             fi.write("}\n\n")

@@ -361,6 +361,11 @@ def main(ruta, samplename = "noName") :
 
 
 if __name__ == "__main__" :
-    path = sys.argv[1]
-    sample = sys.argv[1]
-    main(path, sample)
+    if len(sys.argv) > 2 :
+        path = sys.argv[1]
+        sample = sys.argv[2]
+        main(path, sample)
+    elif len(sys.argv) == 2 :
+        main(path)
+    else :
+        print("ERROR: Numero de parametros invalido. Uso\n\tpython3 reAnnoFilt.py archivo_multianno.txt nombreMuestra")

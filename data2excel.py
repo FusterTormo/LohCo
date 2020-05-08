@@ -128,6 +128,82 @@ def escribirVariantes(hoja, libro, cnt, empiezaEn) :
         fila += 1
     return fila
 
+def ayudaPredictores(hoja, libro, fila) :
+    """Escribe un cuadro con temas de ayuda interesantes para el usuario final a partir de la fila pasada como parametro. Los temas de ayuda son:
+    Los predictores, los coeficientes de strand-bias, las calidades de la variante, dependiendo de si la muestra analizada es somatica o germinal, y la columna summary_predictors"""
+    # Estilos
+    titulo = libro.add_format({ 'bold' : True,
+        'bg_color' : '#B3C6FF',
+        'align' : 'center',
+        'top' : 1,
+        'left' : 1,
+        'right' : 1,
+        'font_size' : 13
+    })
+    medio = libro.add_format({
+        'left' : 1,
+        'right' : 1
+    })
+    bajo = libro.add_format({'bottom' : 1,
+        'left' : 1,
+        'right' : 1
+    })
+
+    #Ayuda para interpretar la prediccion de algunos de los predictores
+    titol = "HELP for in silico predictors"
+    sift = "SIFT\n\rD -> Deleterious\n\rT -> Benign"
+    polyphen = "Polyphen\n\rD -> Probably damaging\n\rP -> Possibly damaging\n\rB -> Benign"
+    lrt = "LRT\n\rD -> Deletereous\n\rN -> Neutral\n\rU -> Unknown"
+    mtaster = "Mutation Taster\n\rA -> Disease causing automatic\n\rD -> Disease causing\n\rN -> Polymophism\n\rP -> Polymophism automatic"
+    massessor = "Mutation Assessor\n\rH -> High (Deleterious)\n\rM -> Medium (Deleterious)\n\rL -> Low (Tolerated)\n\rN -> Neutral (Tolerated)"
+    provean = "PROVEAN\n\rD -> Deleterious\n\rT -> Benign"
+    fathmm = "FATHMM\n\rD -> Deleterious\n\rN -> Benign"
+    msvm = "MetaSVM\n\rD -> Deleterious\n\rT -> Benign"
+    mlr = "MetaLR\n\rD -> Deleterious\n\rT -> Benign"
+    ot = "GERP++, PhyloP, SiPhy -> Higher scores are more deleterious"
+
+    hoja.merge_range(fila, 2, fila, 8, titol, titulo)
+    hoja.merge_range(fila+1, 2, fila+3, 8, sift, medio)
+    hoja.merge_range(fila+4, 2, fila+7, 8, polyphen, medio)
+    hoja.merge_range(fila+8, 2, fila+11, 8, lrt, medio)
+    hoja.merge_range(fila+12, 2, fila+16, 8, mtaster, medio)
+    hoja.merge_range(fila+17, 2, fila+21, 8, massessor, medio)
+    hoja.merge_range(fila+22, 2, fila+24, 8, provean, medio)
+    hoja.merge_range(fila+25, 2, fila+27, 8, fathmm, medio)
+    hoja.merge_range(fila+28, 2, fila+30, 8, msvm, medio)
+    hoja.merge_range(fila+31, 2, fila+33, 8, mlr, medio)
+    hoja.merge_range(fila+34, 2, fila+34, 8, ot, bajo)
+
+    #Ayuda para interpretar la columna summary_predictors
+    titol = "HELP for 'predictor summary' column"
+    body = "The column summarizes the prediction of SIFT,\n\rPolyphen2 HDIV, Polyphen2 HVAR, LRT, MutationTaster,\n\rMutationAssessor, FATHMM, PROVEAN, MetaSVM, and MetaLR.\n\n"
+    body += "It enumerates the number of (D)eletereous, (T)olerated,\n\r and (U)nknown prediction\n\n"
+    body += "So 2D, 7T, 1U\nmeans\n2 deleterious, 7 tolerated, and 1 unknown predictions."
+    hoja.merge_range(fila, 10, fila, 16, titol, titulo)
+    hoja.merge_range(fila+1, 10, fila+9, 16, body, bajo)
+
+    #Ayuda para interpretar las calidades de la variante, dependiendo de si la muestra analizada es somatica o germinal
+    titol = "HELP for quality column, depending on variant calling analysis"
+    body = "Quality column represents the score for variant sites."
+
+    hoja.merge_range(fila+12, 10, fila+12, 18, titol, titulo)
+    hoja.merge_range(fila+13, 10, fila+14, 18, body, bajo)
+
+    #Ayuda para los coeficientes de strand-bias
+    titol = "HELP for Strand bias ratio"
+    body = "Strand bias is calculated with the formula:\nreads_reference_forward + reads_alterated_forward - read_reference_reverse - reads_alterated_reverse"
+
+    hoja.merge_range(fila+17, 10, fila+17, 19, titol, titulo)
+    hoja.merge_range(fila+18, 10, fila+19, 19, body, bajo)
+
+def escribirEstadisticas(hoja, libro) :
+    if os.path.isfile(qc) :
+        hoja.write(0, 0, "Calidad del alineamiento")
+    if os.path.isfile(cov) :
+        hoja.write(4, 0, "Datos de coverage")
+    if os.path.isfie(stats) :
+        hoja.write(8, 0, "Estadisticas de variantes")
+
 def crearExcel(nom) :
     """Recoge la informacion de las variantes desde los archivos .reanno.tsv
     Convierte los datos de cada archivo en un diccionario
@@ -143,10 +219,14 @@ def crearExcel(nom) :
     for a in arxius :
         if os.path.isfile(a) :
             aux = a.split(".")[0] # Recoger el nombre que tendra la pestana
-            full = wb.add_worksheet(a)
+            full = wb.add_worksheet(aux.capitalize())
             dc = convertirArchivo(a)
             filaActual = crearCabecera(full, wb)
             filaActual = escribirVariantes(full, wb, dc, filaActual)
+            ayudaPredictores(full, wb, filaActual+2)
+
+    full = wb.add_worksheet("QC_stats")
+    escribirEstadisticas(full, wb)
 
 if __name__ == "__main__" :
     # Comprobar que todos los archivos necesarios estan creados
