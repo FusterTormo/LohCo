@@ -112,7 +112,7 @@ def convertirData(path) :
             if cabecera :
                 cabecera = False
             else :
-                aux = l.split("\t")
+                aux = l.strip().split("\t")
                 i = 0
                 for c in claves :
                     temp[c] = aux[i]
@@ -282,14 +282,10 @@ def resumPredictors(d) :
     return "{}D, {}T, {}U".format(deleterious, tolerated, unknown)
 
 def main(ruta, samplename = "noName") :
-    webInfo = False
     # Leer el archivo multianno de ANNOVAR y guardar los datos en un diccionario
     todas = convertirData(ruta)
     # Separar las variantes que han pasado todos los filtros de STrelka2
     pas = filtroPAS(todas)
-    if len(pas) <= 200 :
-        pas = addWebInfo(pas)
-        webInfo = True
     # Agregar las columnas adicionales: "population_max", "predictor_summary". "Strand_bias_score", "Ref_depth", "Alt_depth", "VAF", "IGV_link", "sample"
     for p in pas :
         p["population_max"], p["population_max_name"] = maximMaf(p)
@@ -311,7 +307,9 @@ def main(ruta, samplename = "noName") :
     # Separar las variantes exonicas (consecuencia) y las splicing en un diccionario aparte
     conseq = filtroConseq(pas)
     # Si el total de variantes es menor de 200 (numero arbitrario) re-anotar todas las variantes. En caso contrario, solo re-anotar las conseq
-    if not webInfo :
+    if len(pas) <= 200 :
+        pas = addWebInfo(pas)
+    else :
         conseq = addWebInfo(conseq)
     # Filtrar por MAF
     mafAlta, mafBaja = filtrarMAF(conseq)

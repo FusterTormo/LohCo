@@ -12,7 +12,7 @@ import xlsxwriter
 # Archivos que se usaran para recoger la informacion que se guardara en el excel final
 qc = "../alnQC.txt"
 cov = "../coverage.txt"
-arxius = ["raw.reanno.tsv", "pass.reanno.tsv", "conseq.reanno.tsv", "highMAF.reanno.tsv". "lowVAF.reanno.tsv". "cand.reanno.tsv"]
+arxius = ["raw.reanno.tsv", "pass.reanno.tsv", "conseq.reanno.tsv", "highMAF.reanno.tsv", "lowVAF.reanno.tsv", "cand.reanno.tsv"]
 stats = "variants.stats.txt"
 # Orden de las columnas en que se colocaran en cada una de las pestanas del excel
 orden = ["sample", "IGV_link", "Gene.refGene", "Chr", "Start", "End", "Ref", "Alt", "GT", "GQ", "GQX", "MQ", "Func.refGene", "GeneDetail.refGene", "ExonicFunc.refGene", "AAChange.refGene",
