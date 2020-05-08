@@ -120,7 +120,7 @@ def escribirVariantes(hoja, libro, cnt, empiezaEn) :
                     hoja.write(fila, columna, dic[o], verde)
                 else :
                     hoja.write(fila, columna, dic[o])
-            elif o == "Chr" and not dic[0].startswith("chr") :
+            elif o == "Chr" and not dic[o].startswith("chr") :
                 hoja.write(fila, columna, "chr{}".format(dic[o]))
             else :
                 hoja.write(fila, columna, dic[o])
