@@ -301,7 +301,7 @@ def main(ruta, samplename = "noName") :
             for t in tmp :
                 dp += int(t)
             p["VAF"] = float(p["Alt_depth"])/dp * 100
-        p["IGV_link"] = "http://localhost:60151/goto?locus={}:{}".format(p["Chr"], p["Start"])
+        p["IGV_link"] = "http://localhost:60151/goto?locus=chr{}:{}".format(p["Chr"], p["Start"])
         p["sample"] = samplename
 
     # Separar las variantes exonicas (consecuencia) y las splicing en un diccionario aparte
