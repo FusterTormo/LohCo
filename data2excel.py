@@ -162,45 +162,96 @@ def ayudaPredictores(hoja, libro, fila) :
     mlr = "MetaLR\n\rD -> Deleterious\n\rT -> Benign"
     ot = "GERP++, PhyloP, SiPhy -> Higher scores are more deleterious"
 
-    hoja.merge_range(fila, 2, fila, 8, titol, titulo)
-    hoja.merge_range(fila+1, 2, fila+3, 8, sift, medio)
-    hoja.merge_range(fila+4, 2, fila+7, 8, polyphen, medio)
-    hoja.merge_range(fila+8, 2, fila+11, 8, lrt, medio)
-    hoja.merge_range(fila+12, 2, fila+16, 8, mtaster, medio)
-    hoja.merge_range(fila+17, 2, fila+21, 8, massessor, medio)
-    hoja.merge_range(fila+22, 2, fila+24, 8, provean, medio)
-    hoja.merge_range(fila+25, 2, fila+27, 8, fathmm, medio)
-    hoja.merge_range(fila+28, 2, fila+30, 8, msvm, medio)
-    hoja.merge_range(fila+31, 2, fila+33, 8, mlr, medio)
-    hoja.merge_range(fila+34, 2, fila+34, 8, ot, bajo)
+    hoja.merge_range(fila, 1, fila, 8, titol, titulo)
+    hoja.merge_range(fila+1, 1, fila+3, 8, sift, medio)
+    hoja.merge_range(fila+4, 1, fila+7, 8, polyphen, medio)
+    hoja.merge_range(fila+8, 1, fila+11, 8, lrt, medio)
+    hoja.merge_range(fila+12, 1, fila+16, 8, mtaster, medio)
+    hoja.merge_range(fila+17, 1, fila+21, 8, massessor, medio)
+    hoja.merge_range(fila+22, 1, fila+24, 8, provean, medio)
+    hoja.merge_range(fila+25, 1, fila+27, 8, fathmm, medio)
+    hoja.merge_range(fila+28, 1, fila+30, 8, msvm, medio)
+    hoja.merge_range(fila+31, 1, fila+33, 8, mlr, medio)
+    hoja.merge_range(fila+34, 1, fila+34, 8, ot, bajo)
 
     #Ayuda para interpretar la columna summary_predictors
     titol = "HELP for 'predictor summary' column"
     body = "The column summarizes the prediction of SIFT,\n\rPolyphen2 HDIV, Polyphen2 HVAR, LRT, MutationTaster,\n\rMutationAssessor, FATHMM, PROVEAN, MetaSVM, and MetaLR.\n\n"
     body += "It enumerates the number of (D)eletereous, (T)olerated,\n\r and (U)nknown prediction\n\n"
     body += "So 2D, 7T, 1U\nmeans\n2 deleterious, 7 tolerated, and 1 unknown predictions."
-    hoja.merge_range(fila, 10, fila, 16, titol, titulo)
-    hoja.merge_range(fila+1, 10, fila+9, 16, body, bajo)
-
-    #Ayuda para interpretar las calidades de la variante, dependiendo de si la muestra analizada es somatica o germinal
-    titol = "HELP for quality column, depending on variant calling analysis"
-    body = "Quality column represents the score for variant sites."
-
-    hoja.merge_range(fila+12, 10, fila+12, 18, titol, titulo)
-    hoja.merge_range(fila+13, 10, fila+14, 18, body, bajo)
+    hoja.merge_range(fila, 9, fila, 15, titol, titulo)
+    hoja.merge_range(fila+1, 9, fila+10, 15, body, bajo)
 
     #Ayuda para los coeficientes de strand-bias
     titol = "HELP for Strand bias ratio"
     body = "Strand bias is calculated with the formula:\nreads_reference_forward + reads_alterated_forward - read_reference_reverse - reads_alterated_reverse"
 
-    hoja.merge_range(fila+17, 10, fila+17, 19, titol, titulo)
-    hoja.merge_range(fila+18, 10, fila+19, 19, body, bajo)
+    hoja.merge_range(fila+12, 9, fila+17, 19, titol, titulo)
+    hoja.merge_range(fila+13, 9, fila+19, 19, body, bajo)
 
 def escribirEstadisticas(hoja, libro) :
+    # Estilos
+    titulo = libro.add_format({ 'bold' : True,
+        'bg_color' : '#B3FFC6',
+        'align' : 'center',
+        'top' : 1,
+        'left' : 1,
+        'right' : 1,
+        'font_size' : 13
+    })
+    izquierda = libro.add_format({
+        'left' : 1,
+        'bold' : True
+    })
+    derecha = libro.add_format({
+        'right' : 1
+    })
+    bajo = libro.add_format({'bottom' : 1,
+        'left' : 1,
+        'right' : 1
+    })
     if os.path.isfile(qc) :
-        hoja.write(0, 0, "Calidad del alineamiento")
+        with open(qc, "r") as fi :
+            aux = fi.read()
+        qua = eval(aux)
+        hoja.merge_range(0, 0, 0, 1, "Alignment quality", titulo)
+        hoja.write(1, 0, "FASTQ reads", izquierda)
+        hoja.write(1, 1, "".format(2*int(qua["FASTQ"])), derecha)
+        hoja.write(2, 0, "Aligned reads", izquierda)
+        hoja.write(2, 1, "{} ({:.2f %})".format(qua["BAM"], 100*float(qua["BAM"])/float(qua["FASTQ"])), derecha)
+        hoja.write(3, 0, "ON target", izquierda)
+        hoja.write(3, 1, "{} ({:.2f %})".format(qua["ON"], 100*float(qua["ON"])/float(qua["BAM"])), derecha)
+        hoja.write(4, 0, "OFF target", izquierda)
+        hoja.write(4, 1, "{} ({:.2f %})".format(qua["OFF"], 100*float(qua["OFF"])/float(qua["BAM"])), derecha)
+        if "DUPS" in qua.keys() :
+            hoja.write(5, 0, "Duplicates", izquierda)
+            hoja.write(5, 1, "{}".format(qua["DUPS"]), derecha)
     if os.path.isfile(cov) :
-        hoja.write(0, 4, "Datos de coverage")
+        with open(cov, "r") as fi:
+            aux = fi.read()
+        cv = eval(aux)
+        hoja.merge_range(0, 4, 0, 5, "Datos de coverage", titulo)
+        hoja.write(1, 4, "Min", izquierda)
+        hoja.write(1, 5, cv["minimo"], derecha)
+        hoja.write(2, 4, "Max", izquierda)
+        hoja.write(2, 5, cv["maximo"], derecha)
+        hoja.write(3, 4, "Average", izquierda)
+        hoja.write(3, 5, cv["media"], derecha)
+        hoja.write(4, 4, "Median", izquierda)
+        hoja.write(4, 5, cv["mediana"], derecha)
+        hoja.write(5, 4, "% bases with 0 cov", izquierda)
+        hoja.write(5, 5, cv["bases0"], derecha)
+        hoja.write(6, 4, "% bases with 30 cov", izquierda)
+        hoja.write(6, 5, cv["bases30"], derecha)
+        hoja.write(7, 4, "% bases with 100 cov", izquierda)
+        hoja.write(7, 5, cv["bases100"], derecha)
+        hoja.write(8, 4, "% bases with 500 cov", izquierda)
+        hoja.write(8, 5, cv["bases500"], derecha)
+        hoja.write(9, 4, "% bases with 1000 cov", izquierda)
+        hoja.write(9, 5, cv["bases1000"], derecha)
+        if os.path.isfile("../coverage/coverage.png") : #Adjuntar el grafico de coverage general
+            hoja.insert_image(12, 4, "../coverage/coverage.png")
+
     if os.path.isfile(stats) :
         hoja.write(0, 8, "Estadisticas de variantes")
 
