@@ -179,15 +179,15 @@ def ayudaPredictores(hoja, libro, fila) :
     body = "The column summarizes the prediction of SIFT,\n\rPolyphen2 HDIV, Polyphen2 HVAR, LRT, MutationTaster,\n\rMutationAssessor, FATHMM, PROVEAN, MetaSVM, and MetaLR.\n\n"
     body += "It enumerates the number of (D)eletereous, (T)olerated,\n\r and (U)nknown prediction\n\n"
     body += "So 2D, 7T, 1U\nmeans\n2 deleterious, 7 tolerated, and 1 unknown predictions."
-    hoja.merge_range(fila, 9, fila, 15, titol, titulo)
-    hoja.merge_range(fila+1, 9, fila+10, 15, body, bajo)
+    hoja.merge_range(fila, 10, fila, 16, titol, titulo)
+    hoja.merge_range(fila+1, 10, fila+9, 16, body, bajo)
 
     #Ayuda para los coeficientes de strand-bias
     titol = "HELP for Strand bias ratio"
     body = "Strand bias is calculated with the formula:\nreads_reference_forward + reads_alterated_forward - read_reference_reverse - reads_alterated_reverse"
 
-    hoja.merge_range(fila+12, 9, fila+17, 19, titol, titulo)
-    hoja.merge_range(fila+13, 9, fila+19, 19, body, bajo)
+    hoja.merge_range(fila+12, 10, fila+12, 19, titol, titulo)
+    hoja.merge_range(fila+13, 10, fila+14, 19, body, bajo)
 
 def escribirEstadisticas(hoja, libro) :
     # Estilos
@@ -206,8 +206,10 @@ def escribirEstadisticas(hoja, libro) :
     derecha = libro.add_format({
         'right' : 1
     })
-    bajo = libro.add_format({'bottom' : 1,
+    bajoIzq = libro.add_format({'bottom' : 1,
         'left' : 1,
+    })
+    bajoDrch = libro.add_format({'bottom' : 1,
         'right' : 1
     })
     if os.path.isfile(qc) :
@@ -221,16 +223,19 @@ def escribirEstadisticas(hoja, libro) :
         hoja.write(2, 1, "{} ({:.2f} %)".format(qua["BAM"], 100*float(qua["BAM"])/float(qua["FASTQ"])), derecha)
         hoja.write(3, 0, "ON target", izquierda)
         hoja.write(3, 1, "{} ({:.2f} %)".format(qua["ON"], 100*float(qua["ON"])/float(qua["BAM"])), derecha)
-        hoja.write(4, 0, "OFF target", izquierda)
-        hoja.write(4, 1, "{} ({:.2f} %)".format(qua["OFF"], 100*float(qua["OFF"])/float(qua["BAM"])), derecha)
         if "DUPS" in qua.keys() :
-            hoja.write(5, 0, "Duplicates", izquierda)
-            hoja.write(5, 1, "{}".format(qua["DUPS"]), derecha)
+            hoja.write(4, 0, "OFF target", izquierda)
+            hoja.write(4, 1, "{} ({:.2f} %)".format(qua["OFF"], 100*float(qua["OFF"])/float(qua["BAM"])), derecha)
+            hoja.write(5, 0, "Duplicates", bajoIzq)
+            hoja.write(5, 1, "{}".format(qua["DUPS"]), bajoDrch)
+        else :
+            hoja.write(4, 0, "OFF target", bajoIzq)
+            hoja.write(4, 1, "{} ({:.2f} %)".format(qua["OFF"], 100*float(qua["OFF"])/float(qua["BAM"])), bajoDrch)
     if os.path.isfile(cov) :
         with open(cov, "r") as fi:
             aux = fi.read()
         cv = eval(aux)
-        hoja.merge_range(0, 4, 0, 5, "Datos de coverage", titulo)
+        hoja.merge_range(0, 4, 0, 5, "Coverage statistics", titulo)
         hoja.write(1, 4, "Min", izquierda)
         hoja.write(1, 5, cv["minimo"], derecha)
         hoja.write(2, 4, "Max", izquierda)
@@ -247,13 +252,42 @@ def escribirEstadisticas(hoja, libro) :
         hoja.write(7, 5, cv["bases100"], derecha)
         hoja.write(8, 4, "% bases with 500 cov", izquierda)
         hoja.write(8, 5, cv["bases500"], derecha)
-        hoja.write(9, 4, "% bases with 1000 cov", izquierda)
-        hoja.write(9, 5, cv["bases1000"], derecha)
-        if os.path.isfile("../coverage/coverage.png") : #Adjuntar el grafico de coverage general
-            hoja.insert_image(12, 4, "../coverage/coverage.png")
+        hoja.write(9, 4, "% bases with 1000 cov", bajoIzq)
+        hoja.write(9, 5, cv["bases1000"], bajoDrch)
+        if os.path.isfile("../coverage/coverage.png") : #Adjuntar el grafico de coverage general. Se reduce un 50%
+            hoja.insert_image(12, 4, "../coverage/coverage.png", {"x_scale" : 0.5, "y_scale" : 0.5})
 
     if os.path.isfile(stats) :
-        hoja.write(0, 8, "Estadisticas de variantes")
+        with open(stats, "r") as fi :
+            aux = fi.read()
+        var = eval(aux)
+        hoja.merge_range(0, 8, 0, 9, "Variant number per filter", titulo)
+        hoja.write(1, 8, "RAW", izquierda)
+        hoja.write(1, 9, var["Totales"], derecha)
+        del var["Totales"]
+        hoja.write(2, 8, "PASS strelka2", izquierda)
+        hoja.write(2, 9, var["sonPASS"], derecha)
+        del var["sonPASS"]
+        hoja.write(3, 8, "Consequence", izquierda)
+        hoja.write(3, 9, var["Conseq"], derecha)
+        del var["Conseq"]
+        hoja.write(4, 8, "High MAF", izquierda)
+        hoja.write(4, 9, var["MAF_alta"], derecha)
+        del var["MAF_alta"]
+        hoja.write(5, 8, "Low VAF", izquierda)
+        hoja.write(5, 9, var["VAF_baja"], derecha)
+        del var["VAF_baja"]
+        hoja.write(6, 8, "Candidates", bajoIzq)
+        hoja.write(6, 9, var["Candidatas"], bajoDrch)
+        del var["Candidatas"]
+        hoja.merge_range(0, 11, 0, 12, "Variant distribution", titulo)
+        fila = 1
+        for k, v in var.items() :
+            hoja.write(fila, 11, k, izquierda)
+            hoja.write(fila, 12, v, derecha)
+            fila += 1
+        hoja.write(fila, 11, k, bajoIzq)
+        hoja.write(fila, 12, v, bajoDrch)
 
 def crearExcel(nom) :
     """Recoge la informacion de las variantes desde los archivos .reanno.tsv
