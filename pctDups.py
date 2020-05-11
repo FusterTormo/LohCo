@@ -43,7 +43,7 @@ def pct(bam = "bwaAlign/bwa.nodup.bam") :
                 with open(output, "w") as fi :
                     fi.write(aux)
         else :
-            print("ERROR: Samtools no se ejecuto correctamente. Descripcion: {}".print(err))
+            print("ERROR: Samtools no se ejecuto correctamente. Descripcion: {}".format(err))
     else :
         print("ERROR: Bam no encontrado. Ruta de busqueda: {}".format(bam))
 

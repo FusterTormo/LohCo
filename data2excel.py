@@ -208,6 +208,7 @@ def escribirEstadisticas(hoja, libro) :
     })
     bajoIzq = libro.add_format({'bottom' : 1,
         'left' : 1,
+        'bold' : True
     })
     bajoDrch = libro.add_format({'bottom' : 1,
         'right' : 1
@@ -218,7 +219,7 @@ def escribirEstadisticas(hoja, libro) :
         qua = eval(aux)
         hoja.merge_range(0, 0, 0, 1, "Alignment quality", titulo)
         hoja.write(1, 0, "FASTQ reads", izquierda)
-        hoja.write(1, 1, "".format(2*int(qua["FASTQ"])), derecha)
+        hoja.write(1, 1, "{}".format(2*int(qua["FASTQ"])), derecha)
         hoja.write(2, 0, "Aligned reads", izquierda)
         hoja.write(2, 1, "{} ({:.2f} %)".format(qua["BAM"], 100*float(qua["BAM"])/float(qua["FASTQ"])), derecha)
         hoja.write(3, 0, "ON target", izquierda)
@@ -280,7 +281,7 @@ def escribirEstadisticas(hoja, libro) :
         hoja.write(6, 8, "Candidates", bajoIzq)
         hoja.write(6, 9, var["Candidatas"], bajoDrch)
         del var["Candidatas"]
-        hoja.merge_range(0, 11, 0, 12, "Variant distribution", titulo)
+        hoja.merge_range(0, 11, 0, 12, "Raw variant distribution", titulo)
         fila = 1
         for k, v in var.items() :
             hoja.write(fila, 11, k, izquierda)
@@ -305,6 +306,9 @@ def crearExcel(nom) :
         if os.path.isfile(a) :
             aux = a.split(".")[0] # Recoger el nombre que tendra la pestana
             full = wb.add_worksheet(aux.capitalize())
+            if aux == "cand" :
+                full.activate()
+            full.freeze_panes(2,0)
             dc = convertirArchivo(a)
             filaActual = crearCabecera(full, wb)
             filaActual = escribirVariantes(full, wb, dc, filaActual)

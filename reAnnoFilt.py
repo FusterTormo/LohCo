@@ -63,7 +63,7 @@ def addFORMAT(dic) :
     #Separar los datos de la columna FORMAT en distintas columnas
     for c in claves :
         if c in dic.keys() :
-            print("WARNING: Clau {} repetida en {}".format(c, dic.keys()))
+            print("WARNING: Clave {} repetida en {}".format(c, dic.keys()))
             sys.exit()
         else :
             minidic[c] = valores[i]
@@ -75,7 +75,7 @@ def addFORMAT(dic) :
         aux = d.split("=")
         aux[0] = "{}_INFO".format(aux[0])
         if aux[0] in dic.keys() or aux[0] in minidic.keys():
-            print("WARNING: Clau {} repetida al muntar INFO".format(aux[0]))
+            print("WARNING: Clave {} repetida al montar INFO".format(aux[0]))
             sys.exit()
         if len(aux) == 1 :
             minidic[aux[0]] = aux[0]
@@ -327,13 +327,13 @@ def main(ruta, samplename = "noName") :
     guardarTabla(vafAlta, "cand") # Variantes que han pasado todos los filtros anteriores
 
     # Mostrar por pantalla estadisticas basicas
-    print("INFO: Totes les variants {}".format(len(todas))) # Total de variantes reportadas por Strelka2
-    print("INFO: Variants amb filtres=PASS {}".format(len(pas)))
-    print("INFO: Variants conseq: {}".format(len(conseq)))
+    print("INFO: Variantes encontradas por Strelka2 {}".format(len(todas))) # Total de variantes reportadas por Strelka2
+    print("INFO: Variantes con filtro=PASS {}".format(len(pas)))
+    print("INFO: Variantes conseq: {}".format(len(conseq)))
     print("INFO: MAF >= 0.1: {}".format(len(mafAlta)))
     print("INFO: MAF < 0.1: {}".format(len(mafBaja)))
-    print("INFO: Baixa VAF: {}".format(len(vafBaja)))
-    print("INFO: Variants candidates: {}".format(len(vafAlta)))
+    print("INFO: VAF baja: {}".format(len(vafBaja)))
+    print("INFO: Variantes candidatas: {}".format(len(vafAlta)))
 
     # Agregar estadisticas de los tipos de variantes recogidos en el panel a la pestaña QC
     tiposVariantes = {}

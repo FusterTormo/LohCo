@@ -106,7 +106,7 @@ def getFASTQnames(path) :
             Lista con las rutas absolutas de los FASTQ encontrados en la ruta que se paso como parametro
     """
     files2copy = []
-    print("INFO: Recollint el nom dels FASTQ des de {}".format(path))
+    print("INFO: Recogiendo el nombre de los FASTQ en {}".format(path))
     for root, dirs, files in os.walk(path) :
         for fic in files :
             # Parche. Se asume que el archivo FASTQ tiene extension .fastq.gz
@@ -116,7 +116,7 @@ def getFASTQnames(path) :
             if extension2 == ".fastq" :
                 pt = "{}/{}".format(root, fic)
                 files2copy.append(pt)
-    print("INFO: {} arxius trobats".format(len(files2copy)))
+    print("INFO: {} archivos encontrados".format(len(files2copy)))
 
     return files2copy
 
@@ -159,7 +159,7 @@ def comprobarArchivos() :
     """
     Comprueba si los archivos necesarios para el analisis existen en la ruta especificada en las constantes
     """
-    print("INFO: Buscant els arxius necessaris per executar la pipeline")
+    print("INFO: Buscando los archivos necesarios para ejecutar la pipeline")
     if not os.path.isfile(referencia) :
         raise IOError("No se encuentra el genoma de referencia")
     if not os.path.isfile(manifest) :
@@ -199,14 +199,14 @@ def prepararScript(ruta) :
     tanda = "{prefijo}{tanda}".format(prefijo = prefijoTanda, tanda = tnd)
     arxiu = "logTanda{tanda}.sh".format(tanda = tnd)
 
-    print("INFO: Els resultats de l'analisi es guardaran en {path}/{tanda}".format(path = pathAnalisi, tanda = tanda))
+    print("INFO: Los resultados del analisis se guardaran en {path}/{tanda}".format(path = pathAnalisi, tanda = tanda))
     comprobarArchivos() # Esta funcion dispara una excepcion en caso de que no se encuentre alguno de los archivos necesarios para el analisis
     fastqs = getFASTQnames(ruta)
     if len(fastqs) == 0 :
-        print("ERROR: No s'han trobat arxius FASTQ en {}".format(ruta))
+        print("ERROR: No se han encontrado archivos FASTQ en {}".format(ruta))
         sys.exit(1)
     else :
-        print("INFO: Creant el bash per la tanda {}".format(tnd))
+        print("INFO: Creando el bash para la tanda {}".format(tnd))
         with open(arxiu, "w") as fi :
             fi.write("#!/bin/bash\n\n") # Shebang del bash
             fi.write("#Referencias usadas en este analisis\n")
@@ -298,5 +298,5 @@ def prepararScript(ruta) :
                     if id not in hechos :
                         fi.write("analisi {params}\n".format(params = params))
                         hechos.append(id)
-        print("INFO: Log guardat com a {}".format(arxiu))
+        print("INFO: Log guardado como {}".format(arxiu))
         os.chmod(arxiu, 0o754)
