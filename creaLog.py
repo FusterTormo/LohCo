@@ -284,6 +284,7 @@ def prepararScript(ruta) :
             # Re-anotacion y filtrado de variantes usando myvariant.info
             fi.write("\t" + reano.format(wd = wd, input = "raw.hg19_multianno.txt", samplename = "$alias") + "\n")
             fi.write("\t" + toExcel.format(wd = wd, output = "$alias") + "\n")
+            fi.write("\tcd {}/{}\n".format(pathAnalisi, tanda))
 
             fi.write("}\n\n")
 
