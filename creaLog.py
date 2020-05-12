@@ -176,7 +176,7 @@ def comprobarArchivos() :
         doListaGenes()
 
 
-def prepararScript(ruta) :
+def prepararPanel(ruta, acciones) :
     """
     Programa principal de la libreria. Prepara el log con todos los comandos necesarios para lanzar la pipeline
 
@@ -187,12 +187,14 @@ def prepararScript(ruta) :
     * Crear el bash de analisis
     * Crear, si no existe, la lista de los genes que contiene el manifest (gensAestudi.txt)
     * Crear el log con todos los comandos para cada una de las muestras del panel
-    * Ejecutar, si procede el analisis usando la libreria subprocess
 
     Parameters
     ----------
         ruta : str
             Ruta absoluta donde esta la carpeta con los FASTQ que se van a analizar en esta pipeline
+        acciones : list
+            Lista de acciones que se pueden agregar al bash. Valores aceptados: ["copiar","fastqc", "aln", "recal", "mdups", "bamqc", "coverage", "vcalGerm", vanno", "filtrar", "excel"]
+            **Pendiente hacer "vcalSoma"**
     """
     os.chdir(pathAnalisi) # Cambiar el directorio de trabajo a la carpeta de analisis
     tnd = getTanda() # Crear el nombre de la carpeta donde se guardaran los analisis y el nombre del bash con todos los comandos
@@ -215,81 +217,93 @@ def prepararScript(ruta) :
             fi.write("gzmani={}\n".format(gzmanifest))
             fi.write("sites={}\n".format(dbsnp))
             fi.write("gens={}\n\n".format(genes))
+            if "copiar" in acciones :
+                #Crear la funcion que copia los datos (FASTQs) en la carpeta de analisis
+                fi.write("function copiar {\n")
+                fi.write("\tcd {}\n".format(pathAnalisi))
+                fi.write("\tmkdir {tanda} ; cd {tanda}\n\n".format(tanda = tanda))
+                fi.write("\techo -e \"################################\\n\\tCopiant dades\\n################################\\n\"\n")
+                for f in fastqs :
+                    patx = f.replace(" ", "\\ ") #Parche para leer los espacios en la terminal bash
+                    fi.write("\trsync -aP {} .\n".format(patx))
 
-            #Crear la funcion que copia los datos (FASTQs) en la carpeta de analisis
-            fi.write("function copiar {\n")
-            fi.write("\tcd {}\n".format(pathAnalisi))
-            fi.write("\tmkdir {tanda} ; cd {tanda}\n\n".format(tanda = tanda))
-            fi.write("\techo -e \"################################\\n\\tCopiant dades\\n################################\\n\"\n")
-            for f in fastqs :
-                patx = f.replace(" ", "\\ ") #Parche para leer los espacios en la terminal bash
-                fi.write("\trsync -aP {} .\n".format(patx))
+                fi.write("\trsync -aP {} .\n".format(genes))
+                fi.write("\tmv ../{} .\n".format(arxiu))
+                fi.write("}\n\n")
 
-            fi.write("\trsync -aP {} .\n".format(genes))
-            fi.write("\tmv ../{} .\n".format(arxiu))
-            fi.write("}\n\n")
-
-            # TODO: Esta part es com si posara analizar.sh dins del log
             fi.write("function analisi {\n")
             fi.write("\tforward=$1\n\treverse=$2\n\treadgroup=$3\n\talias=$4\n")
             fi.write("\techo -e \"################################\\n\\tAnalitzant $alias\\n################################\\n\"\n")
             fi.write("\tmkdir $alias\n")
             fi.write("\tcd $alias\n")
-            fi.write("\n\t# Control de calidad. FastQC\n")
-            fi.write("\tmkdir fastqc # Carpeta donde se guardara el control de calidad\n")
-            # La cadena fastqc tiene una variable (fastq) que se usa para introducir el archivo FASTQ para el analisis
-            fi.write("\t" + fastqc.format(fastq = "../$forward") + "\n")
-            fi.write("\t" + fastqc.format(fastq = "../$reverse") + "\n")
-            fi.write("\trm fastqc/*zip # Eliminar los archivos comprimidos, ya se han descomprimido al finalizar FastQC\n")
-            fi.write("\n\t# Alineamiento. BWA\n")
-            # La cadena align tiene cuatro variables: rg es para introducir el read group, fw es para el fastq forward, rv es para el fastq reverse y ref es para el genoma de referencia
-            fi.write("\t" + bwa.format(rg = "$readgroup", ref = "$ref", fw = "../$forward", rv = "../$reverse") + "\n")
-            fi.write("\t" + picardSort + "\n")
-            fi.write("\t" + picardIndex.format(bam = "bwa.sort.bam") + "\n")
-            fi.write("\tmkdir bwaAlign\n")
-            fi.write("\tmv bwa.sam *bam *bai bwaAlign/\n")
-            # Convertir el bam ordenado en un bed para poder hacer un control de calidad posterior
+            if "fastqc" in acciones :
+                fi.write("\n\t# Control de calidad. FastQC\n")
+                fi.write("\tmkdir fastqc # Carpeta donde se guardara el control de calidad\n")
+                # La cadena fastqc tiene una variable (fastq) que se usa para introducir el archivo FASTQ para el analisis
+                fi.write("\t" + fastqc.format(fastq = "../$forward") + "\n")
+                fi.write("\t" + fastqc.format(fastq = "../$reverse") + "\n")
+                fi.write("\trm fastqc/*zip # Eliminar los archivos comprimidos, ya se han descomprimido al finalizar FastQC\n")
+            if "aln" in acciones :
+                fi.write("\n\t# Alineamiento. BWA\n")
+                # La cadena align tiene cuatro variables: rg es para introducir el read group, fw es para el fastq forward, rv es para el fastq reverse y ref es para el genoma de referencia
+                fi.write("\t" + bwa.format(rg = "$readgroup", ref = "$ref", fw = "../$forward", rv = "../$reverse") + "\n")
+                fi.write("\t" + picardSort + "\n")
+                fi.write("\t" + picardIndex.format(bam = "bwa.sort.bam") + "\n")
+                fi.write("\tmkdir bwaAlign\n")
+                fi.write("\tmv bwa.sam *bam *bai bwaAlign/\n")
             fi.write("\tcd bwaAlign\n")
-            fi.write("\t" + bedtoolsBam2Bed.format(bam = "bwa.sort.bam") + "\n")
+            # Convertir el bam ordenado en un bed para poder hacer un control de calidad posterior
+            if "bamqc" in acciones :
+                fi.write("\t" + bedtoolsBam2Bed.format(bam = "bwa.sort.bam") + "\n")
             # Recalibrar las bases
-            fi.write("\n\t# Post-Alineamiento. GATK\n")
-            fi.write("\t" + gatk1.format(bam = "bwa.sort.bam", ref = "$ref", dbsnp = "$sites", mani = "$mani") + "\n")
-            fi.write("\t" + gatk2.format(bam = "bwa.sort.bam", ref = "$ref", mani = "$mani") + "\n")
+            if "recal" in acciones :
+                fi.write("\n\t# Post-Alineamiento. GATK\n")
+                fi.write("\t" + gatk1.format(bam = "bwa.sort.bam", ref = "$ref", dbsnp = "$sites", mani = "$mani") + "\n")
+                fi.write("\t" + gatk2.format(bam = "bwa.sort.bam", ref = "$ref", mani = "$mani") + "\n")
             # Aqui puede ir el marcar duplicados, en caso de necesitarse
-            # fi.write("\t" + markDup.format(bam = "bwa.recal.bam") + "\n")
-            # fi.write("\t" + picardIndex.format(bam = "bwa.nodup.bam") + "\n")
+            if "mdups" in acciones :
+                fi.write("\t" + markDup.format(bam = "bwa.recal.bam") + "\n")
+                fi.write("\t" + picardIndex.format(bam = "bwa.nodup.bam") + "\n")
             fi.write("\tcd ..")
             # Estudios de coverage, on target, off target, porcentaje de bases con X coverage...
-            fi.write("\n\t# Control de calidad del alineamiento y estudio de coverage\n")
-            fi.write("\t" + bedtoolsCoverageAll.format(mani = "$mani", bam = "bwaAlign/bwa.recal.bam", output = "coverage.txt") + "\n")
-            fi.write("\t" + bedtoolsCoverageBase.format(mani = "$mani", bam = "bwaAlign/bwa.recal.bam", output = "coverageBase.txt") + "\n")
-            fi.write("\tgrep '^all' coverage.txt > coverageAll.txt\n")
-            fi.write("\trm coverage.txt\n")
-            fi.write("\tRscript {}/coveragePanells.R\n".format(wd))
-            fi.write("\tmkdir coverage\n")
-            fi.write("\tmv *png coverageAll.txt coverageBase.txt coverage/\n")
-            fi.write("\tpython3 {}/bamQC.py\n".format(wd)) # Hay una opcion de lanzar pctDups (calcular porcentaje de duplicados) en caso de exomas
+            if "coverage" in acciones :
+                fi.write("\n\t# Control de calidad del alineamiento y estudio de coverage\n")
+                fi.write("\t" + bedtoolsCoverageAll.format(mani = "$mani", bam = "bwaAlign/bwa.recal.bam", output = "coverage.txt") + "\n")
+                fi.write("\t" + bedtoolsCoverageBase.format(mani = "$mani", bam = "bwaAlign/bwa.recal.bam", output = "coverageBase.txt") + "\n")
+                fi.write("\tgrep '^all' coverage.txt > coverageAll.txt\n")
+                fi.write("\trm coverage.txt\n")
+                fi.write("\tRscript {}/coveragePanells.R\n".format(wd))
+                fi.write("\tmkdir coverage\n")
+                fi.write("\tmv *png coverageAll.txt coverageBase.txt coverage/\n")
+            if "bamqc" in acciones :
+                fi.write("\tpython3 {}/bamQC.py\n".format(wd)) # Hay una opcion de lanzar pctDups (calcular porcentaje de duplicados) en caso de exomas
             # Variant calling. La carpeta donde se guardan los datos se llama variantCalling. En caso de queren cambiarse, modificar las dos siguientes lineas
-            fi.write("\n\t# Variant calling. Strelka2\n")
-            fi.write("\t" + vc1.format(bam = "bwaAlign/bwa.recal.bam", ref = "$ref", variantDir = "variantCalling", mani = "$gzmani") + "\n")
-            fi.write("\tcd {}\n".format("variantCalling"))
-            fi.write("\t" + vc2 + "\n")
-            fi.write("\trsync -aP results/variants/variants.vcf.gz .\n")
-            fi.write("\tgunzip variants.vcf.gz\n")
+            if "vcalGerm" in acciones :
+                fi.write("\n\t# Variant calling. Strelka2\n")
+                fi.write("\t" + vc1.format(bam = "bwaAlign/bwa.recal.bam", ref = "$ref", variantDir = "variantCalling", mani = "$gzmani") + "\n")
+                fi.write("\tcd {}\n".format("variantCalling"))
+                fi.write("\t" + vc2 + "\n")
+                fi.write("\trsync -aP results/variants/variants.vcf.gz .\n")
+                fi.write("\tgunzip variants.vcf.gz\n")
             # Anotacion de variantes usando ANNOVAR
-            fi.write("\n\t# Anotacion y filtrado de variantes. ANNOVAR y myvariant.info\n")
-            fi.write("\t" + annovar.format(vcf = "variants.vcf", out = "raw.av") + "\n")
-            fi.write("\t" + annovar2.format(input = "raw.av", output = "raw") + "\n")
-            fi.write("\t" + annovar3.format(input = "raw.av", output = "raw") + "\n")
+            if "vanno" in acciones :
+                fi.write("\n\t# Anotacion y filtrado de variantes. ANNOVAR y myvariant.info\n")
+                fi.write("\t" + annovar.format(vcf = "variants.vcf", out = "raw.av") + "\n")
+                fi.write("\t" + annovar2.format(input = "raw.av", output = "raw") + "\n")
+                fi.write("\t" + annovar3.format(input = "raw.av", output = "raw") + "\n")
             # Re-anotacion y filtrado de variantes usando myvariant.info
-            fi.write("\t" + reano.format(wd = wd, input = "raw.hg19_multianno.txt", samplename = "$alias") + "\n")
-            fi.write("\t" + toExcel.format(wd = wd, output = "$alias") + "\n")
+            if "filtrar" in acciones :
+                fi.write("\t" + reano.format(wd = wd, input = "raw.hg19_multianno.txt", samplename = "$alias") + "\n")
+            # Juntar los resultados obtenidos en un Excel
+            if "excel" in acciones :
+                fi.write("\t" + toExcel.format(wd = wd, output = "$alias") + "\n")
             fi.write("\tcd {}/{}\n".format(pathAnalisi, tanda))
 
             fi.write("}\n\n")
 
             #Crear los comandos para lanzar las funciones
-            fi.write("copiar\n")
+            if "copiar" in acciones :
+                fi.write("copiar\n")
             hechos = []
             for f in fastqs :
                 params, id = extraerRG(os.path.basename(f))
@@ -300,4 +314,4 @@ def prepararScript(ruta) :
                         fi.write("analisi {params}\n".format(params = params))
                         hechos.append(id)
         print("INFO: Log guardado como {}".format(arxiu))
-        os.chmod(arxiu, 0o754)
+        os.chmod(arxiu, 0o754) # Dar permiso de ejecuion para el propietario, lectura y escritura para el grupo, y lectura para el resto de usuarios
