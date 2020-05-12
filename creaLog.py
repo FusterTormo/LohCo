@@ -14,30 +14,12 @@ FUNCTIONS:
 import os
 import re
 import sys
+import getCommands as cmd
 
 """
 CONSTANTS:
     Rutas de los programas y parametros de cada uno de los pasos dentro de la pipeline
 """
-# IDEA: Podrien ser getters amb els parametres per defecte. Seria mes llegible
-fastqc = "/opt/FastQC/fastqc -o fastqc/ -f fastq -extract -q -t 6 {fastq}" #Comando para ejecutar FastQC (control de calidad de los FASTQ). Los parametros indican -o ruta donde se guardaran los archivos de salida. -f que el archivo de entrada es un FASTQ -extract descomprimir el archivo de salida -q omite los mensajes de progreso (log) -t 6 el numero de hilos (threads) que usa el programa para ejcutarse en paralelo
-bwa = "/opt/bwa.kit/bwa mem -M -t 6 -R {rg} {ref} {fw} {rv} > bwa.sam" # Comando para ejecutar BWA (alineamiento). Los parametros indican -M para compatibilidad con Picard tools y GATk -t numero de hilos (threads) que usa el programa para ejecutarse -R Read Group que se pondra en el sam de salida. Este Read Group es necesario para poder ejecutar GATK (post-alineamiento)
-picardSort = "java -jar /opt/picard-tools-2.21.8/picard.jar SortSam INPUT=bwa.sam OUTPUT=bwa.sort.bam SORT_ORDER=coordinate" # Comando para ordenar el bam
-picardIndex = "java -jar /opt/picard-tools-2.21.8/picard.jar BuildBamIndex INPUT={bam}" # Comando para crear un indice en el bam ordenado
-bedtoolsBam2Bed = "bedtools bamtobed -i {bam} > bwa.bed" #Comando para crear un bed con todas las regiones donde se han alineado reads
-gatk1 = "/opt/gatk-4.1.4.1/gatk BaseRecalibrator -I {bam} -R {ref} --known-sites {dbsnp} -O recaldata.table -L {mani}" # Comando para realizar el primer paso de la recalibracion de bases sugerida por GATK
-gatk2 = "/opt/gatk-4.1.4.1/gatk ApplyBQSR -I {bam} -R {ref} -bqsr-recal-file recaldata.table -O bwa.recal.bam -L {mani}" # Comando para realizar el segundo paso de la recalibracion de bases sugerida por GATK
-bedtoolsCoverageAll = "bedtools coverage -hist -a {mani} -b {bam} > {output}" # Comando para calcular el coverage agrupado del bam en las regiones del manifest
-bedtoolsCoverageBase = "bedtools coverage -d -a {mani} -b {bam} > {output}" # Comando para calcular el coverage de cada una de las bases dentro de la region de interes
-markDup = "java -jar /opt/picard-tools-2.21.8/picard.jar MarkDuplicates INPUT={bam} OUTPUT=bwa.nodup.bam METRICS_FILE=dups_bam.txt" # Comando para marcar duplicados usando Picard tools
-vc1 = "/opt/strelka-2.9.10/bin/configureStrelkaGermlineWorkflow.py --bam {bam} --referenceFasta {ref} --exome --runDir {variantDir} --callRegions {mani}" # Comando para ejecutar el variant caller que se va a usar (Strelka2)
-vc2 = "./runWorkflow.py -m local -j 6 --quiet"
-annovar = "/opt/annovar20180416/convert2annovar.pl -format vcf4 -outfile {out} -includeinfo {vcf}"
-annovar2 = "/opt/annovar20180416/annotate_variation.pl -geneanno -buildver hg19 -hgvs -separate -out {output} {input} /opt/annovar20180416/humandb/"
-annovar3 = "/opt/annovar20180416/table_annovar.pl {input} /opt/annovar20180416/humandb/ -buildver hg19 -out {output} -remove -protocol refGene,avsnp150,1000g2015aug_all,1000g2015aug_afr,1000g2015aug_amr,1000g2015aug_eas,1000g2015aug_eur,1000g2015aug_sas,exac03,gnomad211_exome,gnomad211_genome,esp6500siv2_all,esp6500siv2_ea,esp6500siv2_aa,clinvar_20190305,cosmic70,dbnsfp35a --operation g,f,f,f,f,f,f,f,f,f,f,f,f,f,f,f,f -nastring NA -otherinfo"
-reano = "python3 {wd}/reAnnoFilt.py {input} {samplename}"
-toExcel = "python3 {wd}/data2excel.py {output}"
-
 referencia = "/home/ffuster/share/biodata/solelab/referencies/ucsc/hg19.fa"
 manifest = "/home/ffuster/panalisi/resultats/manifest.bed"
 gzmanifest = "/home/ffuster/panalisi/resultats/manifest.bed.gz"
@@ -193,8 +175,8 @@ def prepararPanel(ruta, acciones) :
         ruta : str
             Ruta absoluta donde esta la carpeta con los FASTQ que se van a analizar en esta pipeline
         acciones : list
-            Lista de acciones que se pueden agregar al bash. Valores aceptados: ["copiar","fastqc", "aln", "recal", "mdups", "bamqc", "coverage", "vcalGerm", vanno", "filtrar", "excel"]
-            **Pendiente hacer "vcalSoma"**
+            Lista de acciones que se pueden agregar al bash. Valores aceptados: ["copiar","fastqc", "aln", "recal", "mdups", "bamqc", "coverage", "strelkaGerm", "mutectGerm", "vanno", "filtrar", "excel"]
+            **Pendiente hacer "strelkaSoma", "mutectSoma"**
     """
     os.chdir(pathAnalisi) # Cambiar el directorio de trabajo a la carpeta de analisis
     tnd = getTanda() # Crear el nombre de la carpeta donde se guardaran los analisis y el nombre del bash con todos los comandos
@@ -239,37 +221,38 @@ def prepararPanel(ruta, acciones) :
             if "fastqc" in acciones :
                 fi.write("\n\t# Control de calidad. FastQC\n")
                 fi.write("\tmkdir fastqc # Carpeta donde se guardara el control de calidad\n")
-                # La cadena fastqc tiene una variable (fastq) que se usa para introducir el archivo FASTQ para el analisis
-                fi.write("\t" + fastqc.format(fastq = "../$forward") + "\n")
-                fi.write("\t" + fastqc.format(fastq = "../$reverse") + "\n")
+                # Recoger la cadena para invocar fastqc usando la libreria de comandos
+                fi.write("\t" + cmd.getFastQC("../$forward", "fastqc") + "\n")
+                fi.write("\t" + cmd.getFastQC("../$reverse", "fastqc") + "\n")
                 fi.write("\trm fastqc/*zip # Eliminar los archivos comprimidos, ya se han descomprimido al finalizar FastQC\n")
             if "aln" in acciones :
                 fi.write("\n\t# Alineamiento. BWA\n")
                 # La cadena align tiene cuatro variables: rg es para introducir el read group, fw es para el fastq forward, rv es para el fastq reverse y ref es para el genoma de referencia
-                fi.write("\t" + bwa.format(rg = "$readgroup", ref = "$ref", fw = "../$forward", rv = "../$reverse") + "\n")
-                fi.write("\t" + picardSort + "\n")
-                fi.write("\t" + picardIndex.format(bam = "bwa.sort.bam") + "\n")
-                fi.write("\tmkdir bwaAlign\n")
-                fi.write("\tmv bwa.sam *bam *bai bwaAlign/\n")
-            fi.write("\tcd bwaAlign\n")
+                fi.write("\t" + cmd.getAln("$readgroup", "$ref", "../$forward", "../$reverse", "bwa.sam") + "\n")
+                fi.write("\t" + cmd.getPcSort("bwa.sam", "bwa.sort.bam") + "\n")
+                fi.write("\t" + cmd.getPcIndex("bwa.sort.bam") + "\n")
+                fi.write("\tmkdir alignment\n")
+                fi.write("\tmv bwa.sam *bam *bai alignment/\n")
+            fi.write("\tcd alignment\n")
             # Convertir el bam ordenado en un bed para poder hacer un control de calidad posterior
             if "bamqc" in acciones :
-                fi.write("\t" + bedtoolsBam2Bed.format(bam = "bwa.sort.bam") + "\n")
+                fi.write("\t" + cmd.getBam2bed("bwa.sort.bam", "bwa.bed") + "\n")
             # Recalibrar las bases
             if "recal" in acciones :
                 fi.write("\n\t# Post-Alineamiento. GATK\n")
-                fi.write("\t" + gatk1.format(bam = "bwa.sort.bam", ref = "$ref", dbsnp = "$sites", mani = "$mani") + "\n")
-                fi.write("\t" + gatk2.format(bam = "bwa.sort.bam", ref = "$ref", mani = "$mani") + "\n")
-            # Aqui puede ir el marcar duplicados, en caso de necesitarse
+                # GATKrecal devuelve dos ordenes, separadas por \n. Como queremos que se tabule tambien la segunda linea, se reemplaza el \n por \n + \t
+                fi.write("\t" + cmd.getGATKrecal("bwa.sort.bam", "$ref", "$sites", "$mani", "bwa.recal.bam").replace("\n", "\n\t") + "\n")
+
+            # Marcar duplicados
             if "mdups" in acciones :
-                fi.write("\t" + markDup.format(bam = "bwa.recal.bam") + "\n")
-                fi.write("\t" + picardIndex.format(bam = "bwa.nodup.bam") + "\n")
+                fi.write("\t" + cmd.getPcMarkduplicates("bwa.recal.bam", "bwa.nodup.bam") + "\n")
+                fi.write("\t" + cmd.getPcIndex("bwa.nodup.bam") + "\n")
             fi.write("\tcd ..")
             # Estudios de coverage, on target, off target, porcentaje de bases con X coverage...
             if "coverage" in acciones :
                 fi.write("\n\t# Control de calidad del alineamiento y estudio de coverage\n")
-                fi.write("\t" + bedtoolsCoverageAll.format(mani = "$mani", bam = "bwaAlign/bwa.recal.bam", output = "coverage.txt") + "\n")
-                fi.write("\t" + bedtoolsCoverageBase.format(mani = "$mani", bam = "bwaAlign/bwa.recal.bam", output = "coverageBase.txt") + "\n")
+                fi.write("\t" + cmd.getCoverageAll("$mani","alignment/bwa.recal.bam", "coverage.txt") + "\n")
+                fi.write("\t" + cmd.getCoverageBase("$mani", "bwaAlign/bwa.recal.bam", "coverageBase.txt") + "\n")
                 fi.write("\tgrep '^all' coverage.txt > coverageAll.txt\n")
                 fi.write("\trm coverage.txt\n")
                 fi.write("\tRscript {}/coveragePanells.R\n".format(wd))
@@ -280,23 +263,26 @@ def prepararPanel(ruta, acciones) :
             # Variant calling. La carpeta donde se guardan los datos se llama variantCalling. En caso de queren cambiarse, modificar las dos siguientes lineas
             if "vcalGerm" in acciones :
                 fi.write("\n\t# Variant calling. Strelka2\n")
-                fi.write("\t" + vc1.format(bam = "bwaAlign/bwa.recal.bam", ref = "$ref", variantDir = "variantCalling", mani = "$gzmani") + "\n")
-                fi.write("\tcd {}\n".format("variantCalling"))
-                fi.write("\t" + vc2 + "\n")
+                if "mdups" in acciones :
+                    fi.write("\t" + cmd.getStrelka2("alignment/bwa.nodup.bam", "$ref", "variantCalling", "$gzmani", "variantCalling").replace("\n", "\n\t") + "\n")
+                elif "recal" in acciones:
+                    fi.write("\t" + cmd.getStrelka2("alignment/bwa.recal.bam", "$ref", "variantCalling", "$gzmani", "variantCalling").replace("\n", "\n\t") + "\n")
+                else :
+                    fi.write("\t" + cmd.getStrelka2("alignment/bwa.sort.bam", "$ref", "variantCalling", "$gzmani", "variantCalling").replace("\n", "\n\t") + "\n")
                 fi.write("\trsync -aP results/variants/variants.vcf.gz .\n")
                 fi.write("\tgunzip variants.vcf.gz\n")
+                fi.write("\tmv variants.vcf strelka2.vcf")
             # Anotacion de variantes usando ANNOVAR
             if "vanno" in acciones :
                 fi.write("\n\t# Anotacion y filtrado de variantes. ANNOVAR y myvariant.info\n")
-                fi.write("\t" + annovar.format(vcf = "variants.vcf", out = "raw.av") + "\n")
-                fi.write("\t" + annovar2.format(input = "raw.av", output = "raw") + "\n")
-                fi.write("\t" + annovar3.format(input = "raw.av", output = "raw") + "\n")
+                fi.write("\t" + cmd.getANNOVAR("strelka2.vcf", "raw") + "\n")
+
             # Re-anotacion y filtrado de variantes usando myvariant.info
             if "filtrar" in acciones :
-                fi.write("\t" + reano.format(wd = wd, input = "raw.hg19_multianno.txt", samplename = "$alias") + "\n")
+                fi.write("\tpython3 {wd}/reAnnoFilt.py {input} {samplename}\n".format(wd = wd, input = "raw.hg19_multianno.txt", samplename = "$alias"))
             # Juntar los resultados obtenidos en un Excel
             if "excel" in acciones :
-                fi.write("\t" + toExcel.format(wd = wd, output = "$alias") + "\n")
+                fi.write("\tpython3 {wd}/data2excel.py {output}\n".format(wd = wd, output = "$alias"))
             fi.write("\tcd {}/{}\n".format(pathAnalisi, tanda))
 
             fi.write("}\n\n")

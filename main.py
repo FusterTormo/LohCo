@@ -15,7 +15,7 @@ def GUI() :
     # TODO: Pintar-ho bonico
     # IDEA: Crear un menu amb els passos que es volen seguir per fer l'analisi mes personalitzat
     ruta = input("Introducir el path absoluto de la carpeta donde estan los FASTQ a analizar: ")
-    cl.prepararPanel(ruta, ["copiar","fastqc", "aln", "recal", "bamqc", "coverage", "vcalGerm", "vanno", "filtrar", "excel"])
+    cl.prepararPanel(ruta, ["copiar","fastqc", "aln", "recal", "bamqc", "coverage", "strelkaGerm", "vanno", "filtrar", "excel"])
     # TODO: Preguntar si executar la pipeline usant subprocess
 
 

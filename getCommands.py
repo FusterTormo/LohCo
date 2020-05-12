@@ -5,21 +5,6 @@
 CONSTANTS:
     Rutas de los programas y parametros de cada uno de los pasos dentro de la pipeline
 """
-# IDEA: Podrien ser getters amb els parametres per defecte. Seria mes llegible
-
-picardSort = "java -jar /opt/picard-tools-2.21.8/picard.jar SortSam INPUT=bwa.sam OUTPUT=bwa.sort.bam SORT_ORDER=coordinate" # Comando para ordenar el bam
-picardIndex = "java -jar /opt/picard-tools-2.21.8/picard.jar BuildBamIndex INPUT={bam}" # Comando para crear un indice en el bam ordenado
-bedtoolsBam2Bed = "bedtools bamtobed -i {bam} > bwa.bed" #Comando para crear un bed con todas las regiones donde se han alineado reads
-gatk1 = "/opt/gatk-4.1.4.1/gatk BaseRecalibrator -I {bam} -R {ref} --known-sites {dbsnp} -O recaldata.table" # Comando para realizar el primer paso de la recalibracion de bases sugerida por GATK
-gatk2 = "/opt/gatk-4.1.4.1/gatk ApplyBQSR -I {bam} -R {ref} -bqsr-recal-file recaldata.table -O bwa.recal.bam" # Comando para realizar el segundo paso de la recalibracion de bases sugerida por GATK
-bedtoolsCoverageAll = "bedtools coverage -hist -a {mani} -b {bam} > {output}" # Comando para calcular el coverage agrupado del bam en las regiones del manifest
-bedtoolsCoverageBase = "bedtools coverage -d -a {mani} -b {bam} > {output}" # Comando para calcular el coverage de cada una de las bases dentro de la region de interes
-markDup = "java -jar /opt/picard-tools-2.21.8/picard.jar MarkDuplicates INPUT={bam} OUTPUT=bwa.nodup.bam METRICS_FILE=dups_bam.txt" # Comando para marcar duplicados usando Picard tools
-vc1 = "/opt/strelka-2.9.10/bin/configureStrelkaGermlineWorkflow.py --bam {bam} --referenceFasta {ref} --exome --runDir {variantDir} --callRegions {mani}" # Comando para ejecutar el variant caller que se va a usar (Strelka2)
-vc2 = "./runWorkflow.py -m local -j 6 --quiet"
-annovar = "/opt/annovar20180416/convert2annovar.pl -format vcf4 -outfile {out} -includeinfo {vcf}"
-annovar2 = "/opt/annovar20180416/annotate_variation.pl -geneanno -buildver hg19 -hgvs -separate -out {output} {input} /opt/annovar20180416/humandb/"
-annovar3 = "/opt/annovar20180416/table_annovar.pl {input} /opt/annovar20180416/humandb/ -buildver hg19 -out {output} -remove -protocol refGene,avsnp150,1000g2015aug_all,1000g2015aug_afr,1000g2015aug_amr,1000g2015aug_eas,1000g2015aug_eur,1000g2015aug_sas,exac03,gnomad211_exome,gnomad211_genome,esp6500siv2_all,esp6500siv2_ea,esp6500siv2_aa,clinvar_20190305,cosmic70,dbnsfp35a --operation g,f,f,f,f,f,f,f,f,f,f,f,f,f,f,f,f -nastring NA -otherinfo"
 
 referencia = "/home/ffuster/share/biodata/solelab/referencies/ucsc/hg19.fa"
 manifest = "/home/ffuster/panalisi/resultats/manifest.bed"
@@ -40,7 +25,7 @@ pathAnalisi = "/home/ffuster/panalisi/resultats" # Ruta donde se ejecutan y guar
 prefijoTanda = "tanda" # Prefijo que tiene todas las tandas analizadas
 wd = "~/AUP" # Directorio de trabajo donde estan los scripts
 
-def getFastQC(f) :
+def getFastQC(input, output) :
     """Comando para ejecutar FastQC (control de calidad de los FASTQ).
 
     Los parametros indican
@@ -52,17 +37,19 @@ def getFastQC(f) :
 
     Parameters
     ----------
-        f : str
+        input : str
             Ruta al archivo FASTQ que se incrustara en el comando
+        output : str
+            Carpeta donde se guardara la salida del programa
 
     Returns
     -------
         str
             Comando para ejecutar FastQC en el archivo que se ha pasado por parametro
     """
-    return "/opt/FastQC/fastqc -o fastqc/ -f fastq -extract -q -t 6 {fastq}".format(f)
+    return "/opt/FastQC/fastqc -o {fastqc}/ -f fastq -extract -q -t 6 {fastq}".format(fastq = input, fastqc = output)
 
-def getAln(rg, ref, fw, rv) :
+def getAln(rg, ref, fw, rv, output) :
     """Comando para ejecutar BWA (alineamiento).
 
     Los parametros indican
@@ -71,4 +58,91 @@ def getAln(rg, ref, fw, rv) :
         -R Read Group que se pondra en el sam de salida. Este Read Group es necesario para poder ejecutar GATK (post-alineamiento)
 
     """
-    return "/opt/bwa.kit/bwa mem -M -t 6 -R {rg} {ref} {fw} {rv} > bwa.sam".format(rg = rg, ref = ref, fw = fw, rv = rv)
+    return "/opt/bwa.kit/bwa mem -M -t 6 -R {rg} {ref} {fw} {rv} > {out}".format(rg = rg, ref = ref, fw = fw, rv = rv, out = output)
+
+def getPcSort(input, output) :
+    """Comando para ordenar el bam, usando Picard tools SortBam
+
+    Los parametros indican
+        INPUT archivo de entrada que se quiere ordenar
+        OUTPUT nombre que tendra el archivo resultante (bwa.sort.bam)
+        SORT_ORDER tipo de ordenamiento que se quiere hacer en el archivo de entrada
+    """
+    return "java -jar /opt/picard-tools-2.21.8/picard.jar SortSam INPUT={input} OUTPUT={output} SORT_ORDER=coordinate".format(input = input, output = output)
+
+def getPcIndex(bam) :
+    """Comando para crear un indice en el bam ordenado
+    Los parametros indican
+        INPUT archivo de entrada que se quiere indexar
+    """
+    return "java -jar /opt/picard-tools-2.21.8/picard.jar BuildBamIndex INPUT={bam}".format(bam = bam)
+
+def getBam2bed(bam, bed) :
+    """Comando para crear un bed con todas las regiones donde se han alineado reads
+    Los parametros indican
+        -i archivo (bam) de entrada que se quiere convertir en formato bed
+    """
+    return "bedtools bamtobed -i {bam} > {bed}".format(bam = bam, bed = bed)
+
+def getGATKrecal(bam, ref, sites, output, regions = None) :
+    # Comando para realizar el primer paso de la recalibracion de bases sugerida por GATK
+    cmd = "/opt/gatk-4.1.4.1/gatk BaseRecalibrator -I {bam} -R {ref} --known-sites {dbsnp} -O recaldata.table".format(bam = bam, ref = ref, dbsnp = sites)
+    if regions != None :
+        cmd += "-L {mani}".format(mani = regions)
+    cmd += "\n"
+    # Comando para realizar el segundo paso de la recalibracion de bases sugerida por GATK
+    cmd += "/opt/gatk-4.1.4.1/gatk ApplyBQSR -I {bam} -R {ref} -bqsr-recal-file recaldata.table -O {output}".format(bam = bam, ref = ref, output = output)
+    if regions != None :
+        cmd += "-L {mani}".format(mani = regions)
+    return cmd
+
+def getPcMarkduplicates(input, output) :
+    """Comando para marcar duplicados usando Picard tools
+
+    Los parametros indican
+        INPUT archivo (bam) en el que se quieren marcar duplicados
+        OUTPUT nombre que tendra el bam con los duplicados marcados
+        METRICS_FILE archivo donde se muestran los reads que se han marcado como duplicados
+    """
+    return "java -jar /opt/picard-tools-2.21.8/picard.jar MarkDuplicates INPUT={bamIn} OUTPUT={bamOut} METRICS_FILE=dups_bam.txt".format(bamIn = input, bamOut = output)
+
+def getCoverageAll(regiones, bam, salida) :
+    """Comando para calcular el coverage agrupado del bam en las regiones del manifest
+    Los parametros indican
+        -hist la salida tendra formato histograma
+        -a regiones en las que se quiere calcular el coverage
+        -b bam con las regiones en las que se calculara el coverage
+    """
+    return "bedtools coverage -hist -a {mani} -b {bam} > {output}".format(mani = regiones, bam = bam, output = salida)
+
+def getCoverageBase(regiones, bam, salida) :
+    """Comando para calcular el coverage de cada una de las bases dentro de la region de interes
+    Los parametros indican
+        -d la salida mostrara el coverage base por base
+        -a regiones en las que se quiere calcular el coverage
+        -b bam con las regiones en las que se quiere calcular el coverage
+
+    """
+    return "bedtools coverage -d -a {mani} -b {bam} > {output}".format(mani = regiones, bam = bam, output = salida)
+
+def getStrelka2(bam, referencia, output, regiones = None) :
+    """ Comando para ejecutar el variant caller Strelka2"""
+    cmd = "/opt/strelka-2.9.10/bin/configureStrelkaGermlineWorkflow.py --bam {bam} --referenceFasta {ref} --runDir {variantDir}".format(bam = bam, ref = referencia, variantDir = output)
+    if regiones != None :
+        cmd += " --exome --callRegions {mani}"
+    cmd += "\ncd {variantDir}\n".format(output)
+    cmd += "./runWorkflow.py -m local -j 6 --quiet"
+    return cmd
+
+def getMutect2(input, referencia, germline, output, regiones = None) :
+    cmd = "/opt/gatk-4.1.4.1/gatk Mutect2 -I {input} -R {ref} --germline-resource {gnomad} -O {salida}.vcf".format(input = input, ref = referencia, gnomad = germline, salida = output)
+    if regiones != None :
+        cmd += " -L {manifest}".format(manifest = regiones)
+    cmd += "\n"
+    cmd += "/opt/gatk-4.1.4.1/gatk FilterMutectCalls -R {ref} -V {id}.vcf --stats {id}.vcf.stats --filtering-stats {id}.filter.tsv -O {id}.filtered.vcf".format(ref = referencia, id = output)
+
+def getANNOVAR(vcf, prefix) :
+    cmd = "/opt/annovar20180416/convert2annovar.pl -format vcf4 -outfile {out}.av -includeinfo {input}\n".format(out = prefix, input = vcf)
+    cmd += "/opt/annovar20180416/annotate_variation.pl -geneanno -buildver hg19 -hgvs -separate -out {prefix} {prefix}.av /opt/annovar20180416/humandb/\n".format(prefix = prefix)
+    cmd += "/opt/annovar20180416/table_annovar.pl {input}.av /opt/annovar20180416/humandb/ -buildver hg19 -out {input} -remove -protocol refGene,avsnp150,1000g2015aug_all,1000g2015aug_afr,1000g2015aug_amr,1000g2015aug_eas,1000g2015aug_eur,1000g2015aug_sas,exac03,gnomad211_exome,gnomad211_genome,esp6500siv2_all,esp6500siv2_ea,esp6500siv2_aa,clinvar_20190305,cosmic70,dbnsfp35a --operation g,f,f,f,f,f,f,f,f,f,f,f,f,f,f,f,f -nastring NA -otherinfo".format(input = prefix)
+    return cmd
