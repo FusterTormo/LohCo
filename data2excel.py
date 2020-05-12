@@ -12,7 +12,7 @@ import xlsxwriter
 # Archivos que se usaran para recoger la informacion que se guardara en el excel final
 qc = "../alnQC.txt"
 cov = "../coverage.txt"
-arxius = ["cand.reanno.tsv", "lowVAF.reanno.tsv", "highMAF.reanno.tsv", "conseq.reanno.tsv", "pass.reanno.tsv", "raw.reanno.tsv"]
+arxius = ["cand.reanno.tsv", "lowVAF.reanno.tsv", "highMAF.reanno.tsv", "conseq.reanno.tsv", "raw.reanno.tsv"]
 stats = "variants.stats.txt"
 # Orden de las columnas en que se colocaran en cada una de las pestanas del excel
 orden = ["sample", "IGV_link", "Gene.refGene", "Chr", "Start", "End", "Ref", "Alt", "GT", "GQ", "MQ", "Func.refGene", "ExonicFunc.refGene", "AAChange.refGene", "GeneDetail.refGene",
@@ -266,9 +266,6 @@ def escribirEstadisticas(hoja, libro) :
         hoja.write(1, 8, "RAW", izquierda)
         hoja.write(1, 9, var["Totales"], derecha)
         del var["Totales"]
-        hoja.write(2, 8, "PASS strelka2", izquierda)
-        hoja.write(2, 9, var["sonPASS"], derecha)
-        del var["sonPASS"]
         hoja.write(3, 8, "Consequence", izquierda)
         hoja.write(3, 9, var["Conseq"], derecha)
         del var["Conseq"]

@@ -176,7 +176,6 @@ def prepararPanel(ruta, acciones) :
             Ruta absoluta donde esta la carpeta con los FASTQ que se van a analizar en esta pipeline
         acciones : list
             Lista de acciones que se pueden agregar al bash. Valores aceptados: ["copiar","fastqc", "aln", "recal", "mdups", "bamqc", "coverage", "strelkaGerm", "mutectGerm", "vanno", "filtrar", "excel"]
-            **Pendiente hacer "strelkaSoma", "mutectSoma"**
     """
     os.chdir(pathAnalisi) # Cambiar el directorio de trabajo a la carpeta de analisis
     tnd = getTanda() # Crear el nombre de la carpeta donde se guardaran los analisis y el nombre del bash con todos los comandos
@@ -261,7 +260,7 @@ def prepararPanel(ruta, acciones) :
             if "bamqc" in acciones :
                 fi.write("\tpython3 {}/bamQC.py\n".format(wd)) # Hay una opcion de lanzar pctDups (calcular porcentaje de duplicados) en caso de exomas
             # Variant calling. La carpeta donde se guardan los datos se llama variantCalling. En caso de queren cambiarse, modificar las dos siguientes lineas
-            if "vcalGerm" in acciones :
+            if "strelkaGerm" in acciones :
                 fi.write("\n\t# Variant calling. Strelka2\n")
                 if "mdups" in acciones :
                     fi.write("\t" + cmd.getStrelka2("alignment/bwa.nodup.bam", "$ref", "variantCalling", "$gzmani", "variantCalling").replace("\n", "\n\t") + "\n")
@@ -272,6 +271,14 @@ def prepararPanel(ruta, acciones) :
                 fi.write("\trsync -aP results/variants/variants.vcf.gz .\n")
                 fi.write("\tgunzip variants.vcf.gz\n")
                 fi.write("\tmv variants.vcf strelka2.vcf")
+            elif "mutectGerm" in acciones :
+                fi.write("\n\t#Variant calling. Mutect2\n")
+                if "mdups" in acciones :
+                    fi.write("\t" + cmd.getMutect2("alignment/bwa.nodup.bam", "$ref", "$sites", "mutect.vcf", "$mani").replace("\n", "\n\t") + "\n")
+                elif "recal" in acciones :
+                    fi.write("\t" + cmd.getMutect2("alignment/bwa.recal.bam", "$ref", "$sites", "mutect.vcf", "$mani").replace("\n", "\n\t") + "\n")
+                else :
+                    fi.write("\t" + cmd.getMutect2("alignment/bwa.sort.bam", "$ref", "$sites", "mutect.vcf", "$mani").replace("\n", "\n\t") + "\n")
             # Anotacion de variantes usando ANNOVAR
             if "vanno" in acciones :
                 fi.write("\n\t# Anotacion y filtrado de variantes. ANNOVAR y myvariant.info\n")
