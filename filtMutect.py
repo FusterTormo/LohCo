@@ -7,7 +7,7 @@ import reAnnoFilt as anno
 
 def main(ruta, samplename = "noName") :
     todas = anno.convertirData(ruta)
-    for t in todas :
+    for p in todas :
         p["population_max"], p["population_max_name"] = anno.maximMaf(p)
         p["predictor_summary"] = anno.resumPredictors(p)
         p["Strand_bias_score"] = p["STRANDQ"] # Mutect2 no proporciona los reads forward y los reads reverse de la variante
