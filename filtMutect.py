@@ -10,7 +10,10 @@ def main(ruta, samplename = "noName") :
     for p in todas :
         p["population_max"], p["population_max_name"] = anno.maximMaf(p)
         p["predictor_summary"] = anno.resumPredictors(p)
-        p["Strand_bias_score"] = p["STRANDQ"] # Mutect2 no proporciona los reads forward y los reads reverse de la variante
+        if "STRANDQ" in p.keys() :
+            p["Strand_bias_score"] = p["STRANDQ"] # Mutect2 no proporciona los reads forward y los reads reverse de la variante
+        else :
+            p["Strand_bias_score"] = "NA"
         p["Ref_depth"] = p["AD"].split(",")[0]
         p["Alt_depth"] = p["AD"].split(",")[1]
         if "AF" in p.keys() :
