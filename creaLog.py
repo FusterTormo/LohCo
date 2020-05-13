@@ -287,7 +287,7 @@ def prepararPanel(ruta, acciones) :
             # Re-anotacion y filtrado de variantes usando myvariant.info
             if "filtrar" in acciones :
                 if "mutectGerm" in acciones :
-                    fi.write("python3 {wd}/filtMutect.py {input} {samplename}\n").format(wd = wd, input = "raw.hg19_multianno.txt", samplename = "$alias"))
+                    fi.write("python3 {wd}/filtMutect.py {input} {samplename}\n".format(wd = wd, input = "raw.hg19_multianno.txt", samplename = "$alias"))
                 elif "strelkaGerm" in acciones :
                     fi.write("\tpython3 {wd}/filtStrelka.py {input} {samplename}".format(wd = wd, input = "raw.hg19_multianno.txt", samplename = "$alias"))
             # Juntar los resultados obtenidos en un Excel
