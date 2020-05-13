@@ -157,7 +157,6 @@ def comprobarArchivos() :
         print("WARNING: No se encuentra el archivo con la lista de genes del manifest. Creando el archivo")
         doListaGenes()
 
-
 def prepararPanel(ruta, acciones) :
     """
     Programa principal de la libreria. Prepara el log con todos los comandos necesarios para lanzar la pipeline

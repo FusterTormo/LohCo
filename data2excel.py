@@ -16,7 +16,9 @@ arxius = ["cand.reanno.tsv", "lowVAF.reanno.tsv", "highMAF.reanno.tsv", "conseq.
 stats = "variants.stats.txt"
 # Orden de las columnas en que se colocaran en cada una de las pestanas del excel
 orden = ["sample", "IGV_link", "Gene.refGene", "Chr", "Start", "End", "Ref", "Alt", "GT", "GQ", "MQ", "Func.refGene", "ExonicFunc.refGene", "AAChange.refGene", "GeneDetail.refGene",
-"Ref_depth", "Alt_depth", "DP", "DPF", "AD", "ADF", "ADR", "VAF", "population_max", "population_max_name", "predictor_summary", "Strand_bias_score", "SB",
+"Ref_depth", "Alt_depth", "DP", "DPF", "AD", "ADF", "ADR", "VAF", "population_max", "population_max_name", "gnomad_exome_AF_popmax", "gnomad_exome_non_topmed_AF_popmax",
+"gnomad_genome_AF_popmax", "gnomad_genome_non_topmed_AF_popmax",
+"predictor_summary", "Strand_bias_score", "SB",
 "avsnp150", "CLNALLELEID", "CLNDN", "CLNDISDB", "CLNREVSTAT", "CLNSIG", "cosmic70",
 "SIFT_score", "SIFT_pred", "Polyphen2_HDIV_score", "Polyphen2_HDIV_pred", "Polyphen2_HVAR_score", "Polyphen2_HVAR_pred",
 "LRT_score", "LRT_pred", "MutationTaster_score", "MutationTaster_pred", "MutationAssessor_score", "MutationAssessor_pred", "FATHMM_score", "FATHMM_pred", "PROVEAN_score", "PROVEAN_pred",
@@ -60,7 +62,8 @@ def crearCabecera(hoja, libro) :
     cabecera = ["Analysis", "Interpretation", "Sample", "IGV_link", "IGV", "Gene", "Chromosome", "Start", "End", "Ref", "Alt", "Genotype", "Genome Quality", "Mapping Quality", "Mutation type",
     "Exonic mutation type", "Amino acid change", "Transcript",
     "Reference depth", "Alterated depth", "Position depth", "Discarded reads", "Allelic depths", "Forward allelic depths", "Reverse allelic depths", "VAF", "Population max MAF",
-    "Population reported max MAF", "Predictor summary", "SMD strand bias score", "Strelka2 strand bias score",
+    "gNOMAD Exome popmax", "gNOMAD Exome nonTOPMed popmax", "gNOMAD Genome popmax", "gNOMAD Genome nonTOPMed popmax",
+    "Population reported max MAF", "Predictor summary", "SMD strand bias score", "Variant caller strand bias score",
     "DBSNP", "ClinVar CLNALLELEID", "ClinVar CLNDN", "ClinVar CLNDISDB", "ClinVar CLNREVSTAT", "Clinvar CLNSIG", "COSMIC",
     "SIFT score", "SIFT pred", "Polyphen2 HDIV score", "Polyphen2 HDIV pred", "Polyphen2 HVAR score", "Polyphen2 HVAR pred",
     "LRT score", "LRT pred", "MutationTaster score", "MutationTaster pred", "MutationAssessor score", "MutationAssessor pred", "FATHMM score", "FATHMM pred", "PROVEAN score", "PROVEAN pred",
