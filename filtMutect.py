@@ -17,7 +17,10 @@ def main(ruta, samplename = "noName") :
         p["Ref_depth"] = p["AD"].split(",")[0]
         p["Alt_depth"] = p["AD"].split(",")[1]
         if "AF" in p.keys() :
-             p["VAF"] = float(p["AF"])
+            if p["AF"].find(",") > -1 :
+                p["VAF"] = float(p["AF"].split(",")[0])
+            else :
+                p["VAF"] = float(p["AF"])
         else :
             tmp = p["AD"].split(",")
             dp = 0
