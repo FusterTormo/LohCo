@@ -297,7 +297,7 @@ def crearExcel(nom) :
     wb = xlsxwriter.Workbook("{}.xlsx".format(nom), {"strings_to_numbers" : True})
     full = wb.add_worksheet("Filtered_def") #Hoja vacio para colocar las variantes que pasan el filtro visual
     crearCabecera(full, wb)
-    full.freeze_panes(2,0)
+    full.freeze_panes(1,0)
     #Comprobar si existen los archivos de variantes, leerlos y montarlos en el excel
     for a in arxius :
         if os.path.isfile(a) :
@@ -305,7 +305,7 @@ def crearExcel(nom) :
             full = wb.add_worksheet(aux.capitalize())
             if aux == "cand" :
                 full.activate()
-            full.freeze_panes(2,0)
+            full.freeze_panes(1,0)
             dc = convertirArchivo(a)
             filaActual = crearCabecera(full, wb)
             filaActual = escribirVariantes(full, wb, dc, filaActual)
