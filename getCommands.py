@@ -88,12 +88,12 @@ def getGATKrecal(bam, ref, sites, output, regions = None) :
     # Comando para realizar el primer paso de la recalibracion de bases sugerida por GATK
     cmd = "/opt/gatk-4.1.4.1/gatk BaseRecalibrator -I {bam} -R {ref} --known-sites {dbsnp} -O recaldata.table".format(bam = bam, ref = ref, dbsnp = sites)
     if regions != None :
-        cmd += "-L {mani}".format(mani = regions)
+        cmd += " -L {mani}".format(mani = regions)
     cmd += "\n"
     # Comando para realizar el segundo paso de la recalibracion de bases sugerida por GATK
     cmd += "/opt/gatk-4.1.4.1/gatk ApplyBQSR -I {bam} -R {ref} -bqsr-recal-file recaldata.table -O {output}".format(bam = bam, ref = ref, output = output)
     if regions != None :
-        cmd += "-L {mani}".format(mani = regions)
+        cmd += " -L {mani}".format(mani = regions)
     return cmd
 
 def getPcMarkduplicates(input, output) :
@@ -140,6 +140,7 @@ def getMutect2(input, referencia, germline, output, regiones = None) :
         cmd += " -L {manifest}".format(manifest = regiones)
     cmd += "\n"
     cmd += "/opt/gatk-4.1.4.1/gatk FilterMutectCalls -R {ref} -V {id}.vcf --stats {id}.vcf.stats --filtering-stats {id}.filter.tsv -O {id}.filtered.vcf".format(ref = referencia, id = output)
+    return cmd
 
 def getANNOVAR(vcf, prefix) :
     cmd = "/opt/annovar20180416/convert2annovar.pl -format vcf4 -outfile {out}.av -includeinfo {input}\n".format(out = prefix, input = vcf)

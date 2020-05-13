@@ -240,18 +240,18 @@ def prepararPanel(ruta, acciones) :
             if "recal" in acciones :
                 fi.write("\n\t# Post-Alineamiento. GATK\n")
                 # GATKrecal devuelve dos ordenes, separadas por \n. Como queremos que se tabule tambien la segunda linea, se reemplaza el \n por \n + \t
-                fi.write("\t" + cmd.getGATKrecal("bwa.sort.bam", "$ref", "$sites", "$mani", "bwa.recal.bam").replace("\n", "\n\t") + "\n")
+                fi.write("\t" + cmd.getGATKrecal("bwa.sort.bam", "$ref", "$sites", "bwa.recal.bam", "$mani").replace("\n", "\n\t") + "\n")
 
             # Marcar duplicados
             if "mdups" in acciones :
                 fi.write("\t" + cmd.getPcMarkduplicates("bwa.recal.bam", "bwa.nodup.bam") + "\n")
                 fi.write("\t" + cmd.getPcIndex("bwa.nodup.bam") + "\n")
-            fi.write("\tcd ..")
+            fi.write("\tcd ..\n")
             # Estudios de coverage, on target, off target, porcentaje de bases con X coverage...
             if "coverage" in acciones :
                 fi.write("\n\t# Control de calidad del alineamiento y estudio de coverage\n")
                 fi.write("\t" + cmd.getCoverageAll("$mani","alignment/bwa.recal.bam", "coverage.txt") + "\n")
-                fi.write("\t" + cmd.getCoverageBase("$mani", "bwaAlign/bwa.recal.bam", "coverageBase.txt") + "\n")
+                fi.write("\t" + cmd.getCoverageBase("$mani", "alignment/bwa.recal.bam", "coverageBase.txt") + "\n")
                 fi.write("\tgrep '^all' coverage.txt > coverageAll.txt\n")
                 fi.write("\trm coverage.txt\n")
                 fi.write("\tRscript {}/coveragePanells.R\n".format(wd))
@@ -274,19 +274,22 @@ def prepararPanel(ruta, acciones) :
             elif "mutectGerm" in acciones :
                 fi.write("\n\t#Variant calling. Mutect2\n")
                 if "mdups" in acciones :
-                    fi.write("\t" + cmd.getMutect2("alignment/bwa.nodup.bam", "$ref", "$sites", "mutect.vcf", "$mani").replace("\n", "\n\t") + "\n")
+                    fi.write("\t" + cmd.getMutect2("alignment/bwa.nodup.bam", "$ref", "$sites", "mutect", "$mani").replace("\n", "\n\t") + "\n")
                 elif "recal" in acciones :
-                    fi.write("\t" + cmd.getMutect2("alignment/bwa.recal.bam", "$ref", "$sites", "mutect.vcf", "$mani").replace("\n", "\n\t") + "\n")
+                    fi.write("\t" + cmd.getMutect2("alignment/bwa.recal.bam", "$ref", "$sites", "mutect", "$mani").replace("\n", "\n\t") + "\n")
                 else :
-                    fi.write("\t" + cmd.getMutect2("alignment/bwa.sort.bam", "$ref", "$sites", "mutect.vcf", "$mani").replace("\n", "\n\t") + "\n")
+                    fi.write("\t" + cmd.getMutect2("alignment/bwa.sort.bam", "$ref", "$sites", "mutect", "$mani").replace("\n", "\n\t") + "\n")
             # Anotacion de variantes usando ANNOVAR
             if "vanno" in acciones :
                 fi.write("\n\t# Anotacion y filtrado de variantes. ANNOVAR y myvariant.info\n")
-                fi.write("\t" + cmd.getANNOVAR("strelka2.vcf", "raw") + "\n")
+                fi.write("\t" + cmd.getANNOVAR("strelka2.vcf", "raw").replace("\n", "\t\n") + "\n")
 
             # Re-anotacion y filtrado de variantes usando myvariant.info
             if "filtrar" in acciones :
-                fi.write("\tpython3 {wd}/reAnnoFilt.py {input} {samplename}\n".format(wd = wd, input = "raw.hg19_multianno.txt", samplename = "$alias"))
+                if "mutectGerm" in acciones :
+                    fi.write("python3 {wd}/filtMutect.py {input} {samplename}\n").format(wd = wd, input = "raw.hg19_multianno.txt", samplename = "$alias"))
+                elif "strelkaGerm" in acciones :
+                    fi.write("\tpython3 {wd}/filtStrelka.py {input} {samplename}".format(wd = wd, input = "raw.hg19_multianno.txt", samplename = "$alias"))
             # Juntar los resultados obtenidos en un Excel
             if "excel" in acciones :
                 fi.write("\tpython3 {wd}/data2excel.py {output}\n".format(wd = wd, output = "$alias"))
