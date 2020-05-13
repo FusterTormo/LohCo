@@ -8,7 +8,7 @@ MAIN: Comprobar la calidad del alineamiento
 import os
 
 # IDEA: Algunes d'aquestes constants podrien anar en una llibreria de constants
-bed = "bwaAlign/bwa.bed"
+bed = "alignment/bwa.bed"
 fastqc = "fastqc"
 fastqcFI = "fastqc_data.txt"
 manifest = "/home/ffuster/panalisi/resultats/manifest.bed"

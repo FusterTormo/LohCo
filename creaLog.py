@@ -271,6 +271,13 @@ def prepararPanel(ruta, acciones) :
                 fi.write("\trsync -aP results/variants/variants.vcf.gz .\n")
                 fi.write("\tgunzip variants.vcf.gz\n")
                 fi.write("\tmv variants.vcf strelka2.vcf")
+                # Anotacion de variantes usando ANNOVAR
+                if "vanno" in acciones :
+                    fi.write("\n\t# Anotacion y filtrado de variantes. ANNOVAR y myvariant.info\n")
+                    fi.write("\t" + cmd.getANNOVAR("strelka2.vcf", "raw").replace("\n", "\t\n") + "\n")
+                # Re-anotacion y filtrado de variantes usando myvariant.info
+                if "filtrar" in acciones :
+                    fi.write("\tpython3 {wd}/filtStrelka.py {input} {samplename}".format(wd = wd, input = "raw.hg19_multianno.txt", samplename = "$alias"))
             elif "mutectGerm" in acciones :
                 fi.write("\n\t#Variant calling. Mutect2\n")
                 if "mdups" in acciones :
@@ -279,17 +286,16 @@ def prepararPanel(ruta, acciones) :
                     fi.write("\t" + cmd.getMutect2("alignment/bwa.recal.bam", "$ref", "$sites", "mutect", "$mani").replace("\n", "\n\t") + "\n")
                 else :
                     fi.write("\t" + cmd.getMutect2("alignment/bwa.sort.bam", "$ref", "$sites", "mutect", "$mani").replace("\n", "\n\t") + "\n")
-            # Anotacion de variantes usando ANNOVAR
-            if "vanno" in acciones :
-                fi.write("\n\t# Anotacion y filtrado de variantes. ANNOVAR y myvariant.info\n")
-                fi.write("\t" + cmd.getANNOVAR("strelka2.vcf", "raw").replace("\n", "\t\n") + "\n")
+                # Anotacion de variantes usando ANNOVAR
+                if "vanno" in acciones :
+                    fi.write("\n\t# Anotacion y filtrado de variantes. ANNOVAR y myvariant.info\n")
+                    fi.write("\t" + cmd.getANNOVAR("mutect2.vcf", "raw").replace("\n", "\t\n") + "\n")
+                # Re-anotacion y filtrado de variantes usando myvariant.info
+                if "filtrar" in acciones :
+                    if "mutectGerm" in acciones :
+                        fi.write("python3 {wd}/filtMutect.py {input} {samplename}\n".format(wd = wd, input = "raw.hg19_multianno.txt", samplename = "$alias"))
 
-            # Re-anotacion y filtrado de variantes usando myvariant.info
-            if "filtrar" in acciones :
-                if "mutectGerm" in acciones :
-                    fi.write("python3 {wd}/filtMutect.py {input} {samplename}\n".format(wd = wd, input = "raw.hg19_multianno.txt", samplename = "$alias"))
-                elif "strelkaGerm" in acciones :
-                    fi.write("\tpython3 {wd}/filtStrelka.py {input} {samplename}".format(wd = wd, input = "raw.hg19_multianno.txt", samplename = "$alias"))
+
             # Juntar los resultados obtenidos en un Excel
             if "excel" in acciones :
                 fi.write("\tpython3 {wd}/data2excel.py {output}\n".format(wd = wd, output = "$alias"))
