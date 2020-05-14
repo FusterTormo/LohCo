@@ -88,9 +88,9 @@ def ejecutar(orden) :
 def alinear(muestra) :
     """Alinea, ordena, recalibra y marca duplicados para la muestra pasada por parametro"""
     sams = []
-    fi.write("cd {}\n".format(os.path.abspath(os.getcwd())))
     # Alinear
     if len(muestra["fastq"]) > 1 :
+        it = 1
         for sample in muestra["fastq"] :
             aux = "bwa_{}.sam".format(it)
             sams.append(aux)
@@ -141,7 +141,6 @@ def main() :
             else :
                 print("INFO: Analizando {}".format(folder))
                 os.makedirs(folder, 0o754)
-                it = 1
                 # Ordenes para alinear la muestra
                 os.chdir(folder)
                 with open(logfile, "a") as fi :
