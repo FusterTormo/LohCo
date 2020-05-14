@@ -1,16 +1,19 @@
 # -*- coding: utf-8 -*-
 #!/usr/bin/python
 
-import sys
-import subprocess
+import os
 import re
+import subprocess
+import sys
 
 #Librerias propias
 import getCommands as gc
 
 # Constantes
-hgref = ""
-snpSites = ""
+hgref = "/home/ffuster/share/biodata/solelab/referencies/gatk_hg38/hg38.fa"
+snpSites = "/home/ffuster/share/biodata/solelab/referencies/gnomad.genomes.r3.0.sites.vcf"
+logfile = "/home/ffuster/share/gsole/WES_Projecte_SMD_NMP/analisi_Fco/log.sh"
+wd = "/home/ffuster/share/gsole/WES_Projecte_SMD_NMP/analisi_Fco"
 
 def crearRG(fq) :
     """Crear el read group para el FASTQ pasado por parametro"""
@@ -81,16 +84,28 @@ def main() :
             elif v["gender"] == "M" :
                 c = "C3"
         if c != "" and c != "C2" and c != "C3" :
-            folder = "{}VS{}".format(t,c)
+            folder = "{}vs{}".format(k,c)
             if os.path.isdir(folder) : # La carpeta existe, puede que algo se haya ejecutado
                 print("INFO: Comprobar que se ha hecho del analisis")
             else :
                 print("INFO: Analizando {}".format(folder))
                 os.makedirs(folder, 0o754)
                 it = 1
-                for sample in v["fastq"] :
-                    print(gc.getAln(sample[2], hgref, sample[0], sample[1], "bwa_{}.sam".format(it)))
-                    it += 1
+                # Ordenes para alinear la muestra
+                os.chdir(folder)
+                if len(v["fastq"]) > 1 :
+                    for sample in v["fastq"] :
+                        cmd = gc.getAln(sample[2], hgref, sample[0], sample[1], "bwa_{}.sam".format(it))
+                        proc = subprocess.Popen(cmd, shell = True, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+                        out, err = proc.communicate()
+                        if proc.returncode == 0:
+                            with open(logfile, "a") as fi :
+                                fi.write("{}\n".format(cmd))
+                        else :
+                            print("ERROR: Al ejecutar {}\n\nDescripcion: {}".format(cmd, err))
+                            sys.exit()
+                        it += 1
+                os.chdir(wd)
                 sys.exit()
             #alinear(tm)
             #alinear(cn)
