@@ -131,9 +131,9 @@ def main() :
         if c != "" and c != "C2" and c != "C3" :
             folder = "{}vs{}".format(k,c)
             if os.path.isdir(folder) : # La carpeta existe, puede que algo se haya ejecutado
-                os.chdir(folder)
                 #Guardar todos los archivos de la carpeta en una lista
                 filenames = os.listdir(folder)
+                os.chdir(folder)
                 if "bwa.nodup.bam" not in filenames :
                     alinear(v)
                 else :
