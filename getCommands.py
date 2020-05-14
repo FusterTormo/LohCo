@@ -65,10 +65,26 @@ def getPcSort(input, output) :
 
     Los parametros indican
         INPUT archivo de entrada que se quiere ordenar
-        OUTPUT nombre que tendra el archivo resultante (bwa.sort.bam)
-        SORT_ORDER tipo de ordenamiento que se quiere hacer en el archivo de entrada
+        OUTPUT nombre que tendra el archivo resultante
+        SORT_ORDER tipo de ordenamiento que se quiere hacer en el archivo de salida
     """
     return "java -jar /opt/picard-tools-2.21.8/picard.jar SortSam INPUT={input} OUTPUT={output} SORT_ORDER=coordinate".format(input = input, output = output)
+
+def getPcMerge(input, output) :
+    """Comando para ordenar una lista de sams
+
+    Los parametros indican
+        INPUT cada uno de los sam de entrada que se quieren ordenar
+        OUTPUT nombre que tendra el archivo bam resultante
+        SORT_ORDER tipo de ordenamiento que se quiere hacer en el archivo de salida
+        USE_THREADING flag para lanzar el comando en paralelo
+        TMP_DIR directorio donde se guardaran los archivos temporales
+    """
+    cmd = "java -jar /opt/picard-tools-2.21.8/picard.jar MergeSamFiles "
+    for i in input :
+        cmd += "INPUT={} ".format(i)
+    cmd += "OUTPUT={} SORT_ORDER=coordinate USE_THREADING=true TMP_DIR=/home/ffuster/share/gsole"
+    return cmd
 
 def getPcIndex(bam) :
     """Comando para crear un indice en el bam ordenado

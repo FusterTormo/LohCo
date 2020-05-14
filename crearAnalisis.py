@@ -45,7 +45,7 @@ def leerMuestras() :
                     fcell = aux[0].split("(")[0]
                     fq1 = "{dir}/{flowcell}_{lane}_{index}_1.fastq.gz".format(dir = dirpath, flowcell = fcell, lane = aux[1], index = aux[2])
                     fq2 = "{dir}/{flowcell}_{lane}_{index}_2.fastq.gz".format(dir = dirpath, flowcell = fcell, lane = aux[1], index = aux[2])
-                    rg = crearRG(fq1.split("/")[1])
+                    rg = crearRG(fq1.split("/")[-1])
                     if id.startswith("CD3") or id.endswith("CD3") : # El identificador indica que es un control
                         if id not in controls.keys() :
                             controls[id] = {"fastq" : [[fq1, fq2, rg]]}
@@ -74,6 +74,50 @@ def getControl(muestra, controles) :
 
     return idmuestra
 
+def ejecutar(orden) :
+    proc = subprocess.Popen(orden, shell = True, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+    out, err = proc.communicate()
+    if proc.returncode == 0:
+        # Escribir la orden finalizada en el log.
+        with open(logfile, "a") as fi :
+            fi.write("{}\n".format(orden))
+    else :
+        print("ERROR: Al ejecutar {cmd}\n\nDescripcion: {dsc}\nComando: {cmd}".format(cmd = orden, dsc = err))
+        sys.exit()
+
+def alinear(muestra) :
+    """Alinea, ordena, recalibra y marca duplicados para la muestra pasada por parametro"""
+    sams = []
+    fi.write("cd {}\n".format(os.path.abspath(os.getcwd())))
+    # Alinear
+    if len(muestra["fastq"]) > 1 :
+        for sample in muestra["fastq"] :
+            aux = "bwa_{}.sam".format(it)
+            sams.append(aux)
+            cmd = gc.getAln(sample[2], hgref, sample[0], sample[1], aux)
+            ejecutar(cmd)
+            it += 1
+    else :
+        sams.append("bwa.sam")
+        cmd = gc.getAln(sample[2], hgref, sample[0], sample[1], "bwa.sam")
+        ejecutar(cmd)
+    # Ordenar
+    if len(sams) == 1 :
+        cmd = gc.getPcSort("bwa.sam", "bwa.sort.bam")
+    else :
+        cmd = gc.getPcMerge(sams, "bwa.sort.bam")
+    ejecutar(cmd)
+    # A partir de este paso ya se trabaja con un unico archivo bam
+    ejecutar(gc.getPcIndex("bwa.sort.bam"))
+    ejecutar(gc.getGATKrecal("bwa.sort.bam", hgref, snpSites, "bwa.recal.bam"))
+    ejecutar(gc.getPcMarkduplicates("bwa.recal.bam", "bwa.nodup.bam"))
+    # Eliminar todos los archivos temporales
+    # for a in sams :
+    #     os.remove(a)
+    # os.remove("bwa.sort.bam")
+    # os.remove("bwa.sort.bai")
+    # os.remove("bwa.recal.bam")
+    # os.remove("bwa.recal.bai")
 
 def main() :
     tm, cn = leerMuestras()
@@ -87,25 +131,23 @@ def main() :
         if c != "" and c != "C2" and c != "C3" :
             folder = "{}vs{}".format(k,c)
             if os.path.isdir(folder) : # La carpeta existe, puede que algo se haya ejecutado
-                print("INFO: Comprobar que se ha hecho del analisis")
+                os.chdir(folder)
+                #Guardar todos los archivos de la carpeta en una lista (filenames)
+                for root, dirs, filenames in os.walk(folder) :
+                    break
+                if "bwa.nodup.bam" not in filenames :
+                    alinear(v)
+                else :
+                    print("TODO: Comprobar si los variant calls se han hecho en la carpeta")
             else :
                 print("INFO: Analizando {}".format(folder))
                 os.makedirs(folder, 0o754)
                 it = 1
                 # Ordenes para alinear la muestra
                 os.chdir(folder)
-                if len(v["fastq"]) > 1 :
-                    for sample in v["fastq"] :
-                        cmd = gc.getAln(sample[2], hgref, sample[0], sample[1], "bwa_{}.sam".format(it))
-                        proc = subprocess.Popen(cmd, shell = True, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
-                        out, err = proc.communicate()
-                        if proc.returncode == 0:
-                            with open(logfile, "a") as fi :
-                                fi.write("{}\n".format(cmd))
-                        else :
-                            print("ERROR: Al ejecutar {}\n\nDescripcion: {}".format(cmd, err))
-                            sys.exit()
-                        it += 1
+                with open(logfile, "a") as fi :
+                    fi.write("cd {}\n".format(os.path.abspath(os.getcwd())))
+                alinear(v)
                 os.chdir(wd)
                 sys.exit()
             #alinear(tm)
