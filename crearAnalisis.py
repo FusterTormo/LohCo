@@ -28,7 +28,8 @@ def leerMuestras() :
     El diccionario de muestras control no tendra informacion del genero. Pero se tiene en cuenta que, de los controles generales, C2 es una mujer y C3 es un hombre
     """
     arx = ["MDS_12.csv", "MDS_13.csv", "MDS_14.csv", "MDS_15.csv"]
-    paths = {"MDS_12.csv" : "../MDS_12/20190618/FASTQ", "MDS_13.csv" : "../MDS_13/20190612/FASTQ", "MDS_14.csv" : "../MDS_14/20200114/FASTQ", "MDS_15.csv" : "../MDS_15/20200114/FASTQ"}
+    paths = {"MDS_12.csv" : "/home/ffuster/share/gsole/WES_Projecte_SMD_NMP/MDS_12/20190618/FASTQ", "MDS_13.csv" : "/home/ffuster/share/gsole/WES_Projecte_SMD_NMP/MDS_13/20190612/FASTQ",
+    "MDS_14.csv" : "/home/ffuster/share/gsole/WES_Projecte_SMD_NMP/MDS_14/20200114/FASTQ", "MDS_15.csv" : "/home/ffuster/share/gsole/WES_Projecte_SMD_NMP/MDS_15/20200114/FASTQ"}
     tumors = {}
     controls = {}
     for a in arx :
