@@ -89,6 +89,7 @@ def doTest(gene, region) :
     results = "INFO: Final score for {}\n".format(gene)
     results += "\tPositive cases: {}\n\tNegative cases: {}\n\tNeutral cases: {}\n".format(len(cases_positive), len(cases_negative), len(cases_neutral))
     results += "\n\tFACETS score: {}\n\tascatNGS score: {}\n\tSequenza score: {}\n".format(scoreF, scoreA, scoreS)
+    return results
 
 def main() :
     brca1 = ["17", 43044295, 43170245]
@@ -107,3 +108,5 @@ def main() :
     print(test2)
     print(test3)
     print(test4)
+
+main()
