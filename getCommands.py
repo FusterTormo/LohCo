@@ -83,7 +83,7 @@ def getPcMerge(input, output) :
     cmd = "java -jar /opt/picard-tools-2.21.8/picard.jar MergeSamFiles "
     for i in input :
         cmd += "INPUT={} ".format(i)
-    cmd += "OUTPUT={} SORT_ORDER=coordinate USE_THREADING=true TMP_DIR=/home/ffuster/share/gsole"
+    cmd += "OUTPUT={} SORT_ORDER=coordinate USE_THREADING=true TMP_DIR=/home/ffuster/share/gsole".format(output)
     return cmd
 
 def getPcIndex(bam) :
