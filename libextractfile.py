@@ -328,7 +328,7 @@ def extractSequenza(path) :
                 else :
                     lcn = int(aux[col_lcn])
                 if chr in lc.chromosomes :
-                    reg = [int(aux[col_s]), int(aux[col_e]), getCN(tcn, lcn), tcn, lcn, "NA"]
+                    reg = [int(float(aux[col_s])), int(float(aux[col_e])), getCN(tcn, lcn), tcn, lcn, "NA"]
                     if chr in seq.keys() :
                         seq[chr].append(reg)
                     else :

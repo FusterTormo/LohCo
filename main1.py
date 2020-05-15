@@ -161,6 +161,7 @@ def checkFacets() :
 
 	print("Total errors: {}".format(m))
 
+#Vore quines mostres tenen ascatNGS fet. Refer ascatNGS en cas que no estiga fet
 def checkAscat() :
 	cont = 0
 	errors = 0
@@ -198,7 +199,7 @@ def checkAscat() :
 					#TODO fer les comandes per executar ascatNGS. Copiar les instruccions en el else de baix
 					aux = "{wd}/{sub}/{uuid}/{bam}".format(wd = wd, sub = c[0], uuid = tm[0], bam = tm[1])
 					aux2 = "{wd}/{sub}/{uuid}/{bam}".format(wd = wd, sub = c[0], uuid = cn[0], bam = cn[1])
-					cmd = "/home/ffuster/Scripts/runAscat.sh {normal} {tumor} {dir} {gender}".format(dir = seq, tumor = aux, control = aux2, gender = gender)
+					cmd = "/home/ffuster/Scripts/runAscat.sh {control} {tumor} {dir} {gender}".format(dir = seq, tumor = aux, control = aux2, gender = gender)
 					print("INFO: Checked {cases} cases. Running {com}".format(cases = cont, com = cmd))
 					proc = subprocess.Popen(cmd, shell = True, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
 					out, err = proc.communicate()
