@@ -161,6 +161,59 @@ def checkFacets() :
 
 	print("Total errors: {}".format(m))
 
+def checkAscat() :
+	cont = 0
+	errors = 0
+	messages = []
+	with dbcon :
+		cur = dbcon.cursor()
+		q = cur.execute("SELECT submitter FROM patient WHERE cancer='OV'")
+		cases = q.fetchall()
+
+	print("INFO: {} cases found".format(len(cases)))
+	for c in cases :
+		cont += 1
+		# Recollir la informacio dels bams i el sexe que te el cas registrats
+		with dbcon :
+			cur = dbcon.cursor()
+			q = cur.execute("SELECT uuid, bamName FROM sample WHERE submitter='{}' AND tumor LIKE '%Tumor%'".format(c[0]))
+			tumors = q.fetchall()
+			q = cur.execute("SELECT uuid, bamName FROM sample WHERE submitter='{}' AND tumor LIKE '%Normal%'".format(c[0]))
+			controls = q.fetchall()
+			q = cur.execute("SELECT gender FROM patient WHERE submitter='{}'".format(c[0]))
+			gender = q.fetchone()[0]
+		for tm in tumors :
+			for cn in controls :
+				acabat = False
+				aux = tm[0].split("-")[0]
+				aux2 = cn[0].split("-")[0]
+				folder = "{wd}/{sub}/{tumor}_VS_{control}".format(wd = wd, sub = c[0], tumor = aux, control = aux2)
+				seq = "{}_ASCAT".format(folder)
+				# Comprovar l'status de l'analisi de ascatNGS
+				if os.path.isdir(seq) :
+					# Si existeix la carpeta, Comprovar si s'ha completat ascatNGS
+					if findAscatName(seq) != "Not found":
+						acabat = True
+				if not acabat :
+					#TODO fer les comandes per executar ascatNGS. Copiar les instruccions en el else de baix
+					aux = "{wd}/{sub}/{uuid}/{bam}".format(wd = wd, sub = c[0], uuid = tm[0], bam = tm[1])
+					aux2 = "{wd}/{sub}/{uuid}/{bam}".format(wd = wd, sub = c[0], uuid = cn[0], bam = cn[1])
+					cmd = "/home/ffuster/Scripts/runAscat.sh {normal} {tumor} {dir} {gender}".format(dir = seq, tumor = aux, control = aux2, gender = gender)
+					print("INFO: Checked {cases} cases. Running {com}".format(cases = cont, com = cmd))
+					proc = subprocess.Popen(cmd, shell = True, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+					out, err = proc.communicate()
+					if proc.returncode != 0 :
+						errors += 1
+						messages.append(cmd)
+						print("ERROR: While runing {}\nDescription:\n{}".format(cmd, err))
+
+
+	print("INFO: Found {} errors in total.\nCommands failed:".format(errors))
+	for m in messages :
+		print("-> {}".format(m))
+
+	print("Total errors: {}".format(errors))
+
 # Buscar la pitjor variant reportada en el gen passat per parametre
 def getWorst(vcf, gene) :
 	found = False
@@ -252,4 +305,4 @@ def prepareTable() :
 				# vs = getWorst(strelka, "ATM")
 				# cf = "{wd}/{sub}/{control}".format(wd = wd, sub = c[0], control = cn[0])
 
-checkFacets()
+checkAscat()
