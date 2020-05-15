@@ -18,6 +18,10 @@ import libgetters as lg
 import libcomparison as lc
 import main1 as lib
 
+# Constants
+dbcon = sqlite3.connect("/g/strcombio/fsupek_cancer2/TCGA_bam/info/info.db")
+wd = "/g/strcombio/fsupek_cancer2/TCGA_bam/OV"
+
 # Gene coordinates, extracted from biogps
 brca1 = ["17", 43044295, 43170245]
 brca2 = ["13", 32315086, 32400266]
@@ -38,7 +42,6 @@ with dbcon :
     cases = q.fetchall()
 
 for c in cases :
-    cont += 1
     # Recollir la informacio dels bams i el sexe que te el cas registrats
     with dbcon :
         cur = dbcon.cursor()
@@ -61,8 +64,31 @@ for c in cases :
             facets = "{wd}/{sub}/{folder}_FACETS/facets_comp_cncf.tsv".format(wd = wd, sub = c[0], folder = analysis)
             lohF = lib.getLOH(facets, "facets", brca1)
             ascat = lib.findAscatName("{wd}/{case}/{folder}_ASCAT/".format(wd = wd, case = c[0], folder = analysis))
-            lohA = getLOH(ascat, "ascatngs", brca1)
+            lohA = lib.getLOH(ascat, "ascatngs", brca1)
             sequenza = "{wd}/{case}/{folder}_Sequenza/{case}_segments.txt".format(folder = analysis, case = c[0], wd = wd)
-            lohS = getLOH(sequenza, "sequenza", brca1)
-            print("{}\t{}\t{}\t{}".format(vpc1, lohF, lohA, lohS))
-            sys.exit()
+            lohS = lib.getLOH(sequenza, "sequenza", brca1)
+            # Check the group for BRCA1
+            if vpc1 in positive :
+                # LOH found in positive cases means +1 to tool score
+                cases_positive.append(analysis)
+                if lohF == "L" :
+                    scoreF += 1
+                if lohA == "L" :
+                    scoreA += 1
+                if lohS == "L" :
+                    scoreS += 1
+            elif vpc1 in negative :
+                # LOH found in negative cases means -1 to tool score
+                cases_negative.append(analysis)
+                if lohF == "L" :
+                    scoreF -= 1
+                if lohA == "L" :
+                    scoreA -= 1
+                if lohS == "L" :
+                    scoreS -= 1
+            else :
+                # If the variant found is nonsynonymous SNV we cannot classify the case. So no score is made
+                cases_neutral.append(analysis)
+print("INFO: Final score for BRCA1")
+print("\tPositive cases: {}\n\tNegative cases: {}\n\tNeutral cases: {}".format(len(cases_positive), len(cases_negative), len(cases_neutral)))
+print("\n\tFACETS score: {}\n\tascatNGS score: {}\n\tSequenza score: {}".format(scoreF, scoreA, scoreS))
