@@ -85,39 +85,40 @@ def ejecutar(orden) :
         print("ERROR: Al ejecutar {cmd}\n\nDescripcion: {dsc}\nComando: {cmd}".format(cmd = orden, dsc = err))
         sys.exit()
 
-def alinear(muestra) :
+def alinear(muestra, id) :
     """Alinea, ordena, recalibra y marca duplicados para la muestra pasada por parametro"""
     sams = []
     # Alinear
     if len(muestra["fastq"]) > 1 :
         it = 1
         for sample in muestra["fastq"] :
-            aux = "bwa_{}.sam".format(it)
+            aux = "{}_{}.sam".format(id, it)
             sams.append(aux)
-            cmd = gc.getAln(sample[2], hgref, sample[0], sample[1], aux)
-            ejecutar(cmd)
+            # Parametros: readgroup, genoma de referencia, fastq 1, fastq 2, sam de salida
+            ejecutar(gc.getAln(sample[2], hgref, sample[0], sample[1], aux))
             it += 1
     else :
-        sams.append("bwa.sam")
-        cmd = gc.getAln(sample[2], hgref, sample[0], sample[1], "bwa.sam")
-        ejecutar(cmd)
+        sams.append("{}.sam".format(id))
+        ejecutar(gc.getAln(sample[2], hgref, sample[0], sample[1], "{}.sam".format(id)))
+
     # Ordenar
     if len(sams) == 1 :
-        cmd = gc.getPcSort("bwa.sam", "bwa.sort.bam")
+        cmd = gc.getPcSort("{}.sam".format(id), "{}.sort.bam".format(id))
     else :
-        cmd = gc.getPcMerge(sams, "bwa.sort.bam")
+        cmd = gc.getPcMerge(sams, "{}.sort.bam".format(id))
     ejecutar(cmd)
     # A partir de este paso ya se trabaja con un unico archivo bam
-    ejecutar(gc.getPcIndex("bwa.sort.bam"))
-    ejecutar(gc.getGATKrecal("bwa.sort.bam", hgref, snpSites, "bwa.recal.bam"))
-    ejecutar(gc.getPcMarkduplicates("bwa.recal.bam", "bwa.nodup.bam"))
+    ejecutar(gc.getPcIndex("{}.sort.bam".format(id)))
+    ejecutar(gc.getGATKrecal("{}.sort.bam".format(id), hgref, snpSites, "{}.recal.bam".format(id)))
+    ejecutar(gc.getPcMarkduplicates("{}.recal.bam".format(id), "{}.nodup.bam".format(id)))
+    ejecutar(gc.getPcIndex("{}.nodup.bam".format(id)))
     # Eliminar todos los archivos temporales
-    # for a in sams :
-    #     os.remove(a)
-    # os.remove("bwa.sort.bam")
-    # os.remove("bwa.sort.bai")
-    # os.remove("bwa.recal.bam")
-    # os.remove("bwa.recal.bai")
+    for a in sams :
+        os.remove(a)
+    os.remove("bwa.sort.bam")
+    os.remove("bwa.sort.bai")
+    os.remove("bwa.recal.bam")
+    os.remove("bwa.recal.bai")
 
 def main() :
     tm, cn = leerMuestras()
@@ -128,14 +129,34 @@ def main() :
                 c = "C2"
             elif v["gender"] == "M" :
                 c = "C3"
-        if c != "" and c != "C2" and c != "C3" :
-            folder = "{}vs{}".format(k,c)
+        if c != "" and c :
+            folder = "{}vs{}".format(k,c) # Crear la carpeta de analisis
+            # Comprobar si existe la carpeta del alineamiento tanto de la muestra tumoral
+            if os.path.isdir(k) :
+                filenames = os.listdir(k)
+                if "{}.nodup.bam".format(k) not in filenames :
+                    print("Alinear el tumor")
+            else :
+                os.makedirs(k, 0o754)
+                os.chdir(k)
+                print("Creada carpeta tumor. Alinear tumor")
+            # Comprobar si existe la carpeta del alineamiento de la muestra control
+            if os.path.isdir(c) :
+                filenames = os.listdir(c)
+                if "{}.nodup.bam".format(c) not in filenames :
+                    print("Alinear el control")
+            else :
+                os.makedirs(k, 0o754)
+                os.chdir(k)
+                print("Creada carpeta control. Alinear control")
+            sys.exit()
+            
             if os.path.isdir(folder) : # La carpeta existe, puede que algo se haya ejecutado
                 #Guardar todos los archivos de la carpeta en una lista
                 filenames = os.listdir(folder)
                 os.chdir(folder)
-                if "bwa.nodup.bam" not in filenames :
-                    alinear(v)
+                if "{}.nodup.bam".format(k) not in filenames :
+                    alinear(v, k)
                 else :
                     print("TODO: Comprobar si los variant calls se han hecho en la carpeta")
             else :
@@ -146,8 +167,8 @@ def main() :
                 with open(logfile, "a") as fi :
                     fi.write("cd {}\n".format(os.path.abspath(os.getcwd())))
                 alinear(v)
-                os.chdir(wd)
-                sys.exit()
+            os.chdir(wd)
+            sys.exit()
             #alinear(tm)
             #alinear(cn)
 
