@@ -12,6 +12,7 @@ import sqlite3
 
 import main1 as mm
 import libcomparison as lc
+import libstatistics as ls
 
 # Constants
 dbcon = sqlite3.connect("/g/strcombio/fsupek_cancer2/TCGA_bam/info/info.db")
@@ -38,24 +39,24 @@ for c in cases :
             ascat = mm.findAscatName("{}_ASCAT/".format(tf))
             sequenza = "{}_Sequenza/{}_segments.txt".format(tf, c[0])
             if os.path.isfile(facets) :
-                outf = lc.convert2region(facets)
+                outf = lc.convert2region(facets, "facets")
             if os.path.isfile(ascat) :
-                outa = lc.convert2region(ascat)
+                outa = lc.convert2region(ascat, "ascatngs")
             if os.path.isfile(sequenza) :
-                outs = lc.convert2region(sequenza)
+                outs = lc.convert2region(sequenza, "sequenza")
 
             if os.path.isfile(facets) and os.path.isfile(ascat) :
                 regs = lc.getFragments(outf, outa)
-                dc = compi.doComparison(regs, outf, outa)
-                print(dc)
+                dc = lc.doComparison2(regs, outf, outa)
+                print(ls.printTable(dc, "FACETS", "ascatNGS", False))
             if os.path.isfile(facets) and os.path.isfile(sequenza) :
                 regs = lc.getFragments(outf, outs)
-                dc = compi.doComparison(regs, outf, outs)
-                print(dc)
+                dc = lc.doComparison2(regs, outf, outs)
+                print(ls.printTable(dc, "FACETS", "Sequenza", False))
             if os.path.isfile(ascat) and os.path.isfile(sequenza) :
                 regs = lc.getFragments(outa, outs)
-                dc = compi.doComparison(regs, outa, outs)
-                print(dc)
+                dc = lc.doComparison2(regs, outa, outs)
+                print(ls.printTable(dc, "ascatNGS", "Sequenza", False))
 
-            
+
             sys.exit()
