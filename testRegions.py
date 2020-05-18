@@ -30,8 +30,11 @@ def doTest(gene, region) :
     cases_negative = []
     cases_neutral = []
     scoreF = 0
+    scoreF2 = 0
     scoreA = 0
+    scoreA2 = 0
     scoreS = 0
+    scoreS2 = 0
 
     with dbcon :
         cur = dbcon.cursor()
@@ -78,17 +81,18 @@ def doTest(gene, region) :
                     # LOH found in negative cases means -1 to tool score
                     cases_negative.append(analysis)
                     if lohF == "L" :
-                        scoreF -= 1
+                        scoreF2 += 1
                     if lohA == "L" :
-                        scoreA -= 1
+                        scoreA2 += 1
                     if lohS == "L" :
-                        scoreS -= 1
+                        scoreS2 += 1
                 else :
                     # If the variant found is nonsynonymous SNV we cannot classify the case. So no score is made
                     cases_neutral.append(analysis)
     results = "INFO: Final score for {}\n".format(gene)
     results += "\tPositive cases: {}\n\tNegative cases: {}\n\tNeutral cases: {}\n".format(len(cases_positive), len(cases_negative), len(cases_neutral))
-    results += "\n\tFACETS score: {}\n\tascatNGS score: {}\n\tSequenza score: {}\n".format(scoreF, scoreA, scoreS)
+    results += "\n\tFACETS LOH detected: {}\n\tascatNGS LOH detected: {}\n\tSequenza LOH detected: {}\n".format(scoreF, scoreA, scoreS)
+    results += "\n\tFACETS LOH negative: {}\n\tascatNGS LOH negative: {}\n\tSequenza LOH negative: {}\n".format(scoreF2, scoreA2, scoreS2)
     return results
 
 def main() :
@@ -104,9 +108,15 @@ def main() :
     test3 = doTest("ATM", atm)
     print("INFO: Checking PALB2")
     test4 = doTest("PALB2", palb2)
+    with open("regionsDetected.txt", "w") as fi :
+        fi.write(test1)
+        fi.write(test2)
+        fi.write(test3)
+        fi.write(test4)
     print(test1)
     print(test2)
     print(test3)
     print(test4)
+    print("INFO: Information stored in regionsDetected.txt")
 
 main()
