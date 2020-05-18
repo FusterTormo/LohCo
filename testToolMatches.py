@@ -13,10 +13,21 @@ import sqlite3
 import main1 as mm
 import libcomparison as lc
 import libstatistics as ls
+import libconstants as cte
 
 # Constants
 dbcon = sqlite3.connect("/g/strcombio/fsupek_cancer2/TCGA_bam/info/info.db")
 wd = "/g/strcombio/fsupek_cancer2/TCGA_bam/OV"
+
+def calculateSimilarity(dc) :
+    dividendo = 0
+    divisor = 0
+    for a in cte.aberrations :
+        dividendo += dc[a][a]
+        for b in cte.aberrations :
+            divisor += dc[a][b]
+    similarity = 100*float(dividendo)/float(divisor)
+    return similarity
 
 with dbcon :
     cur = dbcon.cursor()
@@ -49,14 +60,16 @@ for c in cases :
                 regs = lc.getFragments(outf, outa)
                 dc = lc.doComparison2(regs, outf, outa)
                 print(ls.printTable(dc, "FACETS", "ascatNGS", False))
+                print(calculateSimilarity(dc))
             if os.path.isfile(facets) and os.path.isfile(sequenza) :
                 regs = lc.getFragments(outf, outs)
                 dc = lc.doComparison2(regs, outf, outs)
                 print(ls.printTable(dc, "FACETS", "Sequenza", False))
+                print(calculateSimilarity(dc))
             if os.path.isfile(ascat) and os.path.isfile(sequenza) :
                 regs = lc.getFragments(outa, outs)
                 dc = lc.doComparison2(regs, outa, outs)
                 print(ls.printTable(dc, "ascatNGS", "Sequenza", False))
-
+                print(calculateSimilarity(dc))
 
             sys.exit()
