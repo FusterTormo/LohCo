@@ -3,12 +3,12 @@
 
 """
 TEST REGIONS:
-    For each case
-        Get the most significative variant
+    For each gene
+        Get the most significative variant in this gene
         Test if the sample can be included in the positive, negative or unknown group.
         Get the CNV/LOH for this region from FACETS, ascatNGS, and Sequenza.
-        Score +1 if the program has detected LOH in a deleterious mutation
-        Score -1 if the program has detected LOH in a non-deleterious mutation
+        Score +1 in the positive score if the program has detected LOH in a deleterious mutation
+        Score +1 in the negative score if the program has detected LOH in a non-deleterious mutation
 """
 
 import sqlite3
@@ -23,9 +23,31 @@ dbcon = sqlite3.connect("/g/strcombio/fsupek_cancer2/TCGA_bam/info/info.db")
 wd = "/g/strcombio/fsupek_cancer2/TCGA_bam/OV"
 
 def doTest(gene, region) :
+    """Find the output from FACETS, ascatNGS, and Sequenza to get if there is a LOH in the gene passed as parameter
+
+    Classifies the case as:
+        Positive if there is a deleterious variant in the gene (nonframeshift, frameshift, stopgain)
+        Negative if there is not a deleterious variant in the gen
+        Neutral if the worst variant is nonsynonymous SNV, splicing, or stoploss
+
+    Parameters
+    ----------
+        gene : str
+            Gene name where to find the worst variant and the copy number detected by FACETS, ascatNGS and Sequenza
+        region : list
+            Coordinates of the gene. The format of the list must be [chrNumber, start, end]
+
+    Returns
+    -------
+        str
+            Summary statistics in a fancy manner
+    """
     # Gene coordinates, extracted from biogps
-    positive = ["nonframeshift substitution", "nonframeshift deletion",  "frameshift deletion", "frameshift insertion", "stopgain"]
+    positive = ["nonframeshift substitution", "nonframeshift block substitution", "nonframeshift deletion", "nonframeshift insertion",
+        "frameshift substitution", "frameshift block substitution", "frameshift deletion", "frameshift insertion",
+        "stopgain"]
     negative = ["NA", "synonymous SNV"]
+    # Variants considered unknown, so they will be considered as neutral: nonsynonymous SNV, splicing, stoploss
     cases_positive = []
     cases_negative = []
     cases_neutral = []
