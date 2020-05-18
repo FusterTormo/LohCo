@@ -29,47 +29,64 @@ def calculateSimilarity(dc) :
     similarity = 100*float(dividendo)/float(divisor)
     return similarity
 
-with dbcon :
-    cur = dbcon.cursor()
-    q = cur.execute("SELECT submitter FROM patient WHERE cancer='OV'")
-    cases = q.fetchall()
-
-for c in cases :
-    # Recollir la informacio dels bams i el sexe que te el cas registrats
+def main () :
+    table = []
     with dbcon :
         cur = dbcon.cursor()
-        q = cur.execute("SELECT uuid FROM sample WHERE submitter='{}' AND tumor LIKE '%Tumor%'".format(c[0]))
-        tumors = q.fetchall()
-        q = cur.execute("SELECT uuid FROM sample WHERE submitter='{}' AND tumor LIKE '%Normal%'".format(c[0]))
-        controls = q.fetchall()
-    for tm in tumors :
-        for cn in controls :
-            # Get the absolute path the and the prefix for the tool output
-            tf = "{wd}/{sub}/{tm}_VS_{cn}".format(wd = wd, sub = c[0], tm = tm[0].split("-")[0], cn = cn[0].split("-")[0])
-            facets = "{}_FACETS/facets_comp_cncf.tsv".format(tf)
-            ascat = mm.findAscatName("{}_ASCAT/".format(tf))
-            sequenza = "{}_Sequenza/{}_segments.txt".format(tf, c[0])
-            if os.path.isfile(facets) :
-                outf = lc.convert2region(facets, "facets")
-            if os.path.isfile(ascat) :
-                outa = lc.convert2region(ascat, "ascatngs")
-            if os.path.isfile(sequenza) :
-                outs = lc.convert2region(sequenza, "sequenza")
+        q = cur.execute("SELECT submitter FROM patient WHERE cancer='OV'")
+        cases = q.fetchall()
 
-            if os.path.isfile(facets) and os.path.isfile(ascat) :
-                regs = lc.getFragments(outf, outa)
-                dc = lc.doComparison2(regs, outf, outa)
-                print(ls.printTable(dc, "FACETS", "ascatNGS", False))
-                print(calculateSimilarity(dc))
-            if os.path.isfile(facets) and os.path.isfile(sequenza) :
-                regs = lc.getFragments(outf, outs)
-                dc = lc.doComparison2(regs, outf, outs)
-                print(ls.printTable(dc, "FACETS", "Sequenza", False))
-                print(calculateSimilarity(dc))
-            if os.path.isfile(ascat) and os.path.isfile(sequenza) :
-                regs = lc.getFragments(outa, outs)
-                dc = lc.doComparison2(regs, outa, outs)
-                print(ls.printTable(dc, "ascatNGS", "Sequenza", False))
-                print(calculateSimilarity(dc))
+    for c in cases :
+        # Recollir la informacio dels bams i el sexe que te el cas registrats
+        with dbcon :
+            cur = dbcon.cursor()
+            q = cur.execute("SELECT uuid FROM sample WHERE submitter='{}' AND tumor LIKE '%Tumor%'".format(c[0]))
+            tumors = q.fetchall()
+            q = cur.execute("SELECT uuid FROM sample WHERE submitter='{}' AND tumor LIKE '%Normal%'".format(c[0]))
+            controls = q.fetchall()
+        for tm in tumors :
+            for cn in controls :
+                aux = []
+                # Get the absolute path the and the prefix for the tool output
+                tf = "{wd}/{sub}/{tm}_VS_{cn}".format(wd = wd, sub = c[0], tm = tm[0].split("-")[0], cn = cn[0].split("-")[0])
+                aux.append(tf)
+                facets = "{}_FACETS/facets_comp_cncf.tsv".format(tf)
+                ascat = mm.findAscatName("{}_ASCAT/".format(tf))
+                sequenza = "{}_Sequenza/{}_segments.txt".format(tf, c[0])
+                if os.path.isfile(facets) :
+                    outf = lc.convert2region(facets, "facets")
+                if os.path.isfile(ascat) :
+                    outa = lc.convert2region(ascat, "ascatngs")
+                if os.path.isfile(sequenza) :
+                    outs = lc.convert2region(sequenza, "sequenza")
 
-            sys.exit()
+                if os.path.isfile(facets) and os.path.isfile(ascat) :
+                    regs = lc.getFragments(outf, outa)
+                    dc = lc.doComparison2(regs, outf, outa)
+                    # print(ls.printTable(dc, "FACETS", "ascatNGS", False))
+                    aux.append(calculateSimilarity(dc))
+                else :
+                    aux.append("NA")
+                if os.path.isfile(facets) and os.path.isfile(sequenza) :
+                    regs = lc.getFragments(outf, outs)
+                    dc = lc.doComparison2(regs, outf, outs)
+                    # print(ls.printTable(dc, "FACETS", "Sequenza", False))
+                    aux.append(calculateSimilarity(dc))
+                else :
+                    aux.append("NA")
+                if os.path.isfile(ascat) and os.path.isfile(sequenza) :
+                    regs = lc.getFragments(outa, outs)
+                    dc = lc.doComparison2(regs, outa, outs)
+                    # print(ls.printTable(dc, "ascatNGS", "Sequenza", False))
+                    aux.append(calculateSimilarity(dc))
+                else :
+                    aux.append("NA")
+                table.append(aux)
+    print("INFO: Printing the data in a table")
+    with open("testToolSimilarity.txt", "w") as fi :
+        fi.write("uuid\tfva\tfvs\tavs\n")
+        for t in table :
+            fi.write("\t".join(t))
+            fi.write("\n")
+
+main()
