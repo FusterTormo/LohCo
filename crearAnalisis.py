@@ -130,43 +130,48 @@ def main() :
             elif v["gender"] == "M" :
                 c = "C3"
         if c != "" and c :
-            folder = "{}vs{}".format(k,c) # Crear la carpeta de analisis
             # Comprobar si existe la carpeta del alineamiento tanto de la muestra tumoral
             if os.path.isdir(k) :
                 filenames = os.listdir(k)
                 if "{}.nodup.bam".format(k) not in filenames :
-                    print("Alinear el tumor")
+                    alinear(v, k)
             else :
                 os.makedirs(k, 0o754)
                 os.chdir(k)
-                print("Creada carpeta tumor. Alinear tumor")
+                with open(logfile, "a") as fi :
+                    fi.write("# Alinear {}\n".format(k))
+                    fi.write("cd {}\n".format(os.path.abspath(os.getcwd())))
+                alinear(v, k)
+
+            os.chdir(wd)
             # Comprobar si existe la carpeta del alineamiento de la muestra control
             if os.path.isdir(c) :
                 filenames = os.listdir(c)
                 if "{}.nodup.bam".format(c) not in filenames :
-                    print("Alinear el control")
+                    alinear(cn[c], c)
             else :
-                os.makedirs(k, 0o754)
-                os.chdir(k)
-                print("Creada carpeta control. Alinear control")
+                os.makedirs(c, 0o754)
+                os.chdir(c)
+                alinear(cn[c], c)
             sys.exit()
-            
-            if os.path.isdir(folder) : # La carpeta existe, puede que algo se haya ejecutado
-                #Guardar todos los archivos de la carpeta en una lista
-                filenames = os.listdir(folder)
-                os.chdir(folder)
-                if "{}.nodup.bam".format(k) not in filenames :
-                    alinear(v, k)
-                else :
-                    print("TODO: Comprobar si los variant calls se han hecho en la carpeta")
-            else :
-                print("INFO: Analizando {}".format(folder))
-                os.makedirs(folder, 0o754)
-                # Ordenes para alinear la muestra
-                os.chdir(folder)
-                with open(logfile, "a") as fi :
-                    fi.write("cd {}\n".format(os.path.abspath(os.getcwd())))
-                alinear(v)
+
+            folder = "{}vs{}".format(k,c) # Crear la carpeta de analisis
+            # if os.path.isdir(folder) : # La carpeta existe, puede que algo se haya ejecutado
+            #     #Guardar todos los archivos de la carpeta en una lista
+            #     filenames = os.listdir(folder)
+            #     os.chdir(folder)
+            #     if "{}.nodup.bam".format(k) not in filenames :
+            #         alinear(v, k)
+            #     else :
+            #         print("TODO: Comprobar si los variant calls se han hecho en la carpeta")
+            # else :
+            #     print("INFO: Analizando {}".format(folder))
+            #     os.makedirs(folder, 0o754)
+            #     # Ordenes para alinear la muestra
+            #     os.chdir(folder)
+            #     with open(logfile, "a") as fi :
+            #         fi.write("cd {}\n".format(os.path.abspath(os.getcwd())))
+            #     alinear(v)
             os.chdir(wd)
             sys.exit()
             #alinear(tm)
