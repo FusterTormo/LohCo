@@ -8,8 +8,10 @@ TEST TOOL MATCHES
 """
 
 import os
+import sqlite3
 
 import main1 as mm
+import libcomparison as lc
 
 # Constants
 dbcon = sqlite3.connect("/g/strcombio/fsupek_cancer2/TCGA_bam/info/info.db")
@@ -35,13 +37,25 @@ for c in cases :
             facets = "{}_FACETS/facets_comp_cncf.tsv".format(tf)
             ascat = mm.findAscatName("{}_ASCAT/".format(tf))
             sequenza = "{}_Sequenza/{}_segments.txt".format(tf, c[0])
+            if os.path.isfile(facets) :
+                outf = lc.convert2region(facets)
+            if os.path.isfile(ascat) :
+                outa = lc.convert2region(ascat)
+            if os.path.isfile(sequenza) :
+                outs = lc.convert2region(sequenza)
+
             if os.path.isfile(facets) and os.path.isfile(ascat) :
-                print("Comparar {} amb {}".format(facets, ascat))
+                regs = lc.getFragments(outf, outa)
+                dc = compi.doComparison(regs, outf, outa)
+                print(dc)
             if os.path.isfile(facets) and os.path.isfile(sequenza) :
-                print("Comparar {} amb {}".format(facets, sequenza))
+                regs = lc.getFragments(outf, outs)
+                dc = compi.doComparison(regs, outf, outs)
+                print(dc)
             if os.path.isfile(ascat) and os.path.isfile(sequenza) :
-                print("Comparar {} amb {}".format(ascat, sequenza))
-            if os.path.isfile(facets) and os.path.isfile(ascat) and os.path.isfile(sequenza) :
-                print("Comparar totes les eines")
-            print(tf)
+                regs = lc.getFragments(outa, outs)
+                dc = compi.doComparison(regs, outa, outs)
+                print(dc)
+
+            
             sys.exit()
