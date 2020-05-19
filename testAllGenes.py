@@ -47,11 +47,11 @@ for c in cases :
         controls = q.fetchall()
     for tm in tumors :
         for cn in controls :
-            # Get the analysis absolute path
-            tf = "{wd}/{sub}/{tm}_VS_{cn}".format(wd = wd, sub = c[0], tm = tm[0].split("-")[0], cn = cn[0].split("-")[0])
             uuid = "{tm}_VS_{cn}".format(tm = tm[0].split("-")[0], cn = cn[0].split("-")[0])
             linea = "{}\t".format(uuid)
             # Get the variant annotation file name
+            tf = "{wd}/{sub}/{tumor}".format(wd = wd, sub = c[0], tumor = tm[0])
+            cf = "{wd}/{sub}/{control}".format(wd = wd, sub = c[0], control = cn[0])
             platypust = "{}/platypusGerm/platypus.hg38_multianno.txt".format(tf)
             platypusc = "{}/platypusGerm/platypus.hg38_multianno.txt".format(cf)
             # Get the FACETS, ascatNGS and sequenza output in REGION format
