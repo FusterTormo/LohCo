@@ -13,6 +13,7 @@ TEST REGIONS:
 
 import sqlite3
 import sys
+import os
 
 import libgetters as lg
 import libcomparison as lc
@@ -47,8 +48,9 @@ for c in cases :
         controls = q.fetchall()
     for tm in tumors :
         for cn in controls :
-            uuid = "{tm}_VS_{cn}".format(tm = tm[0].split("-")[0], cn = cn[0].split("-")[0])
-            linea = "{}\t".format(uuid)
+            # Get the analysis absolute path
+            analysis = "{tm}_VS_{cn}".format(tm = tm[0].split("-")[0], cn = cn[0].split("-")[0])
+            linea = "{}\t".format(analysis)
             # Get the variant annotation file name
             tf = "{wd}/{sub}/{tumor}".format(wd = wd, sub = c[0], tumor = tm[0])
             cf = "{wd}/{sub}/{control}".format(wd = wd, sub = c[0], control = cn[0])
@@ -71,11 +73,11 @@ for c in cases :
             else :
                 regSe = "X"
             # Get the information regarding the worst variant in the gene selected found in platypus variant calling
-            gene1 = lib.getWorst(platypusc, "BRCA1")
-            linea += "{}\t".format(gene1)
-            if gene1 in positive :
+            variant = lib.getWorst(platypusc, "BRCA1")
+            linea += "{}\t".format(variant)
+            if variant in positive :
                 linea += "+\t"
-            elif gene1 in negative :
+            elif variant in negative :
                 linea += "-\t"
             else :
                 linea += "?\t"
@@ -93,14 +95,74 @@ for c in cases :
                 linea += "-\t"
             else :
                 linea += "{}\t".format(lg.getCopyNumber(brca1[1:3], brca1[0], regSe))
-            print(linea)
-            sys.exit()
 
-            # gene2 = lib.getWorst(platypusc, "BRCA2")
-            # gene3 = lib.getWorst(platypusc, "ATM")
-            # gene4 = lib.getWorst(platypusc, "PALB2")
-            #
-            # ascat = lib.findAscatName("{wd}/{case}/{folder}_ASCAT/".format(wd = wd, case = c[0], folder = analysis))
-            # lohA = lib.getLOH(ascat, "ascatngs", region)
-            # sequenza = "{wd}/{case}/{folder}_Sequenza/{case}_segments.txt".format(folder = analysis, case = c[0], wd = wd)
-            # lohS = lib.getLOH(sequenza, "sequenza", region)
+            variant = lib.getWorst(platypusc, "BRCA2")
+            linea += "{}\t".format(variant)
+            if variant in positive :
+                linea += "+\t"
+            elif variant in negative :
+                linea += "-\t"
+            else :
+                linea += "?\t"
+
+            # Get the output from the LOH tools
+            if regFa == "X" :
+                linea += "-\t"
+            else :
+                linea += "{}\t".format(lg.getCopyNumber(brca2[1:3], brca2[0], regFa))
+            if regAs == "X" :
+                linea += "-\t"
+            else :
+                linea += "{}\t".format(lg.getCopyNumber(brca2[1:3], brca2[0], regAs))
+            if regSe == "X" :
+                linea += "-\t"
+            else :
+                linea += "{}\t".format(lg.getCopyNumber(brca2[1:3], brca2[0], regSe))
+
+            variant = lib.getWorst(platypusc, "ATM")
+            linea += "{}\t".format(variant)
+            if variant in positive :
+                linea += "+\t"
+            elif variant in negative :
+                linea += "-\t"
+            else :
+                linea += "?\t"
+
+            # Get the output from the LOH tools
+            if regFa == "X" :
+                linea += "-\t"
+            else :
+                linea += "{}\t".format(lg.getCopyNumber(atm[1:3], atm[0], regFa))
+            if regAs == "X" :
+                linea += "-\t"
+            else :
+                linea += "{}\t".format(lg.getCopyNumber(atm[1:3], atm[0], regAs))
+            if regSe == "X" :
+                linea += "-\t"
+            else :
+                linea += "{}\t".format(lg.getCopyNumber(atm[1:3], atm[0], regSe))
+
+            variant = lib.getWorst(platypusc, "PALB2")
+            linea += "{}\t".format(variant)
+            if variant in positive :
+                linea += "+\t"
+            elif variant in negative :
+                linea += "-\t"
+            else :
+                linea += "?\t"
+
+            # Get the output from the LOH tools
+            if regFa == "X" :
+                linea += "-\t"
+            else :
+                linea += "{}\t".format(lg.getCopyNumber(palb2[1:3], palb2[0], regFa))
+            if regAs == "X" :
+                linea += "-\t"
+            else :
+                linea += "{}\t".format(lg.getCopyNumber(palb2[1:3], palb2[0], regAs))
+            if regSe == "X" :
+                linea += "-\t"
+            else :
+                linea += "{}\t".format(lg.getCopyNumber(palb2[1:3], palb2[0], regSe))
+            sys.exit()
+            
