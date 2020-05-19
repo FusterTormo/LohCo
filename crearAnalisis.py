@@ -99,7 +99,7 @@ def alinear(muestra, id) :
             it += 1
     else :
         sams.append("{}.sam".format(id))
-        ejecutar(gc.getAln(sample[2], hgref, sample[0], sample[1], "{}.sam".format(id)))
+        ejecutar(gc.getAln(muestra["fastq"][0][2], hgref, muestra["fastq"][0][0], muestra["fastq"][0][1], "{}.sam".format(id)))
 
     # Ordenar
     if len(sams) == 1 :
