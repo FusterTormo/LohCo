@@ -115,10 +115,10 @@ def alinear(muestra, id) :
     # Eliminar todos los archivos temporales
     for a in sams :
         os.remove(a)
-    os.remove("bwa.sort.bam")
-    os.remove("bwa.sort.bai")
-    os.remove("bwa.recal.bam")
-    os.remove("bwa.recal.bai")
+    os.remove("{}.sort.bam".format(id))
+    os.remove("{}.sort.bai".format(id))
+    os.remove("{}.recal.bam".format(id))
+    os.remove("{}.recal.bai".format(id))
 
 def main() :
     tm, cn = leerMuestras()
@@ -134,6 +134,7 @@ def main() :
             if os.path.isdir(k) :
                 filenames = os.listdir(k)
                 if "{}.nodup.bam".format(k) not in filenames :
+                    os.chdir(k)
                     alinear(v, k)
             else :
                 os.makedirs(k, 0o754)
@@ -148,14 +149,20 @@ def main() :
             if os.path.isdir(c) :
                 filenames = os.listdir(c)
                 if "{}.nodup.bam".format(c) not in filenames :
+                    os.chdir(c)
                     alinear(cn[c], c)
             else :
                 os.makedirs(c, 0o754)
                 os.chdir(c)
                 alinear(cn[c], c)
-            sys.exit()
 
             folder = "{}vs{}".format(k,c) # Crear la carpeta de analisis
+            # if os.path.isdir(folder) :
+            #     pass
+            # else :
+            #     os.makedirs(folder, 0o754)
+            #     os.chdir(folder)
+            
             # if os.path.isdir(folder) : # La carpeta existe, puede que algo se haya ejecutado
             #     #Guardar todos los archivos de la carpeta en una lista
             #     filenames = os.listdir(folder)
@@ -173,9 +180,7 @@ def main() :
             #         fi.write("cd {}\n".format(os.path.abspath(os.getcwd())))
             #     alinear(v)
             os.chdir(wd)
-            sys.exit()
-            #alinear(tm)
-            #alinear(cn)
+
 
 if __name__ == "__main__" :
     main()
