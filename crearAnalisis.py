@@ -51,11 +51,6 @@ def leerMuestras() :
                             controls[id] = {"fastq" : [[fq1, fq2, rg]]}
                         else :
                             controls[id]["fastq"].append([fq1, fq2, rg])
-                    elif id == "C2" or id == "C3" :
-                        if id not in controls.keys() :
-                            controls[id] = {"fastq" : [[fq1, fq2, rg]]}
-                        else :
-                            controls[id]["fastq"].append([fq1, fq2, rg])
                     else :
                         if id not in tumors.keys() :
                             tumors[id] = {"fastq" : [[fq1, fq2, rg]], "gender" : aux[10]}
@@ -127,15 +122,13 @@ def alinear(muestra, id) :
 
 def main() :
     tm, cn = leerMuestras()
-    print(tm)
-    print(cn)
     for k,v in tm.items() :
         c = getControl(k, cn)
         if c == "" :
             if v["gender"] == "F" :
-                c = "C2"
+                c = "C2_CD3"
             elif v["gender"] == "M" :
-                c = "C3"
+                c = "C3_CD3"
         if c != "" and c :
             # Comprobar si existe la carpeta del alineamiento tanto de la muestra tumoral
             if os.path.isdir(k) :
