@@ -127,6 +127,8 @@ def alinear(muestra, id) :
 
 def main() :
     tm, cn = leerMuestras()
+    print(tm)
+    print(cn)
     for k,v in tm.items() :
         c = getControl(k, cn)
         if c == "" :
