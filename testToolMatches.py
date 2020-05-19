@@ -86,7 +86,6 @@ def main () :
     with open("testToolSimilarity.txt", "w") as fi :
         fi.write("uuid\tfva\tfvs\tavs\n")
         for t in table :
-            fi.write("\t".join(t))
-            fi.write("\n")
+            fi.write("{}\t{}\t{}\t{}\n".format(t[0], t[1], t[2], t[3]))
 
 main()
