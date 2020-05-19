@@ -51,6 +51,11 @@ def leerMuestras() :
                             controls[id] = {"fastq" : [[fq1, fq2, rg]]}
                         else :
                             controls[id]["fastq"].append([fq1, fq2, rg])
+                    elif id == "C2" or id == "C3" :
+                        if id not in controls.keys() :
+                            controls[id] = {"fastq" : [[fq1, fq2, rg]]}
+                        else :
+                            controls[id]["fastq"].append([fq1, fq2, rg])
                     else :
                         if id not in tumors.keys() :
                             tumors[id] = {"fastq" : [[fq1, fq2, rg]], "gender" : aux[10]}
@@ -162,7 +167,7 @@ def main() :
             # else :
             #     os.makedirs(folder, 0o754)
             #     os.chdir(folder)
-            
+
             # if os.path.isdir(folder) : # La carpeta existe, puede que algo se haya ejecutado
             #     #Guardar todos los archivos de la carpeta en una lista
             #     filenames = os.listdir(folder)
