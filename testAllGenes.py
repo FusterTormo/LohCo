@@ -38,6 +38,9 @@ with dbcon :
     q = cur.execute("SELECT submitter FROM patient WHERE cancer='OV'")
     cases = q.fetchall()
 
+with open("lohGenes.tsv", "w") as fi :
+    fi.write("Case\tBRCA1\tclass1\tf1\ta1\ts1\tBRCA2\tclass2\tf2\ta2\ts2\tATM\tclass3\tf3\ta3\ts3\tPALB2\tclass4\tf4\ta4\ts4\n")
+
 for c in cases :
     # Recollir la informacio dels bams i el sexe que te el cas registrats
     with dbcon :
@@ -161,8 +164,10 @@ for c in cases :
             else :
                 linea += "{}\t".format(lg.getCopyNumber(palb2[1:3], palb2[0], regAs))
             if regSe == "X" :
-                linea += "-\t"
+                linea += "-\n"
             else :
-                linea += "{}\t".format(lg.getCopyNumber(palb2[1:3], palb2[0], regSe))
-            sys.exit()
-            
+                linea += "{}\n".format(lg.getCopyNumber(palb2[1:3], palb2[0], regSe))
+
+            with open("lohGenes.tsv", "a") as fi :
+                fi.write(linea)
+print("INFO: End. Info written in lohGenes.tsv")
