@@ -28,9 +28,7 @@ brca2 = ["13", 32315086, 32400266]
 palb2 = ["16", 23603160, 23641310]
 atm = ["11", 108222484, 108369102]
 # Variants classifier
-positive = ["nonframeshift substitution", "nonframeshift block substitution", "nonframeshift deletion", "nonframeshift insertion",
-    "frameshift substitution", "frameshift block substitution", "frameshift deletion", "frameshift insertion",
-    "stopgain"]
+positive = ["nonframeshift deletion", "nonframeshift insertion", "frameshift substitution", "frameshift block substitution", "frameshift deletion", "frameshift insertion", "stopgain"]
 negative = ["NA", "synonymous SNV"]
 
 with dbcon :
