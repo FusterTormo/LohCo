@@ -17,6 +17,7 @@ import sys
 import libgetters as lg
 import libcomparison as lc
 import main1 as lib
+import libconstants as cts
 
 # Constants
 dbcon = sqlite3.connect("/g/strcombio/fsupek_cancer2/TCGA_bam/info/info.db")
@@ -43,8 +44,8 @@ def doTest(gene, region) :
             Summary statistics in a fancy manner
     """
     # Gene coordinates, extracted from biogps
-    positive = var_positive
-    negative = var_negative
+    positive = cts.var_positive
+    negative = cts.var_negative
     # Variants considered unknown, so they will be considered as neutral: nonsynonymous SNV, splicing, stoploss
     cases_positive = []
     cases_negative = []

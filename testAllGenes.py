@@ -18,6 +18,7 @@ import os
 import libgetters as lg
 import libcomparison as lc
 import main1 as lib
+import libconstants as cts
 
 # Constants
 dbcon = sqlite3.connect("/g/strcombio/fsupek_cancer2/TCGA_bam/info/info.db")
@@ -28,8 +29,8 @@ brca2 = ["13", 32315086, 32400266]
 palb2 = ["16", 23603160, 23641310]
 atm = ["11", 108222484, 108369102]
 # Variants classifier
-positive = var_positive
-negative = var_negative
+positive = cts.var_positive
+negative = cts.var_negative
 
 with dbcon :
     cur = dbcon.cursor()
