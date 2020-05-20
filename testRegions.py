@@ -43,10 +43,8 @@ def doTest(gene, region) :
             Summary statistics in a fancy manner
     """
     # Gene coordinates, extracted from biogps
-    positive = ["nonframeshift substitution", "nonframeshift block substitution", "nonframeshift deletion", "nonframeshift insertion",
-        "frameshift substitution", "frameshift block substitution", "frameshift deletion", "frameshift insertion",
-        "stopgain"]
-    negative = ["NA", "synonymous SNV"]
+    positive = var_positive
+    negative = var_negative
     # Variants considered unknown, so they will be considered as neutral: nonsynonymous SNV, splicing, stoploss
     cases_positive = []
     cases_negative = []
