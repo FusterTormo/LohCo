@@ -145,8 +145,8 @@ def main () :
                     for ab in cte.aberrations :
                         avs.append(jcc[ab])
                 else :
-                    fvs.append("NA")
-                    fvs.append("NA")
+                    avs.append("NA")
+                    avs.append("NA")
                     for ab in cte.aberrations :
                         avs.append("NA")
                     for ab in cte.aberrations :
@@ -154,8 +154,6 @@ def main () :
                 # Write the output in the corresponding files for each comparison
                 with open(fvaFi, "a") as fi :
                     fi.write("{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n".format(fva[0], fva[1], fva[2], fva[3], fva[4], fva[5], fva[6], fva[7], fva[8], fva[9], fva[10]))
-                    print(fva)
-                    sys.exit()
                 with open(fvsFi, "a") as fi :
                     fi.write("{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n".format(fvs[0], fvs[1], fvs[2], fvs[3], fvs[4], fvs[5], fvs[6], fvs[7], fvs[8], fvs[9], fvs[10]))
                 with open(avsFi, "a") as fi :
