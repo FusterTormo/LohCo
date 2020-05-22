@@ -51,11 +51,11 @@ def main () :
     fvsFi = "facetsVSsequenza.tsv"
     avsFi = "ascatVSsequenza.tsv"
     # Write the output files' header
-    with open(fvaFI, "w") as fi :
+    with open(fvaFi, "w") as fi :
         fi.write("Case\tpercent\tACC\tMCCA\tMCCN\tMCCL\tMCCD\tjcca\tjccn\tjccl\tjccd\n")
-    with open(fvsFI, "w") as fi :
+    with open(fvsFi, "w") as fi :
         fi.write("Case\tpercent\tACC\tMCCA\tMCCN\tMCCL\tMCCD\tjcca\tjccn\tjccl\tjccd\n")
-    with open(avsFI, "w") as fi :
+    with open(avsFi, "w") as fi :
         fi.write("Case\tpercent\tACC\tMCCA\tMCCN\tMCCL\tMCCD\tjcca\tjccn\tjccl\tjccd\n")
 
     table = []
@@ -98,12 +98,12 @@ def main () :
                     c2 = lc.doComparison2(regs, outf, outa)
                     sts = ls.doContingency(c1) # Get the MCC for all the aberrations
                     jcc = ls.jaccardIndex(c2)
-                    fva.append(calculateSimilarity(c2))
-                    fva.append(percentSimilarity(regs, outf, outa))
+                    fva.append(str(calculateSimilarity(c2)))
+                    fva.append(str(percentSimilarity(regs, outf, outa)))
                     for ab in cte.aberrations :
-                        fva.append(sts[ab]["MCC"])
+                        fva.append(str(sts[ab]["MCC"]))
                     for ab in cte.aberrations :
-                        fva.append(jcc[ab])
+                        fva.append(str(jcc[ab]))
                 else :
                     fva.append("NA")
                     fva.append("NA")
@@ -118,12 +118,12 @@ def main () :
                     c2 = lc.doComparison2(regs, outf, outs)
                     sts = ls.doContingency(c1) # Get the MCC for all the aberrations
                     jcc = ls.jaccardIndex(c2) # Get the Jaccard index for all the aberrations
-                    fvs.append(calculateSimilarity(c2))
-                    fvs.append(percentSimilarity(regs, outf, outs))
+                    fvs.append(str(calculateSimilarity(c2)))
+                    fvs.append(str(percentSimilarity(regs, outf, outs)))
                     for ab in cte.aberrations :
-                        fvs.append(sts[ab]["MCC"])
+                        fvs.append(str(sts[ab]["MCC"]))
                     for ab in cte.aberrations :
-                        fvs.append(jcc[ab])
+                        fvs.append(str(jcc[ab]))
                 else :
                     fvs.append("NA")
                     fvs.append("NA")
@@ -138,12 +138,12 @@ def main () :
                     c2 = lc.doComparison2(regs, outa, outs)
                     sts = ls.doContingency(c1) # Get the MCC for all the aberrations
                     jcc = ls.jaccardIndex(c2) # Get the Jaccard index for all the aberrations
-                    fvs.append(calculateSimilarity(c2))
-                    fvs.append(percentSimilarity(regs, outa, outs))
+                    fvs.append(str(calculateSimilarity(c2)))
+                    fvs.append(str(percentSimilarity(regs, outa, outs)))
                     for ab in cte.aberrations :
-                        avs.append(sts[ab]["MCC"])
+                        avs.append(str(sts[ab]["MCC"]))
                     for ab in cte.aberrations :
-                        avs.append(jcc[ab])
+                        avs.append(str(jcc[ab]))
                 else :
                     fvs.append("NA")
                     fvs.append("NA")
@@ -152,13 +152,13 @@ def main () :
                     for ab in cte.aberrations :
                         avs.append("NA")
                 # Write the output in the corresponding files for each comparison
-                with open(fvaFI, "a") as fi :
+                with open(fvaFi, "a") as fi :
                     fi.write("\t".join(fva))
                     fi.write("\n")
-                with open(fvsFI, "a") as fi :
+                with open(fvsFi, "a") as fi :
                     fi.write("\t".join(fvs))
                     fi.write("\n")
-                with open(avsFI, "a") as fi :
+                with open(avsFi, "a") as fi :
                     fi.write("\t".join(avs))
                     fi.write("\n")
 
