@@ -251,7 +251,10 @@ def getConfusionStatistics(tp, fp, fn, tn) :
     except ZeroDivisionError :
         stats["FOR"] = "NA"
     stats["ACC"] = (tp+tn)/(tp+fp+fn+tn)
-    stats["F1"] = (2*tp)/(2*tp + fp + fn)
+    try :
+        stats["F1"] = (2*tp)/(2*tp + fp + fn)
+    except ZeroDivisionError :
+        stats["F1"] = "NA"
     try :
         stats["MCC"] = ((tp*tn)-(fp*fn))/math.sqrt((tp+fp)*(tp+fn)*(tn+fp)*(tn+fn))
     except (ValueError, ZeroDivisionError) :
