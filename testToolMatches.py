@@ -98,12 +98,12 @@ def main () :
                     c2 = lc.doComparison2(regs, outf, outa)
                     sts = ls.doContingency(c1) # Get the MCC for all the aberrations
                     jcc = ls.jaccardIndex(c2)
-                    fva.append(str(calculateSimilarity(c2)))
-                    fva.append(str(percentSimilarity(regs, outf, outa)))
+                    fva.append(calculateSimilarity(c2))
+                    fva.append(percentSimilarity(regs, outf, outa))
                     for ab in cte.aberrations :
-                        fva.append(str(sts[ab]["MCC"]))
+                        fva.append(sts[ab]["MCC"])
                     for ab in cte.aberrations :
-                        fva.append(str(jcc[ab]))
+                        fva.append(jcc[ab])
                 else :
                     fva.append("NA")
                     fva.append("NA")
@@ -118,12 +118,12 @@ def main () :
                     c2 = lc.doComparison2(regs, outf, outs)
                     sts = ls.doContingency(c1) # Get the MCC for all the aberrations
                     jcc = ls.jaccardIndex(c2) # Get the Jaccard index for all the aberrations
-                    fvs.append(str(calculateSimilarity(c2)))
-                    fvs.append(str(percentSimilarity(regs, outf, outs)))
+                    fvs.append(calculateSimilarity(c2))
+                    fvs.append(percentSimilarity(regs, outf, outs))
                     for ab in cte.aberrations :
-                        fvs.append(str(sts[ab]["MCC"]))
+                        fvs.append(sts[ab]["MCC"])
                     for ab in cte.aberrations :
-                        fvs.append(str(jcc[ab]))
+                        fvs.append(jcc[ab])
                 else :
                     fvs.append("NA")
                     fvs.append("NA")
@@ -138,12 +138,12 @@ def main () :
                     c2 = lc.doComparison2(regs, outa, outs)
                     sts = ls.doContingency(c1) # Get the MCC for all the aberrations
                     jcc = ls.jaccardIndex(c2) # Get the Jaccard index for all the aberrations
-                    fvs.append(str(calculateSimilarity(c2)))
-                    fvs.append(str(percentSimilarity(regs, outa, outs)))
+                    avs.append(calculateSimilarity(c2))
+                    avs.append(percentSimilarity(regs, outa, outs))
                     for ab in cte.aberrations :
-                        avs.append(str(sts[ab]["MCC"]))
+                        avs.append(sts[ab]["MCC"])
                     for ab in cte.aberrations :
-                        avs.append(str(jcc[ab]))
+                        avs.append(jcc[ab])
                 else :
                     fvs.append("NA")
                     fvs.append("NA")
@@ -153,14 +153,13 @@ def main () :
                         avs.append("NA")
                 # Write the output in the corresponding files for each comparison
                 with open(fvaFi, "a") as fi :
-                    fi.write("\t".join(fva))
-                    fi.write("\n")
+                    fi.write("{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n".format(fva[0], fva[1], fva[2], fva[3], fva[4], fva[5], fva[6], fva[7], fva[8], fva[9], fva[10]))
+                    print(fva)
+                    sys.exit()
                 with open(fvsFi, "a") as fi :
-                    fi.write("\t".join(fvs))
-                    fi.write("\n")
+                    fi.write("{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n".format(fvs[0], fvs[1], fvs[2], fvs[3], fvs[4], fvs[5], fvs[6], fvs[7], fvs[8], fvs[9], fvs[10]))
                 with open(avsFi, "a") as fi :
-                    fi.write("\t".join(avs))
-                    fi.write("\n")
+                    fi.write("{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n".format(avs[0], avs[1], avs[2], avs[3], avs[4], avs[5], avs[6], avs[7], avs[8], avs[9], avs[10]))
 
 
 
