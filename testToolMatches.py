@@ -4,10 +4,10 @@
 """MAIN PROGRAM
 TEST TOOL MATCHES
     Calculates the similarity between two tools
-    This similarity is defined as the number of regions where both tools report the same aberration. This similarity calculation is multiplied by the number of bases that the region comprises
+    When two regions have the same aberration reported by both tools, this is annotated as a coincidence.
     Two different similarities are calculated
-        calculateSimilarity creates a 4x4 table where the tool outputs are reported according to the aberration and divides the coincidences vs the total
-        percentSimilarity checks the regions in common. If both tools report the same, it is added to the coincidences. Otherwise not.
+        regSimilarity annotates the regions in common that are similar
+        baseSimilarity annotates the length of the regions that are annotated as similar
 
     Additionally, calculates the MCC, and the Jaccard index for all the aberrations
     Finally it calculates the percentage of coincidences by inspecting the regions in common
@@ -17,17 +17,17 @@ TEST TOOL MATCHES
 import os
 import sqlite3
 
-import main1 as mm
 import libcomparison as lc
-import libstatistics as ls
 import libconstants as cte
 import libgetters as lg
+import libstatistics as ls
+import main1 as mm
 
 # Constants
 dbcon = sqlite3.connect("/g/strcombio/fsupek_cancer2/TCGA_bam/info/info.db")
 wd = "/g/strcombio/fsupek_cancer2/TCGA_bam/OV"
 
-def percentSimilarity(regs, tool1, tool2) :
+def baseSimilarity(regs, tool1, tool2) :
     coin = 0
     all = 0
     for k in regs.keys() : # Iterate by chromosome
@@ -41,15 +41,17 @@ def percentSimilarity(regs, tool1, tool2) :
     return percent
 
 
-def calculateSimilarity(dc) :
-    dividendo = 0
-    divisor = 0
-    for a in cte.aberrations :
-        dividendo += dc[a][a]
-        for b in cte.aberrations :
-            divisor += dc[a][b]
-    similarity = 100*float(dividendo)/float(divisor)
-    return similarity
+def regSimilarity(regs, tool1, tool2) :
+    coin = 0
+    all = 0
+    for k in regs.keys() : # Iterate by chromosome
+        for r in regs[k] : # Iterate the regions in the chromosome
+            all += 1
+            if lg.getCopyNumber(r, k, tool1) == lg.getCopyNumber(r, k, tool2) :
+                coin += 1
+
+    percent = 100*float(coin)/float(all)
+    return percent
 
 def main () :
     fvaFi = "facetsVSascatngs.tsv"
@@ -57,11 +59,11 @@ def main () :
     avsFi = "ascatVSsequenza.tsv"
     # Write the output files' header
     with open(fvaFi, "w") as fi :
-        fi.write("Case\tpercent\tACC\tMCCA\tMCCN\tMCCL\tMCCD\tjcca\tjccn\tjccl\tjccd\n")
+        fi.write("Case\tregSim\tbaseSim\tMCCA\tMCCN\tMCCL\tMCCD\tjcca\tjccn\tjccl\tjccd\n")
     with open(fvsFi, "w") as fi :
-        fi.write("Case\tpercent\tACC\tMCCA\tMCCN\tMCCL\tMCCD\tjcca\tjccn\tjccl\tjccd\n")
+        fi.write("Case\tregSim\tbaseSim\tMCCA\tMCCN\tMCCL\tMCCD\tjcca\tjccn\tjccl\tjccd\n")
     with open(avsFi, "w") as fi :
-        fi.write("Case\tpercent\tACC\tMCCA\tMCCN\tMCCL\tMCCD\tjcca\tjccn\tjccl\tjccd\n")
+        fi.write("Case\tregSim\tbaseSim\tMCCA\tMCCN\tMCCL\tMCCD\tjcca\tjccn\tjccl\tjccd\n")
 
     table = []
     with dbcon :
@@ -103,8 +105,8 @@ def main () :
                     c2 = lc.doComparison2(regs, outf, outa)
                     sts = ls.doContingency(c1) # Get the MCC for all the aberrations
                     jcc = ls.jaccardIndex(c2)
-                    fva.append(calculateSimilarity(c2))
-                    fva.append(percentSimilarity(regs, outf, outa))
+                    fva.append(regSimilarity(regs, outf, outa))
+                    fva.append(baseSimilarity(regs, outf, outa))
                     for ab in cte.aberrations :
                         fva.append(sts[ab]["MCC"])
                     for ab in cte.aberrations :
@@ -123,8 +125,8 @@ def main () :
                     c2 = lc.doComparison2(regs, outf, outs)
                     sts = ls.doContingency(c1) # Get the MCC for all the aberrations
                     jcc = ls.jaccardIndex(c2) # Get the Jaccard index for all the aberrations
-                    fvs.append(calculateSimilarity(c2))
-                    fvs.append(percentSimilarity(regs, outf, outs))
+                    fvs.append(regSimilarity(regs, outf, outs))
+                    fvs.append(baseSimilarity(regs, outf, outs))
                     for ab in cte.aberrations :
                         fvs.append(sts[ab]["MCC"])
                     for ab in cte.aberrations :
@@ -143,8 +145,8 @@ def main () :
                     c2 = lc.doComparison2(regs, outa, outs)
                     sts = ls.doContingency(c1) # Get the MCC for all the aberrations
                     jcc = ls.jaccardIndex(c2) # Get the Jaccard index for all the aberrations
-                    avs.append(calculateSimilarity(c2))
-                    avs.append(percentSimilarity(regs, outa, outs))
+                    avs.append(regSimilarity(regs, outa, outs))
+                    avs.append(baseSimilarity(regs, outa, outs))
                     for ab in cte.aberrations :
                         avs.append(sts[ab]["MCC"])
                     for ab in cte.aberrations :
