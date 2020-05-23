@@ -99,9 +99,9 @@ def doTest(gene, region) :
                     # Add the case to the corresponding totals, depending if the tool has reported anything
                     if lohF != "Not found" :
                         positiveF.append(analysis)
-                    if lohF != "Not found" :
+                    if lohA != "Not found" :
                         positiveA.append(analysis)
-                    if lohF != "Not found" :
+                    if lohS != "Not found" :
                         positiveS.append(analysis)
 
                     # Deleterious variant found. LOH should be present
@@ -112,7 +112,7 @@ def doTest(gene, region) :
                     if lohS == "L" :
                         scoreS += 1
                 elif vpc1 in negative :
-                    if lohf != "Not found" :
+                    if lohF != "Not found" :
                         negativeF.append(analysis)
                     if lohA != "Not found" :
                         negativeA.append(analysis)
@@ -128,7 +128,7 @@ def doTest(gene, region) :
                         scoreS2 += 1
                 else :
                     # If the variant found is nonsynonymous SNV we cannot classify the case. So no score is made
-                    if lohf != "Not found" :
+                    if lohF != "Not found" :
                         neutralF.append(analysis)
                     if lohA != "Not found" :
                         neutralA.append(analysis)
