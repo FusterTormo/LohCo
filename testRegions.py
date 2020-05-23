@@ -47,9 +47,15 @@ def doTest(gene, region) :
     positive = cts.var_positive
     negative = cts.var_negative
     # Variants considered unknown, so they will be considered as neutral: nonsynonymous SNV, splicing, stoploss
-    cases_positive = []
-    cases_negative = []
-    cases_neutral = []
+    positiveF = []
+    negativeF = []
+    neutralF = []
+    positiveA = []
+    negativeA = []
+    neutralA = []
+    positiveS = []
+    negativeS = []
+    neutralS = []
     scoreF = 0
     scoreF2 = 0
     scoreA = 0
@@ -90,8 +96,15 @@ def doTest(gene, region) :
                 lohS = lib.getLOH(sequenza, "sequenza", region)
                 # Check the group for the gene selected
                 if vpc1 in positive :
-                    # LOH found in positive cases means +1 to tool score
-                    cases_positive.append(analysis)
+                    # Add the case to the corresponding totals, depending if the tool has reported anything
+                    if lohF != "Not found" :
+                        positiveF.append(analysis)
+                    if lohF != "Not found" :
+                        positiveA.append(analysis)
+                    if lohF != "Not found" :
+                        positiveS.append(analysis)
+
+                    # Deleterious variant found. LOH should be present
                     if lohF == "L" :
                         scoreF += 1
                     if lohA == "L" :
@@ -99,8 +112,14 @@ def doTest(gene, region) :
                     if lohS == "L" :
                         scoreS += 1
                 elif vpc1 in negative :
-                    # LOH found in negative cases means -1 to tool score
-                    cases_negative.append(analysis)
+                    if lohf != "Not found" :
+                        negativeF.append(analysis)
+                    if lohA != "Not found" :
+                        negativeA.append(analysis)
+                    if lohS != "Not found" :
+                        negativeS.append(analysis)
+
+                    # Tolerated variant found. LOH should not be present
                     if lohF == "L" :
                         scoreF2 += 1
                     if lohA == "L" :
@@ -109,11 +128,17 @@ def doTest(gene, region) :
                         scoreS2 += 1
                 else :
                     # If the variant found is nonsynonymous SNV we cannot classify the case. So no score is made
-                    cases_neutral.append(analysis)
+                    if lohf != "Not found" :
+                        neutralF.append(analysis)
+                    if lohA != "Not found" :
+                        neutralA.append(analysis)
+                    if lohS != "Not found" :
+                        neutralS.append(analysis)
+
     results = "INFO: Final score for {}\n".format(gene)
-    results += "\tPositive cases: {}\n\tNegative cases: {}\n\tNeutral cases: {}\n".format(len(cases_positive), len(cases_negative), len(cases_neutral))
-    results += "\n\tFACETS LOH detected: {}\n\tascatNGS LOH detected: {}\n\tSequenza LOH detected: {}\n".format(scoreF, scoreA, scoreS)
-    results += "\n\tFACETS LOH negative: {}\n\tascatNGS LOH negative: {}\n\tSequenza LOH negative: {}\n".format(scoreF2, scoreA2, scoreS2)
+    results += "\tFACETS\n\t\tPositive: {} - Detected: {}\n\t\tNegative: {} - Detected: {}\n\t\tUnknown: {}\n".format(len(positiveF), scoreF, len(negativeF), scoreF2, len(neutralF))
+    results += "\tascatNGS\n\t\tPositive: {} - Detected: {}\n\t\tNegative: {} - Detected: {}\n\t\tUnknown: {}\n".format(len(positiveA), scoreA, len(negativeA), scoreA2, len(neutralA))
+    results += "\tSequenza\n\t\tPositive: {} - Detected: {}\n\t\tNegative: {} - Detected: {}\n\t\tUnknown: {}\n\n".format(len(positiveS), scoreF, len(negativeS), scoreS2, len(neutralS))
     return results
 
 def main() :
@@ -129,7 +154,7 @@ def main() :
     test3 = doTest("ATM", atm)
     print("INFO: Checking PALB2")
     test4 = doTest("PALB2", palb2)
-    with open("regionsDetected.txt", "w") as fi :
+    with open("score.txt", "w") as fi :
         fi.write(test1)
         fi.write(test2)
         fi.write(test3)
@@ -138,6 +163,6 @@ def main() :
     print(test2)
     print(test3)
     print(test4)
-    print("INFO: Information stored in regionsDetected.txt")
+    print("INFO: Information stored in score.txt")
 
 main()
