@@ -218,7 +218,7 @@ def checkAscat() :
 # Buscar la pitjor variant reportada en el gen passat per parametre
 def getWorst(vcf, gene) :
 	found = False
-	classifier = ["NA", "synonymous SNV", "nonsynonymous SNV", "stoploss", "splicing", "nonframeshift substitution", "nonframeshift deletion", "nonframeshift insertion", "frameshift substitution", "frameshift deletion", "frameshift insertion", "stopgain"]
+	classifier = ["NA", "synonymous SNV", "nonsynonymous SNV", "stoploss", "nonframeshift substitution", "splicing", "nonframeshift deletion", "nonframeshift insertion", "frameshift substitution", "frameshift deletion", "frameshift insertion", "stopgain"]
 	level = -1
 	order = []
 	worst = "Not found"

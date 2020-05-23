@@ -79,9 +79,9 @@ def main () :
                 avs = []
                 # Get the absolute path the and the prefix for the tool output
                 tf = "{wd}/{sub}/{tm}_VS_{cn}".format(wd = wd, sub = c[0], tm = tm[0].split("-")[0], cn = cn[0].split("-")[0])
-                fva.append(tf)
-                fvs.append(tf)
-                avs.append(tf)
+                fva.append(tf.split("/")[-1])
+                fvs.append(tf.split("/")[-1])
+                avs.append(tf.split("/")[-1])
                 facets = "{}_FACETS/facets_comp_cncf.tsv".format(tf)
                 ascat = mm.findAscatName("{}_ASCAT/".format(tf))
                 sequenza = "{}_Sequenza/{}_segments.txt".format(tf, c[0])

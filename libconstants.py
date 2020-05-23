@@ -6,6 +6,6 @@ chromosomes = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10","11", "12", "13
 
 aberrations = ["D", "L", "N", "A"]
 
-var_positive = ["nonframeshift deletion", "nonframeshift insertion", "frameshift substitution", "frameshift block substitution", "frameshift deletion", "frameshift insertion", "stopgain"]
+var_positive = ["nonframeshift deletion", "nonframeshift insertion", "frameshift substitution", "frameshift block substitution", "frameshift deletion", "frameshift insertion", "stopgain", "splicing"]
 var_neutral = ["nonsynonymous SNV", "nonframeshift substitution", "nonframeshift block substitution", "stoploss"]
 var_negative = ["NA", "synonymous SNV"]
