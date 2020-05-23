@@ -1,10 +1,14 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-"""
+"""MAIN PROGRAM
 TEST TOOL MATCHES
-    For each sample, calculates the percent of similarity. Similarity is defined as the number of regions where two (or three) tools report the same
-    copy number divided by the total of regions that the case has. Value should be similar to accuracy in the confusion matrix
+    Calculates the similarity between two tools
+    This similarity is defined as the number of regions where both tools report the same aberration. This similarity calculation is multiplied by the number of bases that the region comprises
+    Two different similarities are calculated
+        calculateSimilarity creates a 4x4 table where the tool outputs are reported according to the aberration and divides the coincidences vs the total
+        percentSimilarity checks the regions in common. If both tools report the same, it is added to the coincidences. Otherwise not.
+
     Additionally, calculates the MCC, and the Jaccard index for all the aberrations
     Finally it calculates the percentage of coincidences by inspecting the regions in common
     The output is printed in separated files one for each comparison
@@ -26,11 +30,12 @@ wd = "/g/strcombio/fsupek_cancer2/TCGA_bam/OV"
 def percentSimilarity(regs, tool1, tool2) :
     coin = 0
     all = 0
-    for k in regs.keys() :
-        for r in regs[k] :
-            all += 1
+    for k in regs.keys() : # Iterate by chromosome
+        for r in regs[k] : # Iterate the regions in the chromosome
+            length = r[1] - r[0]
+            all += length
             if lg.getCopyNumber(r, k, tool1) == lg.getCopyNumber(r, k, tool2) :
-                coin += 1
+                coin += length
 
     percent = 100*float(coin)/float(all)
     return percent
