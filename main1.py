@@ -222,14 +222,28 @@ def getWorst(vcf, gene) :
 	level = -1
 	order = []
 	worst = "Not found"
+	maxMaf = 0.05 # If a nonsynonymous SNV has a MAF higher than this threshold, the variant is considered tolerated
 	with open(vcf, "r") as fi :
 		for l in fi :
 			aux = l.split("\t") # Get the gene name
 			if aux[6] == gene :
 				found = True
-				if classifier.index(aux[8]) > level :
-					level = classifier.index(aux[8])
-					worst = aux[8]
+				var = aux[8]
+				if var == "nonsynonymous SNV" :
+					maf = -1
+					# Look at all the MAF reported by gNOMAD (v2.1.1 and 3.0)
+					for m in aux[12:41] :
+						try :
+							aux = float(m)
+							if aux > maf :
+								maf = aux
+						except ValueError :
+							pass
+					if maf >= maxMaf :
+						var = "synonymous SNV"
+				if classifier.index(var) > level :
+					level = classifier.index(var)
+					worst = var
 			elif found :
 				break
 	return worst
@@ -307,4 +321,4 @@ def prepareTable() :
 				# cf = "{wd}/{sub}/{control}".format(wd = wd, sub = c[0], control = cn[0])
 
 if __name__ == "__main__" :
-	checkAscat()
+	prepareTable()
