@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 #!/usr/bin/python
 
+import scipy
 import sys
+
 import getWebInfo as gw
 import reAnnoFilt as anno
 
@@ -14,8 +16,22 @@ def main(ruta, samplename = "noName") :
             p["Strand_bias_score"] = p["STRANDQ"] # Mutect2 no proporciona los reads forward y los reads reverse de la variante
         else :
             p["Strand_bias_score"] = "NA"
+        if "SB" in p.keys() :
+            aux = p["SB"].split(",")
+            refFw = int(aux[0])
+            refRv = int(aux[1])
+            altFw = int(aux[2])
+            altRv = int(aux[3])
+            odds_ratio, pvalue = scipy.stats.fisher_exact([[refFw, refRv], [altFw, altRv]])
+            p["SB"] = pvalue
+            p["ADF"] = "{},{}".format(refFw, altFw)
+            p["ADR"] = "{},{}".format(refRv, altRv)
+            if not "STRANDQ" in p.keys() :
+                p["Strand_bias_score"] = refFw + altFw - refRv - altRv
+
         p["Ref_depth"] = p["AD"].split(",")[0]
         p["Alt_depth"] = p["AD"].split(",")[1]
+        p["MQ"] = p["MMQ"] # Parche para que data2excel coja la mapping quality
         if "AF" in p.keys() :
             if p["AF"].find(",") > -1 :
                 p["VAF"] = 100*float(p["AF"].split(",")[0])

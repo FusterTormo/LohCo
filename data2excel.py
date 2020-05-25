@@ -16,7 +16,7 @@ arxius = ["cand.reanno.tsv", "lowVAF.reanno.tsv", "highMAF.reanno.tsv", "conseq.
 stats = "variants.stats.txt"
 # Orden de las columnas en que se colocaran en cada una de las pestanas del excel
 orden = ["sample", "IGV_link", "Gene.refGene", "Chr", "Start", "End", "Ref", "Alt", "GT", "GQ", "MQ", "Func.refGene", "ExonicFunc.refGene", "AAChange.refGene", "GeneDetail.refGene",
-"Ref_depth", "Alt_depth", "DP", "DPF", "AD", "ADF", "ADR", "VAF", "population_max", "population_max_name", "gnomad_exome_AF_popmax", "gnomad_exome_non_topmed_AF_popmax",
+"Ref_depth", "Alt_depth", "DP", "DPF", "AD", "ADF", "ADR", "VAF", "FILTER", "population_max", "population_max_name", "gnomad_exome_AF_popmax", "gnomad_exome_non_topmed_AF_popmax",
 "gnomad_genome_AF_popmax", "gnomad_genome_non_topmed_AF_popmax",
 "predictor_summary", "Strand_bias_score", "SB",
 "avsnp150", "CLNALLELEID", "CLNDN", "CLNDISDB", "CLNREVSTAT", "CLNSIG", "cosmic70",
@@ -61,7 +61,7 @@ def crearCabecera(hoja, libro) :
 
     cabecera = ["Analysis", "Interpretation", "Sample", "IGV_link", "IGV", "Gene", "Chromosome", "Start", "End", "Ref", "Alt", "Genotype", "Genome Quality", "Mapping Quality", "Mutation type",
     "Exonic mutation type", "Amino acid change", "Transcript",
-    "Reference depth", "Alterated depth", "Position depth", "Discarded reads", "Allelic depths", "Forward allelic depths", "Reverse allelic depths", "VAF", "Population max MAF",
+    "Reference depth", "Alterated depth", "Position depth", "Discarded reads", "Allelic depths", "Forward allelic depths", "Reverse allelic depths", "VAF", "Variant caller filter", "Population max MAF",
     "gNOMAD Exome popmax", "gNOMAD Exome nonTOPMed popmax", "gNOMAD Genome popmax", "gNOMAD Genome nonTOPMed popmax",
     "Population reported max MAF", "Predictor summary", "SMD strand bias score", "Variant caller strand bias score",
     "DBSNP", "ClinVar CLNALLELEID", "ClinVar CLNDN", "ClinVar CLNDISDB", "ClinVar CLNREVSTAT", "Clinvar CLNSIG", "COSMIC",
@@ -269,17 +269,17 @@ def escribirEstadisticas(hoja, libro) :
         hoja.write(1, 8, "RAW", izquierda)
         hoja.write(1, 9, var["Totales"], derecha)
         del var["Totales"]
-        hoja.write(3, 8, "Consequence", izquierda)
-        hoja.write(3, 9, var["Conseq"], derecha)
+        hoja.write(2, 8, "Consequence", izquierda)
+        hoja.write(2, 9, var["Conseq"], derecha)
         del var["Conseq"]
-        hoja.write(4, 8, "High MAF", izquierda)
-        hoja.write(4, 9, var["MAF_alta"], derecha)
+        hoja.write(3, 8, "High MAF", izquierda)
+        hoja.write(3, 9, var["MAF_alta"], derecha)
         del var["MAF_alta"]
-        hoja.write(5, 8, "Low VAF", izquierda)
-        hoja.write(5, 9, var["VAF_baja"], derecha)
+        hoja.write(4, 8, "Low VAF", izquierda)
+        hoja.write(4, 9, var["VAF_baja"], derecha)
         del var["VAF_baja"]
-        hoja.write(6, 8, "Candidates", bajoIzq)
-        hoja.write(6, 9, var["Candidatas"], bajoDrch)
+        hoja.write(5, 8, "Candidates", bajoIzq)
+        hoja.write(5, 9, var["Candidatas"], bajoDrch)
         del var["Candidatas"]
         hoja.merge_range(0, 11, 0, 12, "Raw variant distribution", titulo)
         fila = 1
