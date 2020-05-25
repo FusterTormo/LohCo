@@ -158,7 +158,7 @@ def getMutect2(input, referencia, germline, output, regiones = None) :
     cmd += "/opt/gatk-4.1.4.1/gatk FilterMutectCalls -R {ref} -V {id}.vcf --stats {id}.vcf.stats --filtering-stats {id}.filter.tsv -O {id}.filtered.vcf\n".format(ref = referencia, id = output)
     cmd += "mkdir variantCalling\n"
     cmd += "cd variantCalling\n"
-    cmd += "mv ../mutect* .\n")
+    cmd += "mv ../mutect* .\n"
     return cmd
 
 def getANNOVAR(vcf, prefix) :
