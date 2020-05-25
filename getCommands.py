@@ -163,6 +163,5 @@ def getMutect2(input, referencia, germline, output, regiones = None) :
 
 def getANNOVAR(vcf, prefix) :
     cmd = "/opt/annovar20180416/convert2annovar.pl -format vcf4 -outfile {out}.av -includeinfo {input}\n".format(out = prefix, input = vcf)
-    cmd += "/opt/annovar20180416/annotate_variation.pl -geneanno -buildver hg19 -hgvs -separate -out {prefix} {prefix}.av /opt/annovar20180416/humandb/\n".format(prefix = prefix)
     cmd += "/opt/annovar20180416/table_annovar.pl {input}.av /opt/annovar20180416/humandb/ -buildver hg19 -out {input} -remove -protocol refGene,avsnp150,1000g2015aug_all,1000g2015aug_afr,1000g2015aug_amr,1000g2015aug_eas,1000g2015aug_eur,1000g2015aug_sas,exac03,gnomad211_exome,gnomad211_genome,esp6500siv2_all,esp6500siv2_ea,esp6500siv2_aa,clinvar_20190305,cosmic70,dbnsfp35a --operation g,f,f,f,f,f,f,f,f,f,f,f,f,f,f,f,f -nastring NA -otherinfo".format(input = prefix)
     return cmd
