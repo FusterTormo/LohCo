@@ -31,7 +31,8 @@ def main(ruta, samplename = "noName") :
 
         p["Ref_depth"] = p["AD"].split(",")[0]
         p["Alt_depth"] = p["AD"].split(",")[1]
-        p["MQ"] = p["MMQ"] # Parche para que data2excel coja la mapping quality
+        if "MMQ" in p.keys() :
+            p["MQ"] = p["MMQ"] # Parche para que data2excel coja la mapping quality
         if "AF" in p.keys() :
             if p["AF"].find(",") > -1 :
                 p["VAF"] = 100*float(p["AF"].split(",")[0])
