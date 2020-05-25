@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #!/usr/bin/python
 
-import scipy
+import scipy.stats as stats
 import sys
 
 import getWebInfo as gw
@@ -22,7 +22,7 @@ def main(ruta, samplename = "noName") :
             refRv = int(aux[1])
             altFw = int(aux[2])
             altRv = int(aux[3])
-            odds_ratio, pvalue = scipy.stats.fisher_exact([[refFw, refRv], [altFw, altRv]])
+            odds_ratio, pvalue = stats.fisher_exact([[refFw, refRv], [altFw, altRv]])
             p["SB"] = pvalue
             p["ADF"] = "{},{}".format(refFw, altFw)
             p["ADR"] = "{},{}".format(refRv, altRv)
