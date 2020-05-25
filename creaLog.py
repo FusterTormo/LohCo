@@ -285,8 +285,6 @@ def prepararPanel(ruta, acciones) :
                     fi.write("\t" + cmd.getMutect2("alignment/bwa.recal.bam", "$ref", "$sites", "mutect", "$mani").replace("\n", "\n\t") + "\n")
                 else :
                     fi.write("\t" + cmd.getMutect2("alignment/bwa.sort.bam", "$ref", "$sites", "mutect", "$mani").replace("\n", "\n\t") + "\n")
-                fi.write("\tmkdir variantCalling\n")
-                fi.write("\tmv mutect* variantCalling\n")
                 # Anotacion de variantes usando ANNOVAR
                 if "vanno" in acciones :
                     fi.write("\n\t# Anotacion y filtrado de variantes. ANNOVAR y myvariant.info\n")
