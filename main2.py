@@ -9,6 +9,7 @@ TEST REGIONS IN COMMON
     From this list of coincidences/differences, get largest and smallest region
 """
 
+import os
 import sqlite3
 import sys
 
@@ -20,30 +21,34 @@ import main1 as mm
 def compareRegions(regions, tool1, tool2) :
     coincide = []
     differ = []
+    cont = 0
     for k in regs.keys() : # Iterate by chromosome
         for r in regs[k] : # Iterate the regions in the chromosome
+            cont += 1
             if lg.getCopyNumber(r, k, tool1) == lg.getCopyNumber(r, k, tool2) :
                 coincide.append(r)
             else :
                 differ.append(r)
-    sm = 9999999999999999999999999999999999999999999999999999
-    lg = -1
+    print("INFO: {} regions found".format(cont))
+    small = 9999999999999999999999999999999999999999999999999999
+    large = -1
     for r in coincide :
+        print(length)
         length = int(r[1]) - int(r[0])
-        if length > lg :
-            lg = length
-        if length < sm :
-            sm = length
-    print("{} regions in common. Smallest: {}. Largest: {}".format(len(coincide), sm, lg))
-    sm = 9999999999999999999999999999999999999999999999999999
-    lg = -1
+        if length > large :
+            large = length
+        if length < small :
+            small = length
+    print("{} regions in common. Smallest: {}. Largest: {}".format(len(coincide), small, large))
+    small = 9999999999999999999999999999999999999999999999999999
+    large = -1
     for r in differ :
         length = int(r[1]) - int(r[0])
-        if length > lg :
-            lg = length
-        if length < sm :
-            sm = length
-    print("{} regions in common. Smallest: {}. Largest: {}".format(len(coincide), sm, lg))
+        if length > large :
+            large = length
+        if length < small :
+            small = length
+    print("{} regions in common. Smallest: {}. Largest: {}".format(len(coincide), small, large))
 
 # Constants
 dbcon = sqlite3.connect("/g/strcombio/fsupek_cancer2/TCGA_bam/info/info.db")

@@ -285,7 +285,7 @@ def extractAscat(path, verbosity = "warning") :
         print("WARNING: {} not found. Ploidy, purity, and goodness of fit data could not be added to ASCAT".format(path3))
     return sc
 
-def extractSequenza(path, verbosity == "warning") :
+def extractSequenza(path, verbosity = "warning") :
     """Read Sequenza data and return the information in a specific format
 
     Read Sequenza *_segments.txt file, which stores the raw information about copy number that has been calculated. From this file the information is converted to a list of regions for each chromosome. The
