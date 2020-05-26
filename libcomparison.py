@@ -29,7 +29,7 @@ import libextractfile as ex
 import libgetters as ge
 import libconstants as cts
 
-def convert2region(path, filetype) :
+def convert2region(path, filetype, verbosity = "warning") :
     """Read the output file from LOH program and convert the data to REGION format
 
     Reads the file located in path passed as parameter and converts the data to REGION format. It is necessary to pass the type of output in order to call the corresponding function to extract the data
@@ -47,11 +47,11 @@ def convert2region(path, filetype) :
     if filetype == "array" :
         reg = ex.extractArray(path)
     elif filetype == "facets" :
-        reg = ex.extractFacets(path)
+        reg = ex.extractFacets(path, verbosity)
     elif filetype == "ascat" or filetype == "ascatngs" :
-        reg = ex.extractAscat(path)
+        reg = ex.extractAscat(path, verbosity)
     elif filetype == "sequenza" :
-        reg = ex.extractSequenza(path)
+        reg = ex.extractSequenza(path, verbosity)
     elif filetype == "cnacs" :
         print("ERROR: CNACS is not implemented yet")
         sys.exit()

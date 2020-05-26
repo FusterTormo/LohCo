@@ -108,7 +108,7 @@ def extractArray(path) :
     ar["likelyhood"] = 'NA'
     return ar
 
-def extractFacets(path) :
+def extractFacets(path, verbosity = "warning") :
     """Read FACETS $cncf file table and return the interesting information in a specific variable format
 
     Read FACETS *_cncf.tsv file, which stores the raw information about copy number that has been calculated. From this file the information is converted to a list of regions for each chromosome. The
@@ -128,6 +128,7 @@ def extractFacets(path) :
 
     Parameters :
         path (str) : Path of the file to extract the data
+        verbosity (str) : If the function must be verbose: "warning" means that warning messages must be shown. Otherwise, not
 
     Returns :
         REGION : A dict where the key is the chromosome name and the value is a list of the regions in format [start, end, copy-number, tcn, lcn, logR]. Additionally, "ploidy", "purity",
@@ -161,7 +162,7 @@ def extractFacets(path) :
                         fa[chr].append(reg)
                     else :
                         fa[chr] = [reg]
-                else :
+                elif verbosity == "warning" :
                     print("WARNING: Chromosome {} not found in the chromosomes constant".format(chr))
 
     fa["likelyhood"] = 'NA'
@@ -177,12 +178,12 @@ def extractFacets(path) :
         fa["purity"] = float(data[1])
         fa["ploidy"] = float(data[2])
 
-    if fa["ploidy"] == 'NA':
+    if fa["ploidy"] == 'NA' and verbosity == "warning":
         print("WARNING: {} not found. Information about ploidy, purity, and likelyhood not given".format(basicPath))
 
     return fa
 
-def extractAscat(path) :
+def extractAscat(path, verbosity = "warning") :
     """Read ascatNGS data and return the information in a specific format
 
     Read ascatNGS *copynumber.caveman.txt file, which stores the raw information about copy number that has been calculated. From this file the information is converted a list of regions for each chromosome. The
@@ -203,6 +204,7 @@ def extractAscat(path) :
 
     Parameters :
         path (str) : Path of the file to extract the data
+        verbosity (str) : If the function must be verbose: "warning" means that warning messages must be shown. Otherwise, not
 
     Returns :
         REGION : A dict where the key is the chromosome name and the value is a list of the regions in format [start, end, copy-number, tcn, lcn, logR]. Additionally, "ploidy", "purity",
@@ -261,7 +263,7 @@ def extractAscat(path) :
                             pass
                             #NOTE This function slows down a lot the execution. If possible avoid it
                             #getAscatLogR(path2, ps, cr)
-    else :
+    elif verbosity == "warning" :
         print("WARNING: {} not found. LogR calculations could not be added to ASCAT".format(path2))
 
     path3 = path.replace(".copynumber.caveman.csv", ".samplestatistics.txt")
@@ -279,11 +281,11 @@ def extractAscat(path) :
                 if aux[0].startswith("goodnessOfFit") :
                     sc["likelyhood"] = float(aux[1])
 
-    else :
+    elif verbosity == "warning" :
         print("WARNING: {} not found. Ploidy, purity, and goodness of fit data could not be added to ASCAT".format(path3))
     return sc
 
-def extractSequenza(path) :
+def extractSequenza(path, verbosity == "warning") :
     """Read Sequenza data and return the information in a specific format
 
     Read Sequenza *_segments.txt file, which stores the raw information about copy number that has been calculated. From this file the information is converted to a list of regions for each chromosome. The
@@ -303,6 +305,7 @@ def extractSequenza(path) :
 
     Parameters :
         path (str) : Path of the file to extract the data
+        verbosity (str) : If the function must be verbose: "warning" means that warning messages must be shown. Otherwise, not
 
     Returns :
         REGION : A dict where the key is the chromosome name and the value is a list of the regions in format [start, end, copy-number, tcn, lcn, logR]. Additionally, "ploidy", "purity",
@@ -333,9 +336,9 @@ def extractSequenza(path) :
                         seq[chr].append(reg)
                     else :
                         seq[chr] = [reg]
-                else :
-
+                elif verbosity == "warning" :
                     print("WARNING: Chromosome {} not found in the chromosomes constant".format(chr))
+
     path2 = path.replace("_segments.txt", "_alternative_solutions.txt")
     seq["ploidy"] = "NA"
     seq["purity"] = "NA"
@@ -347,7 +350,7 @@ def extractSequenza(path) :
                     aux = l.strip("\n").split("\t")
                     seq["ploidy"] = float(aux[1])
                     seq["purity"] = float(aux[0]) #NOTE: Sequenza uses the term "cellularity", instead of ploidy.
-    else :
+    elif verbosity == "warning" :
         print("WARNING: File {} not found. Cannot add the ploidy and purity values to sequenza variable".format(path2))
     path3 = path.replace("_segments.txt", "_confints_CP.txt")
     if os.path.isfile(path3) :
@@ -358,9 +361,9 @@ def extractSequenza(path) :
                     if float(aux[0]) == seq["purity"] and float(aux[1]) == seq["ploidy"] :
                         seq["likelyhood"] = float(aux[2])
 
-        if seq["likelyhood"] == "NA" :
+        if seq["likelyhood"] == "NA" and verbosity == "warning":
             print("WARNING: Confidence interval not found in {path} for ploidy {ploidy} and purity {purity}".format(path = path3, ploidy = seq["ploidy"], purity = seq["purity"]))
-    else :
+    elif verbosity == "warning" :
         print("WARNING: File {} not found. Cannot add likelyhood value to sequenza variable".format(path3))
 
     return seq
