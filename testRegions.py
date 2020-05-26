@@ -7,8 +7,11 @@ TEST REGIONS:
         Get the most significative variant in this gene
         Test if the sample can be included in the positive, negative or unknown group.
         Get the CNV/LOH for this region from FACETS, ascatNGS, and Sequenza.
-        Score +1 in the positive score if the program has detected LOH in a deleterious mutation
-        Score +1 in the negative score if the program has detected LOH in a non-deleterious mutation
+        Count LOH in each group
+            score[] annotates the LOH in positive cases
+            score[]2 annotates the LOH in negative cases
+            score[]3 annotates the LOH in unknown cases
+        [] is the first letter of the tool (i.e. scoreA is ascatNGS score for positive cases, scoreS3 is Sequenza score for unknown cases)
 """
 
 import sqlite3
@@ -58,10 +61,13 @@ def doTest(gene, region) :
     neutralS = []
     scoreF = 0
     scoreF2 = 0
+    scoreF3 = 0
     scoreA = 0
     scoreA2 = 0
+    scoreA3 = 0
     scoreS = 0
     scoreS2 = 0
+    scoreS3 = 0
 
     with dbcon :
         cur = dbcon.cursor()
@@ -135,10 +141,18 @@ def doTest(gene, region) :
                     if lohS != "Not found" :
                         neutralS.append(analysis)
 
+                    # Unknown variant
+                    if lohF == "L" :
+                        scoreF3 += 1
+                    if lohA == "L" :
+                        scoreA3 += 1
+                    if lohS == "L" :
+                        scoreS3 += 1
+
     results = "INFO: Final score for {}\n".format(gene)
-    results += "\tFACETS\n\t\tPositive: {} - Detected: {}\n\t\tNegative: {} - Detected: {}\n\t\tUnknown: {}\n".format(len(positiveF), scoreF, len(negativeF), scoreF2, len(neutralF))
-    results += "\tascatNGS\n\t\tPositive: {} - Detected: {}\n\t\tNegative: {} - Detected: {}\n\t\tUnknown: {}\n".format(len(positiveA), scoreA, len(negativeA), scoreA2, len(neutralA))
-    results += "\tSequenza\n\t\tPositive: {} - Detected: {}\n\t\tNegative: {} - Detected: {}\n\t\tUnknown: {}\n\n".format(len(positiveS), scoreF, len(negativeS), scoreS2, len(neutralS))
+    results += "\tFACETS\n\t\tPositive: {} - Detected: {}\n\t\tNegative: {} - Detected: {}\n\t\tUnknown: {} - Detected {}\n".format(len(positiveF), scoreF, len(negativeF), scoreF2, len(neutralF), scoreF3)
+    results += "\tascatNGS\n\t\tPositive: {} - Detected: {}\n\t\tNegative: {} - Detected: {}\n\t\tUnknown: {} - Detected {}\n".format(len(positiveA), scoreA, len(negativeA), scoreA2, len(neutralA), scoreA3)
+    results += "\tSequenza\n\t\tPositive: {} - Detected: {}\n\t\tNegative: {} - Detected: {}\n\t\tUnknown: {} - Detected {}\n\n".format(len(positiveS), scoreS, len(negativeS), scoreS2, len(neutralS), scoreS3)
     return results
 
 def main() :
