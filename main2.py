@@ -33,22 +33,23 @@ def compareRegions(regions, tool1, tool2) :
     small = 9999999999999999999999999999999999999999999999999999
     large = -1
     for r in coincide :
-        print(length)
         length = int(r[1]) - int(r[0])
-        if length > large :
-            large = length
-        if length < small :
-            small = length
+        if length > 0 :
+            if length > large :
+                large = length
+            if length < small :
+                small = length
     print("{} regions in common. Smallest: {}. Largest: {}".format(len(coincide), small, large))
     small = 9999999999999999999999999999999999999999999999999999
     large = -1
     for r in differ :
         length = int(r[1]) - int(r[0])
-        if length > large :
-            large = length
-        if length < small :
-            small = length
-    print("{} regions in common. Smallest: {}. Largest: {}".format(len(coincide), small, large))
+        if length > 0 :
+            if length > large :
+                large = length
+            if length < small :
+                small = length
+    print("{} regions in common. Smallest: {}. Largest: {}".format(len(differ), small, large))
 
 # Constants
 dbcon = sqlite3.connect("/g/strcombio/fsupek_cancer2/TCGA_bam/info/info.db")
