@@ -246,15 +246,13 @@ def escribirEstadisticas(hoja, libro) :
                     if n == "per_base_quality.png" :
                         basequal.append(os.path.join(root, n))
             fila = 6
-            print(basequal)
-            print(seqcontent)
             for i in basequal :
-                hoja.insert_image(fila, 0, i, {"x_scale" : 0.1, "y_scale" : 0.1})
-                fila += 10
+                hoja.insert_image(fila, 0, i, {"x_scale" : 0.2, "y_scale" : 0.2})
+                fila += 6
 
             for i in seqcontent :
-                hoja.insert_image(fila, 0, i, {"x_scale" : 0.1, "y_scale" : 0.1})
-                fila += 10
+                hoja.insert_image(fila, 0, i, {"x_scale" : 0.2, "y_scale" : 0.2})
+                fila += 6
 
 
     if os.path.isfile(cov) :
