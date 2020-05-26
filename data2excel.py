@@ -235,6 +235,28 @@ def escribirEstadisticas(hoja, libro) :
         else :
             hoja.write(4, 0, "OFF target", bajoIzq)
             hoja.write(4, 1, "{} ({:.2f} %)".format(qua["OFF"], 100*float(qua["OFF"])/float(qua["BAM"])), bajoDrch)
+        # Incrustar las imagenes de calidad reportadas por FastQC
+        if os.path.isdir("../fastqc") :
+            basequal = []
+            seqcontent = []
+            for root, dirs, files in os.walk("../fastqc", topdown = False) :
+                for n in files :
+                    if n == "per_base_sequence_content.png" :
+                        seqcontent.append(os.path.join(root, n))
+                    if n == "per_base_quality.png" :
+                        basequal.append(os.path.join(root, n))
+            fila = 6
+            print(basequal)
+            print(seqcontent)
+            for i in basequal :
+                hoja.insert_image(fila, 0, i, {"x_scale" : 0.1, "y_scale" : 0.1})
+                fila += 10
+
+            for i in seqcontent :
+                hoja.insert_image(fila, 0, i, {"x_scale" : 0.1, "y_scale" : 0.1})
+                fila += 10
+
+
     if os.path.isfile(cov) :
         with open(cov, "r") as fi:
             aux = fi.read()
@@ -258,8 +280,8 @@ def escribirEstadisticas(hoja, libro) :
         hoja.write(8, 5, cv["bases500"], derecha)
         hoja.write(9, 4, "% bases with 1000 cov", bajoIzq)
         hoja.write(9, 5, cv["bases1000"], bajoDrch)
-        if os.path.isfile("../coverage/coverage.png") : #Adjuntar el grafico de coverage general. Se reduce un 50%
-            hoja.insert_image(12, 4, "../coverage/coverage.png", {"x_scale" : 0.5, "y_scale" : 0.5})
+        if os.path.isfile("../coverage/coverage.png") : #Adjuntar el grafico de coverage general. Se reduce un 75%
+            hoja.insert_image(12, 4, "../coverage/coverage.png", {"x_scale" : 0.25, "y_scale" : 0.25})
 
     if os.path.isfile(stats) :
         with open(stats, "r") as fi :
