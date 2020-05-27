@@ -41,16 +41,16 @@ def compareRegions(regions, tool1, tool2, coincide, differ) :
 dbcon = sqlite3.connect("/g/strcombio/fsupek_cancer2/TCGA_bam/info/info.db")
 wd = "/g/strcombio/fsupek_cancer2/TCGA_bam/OV"
 
-table = []
 with dbcon :
     cur = dbcon.cursor()
     q = cur.execute("SELECT submitter FROM patient WHERE cancer='OV'")
     cases = q.fetchall()
 
+fvsc = []
+fvsd = []
+
 for c in cases :
     # Recollir la informacio dels bams i el sexe que te el cas registrats
-    fvsc = []
-    fvsd = []
     with dbcon :
         cur = dbcon.cursor()
         q = cur.execute("SELECT uuid FROM sample WHERE submitter='{}' AND tumor LIKE '%Tumor%'".format(c[0]))
