@@ -18,9 +18,7 @@ import libgetters as lg
 import main1 as mm
 
 
-def compareRegions(regions, tool1, tool2) :
-    coincide = []
-    differ = []
+def compareRegions(regions, tool1, tool2, coincide, differ) :
     cont = 0
     for k in regs.keys() : # Iterate by chromosome
         for r in regs[k] : # Iterate the regions in the chromosome
@@ -38,7 +36,6 @@ def compareRegions(regions, tool1, tool2) :
                     differ.append("NA")
     print("INFO: {} regions found".format(cont))
 
-    return coincide, differ
 
 # Constants
 dbcon = sqlite3.connect("/g/strcombio/fsupek_cancer2/TCGA_bam/info/info.db")
@@ -75,9 +72,8 @@ for c in cases :
             # Compare FACETS vs ascatNGS
             if os.path.isfile(facets) and os.path.isfile(sequenza) :
                 regs = lc.getFragments(outf, outs)
-                aux1, aux2 = compareRegions(regs, outf, outs)
-                fvsc.extend(aux1)
-                fvsd.extend(aux2)
+                compareRegions(regs, outf, outs, fvsc, fvsd)
+
 with open("coincidentRegionsFacetsSequenza.txt", "w") as fi :
     fi.write(",".join(fvsc))
 with open("differentRegionsFacetsSequenza.txt", "w") as fi:
