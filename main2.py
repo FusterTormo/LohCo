@@ -25,31 +25,20 @@ def compareRegions(regions, tool1, tool2) :
     for k in regs.keys() : # Iterate by chromosome
         for r in regs[k] : # Iterate the regions in the chromosome
             cont += 1
+            length = r[1] - r[0]
             if lg.getCopyNumber(r, k, tool1) == lg.getCopyNumber(r, k, tool2) :
-                coincide.append(r)
+                if length > 0 :
+                    coincide.append(str(length))
+                else :
+                    coincide.append("NA")
             else :
-                differ.append(r)
+                if length > 0 :
+                    differ.append(str(length))
+                else :
+                    differ.append("NA")
     print("INFO: {} regions found".format(cont))
 
-    sys.stdout.write("coin <- c(")
-    for r in coincide :
-        length = int(r[1]) - int(r[0])
-        if length > 0 :
-            sys.stdout.write(length)
-            sys.stdout.write(",")
-        else :
-            sys.stdout.write("NA,")
-    sys.stdout.write(")\n")
-    
-    sys.stdout.write("differ <- c(")
-    for r in differ :
-        length = int(r[1]) - int(r[0])
-        if length > 0 :
-            sys.stdout.write(length)
-            sys.stdout.write(",")
-        else :
-            sys.stdout.write("NA,")
-    sys.stdout.write(")\n")
+    return coincide, differ
 
 # Constants
 dbcon = sqlite3.connect("/g/strcombio/fsupek_cancer2/TCGA_bam/info/info.db")
@@ -63,6 +52,8 @@ with dbcon :
 
 for c in cases :
     # Recollir la informacio dels bams i el sexe que te el cas registrats
+    fvsc = []
+    fvsd = []
     with dbcon :
         cur = dbcon.cursor()
         q = cur.execute("SELECT uuid FROM sample WHERE submitter='{}' AND tumor LIKE '%Tumor%'".format(c[0]))
@@ -84,5 +75,8 @@ for c in cases :
             # Compare FACETS vs ascatNGS
             if os.path.isfile(facets) and os.path.isfile(sequenza) :
                 regs = lc.getFragments(outf, outs)
-                compareRegions(regs, outf, outs)
-                sys.exit()
+                aux1, aux2 = compareRegions(regs, outf, outs)
+                fvsc = fvsc + aux1
+                fvsd = fvsd + aux2
+with open("coincidentRegionsFacetsSequenza.txt", "w") as fi :
+    fi.write(",".join())
