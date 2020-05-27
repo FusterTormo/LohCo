@@ -76,8 +76,8 @@ for c in cases :
             if os.path.isfile(facets) and os.path.isfile(sequenza) :
                 regs = lc.getFragments(outf, outs)
                 aux1, aux2 = compareRegions(regs, outf, outs)
-                fvsc = fvsc + aux1
-                fvsd = fvsd + aux2
+                fvsc.extend(aux1)
+                fvsd.extend(aux2)
 with open("coincidentRegionsFacetsSequenza.txt", "w") as fi :
     fi.write(",".join(fvsc))
 with open("differentRegionsFacetsSequenza.txt", "w") as fi:
