@@ -79,4 +79,6 @@ for c in cases :
                 fvsc = fvsc + aux1
                 fvsd = fvsd + aux2
 with open("coincidentRegionsFacetsSequenza.txt", "w") as fi :
-    fi.write(",".join())
+    fi.write(",".join(fvsc))
+with open("differentRegionsFacetsSequenza.txt", "w") as fi:
+    fi.write(",".join(fvsd))
