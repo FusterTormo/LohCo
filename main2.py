@@ -46,9 +46,6 @@ with dbcon :
     q = cur.execute("SELECT submitter FROM patient WHERE cancer='OV'")
     cases = q.fetchall()
 
-fvsc = []
-fvsd = []
-
 for c in cases :
     # Recollir la informacio dels bams i el sexe que te el cas registrats
     with dbcon :
@@ -59,7 +56,10 @@ for c in cases :
         controls = q.fetchall()
     for tm in tumors :
         for cn in controls :
+            fvsc = []
+            fvsd = []
             tf = "{wd}/{sub}/{tm}_VS_{cn}".format(wd = wd, sub = c[0], tm = tm[0].split("-")[0], cn = cn[0].split("-")[0])
+            output = "{}.txt".format(tf.split("/")[-1])
             facets = "{}_FACETS/facets_comp_cncf.tsv".format(tf)
             ascat = mm.findAscatName("{}_ASCAT/".format(tf))
             sequenza = "{}_Sequenza/{}_segments.txt".format(tf, c[0])
@@ -74,7 +74,8 @@ for c in cases :
                 regs = lc.getFragments(outf, outs)
                 compareRegions(regs, outf, outs, fvsc, fvsd)
 
-with open("coincidentRegionsFacetsSequenza.txt", "w") as fi :
-    fi.write(",".join(fvsc))
-with open("differentRegionsFacetsSequenza.txt", "w") as fi:
-    fi.write(",".join(fvsd))
+            with open(output, "w") as fi :
+                fi.write(",".join(fvsc))
+                fi.write("\n")
+                fi.write(",".join(fvsd))
+                fi.write("\n")
