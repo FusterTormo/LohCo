@@ -186,7 +186,7 @@ def ayudaPredictores(hoja, libro, fila) :
     hoja.merge_range(fila+1, 10, fila+9, 16, body, bajo)
 
     #Ayuda para los coeficientes de strand-bias
-    titol = "HELP for Strand bias ratio"
+    titol = "HELP for SMD Strand bias score"
     body = "Strand bias is calculated with the formula:\nreads_reference_forward + reads_alterated_forward - read_reference_reverse - reads_alterated_reverse"
 
     hoja.merge_range(fila+12, 10, fila+12, 19, titol, titulo)

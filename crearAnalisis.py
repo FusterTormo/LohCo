@@ -58,8 +58,29 @@ def leerMuestras() :
                             tumors[id]["fastq"].append([fq1, fq2, rg])
     return tumors, controls
 
+def leerParejas() :
+    """
+    Lee el csv que contiene la informacion de las parejas tumor/control en todas las muestras
+    """
+    arx = "Clinical_data_gender.csv"
+    lista = []
+    with open(arx, "r") as fi :
+        cabecera = True
+        for l in fi :
+            if cabecera :
+                cabecera = False
+            else :
+                aux = l.strip("\n").split(";")
+                tm = aux[2]
+                gender = aux[3]
+                cn = aux[4]
+                lista.append([tm, cn, gender])
+    print(lista)
+    return lista
+
 def getControl(muestra, controles) :
     # Extraer el numero identificador de la muestra tumoral
+    # Leer el archivo que contiene la relacion muestra_tumor - muestra_control
     regex = "[\d]+"
     match = re.search(regex, muestra)
     idmuestra = ""
@@ -122,6 +143,7 @@ def alinear(muestra, id) :
 
 def main() :
     tm, cn = leerMuestras()
+    par = leerParejas()
     for k,v in tm.items() :
         c = getControl(k, cn)
         if c == "" :
@@ -157,28 +179,7 @@ def main() :
                 alinear(cn[c], c)
 
             folder = "{}vs{}".format(k,c) # Crear la carpeta de analisis
-            # if os.path.isdir(folder) :
-            #     pass
-            # else :
-            #     os.makedirs(folder, 0o754)
-            #     os.chdir(folder)
 
-            # if os.path.isdir(folder) : # La carpeta existe, puede que algo se haya ejecutado
-            #     #Guardar todos los archivos de la carpeta en una lista
-            #     filenames = os.listdir(folder)
-            #     os.chdir(folder)
-            #     if "{}.nodup.bam".format(k) not in filenames :
-            #         alinear(v, k)
-            #     else :
-            #         print("TODO: Comprobar si los variant calls se han hecho en la carpeta")
-            # else :
-            #     print("INFO: Analizando {}".format(folder))
-            #     os.makedirs(folder, 0o754)
-            #     # Ordenes para alinear la muestra
-            #     os.chdir(folder)
-            #     with open(logfile, "a") as fi :
-            #         fi.write("cd {}\n".format(os.path.abspath(os.getcwd())))
-            #     alinear(v)
             os.chdir(wd)
 
 
