@@ -80,7 +80,12 @@ def leerParejas() :
 
 def getControl(muestra, controles) :
     # Extraer el numero identificador de la muestra tumoral
-    # Leer el archivo que contiene la relacion muestra_tumor - muestra_control
+    idmuestra = ""
+    for c in controles :
+        if c[0] == muestra :
+            idmuestra = c[1]
+            break
+    """FORMA ANTIGUA DE BUSCAR UN CONTROL. Es guarda per l'exemple de les expressions regulars
     regex = "[\d]+"
     match = re.search(regex, muestra)
     idmuestra = ""
@@ -92,7 +97,9 @@ def getControl(muestra, controles) :
                 break
     else :
         print("WARNING: Identificador no encontrado en {}".format(muestra))
-
+    """
+    if idmuestra == "" :
+        print("WARNING: Identificador no encontrado en {}".format(muestra))
     return idmuestra
 
 def ejecutar(orden) :
@@ -145,7 +152,7 @@ def main() :
     tm, cn = leerMuestras()
     par = leerParejas()
     for k,v in tm.items() :
-        c = getControl(k, cn)
+        c = getControl(k, par)
         if c == "" :
             if v["gender"] == "F" :
                 c = "C2_CD3"
@@ -184,4 +191,4 @@ def main() :
 
 
 if __name__ == "__main__" :
-    main()
+    leerParejas()
