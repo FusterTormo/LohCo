@@ -14,26 +14,27 @@ import sqlite3
 import sys
 
 import libcomparison as lc
+import libconstants as cts
 import libgetters as lg
 import main1 as mm
 
 
 def compareRegions(regions, tool1, tool2, coincide, differ, bedc, bedd) :
     cont = 0
-    for k in regs.keys() : # Iterate by chromosome
-        for r in regs[k] : # Iterate the regions in the chromosome
+    for k in cts.aberrations : # Iterate by chromosome
+        for r in regions[k] : # Iterate the regions in the chromosome
             cont += 1
             length = r[1] - r[0]
             if lg.getCopyNumber(r, k, tool1) == lg.getCopyNumber(r, k, tool2) :
                 if length > 0 :
                     coincide.append(str(length))
-                    bedc.append([k, str(r[0]), str(r[1]]))
+                    bedc.append([k, str(r[0]), str(r[1])])
                 else :
                     coincide.append("NA")
             else :
                 if length > 0 :
                     differ.append(str(length))
-                    bedd.append([k, str(r[0]), str(r[1]]))
+                    bedd.append([k, str(r[0]), str(r[1])])
                 else :
                     differ.append("NA")
     print("INFO: {} regions found".format(cont))
