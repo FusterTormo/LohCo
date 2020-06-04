@@ -27,13 +27,13 @@ def compareRegions(regions, tool1, tool2, coincide, differ, bedc, bedd) :
             if lg.getCopyNumber(r, k, tool1) == lg.getCopyNumber(r, k, tool2) :
                 if length > 0 :
                     coincide.append(str(length))
-                    bedc.append([k, r[0], r[1]])
+                    bedc.append([k, str(r[0]), str(r[1]]))
                 else :
                     coincide.append("NA")
             else :
                 if length > 0 :
                     differ.append(str(length))
-                    bedd.append([k, r[0], r[1]])
+                    bedd.append([k, str(r[0]), str(r[1]]))
                 else :
                     differ.append("NA")
     print("INFO: {} regions found".format(cont))
