@@ -21,7 +21,7 @@ import main1 as mm
 
 def compareRegions(regions, tool1, tool2, coincide, differ, bedc, bedd) :
     cont = 0
-    for k in cts.aberrations : # Iterate by chromosome
+    for k in cts.chromosomes : # Iterate by chromosome
         for r in regions[k] : # Iterate the regions in the chromosome
             cont += 1
             length = r[1] - r[0]
