@@ -18,7 +18,7 @@ import libgetters as lg
 import main1 as mm
 
 
-def compareRegions(regions, tool1, tool2, coincide, differ) :
+def compareRegions(regions, tool1, tool2, coincide, differ, bedc, bedd) :
     cont = 0
     for k in regs.keys() : # Iterate by chromosome
         for r in regs[k] : # Iterate the regions in the chromosome
@@ -27,11 +27,13 @@ def compareRegions(regions, tool1, tool2, coincide, differ) :
             if lg.getCopyNumber(r, k, tool1) == lg.getCopyNumber(r, k, tool2) :
                 if length > 0 :
                     coincide.append(str(length))
+                    bedc.append([k, r[0], r[1]])
                 else :
                     coincide.append("NA")
             else :
                 if length > 0 :
                     differ.append(str(length))
+                    bedd.append([k, r[0], r[1]])
                 else :
                     differ.append("NA")
     print("INFO: {} regions found".format(cont))
@@ -58,8 +60,13 @@ for c in cases :
         for cn in controls :
             fvsc = []
             fvsd = []
+            bed1 = []
+            bed2 = []
             tf = "{wd}/{sub}/{tm}_VS_{cn}".format(wd = wd, sub = c[0], tm = tm[0].split("-")[0], cn = cn[0].split("-")[0])
-            output = "{}.txt".format(tf.split("/")[-1])
+            filename = tf.split("/")[-1]
+            output = "{}.txt".format(filename)
+            output1 = "{}.regsCoin.bed".format(filename)
+            output2 = "{}.regsDiff.bed".format(filename)
             facets = "{}_FACETS/facets_comp_cncf.tsv".format(tf)
             ascat = mm.findAscatName("{}_ASCAT/".format(tf))
             sequenza = "{}_Sequenza/{}_segments.txt".format(tf, c[0])
@@ -72,10 +79,18 @@ for c in cases :
             # Compare FACETS vs ascatNGS
             if os.path.isfile(facets) and os.path.isfile(sequenza) :
                 regs = lc.getFragments(outf, outs)
-                compareRegions(regs, outf, outs, fvsc, fvsd)
+                compareRegions(regs, outf, outs, fvsc, fvsd, bed1, bed2)
 
-            with open(output, "w") as fi :
-                fi.write(",".join(fvsc))
-                fi.write("\n")
-                fi.write(",".join(fvsd))
-                fi.write("\n")
+                with open(output, "w") as fi :
+                    fi.write(",".join(fvsc))
+                    fi.write("\n")
+                    fi.write(",".join(fvsd))
+                    fi.write("\n")
+                with open(output1, "w") as fi :
+                    for l in bed1 :
+                        fi.write("\t".join(l))
+                        fi.write("\n")
+                with open(output2, "w") as fi :
+                    for l in bed2 :
+                        fi.write("\t".join(l))
+                        fi.write("\n")
