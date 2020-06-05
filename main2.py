@@ -78,23 +78,23 @@ for c in cases :
             if os.path.isfile(sequenza) :
                 outs = lc.convert2region(sequenza, "sequenza", "quiet")
             # Compare FACETS vs ascatNGS
-            if os.path.isfile(facets) and os.path.isfile(sequenza) :
-                regs = lc.getFragments(outf, outa)
-                compareRegions(regs, outf, outa, same, diff, bed1, bed2)
-
-                with open(output, "w") as fi :
-                    fi.write(",".join(same))
-                    fi.write("\n")
-                    fi.write(",".join(diff))
-                    fi.write("\n")
-                with open(output1, "w") as fi :
-                    for l in bed1 :
-                        fi.write("\t".join(l))
-                        fi.write("\n")
-                with open(output2, "w") as fi :
-                    for l in bed2 :
-                        fi.write("\t".join(l))
-                        fi.write("\n")
+            # if os.path.isfile(facets) and os.path.isfile(ascat) :
+            #     regs = lc.getFragments(outf, outa)
+            #     compareRegions(regs, outf, outa, same, diff, bed1, bed2)
+            #
+            #     with open(output, "w") as fi :
+            #         fi.write(",".join(same))
+            #         fi.write("\n")
+            #         fi.write(",".join(diff))
+            #         fi.write("\n")
+            #     with open(output1, "w") as fi :
+            #         for l in bed1 :
+            #             fi.write("\t".join(l))
+            #             fi.write("\n")
+            #     with open(output2, "w") as fi :
+            #         for l in bed2 :
+            #             fi.write("\t".join(l))
+            #             fi.write("\n")
 
             # Compare FACETS vs Sequenza
             # if os.path.isfile(facets) and os.path.isfile(sequenza) :
@@ -114,3 +114,22 @@ for c in cases :
             #         for l in bed2 :
             #             fi.write("\t".join(l))
             #             fi.write("\n")
+
+            # Compare ascatNGS vs Sequenza
+            if os.path.isfile(ascat) and os.path.isfile(sequenza) :
+                regs = lc.getFragments(outa, outs)
+                compareRegions(regs, outa, outs, same, diff, bed1, bed2)
+
+                with open(output, "w") as fi :
+                    fi.write(",".join(same))
+                    fi.write("\n")
+                    fi.write(",".join(diff))
+                    fi.write("\n")
+                with open(output1, "w") as fi :
+                    for l in bed1 :
+                        fi.write("\t".join(l))
+                        fi.write("\n")
+                with open(output2, "w") as fi :
+                    for l in bed2 :
+                        fi.write("\t".join(l))
+                        fi.write("\n")
