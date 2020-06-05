@@ -59,8 +59,8 @@ for c in cases :
         controls = q.fetchall()
     for tm in tumors :
         for cn in controls :
-            fvsc = []
-            fvsd = []
+            same = []
+            diff = []
             bed1 = []
             bed2 = []
             tf = "{wd}/{sub}/{tm}_VS_{cn}".format(wd = wd, sub = c[0], tm = tm[0].split("-")[0], cn = cn[0].split("-")[0])
@@ -79,13 +79,13 @@ for c in cases :
                 outs = lc.convert2region(sequenza, "sequenza", "quiet")
             # Compare FACETS vs ascatNGS
             if os.path.isfile(facets) and os.path.isfile(sequenza) :
-                regs = lc.getFragments(outf, outs)
-                compareRegions(regs, outf, outs, fvsc, fvsd, bed1, bed2)
+                regs = lc.getFragments(outf, outa)
+                compareRegions(regs, outf, outa, same, diff, bed1, bed2)
 
                 with open(output, "w") as fi :
-                    fi.write(",".join(fvsc))
+                    fi.write(",".join(same))
                     fi.write("\n")
-                    fi.write(",".join(fvsd))
+                    fi.write(",".join(diff))
                     fi.write("\n")
                 with open(output1, "w") as fi :
                     for l in bed1 :
@@ -95,3 +95,22 @@ for c in cases :
                     for l in bed2 :
                         fi.write("\t".join(l))
                         fi.write("\n")
+
+            # Compare FACETS vs Sequenza
+            # if os.path.isfile(facets) and os.path.isfile(sequenza) :
+            #     regs = lc.getFragments(outf, outs)
+            #     compareRegions(regs, outf, outs, same, diff, bed1, bed2)
+            #
+            #     with open(output, "w") as fi :
+            #         fi.write(",".join(same))
+            #         fi.write("\n")
+            #         fi.write(",".join(diff))
+            #         fi.write("\n")
+            #     with open(output1, "w") as fi :
+            #         for l in bed1 :
+            #             fi.write("\t".join(l))
+            #             fi.write("\n")
+            #     with open(output2, "w") as fi :
+            #         for l in bed2 :
+            #             fi.write("\t".join(l))
+            #             fi.write("\n")
