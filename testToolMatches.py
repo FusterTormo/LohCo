@@ -59,11 +59,11 @@ def main () :
     avsFi = "ascatVSsequenza.tsv"
     # Write the output files' header
     with open(fvaFi, "w") as fi :
-        fi.write("Case\tregSim\tbaseSim\tMCCA\tMCCN\tMCCL\tMCCD\tjcca\tjccn\tjccl\tjccd\n")
+        fi.write("Case\tregSim\tbaseSim\tMCCA\tMCCN\tMCCL\tMCCD\tjcca\tjccn\tjccl\tjccd\tFpurity\tApurity\tFploidy\tAploidy\n")
     with open(fvsFi, "w") as fi :
-        fi.write("Case\tregSim\tbaseSim\tMCCA\tMCCN\tMCCL\tMCCD\tjcca\tjccn\tjccl\tjccd\n")
+        fi.write("Case\tregSim\tbaseSim\tMCCA\tMCCN\tMCCL\tMCCD\tjcca\tjccn\tjccl\tjccd\tFpurity\tSpurity\tFploidy\tSploidy\n")
     with open(avsFi, "w") as fi :
-        fi.write("Case\tregSim\tbaseSim\tMCCA\tMCCN\tMCCL\tMCCD\tjcca\tjccn\tjccl\tjccd\n")
+        fi.write("Case\tregSim\tbaseSim\tMCCA\tMCCN\tMCCL\tMCCD\tjcca\tjccn\tjccl\tjccd\tApurity\tSpurity\tAploidy\tSploidy\n")
 
     table = []
     with dbcon :
@@ -111,6 +111,10 @@ def main () :
                         fva.append(sts[ab]["MCC"])
                     for ab in cte.aberrations :
                         fva.append(jcc[ab])
+                    fva.append(outf["purity"])
+                    fva.append(outs["purity"])
+                    fva.append(outf["ploidy"])
+                    fva.append(outs["ploidy"])
                 else :
                     fva.append("NA")
                     fva.append("NA")
@@ -118,11 +122,12 @@ def main () :
                         fva.append("NA")
                     for ab in cte.aberrations :
                         fva.append("NA")
+                    fva.append(outf["NA"])
+                    fva.append(outs["NA"])
+                    fva.append(outf["NA"])
+                    fva.append(outs["NA"])
                 # Compare FACETS VS Sequenza
                 if os.path.isfile(facets) and os.path.isfile(sequenza) :
-                    print(outf.keys())
-                    print(outs.keys())
-                    sys.exit()
                     regs = lc.getFragments(outf, outs)
                     c1 = lc.doComparison(regs, outf, outs)
                     c2 = lc.doComparison2(regs, outf, outs)
@@ -134,6 +139,10 @@ def main () :
                         fvs.append(sts[ab]["MCC"])
                     for ab in cte.aberrations :
                         fvs.append(jcc[ab])
+                    fvs.append(outf["purity"])
+                    fvs.append(outs["purity"])
+                    fvs.append(outf["ploidy"])
+                    fvs.append(outs["ploidy"])
                 else :
                     fvs.append("NA")
                     fvs.append("NA")
@@ -141,6 +150,10 @@ def main () :
                         fvs.append("NA")
                     for ab in cte.aberrations :
                         fvs.append("NA")
+                    fvs.append(outf["NA"])
+                    fvs.append(outs["NA"])
+                    fvs.append(outf["NA"])
+                    fvs.append(outs["NA"])
                 # Compare ascatNGS VS Sequenza
                 if os.path.isfile(ascat) and os.path.isfile(sequenza) :
                     regs = lc.getFragments(outa, outs)
@@ -154,6 +167,10 @@ def main () :
                         avs.append(sts[ab]["MCC"])
                     for ab in cte.aberrations :
                         avs.append(jcc[ab])
+                    avs.append(outf["purity"])
+                    avs.append(outs["purity"])
+                    avs.append(outf["ploidy"])
+                    avs.append(outs["ploidy"])
                 else :
                     avs.append("NA")
                     avs.append("NA")
@@ -161,13 +178,17 @@ def main () :
                         avs.append("NA")
                     for ab in cte.aberrations :
                         avs.append("NA")
+                    avs.append(outf["NA"])
+                    avs.append(outs["NA"])
+                    avs.append(outf["NA"])
+                    avs.append(outs["NA"])
                 # Write the output in the corresponding files for each comparison
                 with open(fvaFi, "a") as fi :
-                    fi.write("{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n".format(fva[0], fva[1], fva[2], fva[3], fva[4], fva[5], fva[6], fva[7], fva[8], fva[9], fva[10]))
+                    fi.write("{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n".format(fva[0], fva[1], fva[2], fva[3], fva[4], fva[5], fva[6], fva[7], fva[8], fva[9], fva[10], fva[11], fva[12], fva[13], fva[14]))
                 with open(fvsFi, "a") as fi :
-                    fi.write("{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n".format(fvs[0], fvs[1], fvs[2], fvs[3], fvs[4], fvs[5], fvs[6], fvs[7], fvs[8], fvs[9], fvs[10]))
+                    fi.write("{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n".format(fvs[0], fvs[1], fvs[2], fvs[3], fvs[4], fvs[5], fvs[6], fvs[7], fvs[8], fvs[9], fvs[10], fvs[11], fvs[12], fvs[13], fvs[14]))
                 with open(avsFi, "a") as fi :
-                    fi.write("{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n".format(avs[0], avs[1], avs[2], avs[3], avs[4], avs[5], avs[6], avs[7], avs[8], avs[9], avs[10]))
+                    fi.write("{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n".format(avs[0], avs[1], avs[2], avs[3], avs[4], avs[5], avs[6], avs[7], avs[8], avs[9], avs[10], avs[11], avs[12], avs[13], avs[14]))
 
 
 
