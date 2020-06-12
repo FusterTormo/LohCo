@@ -122,10 +122,10 @@ def main () :
                         fva.append("NA")
                     for ab in cte.aberrations :
                         fva.append("NA")
-                    fva.append(outf["NA"])
-                    fva.append(outs["NA"])
-                    fva.append(outf["NA"])
-                    fva.append(outs["NA"])
+                    fva.append("NA")
+                    fva.append("NA")
+                    fva.append("NA")
+                    fva.append("NA")
                 # Compare FACETS VS Sequenza
                 if os.path.isfile(facets) and os.path.isfile(sequenza) :
                     regs = lc.getFragments(outf, outs)
@@ -150,10 +150,10 @@ def main () :
                         fvs.append("NA")
                     for ab in cte.aberrations :
                         fvs.append("NA")
-                    fvs.append(outf["NA"])
-                    fvs.append(outs["NA"])
-                    fvs.append(outf["NA"])
-                    fvs.append(outs["NA"])
+                    fvs.append("NA")
+                    fvs.append("NA")
+                    fvs.append("NA")
+                    fvs.append("NA")
                 # Compare ascatNGS VS Sequenza
                 if os.path.isfile(ascat) and os.path.isfile(sequenza) :
                     regs = lc.getFragments(outa, outs)
@@ -178,10 +178,10 @@ def main () :
                         avs.append("NA")
                     for ab in cte.aberrations :
                         avs.append("NA")
-                    avs.append(outf["NA"])
-                    avs.append(outs["NA"])
-                    avs.append(outf["NA"])
-                    avs.append(outs["NA"])
+                    avs.append("NA")
+                    avs.append("NA")
+                    avs.append("NA")
+                    avs.append("NA")
                 # Write the output in the corresponding files for each comparison
                 with open(fvaFi, "a") as fi :
                     fi.write("{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n".format(fva[0], fva[1], fva[2], fva[3], fva[4], fva[5], fva[6], fva[7], fva[8], fva[9], fva[10], fva[11], fva[12], fva[13], fva[14]))
