@@ -1,6 +1,6 @@
 library(karyoploteR)
 wd.temp <- getwd()
-setwd("../Desktop/comparacionsFVS/images")
+setwd("../Desktop/comparacionAVS/images")
 wd <- "../"
 
 createPlots <- function() {
@@ -29,10 +29,12 @@ createPlots <- function() {
   })
 }
 
-checkMedians <- function() {
+checkMedians <- function(ruta, wd) {
   # Comprobar si la mediana de la longitud de las regiones que coinciden es menor que la mediana de longitud de las regiones que no coinciden
+  # Parametro ruta -> ruta donde esta el archivo tool1VStool2.tsv
+  # Parametro wd -> directorio comparacion... donde estan las comparaciones entre regiones y entre bases
   files <- list.files(wd, full.names = TRUE, recursive = FALSE, pattern = "*txt")
-  fs <- read.table("../Desktop/facetsVSsequenza.tsv", sep = "\t", header = TRUE)
+  fs <- read.table(ruta, sep = "\t", header = TRUE)
   lapply(files, function(path) {
     name <- basename(path)
     txt <- read.csv(path, header = FALSE)
