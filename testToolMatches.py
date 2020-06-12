@@ -120,6 +120,9 @@ def main () :
                         fva.append("NA")
                 # Compare FACETS VS Sequenza
                 if os.path.isfile(facets) and os.path.isfile(sequenza) :
+                    print(outf.keys())
+                    print(outs.keys())
+                    sys.exit()
                     regs = lc.getFragments(outf, outs)
                     c1 = lc.doComparison(regs, outf, outs)
                     c2 = lc.doComparison2(regs, outf, outs)
