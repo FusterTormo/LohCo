@@ -103,7 +103,7 @@ def main () :
                     regs = lc.getFragments(outf, outa)
                     c1 = lc.doComparison(regs, outf, outa)
                     c2 = lc.doComparison2(regs, outf, outa)
-                    sts = ls.doContingency(c1) # Get the MCC for all the aberrations
+                    sts = ls.doContingency(c2) # Get the MCC for all the aberrations
                     jcc = ls.jaccardIndex(c2)
                     fva.append(regSimilarity(regs, outf, outa))
                     fva.append(baseSimilarity(regs, outf, outa))
@@ -131,7 +131,7 @@ def main () :
                     regs = lc.getFragments(outf, outs)
                     c1 = lc.doComparison(regs, outf, outs)
                     c2 = lc.doComparison2(regs, outf, outs)
-                    sts = ls.doContingency(c1) # Get the MCC for all the aberrations
+                    sts = ls.doContingency(c2) # Get the MCC for all the aberrations
                     jcc = ls.jaccardIndex(c2) # Get the Jaccard index for all the aberrations
                     fvs.append(regSimilarity(regs, outf, outs))
                     fvs.append(baseSimilarity(regs, outf, outs))
@@ -159,7 +159,7 @@ def main () :
                     regs = lc.getFragments(outa, outs)
                     c1 = lc.doComparison(regs, outa, outs)
                     c2 = lc.doComparison2(regs, outa, outs)
-                    sts = ls.doContingency(c1) # Get the MCC for all the aberrations
+                    sts = ls.doContingency(c2) # Get the MCC for all the aberrations
                     jcc = ls.jaccardIndex(c2) # Get the Jaccard index for all the aberrations
                     avs.append(regSimilarity(regs, outa, outs))
                     avs.append(baseSimilarity(regs, outa, outs))
