@@ -12,6 +12,7 @@ import xlsxwriter
 # Archivos que se usaran para recoger la informacion que se guardara en el excel final
 qc = "../alnQC.txt"
 cov = "../coverage.txt"
+covGens = "../coverage/coverageGeneStats.tsv"
 arxius = ["cand.reanno.tsv", "lowVAF.reanno.tsv", "highMAF.reanno.tsv", "conseq.reanno.tsv", "raw.reanno.tsv"]
 stats = "variants.stats.txt"
 # Orden de las columnas en que se colocaran en cada una de las pestanas del excel
@@ -206,12 +207,21 @@ def escribirEstadisticas(hoja, libro) :
         'left' : 1,
         'bold' : True
     })
+    centro = libro.add_format({
+        'bold' : True
+    })
     derecha = libro.add_format({
         'right' : 1
+    })
+    derechaTit = libro.add_format({
+        'right' : 1,
+        'bold' : True
     })
     bajoIzq = libro.add_format({'bottom' : 1,
         'left' : 1,
         'bold' : True
+    })
+    bajoCtr = libro.add_format({'bottom' : 1
     })
     bajoDrch = libro.add_format({'bottom' : 1,
         'right' : 1
@@ -281,34 +291,64 @@ def escribirEstadisticas(hoja, libro) :
         if os.path.isfile("../coverage/coverage.png") : #Adjuntar el grafico de coverage general. Se reduce un 75%
             hoja.insert_image(12, 4, "../coverage/coverage.png", {"x_scale" : 0.25, "y_scale" : 0.25})
 
+    if os.path.isfile(covGens) :
+        hoja.merge_range(0, 8, 0, 12, "Coverage per gene", titulo)
+        header = True
+        fila = 1
+        with open(covGens, "r") as fi :
+            for l in fi :
+                aux = l.strip("\n").split("\t")
+                columna = 8
+                if header :
+                    hoja.write(fila, 8, aux[0].strip("\"").capitalize(), izquierda) # Columna nombre del gen
+                    hoja.write(fila, 9, aux[1].strip("\"").capitalize(), centro) # Columna minim
+                    hoja.write(fila, 10, aux[2].strip("\"").capitalize(), centro) # Columna maxim
+                    hoja.write(fila, 11, aux[3].strip("\"").capitalize(), centro) # Columna mitjana
+                    hoja.write(fila, 12, aux[4].strip("\"").capitalize(), derechaTit) # Columna mediana
+                    header = False
+                else :
+                    hoja.write(fila, 8, aux[0].strip("\""), izquierda)
+                    hoja.write(fila, 9, aux[1])
+                    hoja.write(fila, 10, aux[2])
+                    hoja.write(fila, 11, "{:.2f}".format(float(aux[3])))
+                    hoja.write(fila, 12, aux[4], derecha)
+                fila += 1
+            hoja.write(fila, 8, aux[0].strip("\""), bajoIzq)
+            hoja.write(fila, 9, aux[1], bajoCtr)
+            hoja.write(fila, 10, aux[2], bajoCtr)
+            hoja.write(fila, 11, "{:.2f}".format(float(aux[3])), bajoCtr)
+            hoja.write(fila, 12, aux[4], bajoDrch)
+
+
     if os.path.isfile(stats) :
         with open(stats, "r") as fi :
             aux = fi.read()
         var = eval(aux)
-        hoja.merge_range(0, 8, 0, 9, "Variant number per filter", titulo)
-        hoja.write(1, 8, "RAW", izquierda)
-        hoja.write(1, 9, var["Totales"], derecha)
+        hoja.merge_range(0, 14, 0, 15, "Variant number per filter", titulo)
+        hoja.write(1, 14, "RAW", izquierda)
+        hoja.write(1, 15, var["Totales"], derecha)
         del var["Totales"]
-        hoja.write(2, 8, "Consequence", izquierda)
-        hoja.write(2, 9, var["Conseq"], derecha)
+        hoja.write(2, 14, "Consequence", izquierda)
+        hoja.write(2, 15, var["Conseq"], derecha)
         del var["Conseq"]
-        hoja.write(3, 8, "High MAF", izquierda)
-        hoja.write(3, 9, var["MAF_alta"], derecha)
+        hoja.write(3, 14, "High MAF", izquierda)
+        hoja.write(3, 15, var["MAF_alta"], derecha)
         del var["MAF_alta"]
-        hoja.write(4, 8, "Low VAF", izquierda)
-        hoja.write(4, 9, var["VAF_baja"], derecha)
+        hoja.write(4, 14, "Low VAF", izquierda)
+        hoja.write(4, 15, var["VAF_baja"], derecha)
         del var["VAF_baja"]
-        hoja.write(5, 8, "Candidates", bajoIzq)
-        hoja.write(5, 9, var["Candidatas"], bajoDrch)
+        hoja.write(5, 14, "Candidates", bajoIzq)
+        hoja.write(5, 15, var["Candidatas"], bajoDrch)
         del var["Candidatas"]
-        hoja.merge_range(0, 11, 0, 12, "Raw variant distribution", titulo)
+        hoja.merge_range(0, 17, 0, 18, "Raw variant distribution", titulo)
         fila = 1
         for k, v in var.items() :
-            hoja.write(fila, 11, k, izquierda)
-            hoja.write(fila, 12, v, derecha)
+            hoja.write(fila, 17, k, izquierda)
+            hoja.write(fila, 18, v, derecha)
             fila += 1
-        hoja.write(fila, 11, k, bajoIzq)
-        hoja.write(fila, 12, v, bajoDrch)
+        hoja.write(fila, 17, k, bajoIzq)
+        hoja.write(fila, 18, v, bajoDrch)
+
 
 def crearExcel(nom) :
     """Recoge la informacion de las variantes desde los archivos .reanno.tsv

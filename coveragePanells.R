@@ -38,12 +38,18 @@ coveragePerGen <- function(cov){
   # Leer la lista de genes. Se crea un grafico por cada fila
   gens <- read.table(lista)
   colnames(gens) <- c("nom")
-
+  # Lista con los coverages minimo, maximo, medio y mediana
+  stats <- data.frame()
   # Crear los graficos. Uno por cada gen que hay en la lista de genes (gensAestudi.txt)
   for(it in 1:length(gens$nom)) {
-    png(filename=paste("coverage",gens$nom[it],".png",sep=""),width=500,height=600)
     aux <- cov[grep(gens$nom[it],cov$gen),]
     maxCov <- max(aux$coverage)
+    minCov <- min(aux$coverage)
+    meanCov <- mean(aux$coverage)
+    medianCov <- median(aux$coverage)
+    aux2 <- data.frame(gene=gens$nom[it], min=minCov, max=maxCov, mean=meanCov, median=medianCov)
+    stats <- rbind(stats,aux2)
+    png(filename=paste("coverage",gens$nom[it],".png",sep=""),width=500,height=600)
     plot(aux$coverage, type="l", xlab="Bases", ylab="Coverage", ylim=c(0,maxCov), col="deepskyblue1", lwd=2, main=paste("Coverage", "de", gens$nom[it]))
     abline(h=0.0, col = "gray20")
     abline(h=100, col = "firebrick1") # Rojo
@@ -51,6 +57,8 @@ coveragePerGen <- function(cov){
     abline(h=1000, col = "forestgreen") # Verde
     dev.off()
   }
+  # Escribir la lista con los coverages minimo, maximo, medio y mediana en un archivo de texto
+  write.table(stats, sep = "\t", file = "coverageGeneStats.tsv", row.names = FALSE)
 }
 
 # Extraer el minimo, maximo, la media, la mediana de coverage, así como el porcentaje de bases cubiertos a 0, 30, 100, 500 y 1000 de coverage. Los datos se guardan en un archivo de texto llamado coverage.txt
