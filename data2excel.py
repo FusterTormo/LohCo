@@ -377,6 +377,7 @@ def crearExcel(nom) :
     full = wb.add_worksheet("QC_stats")
     escribirEstadisticas(full, wb)
     print("INFO: Creado archivo excel, con nombre {}, con el resumen de resultados".format("{}.xlsx".format(nom)))
+    wb.close()
 
 if __name__ == "__main__" :
     # Comprobar que todos los archivos necesarios estan creados

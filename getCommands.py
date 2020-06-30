@@ -145,8 +145,21 @@ def getStrelka2(bam, referencia, output, regiones = None) :
     """ Comando para ejecutar el variant caller Strelka2"""
     cmd = "/opt/strelka-2.9.10/bin/configureStrelkaGermlineWorkflow.py --bam {bam} --referenceFasta {ref} --runDir {variantDir}".format(bam = bam, ref = referencia, variantDir = output)
     if regiones != None :
-        cmd += " --exome --callRegions {mani}"
+        cmd += " --exome --callRegions {mani}".format(mani = regiones)
+    elif regiones == "exoma" :
+        cmd += " --exome"
     cmd += "\ncd {variantDir}\n".format(output)
+    cmd += "./runWorkflow.py -m local -j 6 --quiet"
+    return cmd
+
+def getStrelka2soma(tumor, control, referencia, output, regiones = None) :
+    """ Comando para ejecutar el variant caller Strelka2 para analisis somatico"""
+    cmd = "/opt/strelka-2.9.10/bin/configureStrelkaSomaticWorkflow.py --tumorBam {tm} --normalBam {cn} --referenceFasta {ref} --runDir {varDir}".format(tm = tumor, cn = control, ref = referencia, varDir = output)
+    if regiones != None :
+        cmd += " --exome --callRegions{mani}".format(mani = regiones)
+    elif regiones == "exoma" :
+        cmd += " --exome"
+    cmd += "\ncd {variantDir}\n".format(variantDir = output)
     cmd += "./runWorkflow.py -m local -j 6 --quiet"
     return cmd
 
@@ -158,10 +171,34 @@ def getMutect2(input, referencia, germline, output, regiones = None) :
     cmd += "/opt/gatk-4.1.4.1/gatk FilterMutectCalls -R {ref} -V {id}.vcf --stats {id}.vcf.stats --filtering-stats {id}.filter.tsv -O {id}.filtered.vcf\n".format(ref = referencia, id = output)
     cmd += "mkdir variantCalling\n"
     cmd += "cd variantCalling\n"
-    cmd += "mv ../mutect* .\n"
+    cmd += "mv ../mutect* ."
     return cmd
 
-def getANNOVAR(vcf, prefix) :
-    cmd = "/opt/annovar20180416/convert2annovar.pl -format vcf4 -outfile {out}.av -includeinfo {input}\n".format(out = prefix, input = vcf)
-    cmd += "/opt/annovar20180416/table_annovar.pl {input}.av /opt/annovar20180416/humandb/ -buildver hg19 -out {input} -remove -protocol refGene,avsnp150,1000g2015aug_all,1000g2015aug_afr,1000g2015aug_amr,1000g2015aug_eas,1000g2015aug_eur,1000g2015aug_sas,exac03,gnomad211_exome,gnomad211_genome,esp6500siv2_all,esp6500siv2_ea,esp6500siv2_aa,clinvar_20190305,cosmic70,dbnsfp35a --operation g,f,f,f,f,f,f,f,f,f,f,f,f,f,f,f,f -nastring NA -otherinfo".format(input = prefix)
+def getMutect2soma(tumor, control, idtum, idcon, referencia, germline, outputdir, regiones = None) :
+    cmd = "/opt/gatk-4.1.4.1/gatk Mutect2 -I {tm} -I {cn} -tumor {idtm} -normal {idcn} -R {ref} --germline-resource {gnomad} -O {idtm}.vcf".format(tm = tumor, cn = control, idtm = idtum, idcn = idcon, ref = referencia, gnomad = germline)
+    if regiones != None :
+        cmd += " -L {manifest}".format(manifest = regiones)
+    cmd += "\n"
+    cmd += "/opt/gatk-4.1.4.1/gatk FilterMutectCalls -R {ref} -V {id}.vcf --stats {id}.vcf.stats --filtering-stats {id}.filter.tsv -O {id}.filtered.vcf\n".format(ref = referencia, id = idtum)
+    cmd += "mkdir {dir}\n".format(dir = outputdir)
+    cmd += "cd {dir}\n".format(dir = outputdir)
+    cmd += "mv {idtm}.vcf {idtm}.filtered.vcf {dir}".format(idtm = idtum, dir = outputdir)
+    return cmd
+
+def getVarScan2Soma(tumor, control, referencia, output = "VarScan2") :
+    """Comando para ejecutar el variant caller VarScan2 para analisis somatico"""
+    cmd = "samtools mpileup -f {ref} -q 1 {bam} > control.pileup\n".format(ref = referencia, bam = control)
+    cmd += "samtools mpileup -f {ref} -q 1 {bam} > tumor.pileup\n".format(ref = referencia, bam = tumor)
+    cmd += "java -jar /opt/varscan-2.4.0/VarScan.v2.4.0.jar somatic control.pileup tumor.pileup varscan --output-vcf 1 --strand-filter 1\n"
+    cmd += "mkdir {dir}\n".format(dir = output)
+    cmd += "mv tumor.pileup control.pileup varscan* {dir}".format(dir = output)
+    return cmd
+
+def getANNOVAR(vcf, prefix, hgref = "hg19", format = "vcf4") :
+    if hgref == "hg19" :
+        cmd = "/opt/annovar20180416/convert2annovar.pl -format {format} -outfile {out}.av -includeinfo {input}\n".format(out = prefix, input = vcf, format = format)
+        cmd += "/opt/annovar20180416/table_annovar.pl {input}.av /home/ffuster/share/biodata/Indexes/ANNOVAR/humandb/ -buildver hg19 -out {input} -remove -protocol refGene,avsnp150,1000g2015aug_all,1000g2015aug_afr,1000g2015aug_amr,1000g2015aug_eas,1000g2015aug_eur,1000g2015aug_sas,exac03,gnomad211_exome,gnomad211_genome,esp6500siv2_all,esp6500siv2_ea,esp6500siv2_aa,clinvar_20190305,cosmic70,dbnsfp35a --operation g,f,f,f,f,f,f,f,f,f,f,f,f,f,f,f,f -nastring NA -otherinfo".format(input = prefix)
+    elif hgref == "hg38" :
+        cmd = "/opt/annovar20200607/convert2annovar.pl -format {format} -outfile {out}.av -includeinfo {input}\n".format(out = prefix, input = vcf, format = format)
+        cmd += "/opt/annovar20180416/table_annovar.pl {input}.av /home/ffuster/share/biodata/Indexes/ANNOVAR/humandb/ -buildver hg38 -out {input} -remove -protocol refGene,avsnp150,1000g2015aug_all,1000g2015aug_afr,1000g2015aug_amr,1000g2015aug_eas,1000g2015aug_eur,1000g2015aug_sas,exac03,gnomad211_exome,gnomad30_genome,esp6500siv2_all,esp6500siv2_ea,esp6500siv2_aa,clinvar_20200316,cosmic70,dbnsfp35a --operation g,f,f,f,f,f,f,f,f,f,f,f,f,f,f,f,f -nastring NA -otherinfo".format(input = prefix)
     return cmd
