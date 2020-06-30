@@ -313,11 +313,11 @@ def escribirEstadisticas(hoja, libro) :
                     hoja.write(fila, 11, "{:.2f}".format(float(aux[3])))
                     hoja.write(fila, 12, aux[4], derecha)
                 fila += 1
-            hoja.write(fila, 8, aux[0].strip("\""), bajoIzq)
-            hoja.write(fila, 9, aux[1], bajoCtr)
-            hoja.write(fila, 10, aux[2], bajoCtr)
-            hoja.write(fila, 11, "{:.2f}".format(float(aux[3])), bajoCtr)
-            hoja.write(fila, 12, aux[4], bajoDrch)
+            hoja.write(fila-1, 8, aux[0].strip("\""), bajoIzq)
+            hoja.write(fila-1, 9, aux[1], bajoCtr)
+            hoja.write(fila-1, 10, aux[2], bajoCtr)
+            hoja.write(fila-1, 11, "{:.2f}".format(float(aux[3])), bajoCtr)
+            hoja.write(fila-1, 12, aux[4], bajoDrch)
 
 
     if os.path.isfile(stats) :

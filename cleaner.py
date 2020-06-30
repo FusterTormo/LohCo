@@ -22,35 +22,51 @@ def eliminarVariantCalling(ruta) :
     print("INFO: Eliminant temporals de la carpeta de variants")
     cont = 0
     pes = 0
+    # Recoger los directorios (muestras) que se han hecho en la tanda
     for root, dirs, files in os.walk(ruta) :
         break
 
     for d in dirs :
         path = "{root}/{samp}/variantCalling".format(root = ruta, samp = d)
         arxius = os.listdir(path)
-        for a in arxius :
-            if a == "bwa.pileup" :
-                pes += os.path.getsize("{dir}/bwa.pileup".format(dir = path))
-                cont += 1
-                os.remove("{dir}/bwa.pileup".format(dir = path))
-            elif a.startswith("filtro") and not a.endswith(".allInfo") :
-                pes += os.path.getsize("{dir}/{file}".format(dir = path, file = a))
-                cont += 1
-                os.remove("{dir}/{file}".format(dir = path, file = a))
+        # Eliminar los temporales de un variant calling hecho usando VarScan2
+        if "varscan.vcf" in arxius :
+            for a in arxius :
+                if a == "bwa.pileup" :
+                    pes += os.path.getsize("{dir}/bwa.pileup".format(dir = path))
+                    cont += 1
+                    os.remove("{dir}/bwa.pileup".format(dir = path))
+                elif a.startswith("filtro") and not a.endswith(".allInfo") :
+                    pes += os.path.getsize("{dir}/{file}".format(dir = path, file = a))
+                    cont += 1
+                    os.remove("{dir}/{file}".format(dir = path, file = a))
+        # Eliminar los archivos temporales de un variant calling hecho usando Strelka2
+        if "strelka2.vcf" in arxius :
+            print("WARNING: Opcion no implementada todavia")
+        # Eliminar los archivos temporales de un variant calling hecho usando Mutect2
+        if "mutect.vcf" in arxius :
+            eliminar = ["cand.reanno.tsv", "highMAF.reanno.tsv", "raw.hg19_multianno.txt", "variants.stats.txt", "conseq.reanno.tsv", "lowVAF.reanno.tsv", "raw.av", "raw.reanno.tsv"]
+            for a in arxius :
+                if a in eliminar :
+                    pes += os.path.getsize("{dir}/{arx}".format(dir = path, arx = a))
+                    cont += 1
+                    os.remove("{dir}/{arx}".format(dir = path, arx = a))
+
+
     print("INFO: {} arxius eliminats. {} espai alliberat".format(cont, convert_size(pes)))
 
 def eliminarAliniament(ruta) :
     print("INFO: Eliminant bams intermedis")
     cont = 0 # Contador de arxius elminats
     pes = 0
-    arxius = ["bwa.sam", "bwa.sort.bam", "bwa.sort.bai", "indelsGATK.list"] # Lista d'arxius a eliminar
+    arxius = ["bwa.sam", "bwa.sort.bam", "bwa.sort.bai", "bwa.bed", "recaldata.table"] # Lista d'arxius a eliminar
     # Recollir els directoris de cadascuna de les mostres en la tanda
     for root, dirs, files in os.walk(ruta) :
         break
 
     # En cadascuna de les mostres, eliminar els arxius bwa.sam, bwa.sort.bam, bwa.sort.bai i indelsGATK.list
     for d in dirs :
-        path = "{root}/{samp}/bwaAlign".format(root = ruta, samp = d)
+        path = "{root}/{samp}/alignment".format(root = ruta, samp = d)
         for a in arxius :
             arx = "{}/{}".format(path, a)
             if os.path.isfile(arx) :

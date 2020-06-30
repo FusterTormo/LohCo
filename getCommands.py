@@ -175,14 +175,13 @@ def getMutect2(input, referencia, germline, output, regiones = None) :
     return cmd
 
 def getMutect2soma(tumor, control, idtum, idcon, referencia, germline, outputdir, regiones = None) :
-    cmd = "/opt/gatk-4.1.4.1/gatk Mutect2 -I {tm} -I {cn} -tumor {idtm} -normal {idcn} -R {ref} --germline-resource {gnomad} -O {idtm}.vcf".format(tm = tumor, cn = control, idtm = idtum, idcn = idcon, ref = referencia, gnomad = germline)
+    cmd = "/opt/gatk-4.1.4.1/gatk --java-options \"-Xmx32G\" Mutect2 -I {tm} -I {cn} -tumor {idtm} -normal {idcn} -R {ref} --germline-resource {gnomad} -O {idtm}.vcf".format(tm = tumor, cn = control, idtm = idtum, idcn = idcon, ref = referencia, gnomad = germline)
     if regiones != None :
         cmd += " -L {manifest}".format(manifest = regiones)
     cmd += "\n"
     cmd += "/opt/gatk-4.1.4.1/gatk FilterMutectCalls -R {ref} -V {id}.vcf --stats {id}.vcf.stats --filtering-stats {id}.filter.tsv -O {id}.filtered.vcf\n".format(ref = referencia, id = idtum)
     cmd += "mkdir {dir}\n".format(dir = outputdir)
-    cmd += "cd {dir}\n".format(dir = outputdir)
-    cmd += "mv {idtm}.vcf {idtm}.filtered.vcf {dir}".format(idtm = idtum, dir = outputdir)
+    cmd += "mv {idtm}* {dir}".format(idtm = idtum, dir = outputdir)
     return cmd
 
 def getVarScan2Soma(tumor, control, referencia, output = "VarScan2") :
