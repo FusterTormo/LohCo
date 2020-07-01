@@ -232,7 +232,7 @@ def escribirEstadisticas(hoja, libro) :
         qua = eval(aux)
         hoja.merge_range(0, 0, 0, 1, "Alignment quality", titulo)
         hoja.write(1, 0, "FASTQ reads", izquierda)
-        hoja.write(1, 1, "{}".format(2*int(qua["FASTQ"])), derecha)
+        hoja.write(1, 1, "{}".format(qua["FASTQ"]), derecha)
         hoja.write(2, 0, "Aligned reads", izquierda)
         hoja.write(2, 1, "{} ({:.2f} %)".format(qua["BAM"], 100*float(qua["BAM"])/float(qua["FASTQ"])), derecha)
         hoja.write(3, 0, "ON target", izquierda)
