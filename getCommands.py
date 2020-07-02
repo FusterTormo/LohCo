@@ -3,27 +3,17 @@
 
 """
 CONSTANTS:
-    Rutas de los programas y parametros de cada uno de los pasos dentro de la pipeline
+    Rutas de los programas de cada uno de los pasos dentro de la pipeline
 """
-
-referencia = "/home/ffuster/share/biodata/solelab/referencies/ucsc/hg19.fa"
-manifest = "/home/ffuster/panalisi/resultats/manifest.bed"
-gzmanifest = "/home/ffuster/panalisi/resultats/manifest.bed.gz"
-manifestidx = "/home/ffuster/panalisi/resultats/manifest.bed.gz.tbi"
-"""Comandos para generar los manifest tal y como los necesita Strelka2
-    mv manifest.bed manifest_original.bed # Mantener una copia del original
-    sort -k1,1 -k2,2n manifest_original.bed > manifestaux.bed
-    sed 's/chr//g' manifestaux.bed > manifest.bed # Eliminar los 'chr'
-    bgzip -c manifest.bed > manifest.bed.gz # Comprimir el archivo para Strelka2. Puede que la ruta original de bgzip sea /opt/htslib-1.10.2/bin/bgzip
-    tabix -p bed manifest.bed.gz # Crear un indice para el manifest. Puede que la ruta original de tabix sea /opt/htslib-1.10.2/bin/tabix
-"""
-# Descargado desde https://gnomad.broadinstitute.org/downloads
-dbsnp = "/home/ffuster/share/biodata/solelab/referencies/gnomad.exomes.r2.1.1.sites.vcf"
-genes = "/home/ffuster/panalisi/resultats/gensAestudi.txt"
-
-pathAnalisi = "/home/ffuster/panalisi/resultats" # Ruta donde se ejecutan y guardan los analisis
-prefijoTanda = "tanda" # Prefijo que tiene todas las tandas analizadas
-wd = "~/AUP" # Directorio de trabajo donde estan los scripts
+fastqc = "/opt/FastQC/fastqc"
+bwa = "/opt/bwa.kit/bwa"
+picard = "/opt/picard-tools-2.21.8/picard.jar"
+bedtools = "bedtools"
+gatk = "/opt/gatk-4.1.8.0/gatk"
+strelka2 = "/opt/strelka-2.9.10"
+samtools = "samtools"
+varscan = "/opt/varscan-2.4.0/VarScan.v2.4.0.jar"
+annovar = "/opt/annovar20200607"
 
 def getFastQC(input, output) :
     """Comando para ejecutar FastQC (control de calidad de los FASTQ).
@@ -47,7 +37,7 @@ def getFastQC(input, output) :
         str
             Comando para ejecutar FastQC en el archivo que se ha pasado por parametro
     """
-    return "/opt/FastQC/fastqc -o {fastqc}/ -f fastq -extract -q -t 6 {fastq}".format(fastq = input, fastqc = output)
+    return "{exec} -o {fastqc}/ -f fastq -extract -q -t 6 {fastq}".format(fastq = input, fastqc = output, exec = fastqc)
 
 def getAln(rg, ref, fw, rv, output) :
     """Comando para ejecutar BWA (alineamiento).
@@ -75,7 +65,7 @@ def getAln(rg, ref, fw, rv, output) :
         str
             Comando para ejecutar BWA en los fastq que se han pasado por parametro
     """
-    return "/opt/bwa.kit/bwa mem -M -t 6 -R {rg} {ref} {fw} {rv} > {out}".format(rg = rg, ref = ref, fw = fw, rv = rv, out = output)
+    return "{exec} mem -M -t 6 -R {rg} {ref} {fw} {rv} > {out}".format(rg = rg, ref = ref, fw = fw, rv = rv, out = output, exec = bwa)
 
 def getPcSort(input, output) :
     """Comando para ordenar el bam, usando Picard tools SortBam
@@ -97,7 +87,7 @@ def getPcSort(input, output) :
         str
             Comando para ejecutar Picard SortBam en el archivo bam que se ha pasado por parametro
     """
-    return "java -jar /opt/picard-tools-2.21.8/picard.jar SortSam INPUT={input} OUTPUT={output} SORT_ORDER=coordinate".format(input = input, output = output)
+    return "java -jar {picard} SortSam INPUT={input} OUTPUT={output} SORT_ORDER=coordinate".format(input = input, output = output, picard = picard)
 
 def getPcMerge(input, output) :
     """Comando para ordenar y agrupar una lista de sams
@@ -121,7 +111,7 @@ def getPcMerge(input, output) :
         str
             Comando para ejecutar Picard MergeSamFiles la lista de sams que se ha pasado por parametro
     """
-    cmd = "java -jar /opt/picard-tools-2.21.8/picard.jar MergeSamFiles "
+    cmd = "java -jar {exec} MergeSamFiles ".format(exec = picard)
     for i in input :
         cmd += "INPUT={} ".format(i)
     cmd += "OUTPUT={} SORT_ORDER=coordinate USE_THREADING=true TMP_DIR=/home/ffuster/share/gsole".format(output)
@@ -143,7 +133,7 @@ def getPcIndex(bam) :
         str
             Comando para ejecutar Picard BuildBamIndex en el archivo que se ha pasado por parametro
     """
-    return "java -jar /opt/picard-tools-2.21.8/picard.jar BuildBamIndex INPUT={bam}".format(bam = bam)
+    return "java -jar {picard} BuildBamIndex INPUT={bam}".format(bam = bam, picard = picard)
 
 def getBam2bed(bam, bed) :
     """Comando para crear un bed con todas las regiones donde se han alineado reads
@@ -163,7 +153,7 @@ def getBam2bed(bam, bed) :
         str
             Comando para ejecutar bedtools bamtobed en el archivo que se ha pasado por parametro
     """
-    return "bedtools bamtobed -i {bam} > {bed}".format(bam = bam, bed = bed)
+    return "{exec} bamtobed -i {bam} > {bed}".format(bam = bam, bed = bed, exec = bedtools)
 
 def getGATKrecal(bam, ref, sites, output, regions = None) :
     """Comando para realizar el primer paso de la recalibracion de bases sugerida por GATK. Este comando se divide en dos: BaseRecalibrator i ApplyBQSR
@@ -197,12 +187,12 @@ def getGATKrecal(bam, ref, sites, output, regions = None) :
         str
             Comando para ejecutar el recalibrado de bases sugerido por GATK en el archivo bam que se ha pasado por parametro
     """
-    cmd = "/opt/gatk-4.1.4.1/gatk BaseRecalibrator -I {bam} -R {ref} --known-sites {dbsnp} -O recaldata.table".format(bam = bam, ref = ref, dbsnp = sites)
+    cmd = "{gatk} BaseRecalibrator -I {bam} -R {ref} --known-sites {dbsnp} -O recaldata.table".format(bam = bam, ref = ref, dbsnp = sites, gatk = gatk)
     if regions != None :
         cmd += " -L {mani}".format(mani = regions)
     cmd += "\n"
     # Comando para realizar el segundo paso de la recalibracion de bases sugerida por GATK
-    cmd += "/opt/gatk-4.1.4.1/gatk ApplyBQSR -I {bam} -R {ref} -bqsr-recal-file recaldata.table -O {output}".format(bam = bam, ref = ref, output = output)
+    cmd += "{gatk} ApplyBQSR -I {bam} -R {ref} -bqsr-recal-file recaldata.table -O {output}".format(bam = bam, ref = ref, output = output, gatk = gatk)
     if regions != None :
         cmd += " -L {mani}".format(mani = regions)
     return cmd
@@ -227,7 +217,7 @@ def getPcMarkduplicates(input, output) :
         str
             Comando para ejecutar Picard MarkDuplicates en el archivo que se ha pasado por parametro
     """
-    return "java -jar /opt/picard-tools-2.21.8/picard.jar MarkDuplicates INPUT={bamIn} OUTPUT={bamOut} METRICS_FILE=dups_bam.txt".format(bamIn = input, bamOut = output)
+    return "java -jar {picard} MarkDuplicates INPUT={bamIn} OUTPUT={bamOut} METRICS_FILE=dups_bam.txt".format(bamIn = input, bamOut = output, picard = picard)
 
 def getCoverageAll(regiones, bam, salida) :
     """Comando para calcular el coverage agrupado del bam en las regiones del manifest
@@ -251,7 +241,7 @@ def getCoverageAll(regiones, bam, salida) :
         str
             Comando para ejecutar bedtools coverage en el archivo bam que se ha pasado por parametro
     """
-    return "bedtools coverage -hist -a {mani} -b {bam} > {output}".format(mani = regiones, bam = bam, output = salida)
+    return "{exec} coverage -hist -a {mani} -b {bam} > {output}".format(mani = regiones, bam = bam, output = salida, exec = bedtools)
 
 def getCoverageBase(regiones, bam, salida) :
     """Comando para calcular el coverage de cada una de las bases dentro de la region de interes
@@ -275,7 +265,7 @@ def getCoverageBase(regiones, bam, salida) :
         str
             Comando para ejecutar bedtools coverage en el archivo bam que se ha pasado por parametro
     """
-    return "bedtools coverage -d -a {mani} -b {bam} > {output}".format(mani = regiones, bam = bam, output = salida)
+    return "{exec} coverage -d -a {mani} -b {bam} > {output}".format(mani = regiones, bam = bam, output = salida, exec = bedtools)
 
 def getStrelka2(bam, referencia, output, regiones = None) :
     """Comandos para ejecutar el variant caller Strelka2
@@ -308,7 +298,7 @@ def getStrelka2(bam, referencia, output, regiones = None) :
         str
             Comandos para ejecutar Strelka2 en el archivo bam que se ha pasado por parametro
     """
-    cmd = "/opt/strelka-2.9.10/bin/configureStrelkaGermlineWorkflow.py --bam {bam} --referenceFasta {ref} --runDir {variantDir}".format(bam = bam, ref = referencia, variantDir = output)
+    cmd = "{strelka}/bin/configureStrelkaGermlineWorkflow.py --bam {bam} --referenceFasta {ref} --runDir {variantDir}".format(bam = bam, ref = referencia, variantDir = output, strelka = strelka2)
     if regiones != None :
         cmd += " --exome --callRegions {mani}".format(mani = regiones)
     elif regiones == "exoma" :
@@ -351,7 +341,7 @@ def getStrelka2soma(tumor, control, referencia, output, regiones = None) :
         str
             Comandos para ejecutar Strelka2 en el archivo bam que se ha pasado por parametro
     """
-    cmd = "/opt/strelka-2.9.10/bin/configureStrelkaSomaticWorkflow.py --tumorBam {tm} --normalBam {cn} --referenceFasta {ref} --runDir {varDir}".format(tm = tumor, cn = control, ref = referencia, varDir = output)
+    cmd = "{strelka}/bin/configureStrelkaSomaticWorkflow.py --tumorBam {tm} --normalBam {cn} --referenceFasta {ref} --runDir {varDir}".format(tm = tumor, cn = control, ref = referencia, varDir = output, strelka = strelka2)
     if regiones != None :
         cmd += " --exome --callRegions{mani}".format(mani = regiones)
     elif regiones == "exoma" :
@@ -395,11 +385,11 @@ def getMutect2(input, referencia, germline, output, regiones = None) :
         str
             Comandos para ejecutar Mutect2 en el archivo bam que se ha pasado por parametro
     """
-    cmd = "/opt/gatk-4.1.8.0/gatk Mutect2 -I {input} -R {ref} --germline-resource {gnomad} -O {salida}.vcf".format(input = input, ref = referencia, gnomad = germline, salida = output)
+    cmd = "{gatk} Mutect2 -I {input} -R {ref} --germline-resource {gnomad} -O {salida}.vcf".format(input = input, ref = referencia, gnomad = germline, salida = output, gatk = gatk)
     if regiones != None :
         cmd += " -L {manifest}".format(manifest = regiones)
     cmd += "\n"
-    cmd += "/opt/gatk-4.1.4.1/gatk FilterMutectCalls -R {ref} -V {id}.vcf --stats {id}.vcf.stats --filtering-stats {id}.filter.tsv -O {id}.filtered.vcf\n".format(ref = referencia, id = output)
+    cmd += "{gatk} FilterMutectCalls -R {ref} -V {id}.vcf --stats {id}.vcf.stats --filtering-stats {id}.filter.tsv -O {id}.filtered.vcf\n".format(ref = referencia, id = output, gatk = gatk)
     cmd += "mkdir variantCalling\n"
     cmd += "cd variantCalling\n"
     cmd += "mv ../mutect* ."
@@ -449,11 +439,11 @@ def getMutect2soma(tumor, control, idtum, idcon, referencia, germline, outputdir
         str
             Comandos para ejecutar Mutect2 en los archivos bam que se han pasado por parametro
     """
-    cmd = "/opt/gatk-4.1.8.0/gatk --java-options \"-Xmx32G\" Mutect2 -I {tm} -I {cn} -tumor {idtm} -normal {idcn} -R {ref} --germline-resource {gnomad} -O {idtm}.vcf".format(tm = tumor, cn = control, idtm = idtum, idcn = idcon, ref = referencia, gnomad = germline)
+    cmd = "{gatk} --java-options \"-Xmx32G\" Mutect2 -I {tm} -I {cn} -tumor {idtm} -normal {idcn} -R {ref} --germline-resource {gnomad} -O {idtm}.vcf".format(tm = tumor, cn = control, idtm = idtum, idcn = idcon, ref = referencia, gnomad = germline, gatk = gatk)
     if regiones != None :
         cmd += " -L {manifest}".format(manifest = regiones)
     cmd += "\n"
-    cmd += "/opt/gatk-4.1.4.1/gatk FilterMutectCalls -R {ref} -V {id}.vcf --stats {id}.vcf.stats --filtering-stats {id}.filter.tsv -O {id}.filtered.vcf\n".format(ref = referencia, id = idtum)
+    cmd += "{gatk} FilterMutectCalls -R {ref} -V {id}.vcf --stats {id}.vcf.stats --filtering-stats {id}.filter.tsv -O {id}.filtered.vcf\n".format(ref = referencia, id = idtum, gatk = gatk)
     cmd += "mkdir {dir}\n".format(dir = outputdir)
     cmd += "mv {idtm}* {dir}".format(idtm = idtum, dir = outputdir)
     return cmd
@@ -484,9 +474,9 @@ def getVarScan2Soma(tumor, control, referencia, output = "VarScan2") :
         str
             Comandos para ejecutar VarScan2 en los archivos bam que se han pasado por parametro
     """
-    cmd = "samtools mpileup -f {ref} -q 1 {bam} > control.pileup\n".format(ref = referencia, bam = control)
-    cmd += "samtools mpileup -f {ref} -q 1 {bam} > tumor.pileup\n".format(ref = referencia, bam = tumor)
-    cmd += "java -jar /opt/varscan-2.4.0/VarScan.v2.4.0.jar somatic control.pileup tumor.pileup varscan --output-vcf 1 --strand-filter 1\n"
+    cmd = "{samtools} mpileup -f {ref} -q 1 {bam} > control.pileup\n".format(ref = referencia, bam = control, samtools = samtools)
+    cmd += "{samtools} mpileup -f {ref} -q 1 {bam} > tumor.pileup\n".format(ref = referencia, bam = tumor, samtools = samtools)
+    cmd += "java -jar {varscan} somatic control.pileup tumor.pileup varscan --output-vcf 1 --strand-filter 1\n".format(varscan = varscan)
     cmd += "mkdir {dir}\n".format(dir = output)
     cmd += "mv tumor.pileup control.pileup varscan* {dir}".format(dir = output)
     return cmd
@@ -510,9 +500,9 @@ def getANNOVAR(vcf, prefix, hgref = "hg19", format = "vcf4") :
         -otherinfo incluir la informacion del vcf en el archivo de texto final
     """
     if hgref == "hg19" :
-        cmd = "/opt/annovar20180416/convert2annovar.pl -format {format} -outfile {out}.av -includeinfo {input}\n".format(out = prefix, input = vcf, format = format)
-        cmd += "/opt/annovar20180416/table_annovar.pl {input}.av /home/ffuster/share/biodata/Indexes/ANNOVAR/humandb/ -buildver hg19 -out {input} -remove -protocol refGene,avsnp150,1000g2015aug_all,1000g2015aug_afr,1000g2015aug_amr,1000g2015aug_eas,1000g2015aug_eur,1000g2015aug_sas,exac03,gnomad211_exome,gnomad211_genome,esp6500siv2_all,esp6500siv2_ea,esp6500siv2_aa,clinvar_20190305,cosmic70,dbnsfp35a --operation g,f,f,f,f,f,f,f,f,f,f,f,f,f,f,f,f -nastring NA -otherinfo".format(input = prefix)
+        cmd = "{annovar}/convert2annovar.pl -format {format} -outfile {out}.av -includeinfo {input}\n".format(out = prefix, input = vcf, format = format, annovar = annovar)
+        cmd += "{annovar}/table_annovar.pl {input}.av /home/ffuster/share/biodata/Indexes/ANNOVAR/humandb/ -buildver hg19 -out {input} -remove -protocol refGene,avsnp150,1000g2015aug_all,1000g2015aug_afr,1000g2015aug_amr,1000g2015aug_eas,1000g2015aug_eur,1000g2015aug_sas,exac03,gnomad211_exome,gnomad211_genome,esp6500siv2_all,esp6500siv2_ea,esp6500siv2_aa,clinvar_20190305,cosmic70,dbnsfp35a --operation g,f,f,f,f,f,f,f,f,f,f,f,f,f,f,f,f -nastring NA -otherinfo".format(input = prefix, annovar = annovar)
     elif hgref == "hg38" :
-        cmd = "/opt/annovar20200607/convert2annovar.pl -format {format} -outfile {out}.av -includeinfo {input}\n".format(out = prefix, input = vcf, format = format)
-        cmd += "/opt/annovar20180416/table_annovar.pl {input}.av /home/ffuster/share/biodata/Indexes/ANNOVAR/humandb/ -buildver hg38 -out {input} -remove -protocol refGene,avsnp150,1000g2015aug_all,1000g2015aug_afr,1000g2015aug_amr,1000g2015aug_eas,1000g2015aug_eur,1000g2015aug_sas,exac03,gnomad211_exome,gnomad30_genome,esp6500siv2_all,esp6500siv2_ea,esp6500siv2_aa,clinvar_20200316,cosmic70,dbnsfp35a --operation g,f,f,f,f,f,f,f,f,f,f,f,f,f,f,f,f -nastring NA -otherinfo".format(input = prefix)
+        cmd = "{annovar}/convert2annovar.pl -format {format} -outfile {out}.av -includeinfo {input}\n".format(out = prefix, input = vcf, format = format, annovar = annovar)
+        cmd += "{annovar}/table_annovar.pl {input}.av /home/ffuster/share/biodata/Indexes/ANNOVAR/humandb/ -buildver hg38 -out {input} -remove -protocol refGene,avsnp150,1000g2015aug_all,1000g2015aug_afr,1000g2015aug_amr,1000g2015aug_eas,1000g2015aug_eur,1000g2015aug_sas,exac03,gnomad211_exome,gnomad30_genome,esp6500siv2_all,esp6500siv2_ea,esp6500siv2_aa,clinvar_20200316,cosmic70,dbnsfp35a --operation g,f,f,f,f,f,f,f,f,f,f,f,f,f,f,f,f -nastring NA -otherinfo".format(input = prefix, annovar = annovar)
     return cmd
