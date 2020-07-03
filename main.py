@@ -5,8 +5,98 @@
 MAIN: Programa principal. Muestra los pasos a seguir para poder hacer el analisis automatico de paneles en SMD. Usa la libreria creaLog para ejecutar el analisi
 """
 
-import creaLog as cl
+import os
 import subprocess
+
+import creaLog as cl
+import data2excel as xls
+import filtStrelka as fis
+import filtMutect as fim
+import getCommands as gc
+
+def fastq() :
+    """Analizar una unica muestra"""
+    # TODO: Recoger la ruta absoluta de los FASTQ. Lanzar custom para ver el tipo de analisis a ejecutar
+    pass
+
+def reanalizar() :
+    """Reanalizar una muestra sin borrar lo que ya esta guardado"""
+    # # TODO: COMO LO HAGO ??????????
+    pass
+
+def vcf() :
+    """A partir de un vcf pasado por parametro, crear el excel con los datos filtrados y anotados"""
+    ruta = input("Introducir el path absoluto del vcf: ")
+    name = input("Introducir el nombre de la muestra: ")
+    hg = input("Introducir el genoma de referencia usado (hg19, hg38): ")
+    # Comprobar que tipo de variant calling se ha hecho
+    vcal = None
+    # Buscar Mutect2, VarScan2, configureStrelka para saber cual de los variant callers se ha introducido
+    with open(ruta, "r") as fi :
+        for l in fi :
+            if "Mutect2" in l :
+                vcal = "Mutect2"
+                break
+            elif "VarScan2" in l :
+                vcal = "VarScan2"
+                break
+            elif "configureStrelka" in l :
+                vcal = "Sterlka2"
+                break
+    if vcal == None :
+        print("ERROR: No se pudo determinar el variant caller del vcf")
+    else :
+        print("INFO: Anotando VCF")
+        lst = None
+        ## TODO: Comprovar que la mostra no es somatica i cal posar vcf4old
+        # Cambiar el directorio de trabajo a la carpeta donde esta el vcf
+        wd = os.path.dirname(ruta)
+        os.chdir(wd)
+        # Anotar el vcf. Comprobar que no se haya anotado antes
+        arx = "{}.{}_multianno.txt".format(name, hg)
+        if not os.path.isfile(arx) :
+            if hg == "hg19" :
+                lst = gc.getANNOVAR(ruta, name, "hg19")
+            elif hg == "hg38" :
+                lst = gc.getANNOVAR(ruta, name, "hg38")
+            else :
+                print("ERROR: Genoma de referencia no soportado")
+                vcal = None
+            if lst != None :
+                for c in lst.split("\n") :
+                    proc = subprocess.Popen(c, shell = True, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+                    out, err = proc.communicate()
+
+        if vcal == "Strelka2" :
+            fis.main(arx, name)
+            xls.crearExcel(name)
+        elif vcal == "Mutect2" :
+            fim.main(arx, name)
+            xls.crearExcel(name)
+        elif vcal == "VarScan2" :
+            print("Pendiente hacer filtrado de VarScan2")
+    # Ejecutar filtMutect, filtStrelka, dependiendo del variant caller encontrado
+
+def custom() :
+    """Crear un analisis customizado usando un wizard"""
+    # # IDEA: rollo: opciones posibles: copiar, fastqc, aln, recal, bamqc....
+    """
+    OPCIONES YA CONTEMPLADAS EN CREAR LOG
+    copiar
+    fastqc
+    aln
+    recal
+    bamqc
+    mdups
+    coverage
+    strelkagerm
+    mutectgerm
+    vanno
+    filtrar
+    excel
+    Separa las ordenes por espacios. Pulsa enter para ejecutar el analisis
+    """
+
 
 def GUI() :
     """
@@ -20,4 +110,4 @@ def GUI() :
 
 
 if __name__ == "__main__" :
-  GUI()
+  vcf()
