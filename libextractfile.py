@@ -142,7 +142,7 @@ def extractAscatArray(path) :
     with open(path, "r") as fi :
         for l in fi :
             aux = l.strip().split("\t")
-            chr = aux[c]
+            chr = aux[c].replace("chr", "")
             # Skip the header
             if chr in lc.chromosomes :
                 tcn = int(aux[t])
