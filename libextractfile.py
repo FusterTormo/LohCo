@@ -108,6 +108,52 @@ def extractArray(path) :
     ar["likelyhood"] = 'NA'
     return ar
 
+def extractAscat(path) :
+    """Read TCGA allele-specific copy number segment files. Return the data in a REGION format
+
+    Read the allele-specific copy number segment files, extracting the chromosome, start position, end position, total copy number, and minor
+    copy number data. As these files give less information than other tools, the list is appended with 'NA' to get the same length as the other
+    tools. So the structure of the list packed in the returning dict will be:
+        [0] start position of the region (int)
+        [1] end position of the region (int)
+        [2] copy-number (enum) 'A' if region an amplification is considered in the region, 'D' if a deletion is considered in the region, 'N' if the region is considered copy number normal
+        [3] total copy number, extracted from the Copy_Number column (int)
+        [4] low copy number, extracted from the Minor_Copy_Number column (int)
+        [5] 'NA' as here is expected the logR value
+    The additional information, like purity, is not available. So this information is given as "NA", too.
+
+    Parameters:
+        path (str) : Path of the file to extract the data
+
+    Returns :
+        REGION : A dict where the key is the chromosome name and the value is a list of the regions in format [start, end, copy-number, 'NA', 'NA.', 'NA']
+    """
+    #Get the number of columns where the chromosome, start and end are
+    c = 1 # chromosome column number
+    s = 2 # start column number
+    e = 3 # end column number
+    t = 4 # total copy number column number
+    l = 6 # low copy number column number
+    ar = {}
+    tcn = -1
+    lcn = -1
+    chr = ""
+    # Open the file and convert the data to REGION format
+    with open(path, "r") as fi :
+        for l in fi :
+            aux = l.strip().split("\t")
+            chr = aux[c]
+            # Skip the header
+            if chr in lc.chromosomes :
+                tcn = int(aux[t])
+                lcn = int(aux[l])
+                reg = [int(aux[s]), int(aux[e]), getCN(tcn, lcn), tcn, lcn, 'NA']
+                if chr in ar.keys() :
+                    ar[chr].append(reg)
+                else :
+                    ar[chr] = [reg]
+    return ar
+
 def extractFacets(path, verbosity = "warning") :
     """Read FACETS $cncf file table and return the interesting information in a specific variable format
 
