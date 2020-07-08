@@ -46,12 +46,17 @@ def convert2region(path, filetype, verbosity = "warning") :
     filetype = filetype.lower()
     if filetype == "array" :
         reg = ex.extractArray(path)
+    elif filetype == "ascatarray" :
+        reg = ex.extractAscatArray(path)
     elif filetype == "facets" :
         reg = ex.extractFacets(path, verbosity)
     elif filetype == "ascat" or filetype == "ascatngs" :
         reg = ex.extractAscat(path, verbosity)
     elif filetype == "sequenza" :
         reg = ex.extractSequenza(path, verbosity)
+    elif filetype == "alfred" :
+        print("ERROR: Alfred-LOH is not implemented yet")
+        sys.exit()
     elif filetype == "cnacs" :
         print("ERROR: CNACS is not implemented yet")
         sys.exit()
@@ -62,7 +67,7 @@ def convert2region(path, filetype, verbosity = "warning") :
         print("ERROR: Purple is not implemented yet")
         sys.exit()
     else :
-        raise IOError("ERROR: Type of file not found. Cannot continue")
+        raise IOError("ERROR: Type of file not found. Accepted values: 'array', 'ascatarray', 'facets', 'ascat', 'ascatngs', 'sequenza', 'cnacs', 'titan', 'purple', 'alfred'. Cannot continue")
     return reg
 
 def getFragments(l1, l2) :

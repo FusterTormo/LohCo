@@ -108,7 +108,7 @@ def extractArray(path) :
     ar["likelyhood"] = 'NA'
     return ar
 
-def extractAscat(path) :
+def extractAscatArray(path) :
     """Read TCGA allele-specific copy number segment files. Return the data in a REGION format
 
     Read the allele-specific copy number segment files, extracting the chromosome, start position, end position, total copy number, and minor
