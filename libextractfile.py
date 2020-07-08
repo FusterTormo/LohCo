@@ -140,8 +140,8 @@ def extractAscatArray(path) :
     chr = ""
     # Open the file and convert the data to REGION format
     with open(path, "r") as fi :
-        for l in fi :
-            aux = l.strip().split("\t")
+        for it in fi :
+            aux = it.strip().split("\t")
             chr = aux[c].replace("chr", "")
             # Skip the header
             if chr in lc.chromosomes :
