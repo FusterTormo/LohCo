@@ -25,7 +25,7 @@ def getVep() :
     print repr(decoded)
 """
 
-def getMyVariant(chr, pos, ref, alt, na='NA') :
+def getMyVariant(chr, pos, ref, alt, na='NA', assembly = "hg19") :
     """
     Recoger los datos desde myvariant.info para una mutacion puntual dada
 
@@ -83,9 +83,12 @@ def getMyVariant(chr, pos, ref, alt, na='NA') :
         campos += "dbsnp.gmaf"
         #cadd.esp,dbnsfp.esp6500,dbnsfp.1000gp3,dbnsfp.exac,dbsnp.rsid,dbsnp.gmaf,exac,exac_nontcga,snpeff"
         params = 'ids=' + hgvs + '&fields=%s' % (campos)
+        # Agregar, si es necesario el tipo de genoma de referencia que estamos anotando
+        if assembly == "hg38" :
+            params += "&assembly=hg38"
         res, con = h.request('http://myvariant.info/v1/variant', 'POST', params, headers=headers)
         #Comprobar respuesta correcta
-
+        print(params)
         if res.status == 200 :
             try :
                 a = eval(con)[0] #Convertir la respuesta en un array. Cada elemento del array sera un diccionario
@@ -317,7 +320,9 @@ def getMyVariant(chr, pos, ref, alt, na='NA') :
 def main() :
     # Dummy unitary test
     header = False
-    print(getMyVariant("6", "26093141", "26093141", "G", "A"))
+    print(getMyVariant("6", "26093141", "G", "A"))
+    # La misma variante, pero usando las coordenadas de hg38, en lugar de hg19 (por defecto segun myvariant)
+    print(getMyVariant("6", "26092913", "G", "A", assembly = "hg38"))
     """
     with open("MO739/filtro4.allInfo","r") as fi :
         for l in fi :
