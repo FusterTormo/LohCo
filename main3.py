@@ -3,15 +3,15 @@
 
 """MAIN PROGRAM
 TEST TOOL MATCHES
-    Calculates the similarity between two tools
+    Calculates the similarity between two tools (FACETS, ascatNGS, and Sequenza)
     When two regions have the same aberration reported by both tools, this is annotated as a coincidence.
     Two different similarities are calculated
         regSimilarity annotates the regions in common that are similar
         baseSimilarity annotates the length of the regions that are annotated as similar
 
-    Additionally, calculates the MCC, and the Jaccard index for all the aberrations
+    Additionally, calculates the MCC, and the Jaccard index in all the aberrations
     Finally it calculates the percentage of coincidences by inspecting the regions in common
-    The output is printed in separated files one for each comparison
+    The output is printed in separated files (called facetsVSascatngs.tsv, facetsVSsequenza.tsv, and ascatVSsequenza.tsv) one for each comparison
 """
 
 import os
