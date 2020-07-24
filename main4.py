@@ -12,6 +12,8 @@ TEST REGIONS:
             score[]2 annotates the LOH in negative cases
             score[]3 annotates the LOH in unknown cases
         [] is the first letter of the tool (i.e. scoreA is ascatNGS score for positive cases, scoreS3 is Sequenza score for unknown cases)
+    Data is created for all BRCA1, BRCA2, ATM, and PALB2
+    Scores will be printed, and stored in score.txt file
 """
 
 import sqlite3
