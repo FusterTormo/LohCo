@@ -191,5 +191,5 @@ def main () :
                     fi.write("{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n".format(avs[0], avs[1], avs[2], avs[3], avs[4], avs[5], avs[6], avs[7], avs[8], avs[9], avs[10], avs[11], avs[12], avs[13], avs[14]))
 
 
-
-main()
+if __name__ == "__main__" :
+    main()

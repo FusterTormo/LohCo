@@ -19,8 +19,11 @@ wd = "/g/strcombio/fsupek_cancer2/TCGA_bam/OV"
 
 test = "/g/strcombio/fsupek_cancer2/TCGA_bam/OV/TCGA-04-1332"
 folder = "{}/ASCAT2/".format(test)
-ascats = os.list(folder)
+ascats = os.listdir(folder)
 folder = "{}/Array/"
-arrays = os.list(folder)
+arrays = os.listdir(folder)
 print(ascats)
 print(arrays)
+for a in ascats :
+    for b in arrays :
+        
