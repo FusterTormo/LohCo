@@ -9,6 +9,7 @@ TEST REGIONS:
         Get the CNV/LOH for each region from FACETS, ascatNGS, and Sequenza.
         Score +1 in the positive score if the program has detected LOH in a deleterious mutation
         Score +1 in the negative score if the program has detected LOH in a non-deleterious mutation
+    Final table with all the scores stored as lohGenes.tsv
 """
 
 import sqlite3
