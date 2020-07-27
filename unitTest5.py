@@ -15,6 +15,7 @@ The test includes:
 import libcomparison as lc
 import libgetters as lg
 import libstatistics as ls
+import main3 as mm
 
 # BRCA1/2 gene coordinates as reported by bioGPS
 brca1 = ["17", 43044295, 43170245]
@@ -52,9 +53,10 @@ print("----------------------------------------")
 print("INFO: Comparing one vs other")
 regs = lc.getFragments(ascat, array)
 comp = lc.doComparison2(regs, ascat, array)
-print(comp)
 sts = ls.doContingency(comp)
 for s in sts :
-    print("{} - {}".format(s, sts[s]))
+    print("{} - {}".format(s, sts[s]["MCC"]))
 sts = ls.jaccardIndex(comp)
 print(sts)
+print(mm.baseSimilarity(regs, ascat, array))
+print(mm.regSimilarity(regs, ascat, array))
