@@ -27,32 +27,6 @@ import main1 as mm
 dbcon = sqlite3.connect("/g/strcombio/fsupek_cancer2/TCGA_bam/info/info.db")
 wd = "/g/strcombio/fsupek_cancer2/TCGA_bam/OV"
 
-def baseSimilarity(regs, tool1, tool2) :
-    coin = 0
-    all = 0
-    for k in regs.keys() : # Iterate by chromosome
-        for r in regs[k] : # Iterate the regions in the chromosome
-            length = r[1] - r[0]
-            all += length
-            if lg.getCopyNumber(r, k, tool1) == lg.getCopyNumber(r, k, tool2) :
-                coin += length
-
-    percent = 100*float(coin)/float(all)
-    return percent
-
-
-def regSimilarity(regs, tool1, tool2) :
-    coin = 0
-    all = 0
-    for k in regs.keys() : # Iterate by chromosome
-        for r in regs[k] : # Iterate the regions in the chromosome
-            all += 1
-            if lg.getCopyNumber(r, k, tool1) == lg.getCopyNumber(r, k, tool2) :
-                coin += 1
-
-    percent = 100*float(coin)/float(all)
-    return percent
-
 def main () :
     fvaFi = "facetsVSascatngs.tsv"
     fvsFi = "facetsVSsequenza.tsv"
@@ -105,8 +79,8 @@ def main () :
                     c2 = lc.doComparison2(regs, outf, outa)
                     sts = ls.doContingency(c2) # Get the MCC for all the aberrations
                     jcc = ls.jaccardIndex(c2)
-                    fva.append(regSimilarity(regs, outf, outa))
-                    fva.append(baseSimilarity(regs, outf, outa))
+                    fva.append(ls.regSimilarity(regs, outf, outa))
+                    fva.append(ls.baseSimilarity(regs, outf, outa))
                     for ab in cte.aberrations :
                         fva.append(sts[ab]["MCC"])
                     for ab in cte.aberrations :
@@ -133,8 +107,8 @@ def main () :
                     c2 = lc.doComparison2(regs, outf, outs)
                     sts = ls.doContingency(c2) # Get the MCC for all the aberrations
                     jcc = ls.jaccardIndex(c2) # Get the Jaccard index for all the aberrations
-                    fvs.append(regSimilarity(regs, outf, outs))
-                    fvs.append(baseSimilarity(regs, outf, outs))
+                    fvs.append(ls.regSimilarity(regs, outf, outs))
+                    fvs.append(ls.baseSimilarity(regs, outf, outs))
                     for ab in cte.aberrations :
                         fvs.append(sts[ab]["MCC"])
                     for ab in cte.aberrations :
@@ -161,8 +135,8 @@ def main () :
                     c2 = lc.doComparison2(regs, outa, outs)
                     sts = ls.doContingency(c2) # Get the MCC for all the aberrations
                     jcc = ls.jaccardIndex(c2) # Get the Jaccard index for all the aberrations
-                    avs.append(regSimilarity(regs, outa, outs))
-                    avs.append(baseSimilarity(regs, outa, outs))
+                    avs.append(ls.regSimilarity(regs, outa, outs))
+                    avs.append(ls.baseSimilarity(regs, outa, outs))
                     for ab in cte.aberrations :
                         avs.append(sts[ab]["MCC"])
                     for ab in cte.aberrations :

@@ -7,6 +7,7 @@ MAIN: Functions to extract statistics from the LOH processed data
 """
 FUNCTIONS
     - countsXtool : Calculates the number of each alteration reported by each tool
+    - regionNumber : Count the number of regions that the getFragments function has created
     - calculateCounts : Calculates the number of each alteration in each region in common
     - print2Bed : Stores the regions reported by each tool, and the regions once they are put in common
     - printTable : Prints a 4x4 table with the alterations reported by each tool
@@ -15,6 +16,8 @@ FUNCTIONS
     - jaccardIndex : Calculates the Jaccard Index from the original 4x4 table
     - doGGplotFiles : Stores the information necessary to do a ggplot with the counts of the copy numbers. Executes the Rscript that creates the plot
     - logRcomp : Stores the information necesary to do a correlation between logR outputs. Executes the Rscript that creates the plot
+    - baseSimilarity : Annotates the length of the regions that are annotated as similar
+    - regSimilarity : Annotates the regions in common that are similar
 """
 
 """
@@ -56,6 +59,22 @@ def countsXtool(regs1, regs2 = None) :
         return (t1, t2)
     else :
         return t1
+
+def regionNumber(regs) :
+    """Count the number of regions that the getFragments function has created
+
+    Once the getFragments has fragmented the genome in common regions for the comparison of two tools, this function calculates how many regions the genome has been fragmented
+
+    Parameters :
+        regs (dict) : A dict where the key is the chromosome name (chr1, ..., chrX, chrY) and the value is a list of the regions in pairs [start, end].
+
+    Returns :
+        int : The number of fragments that have been created to put the tools' coordinates  in the same start/end points
+    """
+    count = 0
+    for c in regs :
+        count += regs[c]
+    return count
 
 def calculateCounts(tab) :
     """Calculate the number of alterations of each tool in the regions in common
@@ -370,6 +389,57 @@ def logRcomp(regions, t1, t2, name1 = "tool1", name2 = "tool2") :
     command = "Rscript {}".format(rpath)
     proc = subprocess.Popen(command, shell = True)
     proc.communicate()
+
+def baseSimilarity(regs, tool1, tool2) :
+    """Calculate the accuracy between the output of two tools passed as parameter
+
+    This function calculates a the accuracy (ACC) in a different way that using the confusion matrix.ACC is defined as the number of bases (in the genome) that have been reported with
+    the same aberration divided by the total number of bases. With this calculation it is possible to a global ACC rather than for a particular aberration.
+
+    Parameters :
+        regions (dict) : Splitted regions to extract the aberration from the programs output.
+        t1 (dict) : Output from program 1 in REGION format
+        t2 (dict) : Output from program 2 in REGION format
+
+    Returns :
+        float : Base ACC as a percentage
+    """
+    coin = 0
+    all = 0
+    for k in regs.keys() : # Iterate by chromosome
+        for r in regs[k] : # Iterate the regions in the chromosome
+            length = r[1] - r[0]
+            all += length
+            if lg.getCopyNumber(r, k, tool1) == lg.getCopyNumber(r, k, tool2) :
+                coin += length
+
+    percent = 100*float(coin)/float(all)
+    return percent
+
+def regSimilarity(regs, tool1, tool2) :
+    """Calculate the accuracy between the output of two tools passed as parameter
+
+    This function calculates a the accuracy (ACC) in a different way that using the confusion matrix. ACC is defined as the number of regions (in the genome) that have been reported with
+    the same aberration divided by the total number of regions. With this calculation it is possible to a global ACC rather than for a particular aberration.
+
+    Parameters :
+        regions (dict) : Splitted regions to extract the aberration from the programs output.
+        t1 (dict) : Output from program 1 in REGION format
+        t2 (dict) : Output from program 2 in REGION format
+
+    Returns :
+        float : Region ACC as a percentage
+    """
+    coin = 0
+    all = 0
+    for k in regs.keys() : # Iterate by chromosome
+        for r in regs[k] : # Iterate the regions in the chromosome
+            all += 1
+            if lg.getCopyNumber(r, k, tool1) == lg.getCopyNumber(r, k, tool2) :
+                coin += 1
+
+    percent = 100*float(coin)/float(all)
+    return percent
 
 if __name__ == "__main__" :
     """

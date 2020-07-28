@@ -15,7 +15,6 @@ The test includes:
 import libcomparison as lc
 import libgetters as lg
 import libstatistics as ls
-import main3 as mm
 
 # BRCA1/2 gene coordinates as reported by bioGPS
 brca1 = ["17", 43044295, 43170245]
@@ -52,6 +51,7 @@ print("Sequenza: {}".format(lg.getCopyNumber(brca2[1:3], brca2[0], sequenza)))
 print("----------------------------------------")
 print("INFO: Comparing ASCAT vs Array")
 regs = lc.getFragments(ascat, array)
+print("\tGenome divided in {} regions".format(ls.regionNumber(regs)))
 comp = lc.doComparison2(regs, ascat, array)
 sts = ls.doContingency(comp)
 print(ls.printTable(comp, "ASCAT2", "Array", False))
@@ -63,6 +63,6 @@ sts = ls.jaccardIndex(comp)
 for s in sts :
     print("\t\t{} - {}".format(s, sts[s]))
 print("\n\tBase ACC")
-print("\t\t{}".format(mm.baseSimilarity(regs, ascat, array)))
+print("\t\t{}".format(ls.baseSimilarity(regs, ascat, array)))
 print("\n\tRegion ACC")
-print("\t\t{}".format(mm.regSimilarity(regs, ascat, array)))
+print("\t\t{}".format(ls.regSimilarity(regs, ascat, array)))
