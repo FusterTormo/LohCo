@@ -84,4 +84,4 @@ for a in ascats :
     for b in arrays :
         array = lc.convert2region("{}/{}".format(folder2, b), "array")
         print(compareTools(ascat, array))
-        print("-------------------------------------------------------------------------")
+        print(compareTools(array, array))
