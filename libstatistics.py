@@ -410,7 +410,7 @@ def baseSimilarity(regs, tool1, tool2) :
         for r in regs[k] : # Iterate the regions in the chromosome
             length = r[1] - r[0]
             all += length
-            if lg.getCopyNumber(r, k, tool1) == lg.getCopyNumber(r, k, tool2) :
+            if getlib.getCopyNumber(r, k, tool1) == getlib.getCopyNumber(r, k, tool2) :
                 coin += length
 
     percent = 100*float(coin)/float(all)
@@ -435,7 +435,7 @@ def regSimilarity(regs, tool1, tool2) :
     for k in regs.keys() : # Iterate by chromosome
         for r in regs[k] : # Iterate the regions in the chromosome
             all += 1
-            if lg.getCopyNumber(r, k, tool1) == lg.getCopyNumber(r, k, tool2) :
+            if getlib.getCopyNumber(r, k, tool1) == getlib.getCopyNumber(r, k, tool2) :
                 coin += 1
 
     percent = 100*float(coin)/float(all)
