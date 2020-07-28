@@ -26,10 +26,10 @@ def getFACETS(path) :
 def getAscatNGS(path) :
     """Return the ascatNGS output files in the submitter folder passed as parameter """
     ascat = []
-    folder = os.listdir(path)
+    folders = os.listdir(path)
     for f in folders :
         if f.endswith("_ASCAT") :
-            aux = "{abs}/{as}".format(abs = path, as = f)
+            aux = "{abs}/{ngs}".format(abs = path, ngs = f)
             folders2 = os.listdir(aux)
             for g in folders2 :
                 if g.endswith("copynumber.caveman.csv") :
@@ -51,16 +51,29 @@ def getSequenza(path) :
                     sequenza.append(aux2)
     return sequenza
 
+def compareTools(reg1, reg2) :
+    regs = lc.getFragments(reg1, reg2)
+    comp = lc.doComparison2(regs, reg1, reg2)
+    mat = ls.doContingency(comp)
+    jcc = ls.jaccardIndex(comp)
+    num = ls.regionNumber(comp)
+    base = ls.baseSimilarity(regs, reg1, reg2)
+    regions = ls.regSimilarity(regs, reg1, reg2)
+    st = "{nr}\t{bs}\t{rs}\t{mcca}\t{mccn}\t{mccl}\t{mccd}\t{jcca}\t{jccn}\t{jccl}\t{jccd}".format(
+        nr = num, bs = base, rs = regions, mcca = mat["A"]["MCC"], mccn = mat["N"]["MCC"], mccl = mat["L"]["MCC"], mccd = mat["D"]["MCC"],
+        jcca = jcc["A"], jccn = jcc["N"], jccl = jcc["L"], jccd = jcc["D"])
+    return st
+
 # Buscar els submitters en la base de dades
 # Obrir la carpeta d'ASCAT2 i comprovar quants arxius tinc
 # Obrir la carpeta d'Arrays i comprovar quants arxius tinc
 # Comprovar quantes combinacions tinc per cada eina de LOH
 
 test = "/g/strcombio/fsupek_cancer2/TCGA_bam/OV/TCGA-04-1332"
-print(getFACETS(test))
-print(getAscatNGS(test))
-print(getSequenza(test))
-"""
+# print(getFACETS(test))
+# print(getAscatNGS(test))
+# print(getSequenza(test))
+
 print("INFO: Comparing ASCAT2 and Array outputs")
 folder1 = "{}/ASCAT2/".format(test)
 ascats = os.listdir(folder1)
@@ -70,14 +83,5 @@ for a in ascats :
     ascat = lc.convert2region("{}/{}".format(folder1, a), "ascatarray")
     for b in arrays :
         array = lc.convert2region("{}/{}".format(folder2, b), "array")
-        regs = lc.getFragments(ascat, array)
-        comp = lc.doComparison2(regs, ascat, array)
-        sts = ls.doContingency(comp)
-        jcc = ls.jaccardIndex(comp)
-        num = ls.regionNumber(comp)
-        print("{} - {}".format(a[0:8], b[0:8]))
-        print("Regions: {}".format(num))
-        print("JCC:\tAmp - {}\tDel - {}\tLOH - {}\tNor - {}".format(jcc["A"], jcc["D"], jcc["L"], jcc["N"]))
-        print("MCC:\tAmp - {}\tDel - {}\tLOH - {}\tNor - {}".format(sts["A"]["MCC"], sts["D"]["MCC"], sts["L"]["MCC"], sts["N"]["MCC"]))
+        print(compareTools(ascat, array))
         print("-------------------------------------------------------------------------")
-"""
