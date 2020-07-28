@@ -73,7 +73,7 @@ def regionNumber(regs) :
     """
     count = 0
     for c in regs :
-        count += regs[c]
+        count += len(regs[c])
     return count
 
 def calculateCounts(tab) :
