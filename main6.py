@@ -26,4 +26,4 @@ print(ascats)
 print(arrays)
 for a in ascats :
     for b in arrays :
-        
+        print("{} vs {}".format(a, b))
