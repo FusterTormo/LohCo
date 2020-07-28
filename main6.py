@@ -18,12 +18,17 @@ wd = "/g/strcombio/fsupek_cancer2/TCGA_bam/OV"
 # Comprovar quantes combinacions tinc per cada eina de LOH
 
 test = "/g/strcombio/fsupek_cancer2/TCGA_bam/OV/TCGA-04-1332"
-folder = "{}/ASCAT2/".format(test)
-ascats = os.listdir(folder)
-folder = "{}/Array/".format(test)
-arrays = os.listdir(folder)
+folder1 = "{}/ASCAT2/".format(test)
+ascats = os.listdir(folder1)
+folder2 = "{}/Array/".format(test)
+arrays = os.listdir(folder2)
 print(ascats)
 print(arrays)
 for a in ascats :
+    ascat = lc.convert2region("{}/{}".format(folder1, a))
     for b in arrays :
-        print("{} vs {}".format(a, b))
+        array = lc.convert2region("{}/{}".format(folder2, b))
+        regs = lc.getFragments(ascat, array)
+        comp = lc.doComparison2(regs, ascat, array)
+        sts = ls.doContingency(comp)
+        print(sts["A"])
