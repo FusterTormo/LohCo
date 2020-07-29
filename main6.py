@@ -69,19 +69,39 @@ def compareTools(reg1, reg2) :
 # Comprovar quantes combinacions tinc per cada eina de LOH
 
 test = "/g/strcombio/fsupek_cancer2/TCGA_bam/OV/TCGA-04-1332"
-# print(getFACETS(test))
-# print(getAscatNGS(test))
-# print(getSequenza(test))
-
 print("INFO: Comparing ASCAT2 and Array outputs")
 folder1 = "{}/ASCAT2/".format(test)
 ascats = os.listdir(folder1)
 folder2 = "{}/Array/".format(test)
 arrays = os.listdir(folder2)
+facets = getFACETS(test)
+ascatngs = getAscatNGS(test)
+sequenzas = getSequenza(test)
 for a in ascats :
     ascat = lc.convert2region("{}/{}".format(folder1, a), "ascatarray")
-    for b in arrays :
-        array = lc.convert2region("{}/{}".format(folder2, b), "array")
-        print(compareTools(ascat, array))
-        print(compareTools(array, array))
-        
+    for b in array :
+        arr = lc.convert2region("{}/{}".format(folder2, b), "array")
+        print(compareTools(ascat, arr))
+        print(compareTools(arr, arr))
+
+print("INFO: Comparing ASCAT2 and FACETS outputs")
+for a in ascats :
+    ascat = lc.convert2region("{}/{}".format(folder1, a), "ascatarray")
+    for b in facets :
+        f = lc.convert2region(b, "facets")
+        print(compareTools(ascat, f))
+
+print("INFO: Comparing ASCAT2 and ascatNGS outputs")
+for a in ascats :
+    ascat = lc.convert2region("{}/{}".format(folder1, a), "ascatarray")
+    for b in ascatngs :
+        ngs = lc.convert2region(b, "ascatngs")
+        print(compareTools(ascat, ngs))
+
+print("INFO: Comparing ASCAT2 and Sequenza outputs")
+print("INFO: Comparing ASCAT2 and FACETS outputs")
+for a in ascats :
+    ascat = lc.convert2region("{}/{}".format(folder1, a), "ascatarray")
+    for b in sequenzas :
+        s = lc.convert2region(b, "sequenza")
+        print(compareTools(ascat, s))
