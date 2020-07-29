@@ -82,5 +82,10 @@ for a in ascats :
     ascat = lc.convert2region("{}/{}".format(folder1, a), "ascatarray")
     for b in arrays :
         array = lc.convert2region("{}/{}".format(folder2, b), "array")
+        print(ls.countsXtool(ascat, array))
+        print(ls.countsXtool(array, array))
+        print("--------------------------------")
         print(compareTools(ascat, array))
+        print("--------------------------------")
         print(compareTools(array, array))
+        print("--------------------------------")

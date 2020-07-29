@@ -155,11 +155,11 @@ def main () :
                     avs.append("NA")
                 # Write the output in the corresponding files for each comparison
                 with open(fvaFi, "a") as fi :
-                    fi.write("{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n".format(fva[0], fva[1], fva[2], fva[3], fva[4], fva[5], fva[6], fva[7], fva[8], fva[9], fva[10], fva[11], fva[12], fva[13], fva[14]))
+                    fi.write("{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n".format(fva[0], fva[1], fva[2], fva[3], fva[4], fva[5], fva[6], fva[7], fva[8], fva[9], fva[10], fva[11]))
                 with open(fvsFi, "a") as fi :
-                    fi.write("{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n".format(fvs[0], fvs[1], fvs[2], fvs[3], fvs[4], fvs[5], fvs[6], fvs[7], fvs[8], fvs[9], fvs[10], fvs[11], fvs[12], fvs[13], fvs[14]))
+                    fi.write("{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n".format(fvs[0], fvs[1], fvs[2], fvs[3], fvs[4], fvs[5], fvs[6], fvs[7], fvs[8], fvs[9], fvs[10], fvs[11]))
                 with open(avsFi, "a") as fi :
-                    fi.write("{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n".format(avs[0], avs[1], avs[2], avs[3], avs[4], avs[5], avs[6], avs[7], avs[8], avs[9], avs[10], avs[11], avs[12], avs[13], avs[14]))
+                    fi.write("{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n".format(avs[0], avs[1], avs[2], avs[3], avs[4], avs[5], avs[6], avs[7], avs[8], avs[9], avs[10], avs[11]))
 
 
 if __name__ == "__main__" :
