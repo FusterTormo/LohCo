@@ -56,7 +56,7 @@ def compareTools(reg1, reg2) :
     comp = lc.doComparison2(regs, reg1, reg2)
     mat = ls.doContingency(comp)
     jcc = ls.jaccardIndex(comp)
-    num = ls.regionNumber(comp)
+    num = ls.regionNumber(regs)
     base = ls.baseSimilarity(regs, reg1, reg2)
     regions = ls.regSimilarity(regs, reg1, reg2)
     st = "{nr}\t{bs}\t{rs}\t{mcca}\t{mccn}\t{mccl}\t{mccd}\t{jcc}".format(
@@ -82,10 +82,6 @@ for a in ascats :
     ascat = lc.convert2region("{}/{}".format(folder1, a), "ascatarray")
     for b in arrays :
         array = lc.convert2region("{}/{}".format(folder2, b), "array")
-        print(ls.countsXtool(ascat, array))
-        print(ls.countsXtool(array, array))
-        print("--------------------------------")
         print(compareTools(ascat, array))
-        print("--------------------------------")
         print(compareTools(array, array))
-        print("--------------------------------")
+        
