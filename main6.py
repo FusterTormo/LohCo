@@ -79,7 +79,7 @@ ascatngs = getAscatNGS(test)
 sequenzas = getSequenza(test)
 for a in ascats :
     ascat = lc.convert2region("{}/{}".format(folder1, a), "ascatarray")
-    for b in array :
+    for b in arrays :
         arr = lc.convert2region("{}/{}".format(folder2, b), "array")
         print(compareTools(ascat, arr))
         print(compareTools(arr, arr))
@@ -88,20 +88,19 @@ print("INFO: Comparing ASCAT2 and FACETS outputs")
 for a in ascats :
     ascat = lc.convert2region("{}/{}".format(folder1, a), "ascatarray")
     for b in facets :
-        f = lc.convert2region(b, "facets")
+        f = lc.convert2region(b, "facets", "error")
         print(compareTools(ascat, f))
 
 print("INFO: Comparing ASCAT2 and ascatNGS outputs")
 for a in ascats :
     ascat = lc.convert2region("{}/{}".format(folder1, a), "ascatarray")
     for b in ascatngs :
-        ngs = lc.convert2region(b, "ascatngs")
+        ngs = lc.convert2region(b, "ascatngs", "error")
         print(compareTools(ascat, ngs))
 
 print("INFO: Comparing ASCAT2 and Sequenza outputs")
-print("INFO: Comparing ASCAT2 and FACETS outputs")
 for a in ascats :
     ascat = lc.convert2region("{}/{}".format(folder1, a), "ascatarray")
     for b in sequenzas :
-        s = lc.convert2region(b, "sequenza")
+        s = lc.convert2region(b, "sequenza", "error")
         print(compareTools(ascat, s))
