@@ -283,26 +283,26 @@ def getConfusionStatistics(tp, fp, fn, tn) :
 def jaccardIndex(mt, aber = cts.aberrations) :
     """ Calculate the Jaccard Index for each aberration
 
-    Calculates the Jaccard Index in the table given as parameter for the abberations list passed as parameter.
+    Calculates the Jaccard Index in the table given as parameter for the abberations list passed as parameter. Jaccard index measures the similarity between two sets by calculating
+    the size of intersection by the size of the union
 
     Parameters :
         mt (dict) :  Two-dimension dict obtained by executing doComparison function. This dict counts the number of bases that corresponds to each region, instead of just the region
         aber (list) : List of aberrations where want to calculate the Jaccard Index. Default ['A', 'D', 'L', 'N']
 
     Returns :
-        dict : Dict with all the calculated Jaccard indexes, one for each aberration passed in aber parameter
+        float : Jaccard index calculated as len(overlap)/len(all) where overlap is the number of bases reported with the same aberration
     """
-    total = 0
-    dic = {}
+    union = 0
+    intersec = 0
     for a in aber :
+        intersec += mt[a][a]
         for b in aber :
-            total += mt[a][b]
+            union += mt[a][b]
 
-    for a in aber :
-        jc = float(mt[a][a]) / float(total)
-        dic[a] = jc
+    jc = float(intersec) / float(union)
 
-    return dic
+    return jc
 
 def doGGplotFiles(reg1, reg2, prog1, prog2, plot = "both") :
     """Create a plot with the total copy number and/or a plot with the minor copy number reported by two tools

@@ -59,9 +59,8 @@ def compareTools(reg1, reg2) :
     num = ls.regionNumber(comp)
     base = ls.baseSimilarity(regs, reg1, reg2)
     regions = ls.regSimilarity(regs, reg1, reg2)
-    st = "{nr}\t{bs}\t{rs}\t{mcca}\t{mccn}\t{mccl}\t{mccd}\t{jcca}\t{jccn}\t{jccl}\t{jccd}".format(
-        nr = num, bs = base, rs = regions, mcca = mat["A"]["MCC"], mccn = mat["N"]["MCC"], mccl = mat["L"]["MCC"], mccd = mat["D"]["MCC"],
-        jcca = jcc["A"], jccn = jcc["N"], jccl = jcc["L"], jccd = jcc["D"])
+    st = "{nr}\t{bs}\t{rs}\t{mcca}\t{mccn}\t{mccl}\t{mccd}\t{jcc}".format(
+        nr = num, bs = base, rs = regions, mcca = mat["A"]["MCC"], mccn = mat["N"]["MCC"], mccl = mat["L"]["MCC"], mccd = mat["D"]["MCC"], jcc = jcc)
     return st
 
 # Buscar els submitters en la base de dades

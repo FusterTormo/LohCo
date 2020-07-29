@@ -64,10 +64,8 @@ def launchAnalysis(folder, array, ascat, facets) :
             fi.write("{}\t{}\n".format(id, ascatReg["purity"]))
         with open("ascatPloidies.txt", "a") as fi :
             fi.write("{}\t{}\n".format(id, ascatReg["ploidy"]))
-        with open("ascatJaccardAmplification.txt", "a") as fi :
-            fi.write("{}\t{}\n".format(id, jc2["A"]))
-        with open("ascatJaccardDeletion.txt", "a") as fi :
-            fi.write("{}\t{}\n".format(id, jc2["D"]))
+        with open("ascatJaccard.txt", "a") as fi :
+            fi.write("{}\t{}\n".format(id, jc2))
         with open("ascatACCamplification.txt", "a") as fi :
             fi.write("{}\t{}\n".format(id, cm2["A"]["ACC"]))
         with open("ascatTPRamplification.txt", "a") as fi :
@@ -93,10 +91,8 @@ def launchAnalysis(folder, array, ascat, facets) :
             fi.write("{}\t{}\n".format(id, facetsReg["purity"]))
         with open("facetsPloidies.txt", "a") as fi :
             fi.write("{}\t{}\n".format(id, facetsReg["ploidy"]))
-        with open("facetsJaccardAmplification.txt", "a") as fi :
-            fi.write("{}\t{}\n".format(id, jc1["A"]))
-        with open("facetsJaccardDeletion.txt", "a") as fi :
-            fi.write("{}\t{}\n".format(id, jc1["D"]))
+        with open("facetsJaccard.txt", "a") as fi :
+            fi.write("{}\t{}\n".format(id, jc1))
         with open("facetsACCamplification.txt", "a") as fi :
             fi.write("{}\t{}\n".format(id, cm1["A"]["ACC"]))
         with open("facetsTPRamplification.txt", "a") as fi :

@@ -33,11 +33,11 @@ def main () :
     avsFi = "ascatVSsequenza.tsv"
     # Write the output files' header
     with open(fvaFi, "w") as fi :
-        fi.write("Case\tregSim\tbaseSim\tMCCA\tMCCN\tMCCL\tMCCD\tjcca\tjccn\tjccl\tjccd\tFpurity\tApurity\tFploidy\tAploidy\n")
+        fi.write("Case\tregSim\tbaseSim\tMCCA\tMCCN\tMCCL\tMCCD\tjcc\tFpurity\tApurity\tFploidy\tAploidy\n")
     with open(fvsFi, "w") as fi :
-        fi.write("Case\tregSim\tbaseSim\tMCCA\tMCCN\tMCCL\tMCCD\tjcca\tjccn\tjccl\tjccd\tFpurity\tSpurity\tFploidy\tSploidy\n")
+        fi.write("Case\tregSim\tbaseSim\tMCCA\tMCCN\tMCCL\tMCCD\tjcc\tFpurity\tSpurity\tFploidy\tSploidy\n")
     with open(avsFi, "w") as fi :
-        fi.write("Case\tregSim\tbaseSim\tMCCA\tMCCN\tMCCL\tMCCD\tjcca\tjccn\tjccl\tjccd\tApurity\tSpurity\tAploidy\tSploidy\n")
+        fi.write("Case\tregSim\tbaseSim\tMCCA\tMCCN\tMCCL\tMCCD\tjcc\tApurity\tSpurity\tAploidy\tSploidy\n")
 
     table = []
     with dbcon :
@@ -83,8 +83,7 @@ def main () :
                     fva.append(ls.baseSimilarity(regs, outf, outa))
                     for ab in cte.aberrations :
                         fva.append(sts[ab]["MCC"])
-                    for ab in cte.aberrations :
-                        fva.append(jcc[ab])
+                    fva.append(jcc)
                     fva.append(outf["purity"])
                     fva.append(outs["purity"])
                     fva.append(outf["ploidy"])
@@ -111,8 +110,7 @@ def main () :
                     fvs.append(ls.baseSimilarity(regs, outf, outs))
                     for ab in cte.aberrations :
                         fvs.append(sts[ab]["MCC"])
-                    for ab in cte.aberrations :
-                        fvs.append(jcc[ab])
+                    fvs.append(jcc)
                     fvs.append(outf["purity"])
                     fvs.append(outs["purity"])
                     fvs.append(outf["ploidy"])
@@ -139,8 +137,7 @@ def main () :
                     avs.append(ls.baseSimilarity(regs, outa, outs))
                     for ab in cte.aberrations :
                         avs.append(sts[ab]["MCC"])
-                    for ab in cte.aberrations :
-                        avs.append(jcc[ab])
+                    avs.append(jcc)
                     avs.append(outf["purity"])
                     avs.append(outs["purity"])
                     avs.append(outf["ploidy"])
