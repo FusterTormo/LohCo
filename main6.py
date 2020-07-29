@@ -8,10 +8,6 @@ import libcomparison as lc
 import libgetters as lg
 import libstatistics as ls
 
-# Constants
-dbcon = sqlite3.connect("/g/strcombio/fsupek_cancer2/TCGA_bam/info/info.db")
-wd = "/g/strcombio/fsupek_cancer2/TCGA_bam/OV"
-
 def getFACETS(path) :
     """ Return the FACETS output files in the submitter folder passed as parameter """
     facets = []
@@ -63,44 +59,61 @@ def compareTools(reg1, reg2) :
         nr = num, bs = base, rs = regions, mcca = mat["A"]["MCC"], mccn = mat["N"]["MCC"], mccl = mat["L"]["MCC"], mccd = mat["D"]["MCC"], jcc = jcc)
     return st
 
-# Buscar els submitters en la base de dades
-# Obrir la carpeta d'ASCAT2 i comprovar quants arxius tinc
+
 # Obrir la carpeta d'Arrays i comprovar quants arxius tinc
 # Comprovar quantes combinacions tinc per cada eina de LOH
 
-test = "/g/strcombio/fsupek_cancer2/TCGA_bam/OV/TCGA-04-1332"
-print("INFO: Comparing ASCAT2 and Array outputs")
-folder1 = "{}/ASCAT2/".format(test)
-ascats = os.listdir(folder1)
-folder2 = "{}/Array/".format(test)
-arrays = os.listdir(folder2)
-facets = getFACETS(test)
-ascatngs = getAscatNGS(test)
-sequenzas = getSequenza(test)
-for a in ascats :
-    ascat = lc.convert2region("{}/{}".format(folder1, a), "ascatarray")
-    for b in arrays :
-        arr = lc.convert2region("{}/{}".format(folder2, b), "array")
-        print(compareTools(ascat, arr))
-        print(compareTools(arr, arr))
+def main() :
+    # Constants
+    dbcon = sqlite3.connect("/g/strcombio/fsupek_cancer2/TCGA_bam/info/info.db")
+    cancer = "OV"
+    cancerpath = "/g/strcombio/fsupek_cancer2/TCGA_bam/"
+    # Get the OV submitters from the database
+    with dbdon :
+        query = "SELECT submitter FROM patient WHERE cancer='{}' LIMIT 2".format(cancer)
+        c = dbcon.cursor()
+        x = c.execute(query)
+        submitters = x.fetchall()
 
-print("INFO: Comparing ASCAT2 and FACETS outputs")
-for a in ascats :
-    ascat = lc.convert2region("{}/{}".format(folder1, a), "ascatarray")
-    for b in facets :
-        f = lc.convert2region(b, "facets", "error")
-        print(compareTools(ascat, f))
+    for s in submitters :
+        workindir = "{}/{}/{}".format(cancerpath, cancer, s)
+        ascatFolder = "{}/ASCAT2/".format(workindir)
+        # Open ASCAT2 folder and get the files available
+        if os.path.isdir (ascatFolder) :
+            ascatFiles = os.listdir(ascatFolder)
+            arrayFolder = "{}/Array/".format(workindir)
+            if os.path.isdir(arrayFolder) :
+                arrayFiles = os.listdir(arrayFolder)
+                print("INFO: Comparing ASCAT2 and Array outputs in {}".format(s))
+                for a in ascatFiles :
+                    ascat = lc.convert2region("{}/{}".format(folder1, a), "ascatarray")
+                    for b in arrayFiles :
+                        arr = lc.convert2region("{}/{}".format(folder2, b), "array")
+                        print(compareTools(ascat, arr))
 
-print("INFO: Comparing ASCAT2 and ascatNGS outputs")
-for a in ascats :
-    ascat = lc.convert2region("{}/{}".format(folder1, a), "ascatarray")
-    for b in ascatngs :
-        ngs = lc.convert2region(b, "ascatngs", "error")
-        print(compareTools(ascat, ngs))
+            print("INFO: Comparing ASCAT2 and FACETS outputs in {}".format(s))
+            facetsFiles = getFACETS(workindir)
+            for a in ascatFiles :
+                ascat = lc.convert2region("{}/{}".format(folder1, a), "ascatarray")
+                for b in facetsFiles :
+                    f = lc.convert2region(b, "facets", "error")
+                    print(compareTools(ascat, f))
 
-print("INFO: Comparing ASCAT2 and Sequenza outputs")
-for a in ascats :
-    ascat = lc.convert2region("{}/{}".format(folder1, a), "ascatarray")
-    for b in sequenzas :
-        s = lc.convert2region(b, "sequenza", "error")
-        print(compareTools(ascat, s))
+            print("INFO: Comparing ASCAT2 and ascatNGS outputs in {}".format(s))
+            ascatngsFiles = getAscatNGS(workindir)
+            for a in ascatFiles :
+                ascat = lc.convert2region("{}/{}".format(folder1, a), "ascatarray")
+                for b in ascatngsFiles :
+                    ngs = lc.convert2region(b, "ascatngs", "error")
+                    print(compareTools(ascat, ngs))
+
+            print("INFO: Comparing ASCAT2 and Sequenza outputs in {}".format(s))
+            sequenzaFiles = getSequenza(workindir)
+            for a in ascatFiles :
+                ascat = lc.convert2region("{}/{}".format(folder1, a), "ascatarray")
+                for b in sequenzaFiles :
+                    s = lc.convert2region(b, "sequenza", "error")
+                    print(compareTools(ascat, s))
+
+if __name__ == "__main__" :
+    main()
