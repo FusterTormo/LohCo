@@ -88,43 +88,60 @@ def main() :
             # Compare SNP-Arrays CNV outputs with ASCAT2
             if os.path.isdir(arrayFolder) :
                 arrayFiles = os.listdir(arrayFolder)
-                print("INFO: Comparing ASCAT2 and Array outputs in {}".format(s))
+                # print("INFO: Comparing ASCAT2 and Array outputs in {}".format(s))
                 for a in ascatFiles :
                     ascat = lc.convert2region("{}/{}".format(ascatFolder, a), "ascatarray")
                     for b in arrayFiles :
                         arr = lc.convert2region("{}/{}".format(arrayFolder, b), "array")
-                        if not os.path.isfile("ascatVSarray.tsv") :
-                            createFile("ascatVSarray.tsv")
-                        with open("ascatVSarray.tsv", "a") as fi :
+                        if not os.path.isfile("ascat2VSarray.tsv") :
+                            createFile("ascat2VSarray.tsv")
+                        with open("ascat2VSarray.tsv", "a") as fi :
                             fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = b, cmp = compareTools(ascat, arr)))
 
 
             # Compare FACETS LOH/CNV outputs with ASCAT2
-            print("INFO: Comparing ASCAT2 and FACETS outputs in {}".format(s))
+            # print("INFO: Comparing ASCAT2 and FACETS outputs in {}".format(s))
             facetsFiles = getFACETS(workindir)
             for a in ascatFiles :
                 ascat = lc.convert2region("{}/{}".format(ascatFolder, a), "ascatarray")
                 for b in facetsFiles :
                     f = lc.convert2region(b, "facets", "error")
-                    print(compareTools(ascat, f))
+                    if not os.path.isfile("ascat2VSfacets.tsv") :
+                        createFile("ascat2VSfacets.tsv")
+                    with open("ascat2VSfacets.tsv", "a") as fi :
+                        fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = b, cmp = compareTools(ascat, f)))
 
             # Compare ascatNGS LOH/CNV outputs with ASCAT2
-            print("INFO: Comparing ASCAT2 and ascatNGS outputs in {}".format(s))
+            # print("INFO: Comparing ASCAT2 and ascatNGS outputs in {}".format(s))
             ascatngsFiles = getAscatNGS(workindir)
             for a in ascatFiles :
                 ascat = lc.convert2region("{}/{}".format(ascatFolder, a), "ascatarray")
                 for b in ascatngsFiles :
                     ngs = lc.convert2region(b, "ascatngs", "error")
-                    print(compareTools(ascat, ngs))
+                    if not os.path.isfile("ascat2VSascatNGS.tsv") :
+                        createFile("ascat2VSascatNGS.tsv")
+                    with open("ascat2VSascatNGS.tsv", "a") as fi :
+                        fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = b, cmp = compareTools(ascat, ngs)))
 
             # Compare Sequenza LOH/CNV outputs with ASCAT2
-            print("INFO: Comparing ASCAT2 and Sequenza outputs in {}".format(s))
+            # print("INFO: Comparing ASCAT2 and Sequenza outputs in {}".format(s))
             sequenzaFiles = getSequenza(workindir)
             for a in ascatFiles :
                 ascat = lc.convert2region("{}/{}".format(ascatFolder, a), "ascatarray")
                 for b in sequenzaFiles :
                     s = lc.convert2region(b, "sequenza", "error")
-                    print(compareTools(ascat, s))
+                    if not os.path.isfile("ascat2VSsequenza.tsv") :
+                        createFile("ascat2VSsequenza.tsv")
+                    with open("ascat2VSsequenza.tsv", "a") as fi :
+                        fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = b, cmp = compareTools(ascat, s)))
+
+    # Move the output data to a new folder
+    os.mkdir("main6")
+    os.rename("ascat2VSarray.tsv", "main6/ascat2VSarray.tsv")
+    os.rename("ascat2VSfacets.tsv", "main6/ascat2VSfacets.tsv")
+    os.rename("ascat2VSascatNGS.tsv", "main6/ascat2VSascatNGS.tsv")
+    os.rename("ascat2VSsequenza.tsv", "main6/ascat2VSsequenza.tsv")
+
 
 if __name__ == "__main__" :
     main()
