@@ -59,9 +59,10 @@ def compareTools(reg1, reg2) :
         nr = num, bs = base, rs = regions, mcca = mat["A"]["MCC"], mccn = mat["N"]["MCC"], mccl = mat["L"]["MCC"], mccd = mat["D"]["MCC"], jcc = jcc)
     return st
 
-
-# Obrir la carpeta d'Arrays i comprovar quants arxius tinc
-# Comprovar quantes combinacions tinc per cada eina de LOH
+def createFile(name) :
+    """Creates a new file with the name passed as parameter. Prints the header in the file"""
+    with open(name, "w") as fi :
+        fi.write("ID1\tID2\tREGIONS\tBASEsim\tREGIONsim\tMCCamp\tMCCnorm\tMCCloh\tMCCdel\tJCC\n")
 
 def main() :
     # Constants
@@ -69,48 +70,58 @@ def main() :
     cancer = "OV"
     cancerpath = "/g/strcombio/fsupek_cancer2/TCGA_bam/"
     # Get the OV submitters from the database
-    with dbdon :
+    with dbcon :
         query = "SELECT submitter FROM patient WHERE cancer='{}' LIMIT 2".format(cancer)
         c = dbcon.cursor()
         x = c.execute(query)
         submitters = x.fetchall()
 
-    for s in submitters :
+    for sub in submitters :
+        s = sub[0]
         workindir = "{}/{}/{}".format(cancerpath, cancer, s)
         ascatFolder = "{}/ASCAT2/".format(workindir)
         # Open ASCAT2 folder and get the files available
         if os.path.isdir (ascatFolder) :
             ascatFiles = os.listdir(ascatFolder)
+            # Open SNP-array folder and get the files that are in
             arrayFolder = "{}/Array/".format(workindir)
+            # Compare SNP-Arrays CNV outputs with ASCAT2
             if os.path.isdir(arrayFolder) :
                 arrayFiles = os.listdir(arrayFolder)
                 print("INFO: Comparing ASCAT2 and Array outputs in {}".format(s))
                 for a in ascatFiles :
-                    ascat = lc.convert2region("{}/{}".format(folder1, a), "ascatarray")
+                    ascat = lc.convert2region("{}/{}".format(ascatFolder, a), "ascatarray")
                     for b in arrayFiles :
-                        arr = lc.convert2region("{}/{}".format(folder2, b), "array")
-                        print(compareTools(ascat, arr))
+                        arr = lc.convert2region("{}/{}".format(arrayFolder, b), "array")
+                        if not os.path.isfile("ascatVSarray.tsv") :
+                            createFile("ascatVSarray.tsv")
+                        with open("ascatVSarray.tsv", "a") as fi :
+                            fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = b, cmp = compareTools(ascat, arr)))
 
+
+            # Compare FACETS LOH/CNV outputs with ASCAT2
             print("INFO: Comparing ASCAT2 and FACETS outputs in {}".format(s))
             facetsFiles = getFACETS(workindir)
             for a in ascatFiles :
-                ascat = lc.convert2region("{}/{}".format(folder1, a), "ascatarray")
+                ascat = lc.convert2region("{}/{}".format(ascatFolder, a), "ascatarray")
                 for b in facetsFiles :
                     f = lc.convert2region(b, "facets", "error")
                     print(compareTools(ascat, f))
 
+            # Compare ascatNGS LOH/CNV outputs with ASCAT2
             print("INFO: Comparing ASCAT2 and ascatNGS outputs in {}".format(s))
             ascatngsFiles = getAscatNGS(workindir)
             for a in ascatFiles :
-                ascat = lc.convert2region("{}/{}".format(folder1, a), "ascatarray")
+                ascat = lc.convert2region("{}/{}".format(ascatFolder, a), "ascatarray")
                 for b in ascatngsFiles :
                     ngs = lc.convert2region(b, "ascatngs", "error")
                     print(compareTools(ascat, ngs))
 
+            # Compare Sequenza LOH/CNV outputs with ASCAT2
             print("INFO: Comparing ASCAT2 and Sequenza outputs in {}".format(s))
             sequenzaFiles = getSequenza(workindir)
             for a in ascatFiles :
-                ascat = lc.convert2region("{}/{}".format(folder1, a), "ascatarray")
+                ascat = lc.convert2region("{}/{}".format(ascatFolder, a), "ascatarray")
                 for b in sequenzaFiles :
                     s = lc.convert2region(b, "sequenza", "error")
                     print(compareTools(ascat, s))
