@@ -69,7 +69,6 @@ def main() :
     dbcon = sqlite3.connect("/g/strcombio/fsupek_cancer2/TCGA_bam/info/info.db")
     cancer = "OV"
     cancerpath = "/g/strcombio/fsupek_cancer2/TCGA_bam/"
-    workindir = "{}/{}/{}".format(cancerpath, cancer, s)
     # Get the OV submitters from the database
     with dbcon :
         query = "SELECT submitter FROM patient WHERE cancer='{}' LIMIT 2".format(cancer)
@@ -79,6 +78,7 @@ def main() :
 
     for sub in submitters :
         s = sub[0]
+        workindir = "{}/{}/{}".format(cancerpath, cancer, s)
         print("INFO: Checking {} ASCAT".format(s))
         ascatFolder = "{}/ASCAT2/".format(workindir)
         # Open ASCAT2 folder and get the files available
@@ -146,6 +146,7 @@ def main() :
     # Repeat the analysis, but using Arrays as True set
     for sub in submitters :
         s = sub[0]
+        workindir = "{}/{}/{}".format(cancerpath, cancer, s)
         print("INFO: Checking {} arrays".format(s))
         # Open SNP-Array folder and get the files available
         arrayFolder = "{}/Array/".format(workindir)
