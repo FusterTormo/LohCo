@@ -8,6 +8,7 @@ MAIN: Programa principal. Muestra los pasos a seguir para poder hacer el analisi
 import os
 import subprocess
 
+import bamQC as bq
 import creaLog as cl
 import data2excel as xls
 import filtStrelka as fis
@@ -25,7 +26,10 @@ def reanalizar() :
     pass
 
 def vcf() :
-    """A partir de un vcf pasado por parametro, crear el excel con los datos filtrados y anotados"""
+    """Anotar y filtrar un vcf. Guardar los datos en un excel
+
+    Pide al usuario la ruta de un archivo vcf. Anota y filtra los datos de dicho excel. Finalmente guarda todo en un excel. Todos los datos se guardan en la carpeta donde esta el vcf
+    """
     ruta = input("Introducir el path absoluto del vcf: ")
     name = input("Introducir el nombre de la muestra: ")
     hg = input("Introducir el genoma de referencia usado (hg19, hg38): ")
@@ -77,6 +81,26 @@ def vcf() :
             print("Pendiente hacer filtrado de VarScan2")
     # Ejecutar filtMutect, filtStrelka, dependiendo del variant caller encontrado
 
+def bamQC() :
+    """Calcula los parametros de calidad de un bam"""
+    ruta = input("Introducir el path absoluto del bam a analizar: ")
+    os.chdir(os.path.dirname(ruta))
+    bq.bed = "bwa.bed"
+    bq.bam = "bwa.recal.bam"
+    bq.fastqc = "../fastqc"
+    bq.main()
+    # El script bamQC.py crea un archivo de texto, llamado alnQC.txt, con un JSON con los datos de interes
+    with open("alnQC.txt", "r") as fi :
+        txt = fi.read()
+    qc = eval(txt)
+    for k, v in qc.items() :
+        if k == "ON" or k == "OFF":
+            print("{} - {} ({:.2f} %)".format(k, v, 100*float(v)/float(qc["BAM"])))
+        else :
+            print("{} - {}".format(k, v))
+    os.remove("bwa.bed")
+    os.remove("alnQC.txt")
+
 def custom() :
     """Crear un analisis customizado usando un wizard"""
     # # IDEA: rollo: opciones posibles: copiar, fastqc, aln, recal, bamqc....
@@ -110,4 +134,4 @@ def GUI() :
 
 
 if __name__ == "__main__" :
-  vcf()
+  bamQC()

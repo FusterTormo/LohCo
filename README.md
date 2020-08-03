@@ -43,13 +43,25 @@ El programa pedir&aacute; el n&uacute;mero de tanda que se quiere limpiar. Una v
 
 ## Control de calidad de un alineamiento en particular
 
-### Uso
+El control de calidad se puede ejecutar de dos formas distintas: invocando directamente al *script* de control de calidad (bamQC.py) o usando la interfaz (main.py)
+
+### Usando bamQC
 
 El control de calidad se debe hacer dentro de la carpeta de la muestra. Por esto, para ejecutar este *script* se debe poner en la carpeta de la muestra. Una vez all&iacute; ejecutamos el *script*
 
 ```bash
 cd $MUESTRA_A_ANALIZAR
-python $PATH_AUP/bamQC.py
+python3 $PATH_AUP/bamQC.py
 ```
 
 El programa crear&aacute; un archivo de texto, en formato JSON, que contiene el n&uacute;mero de *reads* que tiene el FASTQ (suma de los *reads* reportados por FASTQC), los *reads* que tiene el bam (sumatorio de las filas que tiene el bed creado), los *reads* que est&aacute;n que caen dentro del manifest (ON target) y los que no caen dentro del manifest (OFF target).
+
+### Usando main
+
+Ejecutar el programa principal
+
+```bash
+python3 main.py
+```
+
+La interfaz pedir&aacute; indicar la ruta donde est&aacute; el bam en el que se quiere hacer el control de calidad. Con solo este dato, la interfaz crear&aacute; los archivos necesarios para poder hacer dicho control de calidad y reportar&aacute; la informaci&oacute;n del archivo en formato JSON en un formato m&aacute;s legible. Una vez se hayan mostrado los resultados por pantalla, la interfaz borrar&aacute; todos los archivos que ha creado.
