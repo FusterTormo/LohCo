@@ -10,13 +10,6 @@ python3 main.py
 ```
 El programa pedir&aacute; una ruta absoluta donde est&aacute;n los FASTQ reportados por el MiSeq. Con introducir ese dato basta para hacer todo el an&aacute;lisis, aunque se pueden a&ntilde;adir los pasos para realizar un an&aacute;lisis m&aacute;s customizado.
 
-# FAQs
-
-## &iquest;C&oacute;mo hago para modificar los programas que se ejecutan en los an&aacute;lisis?
-
-La liber&iacute;a [getCommands.py](../master/getCommands.py) contiene las &oacute;rdenes para ejecutar cada uno de los programas necesarios para el an&aacute;lisis. En las constantes de esta librer&iacute;a se encuentran las versiones de todos los programas que se usan para el an&aacute;lisis.
-
-
 # Otras funcionalidades
 ## Limpiar una tanda para archivarla
 
@@ -39,7 +32,10 @@ El programa pedir&aacute; el n&uacute;mero de tanda que se quiere limpiar. Una v
 ## Analizar una muestra por separado
 ## Analisis personalizado
 ## Reanalizar una muestra sin eliminar los datos hechos previamente
+
 ## Crear un excel a partir de un vcf de variantes
+
+Usando la interfaz, pedir&aacute; la ruta absoluta del vcf que se quiere anotar. Adem&aacute;s pedir&aacute; que se le d&eacute; un nombre identificativo a la muestra que se va a anotar. Finalmente, se pedir&aacute; el genoma de referencia que se ha usado para hacer el an&aacute;lisis previo.
 
 ## Control de calidad de un alineamiento en particular
 
@@ -65,3 +61,12 @@ python3 main.py
 ```
 
 La interfaz pedir&aacute; indicar la ruta donde est&aacute; el bam en el que se quiere hacer el control de calidad. Con solo este dato, la interfaz crear&aacute; los archivos necesarios para poder hacer dicho control de calidad y reportar&aacute; la informaci&oacute;n del archivo en formato JSON en un formato m&aacute;s legible. Una vez se hayan mostrado los resultados por pantalla, la interfaz borrar&aacute; todos los archivos que ha creado.
+
+# FAQs
+
+## &iquest;C&oacute;mo hago para modificar los programas que se ejecutan en los an&aacute;lisis?
+
+La liber&iacute;a [getCommands.py](../master/getCommands.py) contiene las &oacute;rdenes para ejecutar cada uno de los programas necesarios para el an&aacute;lisis. En las constantes de esta librer&iacute;a se encuentran las versiones de todos los programas que se usan para el an&aacute;lisis.
+
+
+## El manifest del panel ha cambiado. &iquest;C&oacute;mo cambio el manifest de la pipeline?
