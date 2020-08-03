@@ -263,4 +263,11 @@ def resumPredictors(d) :
     else :
         unknown += 1
 
+    if d["DANN_score"] == "NA" or d["DANN_score"] == "." :
+        unknown += 1
+    elif float(d["DANN_score"]) > 0.9 :
+        deleterious += 1
+    elif float(d["DANN_score"]) <= 0.9 :
+        tolerated += 1
+
     return "{}D, {}T, {}U".format(deleterious, tolerated, unknown)
