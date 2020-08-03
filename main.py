@@ -35,24 +35,30 @@ def vcf() :
     hg = input("Introducir el genoma de referencia usado (hg19, hg38): ")
     # Comprobar que tipo de variant calling se ha hecho
     vcal = None
+    format = "vcf4"
     # Buscar Mutect2, VarScan2, configureStrelka para saber cual de los variant callers se ha introducido
     with open(ruta, "r") as fi :
         for l in fi :
-            if "Mutect2" in l :
-                vcal = "Mutect2"
-                break
-            elif "VarScan2" in l :
-                vcal = "VarScan2"
-                break
-            elif "configureStrelka" in l :
-                vcal = "Sterlka2"
+            # Leer solo la cabecera del vcf para determinar el variant caller y si el vcf es de comparacion somatica o somatico/germinal sin comparacion
+            if l.startswith("#") :
+                # Comprobar que la muestra es somatica y hace falta cambiar el parametro -format de ANNOVAR a vcf4old
+                if l.startswith("#CHROM") :
+                    if len(l.split("\t")) == 11 :
+                        format = "vcf4old"
+
+                if "Mutect2" in l :
+                    vcal = "Mutect2"
+                elif "VarScan2" in l :
+                    vcal = "VarScan2"
+                elif "configureStrelka" in l :
+                    vcal = "Sterlka2"
+            else :
                 break
     if vcal == None :
         print("ERROR: No se pudo determinar el variant caller del vcf")
     else :
         print("INFO: Anotando VCF")
         lst = None
-        ## TODO: Comprovar que la mostra no es somatica i cal posar vcf4old
         # Cambiar el directorio de trabajo a la carpeta donde esta el vcf
         wd = os.path.dirname(ruta)
         os.chdir(wd)
@@ -60,17 +66,18 @@ def vcf() :
         arx = "{}.{}_multianno.txt".format(name, hg)
         if not os.path.isfile(arx) :
             if hg == "hg19" :
-                lst = gc.getANNOVAR(ruta, name, "hg19")
+                lst = gc.getANNOVAR(ruta, name, "hg19", format)
             elif hg == "hg38" :
-                lst = gc.getANNOVAR(ruta, name, "hg38")
+                lst = gc.getANNOVAR(ruta, name, "hg38", format)
             else :
-                print("ERROR: Genoma de referencia no soportado")
-                vcal = None
+                raise ValueError("ERROR: Genoma de referencia no soportado")
+
             if lst != None :
                 for c in lst.split("\n") :
                     proc = subprocess.Popen(c, shell = True, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
                     out, err = proc.communicate()
 
+        # Ejecutar filtMutect, filtStrelka, dependiendo del variant caller encontrado
         if vcal == "Strelka2" :
             fis.main(arx, name)
             xls.crearExcel(name)
@@ -79,7 +86,6 @@ def vcf() :
             xls.crearExcel(name)
         elif vcal == "VarScan2" :
             print("Pendiente hacer filtrado de VarScan2")
-    # Ejecutar filtMutect, filtStrelka, dependiendo del variant caller encontrado
 
 def bamQC() :
     """Calcula los parametros de calidad de un bam"""
@@ -134,4 +140,4 @@ def GUI() :
 
 
 if __name__ == "__main__" :
-  bamQC()
+  vcf()
