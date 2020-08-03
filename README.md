@@ -1,4 +1,4 @@
-# Analisis Utom&aacute;tico (sic) de Paneles
+# Analisis aUtom&aacute;tico de Paneles
 ## Analizar paneles SMD autom&aacute;ticamente
 
 Procesa las muestras de paneles secuenciadas en genomica autom&aacute;ticamente
@@ -14,7 +14,7 @@ El programa pedir&aacute; una ruta absoluta donde est&aacute;n los FASTQ reporta
 
 ## &iquest;C&oacute;mo hago para modificar los programas que se ejecutan en los an&aacute;lisis?
 
-La liber&iacute;a [getCommands.py]{../master/getCommands.py} contiene las &oacute;rdenes para ejecutar cada uno de los programas necesarios para el an&aacute;lisis. En las constantes de esta librer&iacute; se encuentran las versiones de todos los programas que se usan para el an&aacute;lisis.
+La liber&iacute;a [getCommands.py](../master/getCommands.py) contiene las &oacute;rdenes para ejecutar cada uno de los programas necesarios para el an&aacute;lisis. En las constantes de esta librer&iacute;a se encuentran las versiones de todos los programas que se usan para el an&aacute;lisis.
 
 
 # Otras funcionalidades
@@ -37,7 +37,19 @@ python3 cleaner.py
 El programa pedir&aacute; el n&uacute;mero de tanda que se quiere limpiar. Una vez hecho esto, ir&aacute; a la carpeta correspondiente y eliminar&aacute; los archivos FASTQ, los bams intermedios y los vcf y anotaciones intermedias.
 
 ## Analizar una muestra por separado
-## Analisis customizado
+## Analisis personalizado
 ## Reanalizar una muestra sin eliminar los datos hechos previamente
 ## Crear un excel a partir de un vcf de variantes
+
 ## Control de calidad de un alineamiento en particular
+
+### Uso
+
+El control de calidad se debe hacer dentro de la carpeta de la muestra. Por esto, para ejecutar este *script* se debe poner en la carpeta de la muestra. Una vez all&iacute; ejecutamos el *script*
+
+```bash
+cd $MUESTRA_A_ANALIZAR
+python $PATH_AUP/bamQC.py
+```
+
+El programa crear&aacute; un archivo de texto, en formato JSON, que contiene el n&uacute;mero de *reads* que tiene el FASTQ (suma de los *reads* reportados por FASTQC), los *reads* que tiene el bam (sumatorio de las filas que tiene el bed creado), los *reads* que est&aacute;n que caen dentro del manifest (ON target) y los que no caen dentro del manifest (OFF target).

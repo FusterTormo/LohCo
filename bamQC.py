@@ -6,9 +6,14 @@ MAIN: Comprobar la calidad del alineamiento
 """
 
 import os
+import subprocess
+import sys
+
+import getCommands as gc
 
 # IDEA: Algunes d'aquestes constants podrien anar en una llibreria de constants
 bed = "alignment/bwa.bed"
+bam = "alignment/bwa.recal.bam"
 fastqc = "fastqc"
 fastqcFI = "fastqc_data.txt"
 manifest = "/home/ffuster/panalisi/resultats/manifest.bed"
@@ -82,6 +87,16 @@ def main() :
     bamreads = 0
     reads = []
 
+    # Buscar los archivos necesarios para poder crear el control de calidad: la carpeta con la salida de FASTQC, el  archivo bed (o en su defecto el bam con el que crear el bed) y el manifest
+    if not os.path.isdir(fastqc) :
+        if not os.path.isfile(bed) and not os.path.isfile(bam) :
+            print("ERROR: No se han encontrado los archivos necesarios para poder ejecutar el control de calidad")
+            sys.exit()
+
+    if not os.path.isfile(manifest) :
+        print("ERROR: Manifest no encontrado en ruta {}".format(manifest))
+        sys.exit()
+
     # Comprobar si existe la carpeta de FASTQC. Extraer la informacion necesaria de los FASTQ en tal caso
     print("INFO: Leyendo FASTQ")
     if os.path.isdir(fastqc) :
@@ -100,6 +115,10 @@ def main() :
     if os.path.isfile(manifest) :
         dic = convertirManifest()
         print("INFO: Leyendo alineamiento")
+        if not os.path.isfile(bed) :
+            print("INFO: Creando archivo bed con las coordenadas del bam")
+            proc = subprocess.Popen(gc.getBam2bed(bam, bed), shell = True, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+            out, err = proc.communicate()
         if os.path.isfile(bed) :
             with open(bed, "r") as fi :
                 for l in fi :
@@ -107,21 +126,20 @@ def main() :
                         on += 1
                     else :
                         off += 1
-        else :
-            print("ERROR: Bed no encontrado en ruta {}".format(bed))
-    else :
-        print("ERROR: Manifest no encontrado en ruta {}".format(manifest))
 
-    fqreads = sum(reads)
-    breads = on + off
-    print("INFO: Escribiendo resultados en {}".format(output))
-    with open(output, "w") as fi :
-        fi.write("{")
-        fi.write("\'FASTQ\': {},".format(fqreads))
-        fi.write("\'BAM': {},".format(breads))
-        fi.write("\'ON\': {},".format(on))
-        fi.write("\'OFF\': {}".format(off))
-        fi.write("}")
+    if reads == 0 and on == 0 and off == 0 :
+        print("ERROR: No hay datos para poder crear el archivo de calidad del bam")
+    else :
+        fqreads = sum(reads)
+        breads = on + off
+        print("INFO: Escribiendo resultados en {}".format(output))
+        with open(output, "w") as fi :
+            fi.write("{")
+            fi.write("\'FASTQ\': {},".format(fqreads))
+            fi.write("\'BAM': {},".format(breads))
+            fi.write("\'ON\': {},".format(on))
+            fi.write("\'OFF\': {}".format(off))
+            fi.write("}")
 
 if __name__ == "__main__" :
     main()
