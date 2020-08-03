@@ -88,7 +88,6 @@ def getMyVariant(chr, pos, ref, alt, na='NA', assembly = "hg19") :
             params += "&assembly=hg38"
         res, con = h.request('http://myvariant.info/v1/variant', 'POST', params, headers=headers)
         #Comprobar respuesta correcta
-        print(params)
         if res.status == 200 :
             try :
                 a = eval(con)[0] #Convertir la respuesta en un array. Cada elemento del array sera un diccionario
