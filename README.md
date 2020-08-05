@@ -29,6 +29,10 @@ python3 cleaner.py
 
 El programa pedir&aacute; el n&uacute;mero de tanda que se quiere limpiar. Una vez hecho esto, ir&aacute; a la carpeta correspondiente y eliminar&aacute; los archivos FASTQ, los bams intermedios y los vcf y anotaciones intermedias.
 
+## Anotar un manifest
+
+En caso de tener un manifest en el que no se sabe a qu&eacute; genes pertenece cada regi&oacute;n se puede usar el *main* para anotar dicho manifest. El *script*, adem&aacute;, crear&aacute; el archivo gensAestudi.txt que se usa durante la fase de c&aacute;lculo de *coverage*.
+
 ## Analizar una muestra por separado
 ## Analisis personalizado
 ## Reanalizar una muestra sin eliminar los datos hechos previamente
@@ -70,3 +74,8 @@ La liber&iacute;a [getCommands.py](../master/getCommands.py) contiene las &oacut
 
 
 ## El manifest del panel ha cambiado. &iquest;C&oacute;mo cambio el manifest de la pipeline?
+
+Existen dos opciones:
+
+1. Crear el *log* de an&aacute;lisis (usando los comandos descritos al inicio de este README) y cambiar manualmente la ruta del manifest. Dicha ruta est&aacute; guardada como una constante en el *log* del an&aacute;lisis.
+2. Cambiar la ruta de la constante manifest en [bamQC](../master/bamQC.py), y [creaLog](../master/creaLog.py)
