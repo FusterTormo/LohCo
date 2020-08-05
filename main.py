@@ -14,6 +14,7 @@ import data2excel as xls
 import filtStrelka as fis
 import filtMutect as fim
 import getCommands as gc
+import manifestOp as op
 
 def fastq() :
     """Analizar una unica muestra"""
@@ -159,33 +160,9 @@ def custom() :
     ruta = input("Introducir el path absoluto de la carpeta donde estan los FASTQ a analizar: ")
     cl.prepararPanel(ruta, ordenes)
 
-def anotarManifest(ruta) :
-    """Anotar un manifest pasado por parametro para crear el archivo gensAestudi.txt"""
-    if os.path.isfile(ruta) :
-        print("INFO: Anotando manifest")
-        dir = os.path.dirname(ruta)
-        cont = ""
-        arx = "{}/manifest_anotado.bed".format(dir)
-        with open(ruta, "r") as fi :
-            for l in fi :
-                aux = l.strip().split("\t")
-                if len(aux) >= 3 :
-                    if not aux[0].startswith("chr") :
-                        aux[0] = "chr{}".format(aux[0])
-                    cmd = "mysql --user=genome --host=genome-mysql.soe.ucsc.edu -A -P 3306 -sN -D hg19 -e \"select name2 from refGene where chrom = '{chr}' AND txStart <= {nd} AND txEnd >= {st}\"".format(chr = aux[0], nd = aux[2], st = aux[1])
-                    pr = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                    std, err = pr.communicate()
-                    out = std.decode()
-                    genes = list(dict.fromkeys(out.strip().split("\n")))
-                    cont += "{}\t{}\t{}\t{}\n".format(aux[0], aux[1], aux[2], ",".join(genes))
-        with open(arx, "w") as fi :
-            fi.write(cont)
-            print("INFO: Manifest guardado como {}".format(arx))
-            cl.manifest = arx
-            cl.genes = "{}/gensAestudi.txt".format(dir)
-            print("INFO: Creando el archivo gensAestudi.txt para calculos de coverage")
-            cl.doListaGenes()
-
+def anotarManifest() :
+    ruta = input("Introducir ruta absolute del manifest a anotar: ")
+    op.anotarManifest(ruta)
 
 def GUI() :
     """

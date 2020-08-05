@@ -9,12 +9,14 @@ MAIN: Funciones para crear el log de analisis de los paneles
 FUNCTIONS:
     prepararScript - Crea el bash con todos los comandos que se van a usar en el análisis del panel
     extraerRG - Extrae el Read Group de los FASTQ
-    FALTEN FUNCIONS PER POSCAR ACI
+    FALTEN FUNCIONS PER POSAR ACI
 """
 import os
 import re
 import sys
+
 import getCommands as cmd
+import manifestOp as op
 
 """
 CONSTANTS:
@@ -24,13 +26,7 @@ referencia = "/home/ffuster/share/biodata/solelab/referencies/ucsc/hg19.fa"
 manifest = "/home/ffuster/panalisi/resultats/manifest.bed"
 gzmanifest = "/home/ffuster/panalisi/resultats/manifest.bed.gz"
 manifestidx = "/home/ffuster/panalisi/resultats/manifest.bed.gz.tbi"
-"""Comandos para generar los manifest tal y como los necesitan los programas
-    mv manifest.bed manifest_original.bed # Mantener una copia del original
-    sort -k1,1 -k2,2n manifest_original.bed > manifestaux.bed
-    sed 's/chr//g' manifestaux.bed > manifest.bed # Eliminar los 'chr'
-    bgzip -c manifest.bed > manifest.bed.gz # Comprimir el archivo para Strelka2. Puede que la ruta original de bgzip sea /opt/htslib-1.10.2/bin/bgzip
-    tabix -p bed manifest.bed.gz # Crear un indice para el manifest. Puede que la ruta original de tabix sea /opt/htslib-1.10.2/bin/tabix
-"""
+
 # Descargado desde https://gnomad.broadinstitute.org/downloads
 dbsnp = "/home/ffuster/share/biodata/solelab/referencies/gnomad.exomes.r2.1.1.sites.vcf"
 genes = "/home/ffuster/panalisi/resultats/gensAestudi.txt"
@@ -122,20 +118,6 @@ def getTanda() :
     sig = max(nums) + 1
     return sig
 
-def doListaGenes() :
-    """
-    Crear el archivo con la lista de genes que hay dentro del manifest
-    """
-    listaGenes = []
-    with open(manifest, "r") as fi :
-        for l in fi :
-            aux = l.split("\t")[3]
-            aux = aux.strip()
-            if aux not in listaGenes :
-                listaGenes.append(aux)
-    with open(genes, "w") as fi :
-        fi.write("\n".join(listaGenes))
-
 # TODO: Documentar correctament
 def comprobarArchivos() :
     """
@@ -155,7 +137,7 @@ def comprobarArchivos() :
         raise IOError("No se encuentra el archivo de SNPs")
     if not os.path.isfile(genes) :
         print("WARNING: No se encuentra el archivo con la lista de genes del manifest. Creando el archivo")
-        doListaGenes()
+        op.doListaGenes(manifest, genes)
 
 def prepararPanel(ruta, acciones) :
     """
@@ -292,7 +274,7 @@ def prepararPanel(ruta, acciones) :
                 # Re-anotacion y filtrado de variantes usando myvariant.info
                 if "filtrar" in acciones :
                     if "mutectGerm" in acciones :
-                        fi.write("python3 {wd}/filtMutect.py {input} {samplename}\n".format(wd = wd, input = "raw.hg19_multianno.txt", samplename = "$alias"))
+                        fi.write("\tpython3 {wd}/filtMutect.py {input} {samplename}\n".format(wd = wd, input = "raw.hg19_multianno.txt", samplename = "$alias"))
 
 
             # Juntar los resultados obtenidos en un Excel
