@@ -207,7 +207,7 @@ def prepararPanel(ruta, acciones) :
                     patx = f.replace(" ", "\\ ") #Parche para leer los espacios en la terminal bash
                     fi.write("\trsync -aP {} .\n".format(patx))
 
-                fi.write("\trsync -aP {} .\n".format(genes))
+                fi.write("\trsync -aP {} .\n".format("$gens"))
                 fi.write("\tmv ../{} .\n".format(arxiu))
                 fi.write("}\n\n")
 
