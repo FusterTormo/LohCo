@@ -87,9 +87,11 @@ def vcf() :
         elif vcal == "VarScan2" :
             print("Pendiente hacer filtrado de VarScan2")
 
-def bamQC() :
+def bamQC(ruta = None) :
     """Calcula los parametros de calidad de un bam"""
-    ruta = input("Introducir el path absoluto del bam a analizar: ")
+    if ruta == None :
+        ruta = input("Introducir el path absoluto del bam a analizar: ")
+
     os.chdir(os.path.dirname(ruta))
     bq.bed = "bwa.bed"
     bq.bam = "bwa.recal.bam"
@@ -109,7 +111,6 @@ def bamQC() :
 
 def custom() :
     """Crear un analisis customizado usando un wizard"""
-    # # IDEA: rollo: opciones posibles: copiar, fastqc, aln, recal, bamqc....
     """
     OPCIONES YA CONTEMPLADAS EN CREAR LOG
     copiar
@@ -124,8 +125,66 @@ def custom() :
     vanno
     filtrar
     excel
-    Separa las ordenes por espacios. Pulsa enter para ejecutar el analisis
     """
+    ordenes = []
+    print("\n\t------------------------------------------------\n\t\tAnalisis personalizado del panel\n\t------------------------------------------------\n")
+
+    if input("Copiar los fastq? (S/N) ").lower() == "s" :
+        ordenes.append("copiar")
+
+    if input("Control de calidad de los fastq? (S/N) ").lower() == "s" :
+        ordenes.append("fastqc")
+
+    if input("Alinear? (S/N) ").lower() == "s" :
+        ordenes.append("aln")
+        if input("Recalibrar bases? (S/N) ").lower() == "s" :
+            ordenes.append("recal")
+        if input("Marcar duplicados? (S/N) ").lower() == "s" :
+            ordenes.append("mdups")
+        if input("Control de calidad del bam? (S/N) ").lower() == "s" :
+            ordenes.append("bamqc")
+        if input("Calculo de coverage del bam? (S/N) ").lower() == "s" :
+            ordenes.append("coverage")
+        aux = input("Con que programa hacer el variant calling? Opciones disponibles (strelka_germinal, mutect_germinal). En caso de no querer variant calling, escribir 'n' ")
+        if aux.lower() != 'n' :
+            aux = aux.replace("_germinal", "germ")
+            ordenes.append(aux)
+            if input("Anotar variantes usando ANNOVAR? (S/N) ").lower() == "s" :
+                ordenes.append("vanno")
+                if input("Filtrar variantes? (S/N) ").lower() == "s" :
+                    ordenes.append("filtrar")
+                    if input("Convertir los datos en excel? (S/N)").lower() == "s" :
+                        ordenes.append("excel")
+    print("INFO: Se van a ejecutar los siguientes pasos: {}".format(", ".join(ordenes)))
+    ruta = input("Introducir el path absoluto de la carpeta donde estan los FASTQ a analizar: ")
+    cl.prepararPanel(ruta, ordenes)
+
+def anotarManifest(ruta) :
+    """Anotar un manifest pasado por parametro para crear el archivo gensAestudi.txt"""
+    if os.path.isfile(ruta) :
+        print("INFO: Anotando manifest")
+        dir = os.path.dirname(ruta)
+        cont = ""
+        arx = "{}/manifest_anotado.bed".format(dir)
+        with open(ruta, "r") as fi :
+            for l in fi :
+                aux = l.strip().split("\t")
+                if len(aux) >= 3 :
+                    if not aux[0].startswith("chr") :
+                        aux[0] = "chr{}".format(aux[0])
+                    cmd = "mysql --user=genome --host=genome-mysql.soe.ucsc.edu -A -P 3306 -sN -D hg19 -e \"select name2 from refGene where chrom = '{chr}' AND txStart <= {nd} AND txEnd >= {st}\"".format(chr = aux[0], nd = aux[2], st = aux[1])
+                    pr = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                    std, err = pr.communicate()
+                    out = std.decode()
+                    genes = list(dict.fromkeys(out.strip().split("\n")))
+                    cont += "{}\t{}\t{}\t{}\n".format(aux[0], aux[1], aux[2], ",".join(genes))
+        with open(arx, "w") as fi :
+            fi.write(cont)
+            print("INFO: Manifest guardado como {}".format(arx))
+            cl.manifest = arx
+            cl.genes = "{}/gensAestudi.txt".format(dir)
+            print("INFO: Creando el archivo gensAestudi.txt para calculos de coverage")
+            cl.doListaGenes()
 
 
 def GUI() :
@@ -140,4 +199,4 @@ def GUI() :
 
 
 if __name__ == "__main__" :
-  vcf()
+    GUI()
