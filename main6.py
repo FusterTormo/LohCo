@@ -71,7 +71,7 @@ def main() :
     cancerpath = "/g/strcombio/fsupek_cancer2/TCGA_bam/"
     # Get the OV submitters from the database
     with dbcon :
-        query = "SELECT submitter FROM patient WHERE cancer='{}' LIMIT 2".format(cancer)
+        query = "SELECT submitter FROM patient WHERE cancer='{}'".format(cancer)
         c = dbcon.cursor()
         x = c.execute(query)
         submitters = x.fetchall()
