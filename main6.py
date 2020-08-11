@@ -81,16 +81,16 @@ def main() :
         workindir = "{}/{}/{}".format(cancerpath, cancer, s)
         print("INFO: Checking {} ASCAT".format(s))
         ascatFolder = "{}/ASCAT2/".format(workindir)
-        # Open ASCAT2 folder and get the files available
-        ascatFiles = os.listdir(ascatFolder)
-        # Compare ASCAT2 with itself
-        for a in ascatFiles :
-            ascat = lc.conver2region("{}/{}".format(ascatFolder, a), "ascatarray")
-            if not os.path.isfile("ascat2vsascat2.tsv") :
-                createFile("ascat2vsascat2.tsv")
-            with open("ascat2vsascat2.tsv", "a") as fi :
-                fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = a, cmp = compareTools(ascat, ascat)))
         if os.path.isdir (ascatFolder) :
+            # Open ASCAT2 folder and get the files available
+            ascatFiles = os.listdir(ascatFolder)
+            # Compare ASCAT2 with itself
+            for a in ascatFiles :
+                ascat = lc.convert2region("{}/{}".format(ascatFolder, a), "ascatarray")
+                if not os.path.isfile("ascat2vsascat2.tsv") :
+                    createFile("ascat2vsascat2.tsv")
+                    with open("ascat2vsascat2.tsv", "a") as fi :
+                        fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = a, cmp = compareTools(ascat, ascat)))
             # Open SNP-array folder and get the files that are in
             arrayFolder = "{}/Array/".format(workindir)
             # Compare SNP-Arrays CNV outputs with ASCAT2
