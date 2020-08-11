@@ -97,52 +97,55 @@ def getFragments(l1, l2) :
     "16" : 90338345, "17" : 83257441, "18" : 80373285,
     "19" : 58617616, "20" : 64444167, "21" : 46709983,
     "22" : 50818468, "X" : 156040895, "Y" : 57227415}
-    iters = 0
+
+    # Iterar nomes per les claus de cromosomes de l'estructura REGION
     for k in  cts.chromosomes:
-        if k in l1.keys() :
+        if k in l1.keys() : # Recollir totes les regions de dins d'un cromosoma concret per la ferramenta 1
             tmp1 = list(l1[k])
         else :
             tmp1 = []
 
-        if k in l2.keys() :
+        if k in l2.keys() : # Recollir totes les regions de dins d'un cromosoma concret per la ferramenta 2
             tmp2 = list(l2[k])
         else :
             tmp2 = []
-        if tmp1 == [] and tmp2 == [] :
+        if tmp1 == [] and tmp2 == [] : # Si no hi ha dades del cromosoma, la regio comuna resultant es tot el cromosoma
             tmpregs = [[0, maxChr[k]]]
         else :
             tmpregs = []
             aux1 = []
             aux2 = []
             while len(tmp1) > 0 or len(tmp2) > 0 :
-                if len(aux1) == 0 :
+                if len(aux1) == 0 : # En aux1 tenim la regio amb inici menor de totes les que hi ha pel cromosoma k
                     if len(tmp1) > 0 :
-                        aux1 = ge.getRegion(tmp1.pop(0))
+                        aux1 = ge.getRegion(tmp1.pop(0)) # Recollir nomes les coordenades
                     else :
                         aux1.append(maxChr[k])
-                if len(aux2) == 0 :
+                if len(aux2) == 0 : # En aux2 tenim la regio amb inici menor de totes les que hi ha pel cromosoma k
                     if len(tmp2) > 0 :
                         aux2 = ge.getRegion(tmp2.pop(0))
                     else :
                         aux2.append(maxChr[k])
                 reg = []
-                # Si els dos array estan buits, la regio comuna es la dels dos valors minims
+                # Cas inicial: Si els dos array estan buits, la regio comuna es la dels dos valors minims
                 if len(tmpregs) == 0 :
-                    reg = [0, min(aux1[0], aux2[0])]
+                    reg = [0, min(aux1[0], aux2[0])] # Em quede amb el valor menor i l'elimine la coordenada de seu lloc corresponent
                     if min(aux1[0], aux2[0]) == aux1[0] :
                         aux1.pop(0)
                     else :
                         aux2.pop(0)
-                else :
+                else : # Ja tinc una coordenada inicial. Em quede amb la menor coordenada que trobe de les que queden
                     if min(aux1[0], aux2[0]) == aux1[0] :
                         reg = [last, aux1.pop(0)]
                     else :
                         reg = [last, aux2.pop(0)]
                 last = reg[1] + 1
-                tmpregs.append(reg)
-                iters += 1
+                # Parxe en cas que les dos regions que s'estan estudiant finalitzen en la mateixa coordenada. Donant lloc a regions de longitut -1
+                leng = reg[1] - reg[0]
+                if leng > 0 :
+                    tmpregs.append(reg)
 
-            while len(aux1) > 0 or len(aux2) > 0 :
+            while len(aux1) > 0 or len(aux2) > 0 : # Aquest bucle es per finalitzar les regions de l'altra ferramenta
                 reg = []
                 if len(aux1) == 0 :
                     reg = [last, aux2.pop(0)]
@@ -155,7 +158,7 @@ def getFragments(l1, l2) :
                         reg = [last, aux2.pop(0)]
                 last = reg[1] + 1
                 tmpregs.append(reg)
-
+            # Els dos grups de regions ja s'han acabat. Crear una ultima regio des de la maxima coordenada fins el final del cromosoma
             if last < maxChr[k] :
                 tmpregs.append([last, maxChr[k]])
 
