@@ -87,10 +87,10 @@ def main() :
             # Compare ASCAT2 with itself
             for a in ascatFiles :
                 ascat = lc.convert2region("{}/{}".format(ascatFolder, a), "ascatarray")
-                if not os.path.isfile("ascat2vsascat2.tsv") :
-                    createFile("ascat2vsascat2.tsv")
-                    with open("ascat2vsascat2.tsv", "a") as fi :
-                        fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = a, cmp = compareTools(ascat, ascat)))
+                if not os.path.isfile("ascat2VSascat2.tsv") :
+                    createFile("ascat2VSascat2.tsv")
+                with open("ascat2VSascat2.tsv", "a") as fi :
+                    fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = a, cmp = compareTools(ascat, ascat)))
             # Open SNP-array folder and get the files that are in
             arrayFolder = "{}/Array/".format(workindir)
             # Compare SNP-Arrays CNV outputs with ASCAT2
@@ -144,7 +144,7 @@ def main() :
 
     # Move the output data to a new folder
     os.mkdir("main6")
-    os.rename("ascat2vsascat2.tsv", "main6/ascat2vsascat2.tsv")
+    os.rename("ascat2VSascat2.tsv", "main6/ascat2VSascat2.tsv")
     os.rename("ascat2VSarray.tsv", "main6/ascat2VSarray.tsv")
     os.rename("ascat2VSfacets.tsv", "main6/ascat2VSfacets.tsv")
     os.rename("ascat2VSascatNGS.tsv", "main6/ascat2VSascatNGS.tsv")
@@ -162,9 +162,9 @@ def main() :
             # Compare arrays with itself
             for a in arrayFiles :
                 arr = lc.conver2region("{}/{}".format(arrayFolder, a), "array")
-                if not os.path.isfile("arrayvsarray.tsv") :
-                    createFile("arrayvsarray.tsv")
-                with open("arrayvsarray.tsv", "a") as fi :
+                if not os.path.isfile("arrayVSarray.tsv") :
+                    createFile("arrayVSarray.tsv")
+                with open("arrayVSarray.tsv", "a") as fi :
                     fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = a, cmp = compareTools(arr, arr)))
             # Open ASCAT2 folder to get the files that are in
             ascatFolder = "{}/ASCAT2/".format(workindir)
@@ -218,7 +218,7 @@ def main() :
                     with open("arrayVSsequenza.tsv", "a") as fi :
                         fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = b, cmp = compareTools(arr, s)))
 
-    os.rename("arrayvsarray.tsv", "main6/arrayvsarray.tsv")
+    os.rename("arrayVSarray.tsv", "main6/arrayVSarray.tsv")
     os.rename("arrayVSascat2.tsv", "main6/arrayVSascat2.tsv")
     os.rename("arrayVSfacets.tsv", "main6/arrayVSfacets.tsv")
     os.rename("arrayVSascatNGS.tsv", "main6/arrayVSascatNGS.tsv")
