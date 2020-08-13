@@ -12,7 +12,8 @@ def pct(bam = "bwaAlign/bwa.nodup.bam") :
     """
     Extraer el porcentaje de duplicados de un bam pasado por parametro
 
-    Ejecuta samtools flagstat para extraer el numero de reads considerados duplicados y luego calcula el porcentaje de duplicados que contiene el bam pasado por parametro. El resultado se guarda en un archivo de texto
+    Ejecuta samtools flagstat para extraer el numero de reads considerados duplicados y luego calcula el porcentaje de duplicados que contiene el bam pasado por parametro.
+    El resultado se guarda en un archivo de texto.
 
     Parameters
     ----------

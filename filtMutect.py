@@ -8,6 +8,20 @@ import getWebInfo as gw
 import reAnnoFilt as anno
 
 def main(ruta, samplename = "noName") :
+    """Programa principal. Filtra los datos de Mutect2 y guarda los datos en archivos .reanno.tsv
+
+    Filtra los datos de Mutect2, previamente anotados con ANNOVAR. Anade informacion util a los datos ya existentes, como un score para strand bias, calidad del mapeo, VAF, coverage,
+    enlaces para IGV... Tambien llama a la funcion getWebInfo para recoger informacion de MAFs de myvariant.info. Finalmente, filtra los datos y guarda las variantes que no han pasado cada uno
+    de los filtros en archivos .reannot.tsv. Estos archivos se usaran en data2excel para crear el excel final con todas las variantes y los filtros que han pasado. Tambien se crea un archivo
+    de texto con estadisticas del numero de variantes que hay en cada proceso de filtrado
+
+    Parameters
+    ----------
+        ruta : str
+            Path donde esta el archivo hg19_multianno.txt (o hg38_multianno.txt) que se va a reanotar y filtrar.
+        samplename : str, optional
+            Nombre de la muestra. Este dato se incluira a los datos de interes
+    """
     todas = anno.convertirData(ruta)
     for p in todas :
         p["population_max"], p["population_max_name"] = anno.maximMaf(p)

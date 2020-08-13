@@ -2,16 +2,29 @@
 # -*- coding: utf-8 -*-
 
 """
+MAIN: Funciones para modificar un nuevo manifest
+"""
+
+"""
 AYUDA: Comandos para generar los manifest tal y como los necesitan los programas
     mv manifest.bed manifest_original.bed # Mantener una copia del original
-    sort -k1,1 -k2,2n -V -s manifest_original.bed > manifestaux.bed
+    sort -k1,1 -k2,2n -V -s manifest_original.bed > manifestaux.bed # Ordenar el manifest por cromosoma y coordenada
     sed 's/chr//g' manifestaux.bed > manifest.bed # Eliminar los 'chr'
     bgzip -c manifest.bed > manifest.bed.gz # Comprimir el archivo para Strelka2. Puede que la ruta original de bgzip sea /opt/htslib-1.10.2/bin/bgzip
     tabix -p bed manifest.bed.gz # Crear un indice para el manifest. Puede que la ruta original de tabix sea /opt/htslib-1.10.2/bin/tabix
 """
 
 def anotarManifest(ruta) :
-    """Anotar un manifest pasado por parametro para crear el archivo gensAestudi.txt"""
+    """Anotar un maniest. Anadiendo informacion del gen al que pertenece cada region
+
+    Anotar un manifest pasado por parametro, usando la base de datos de UCSC (mysql) y el genoma de referencia hg19. Una vez anotado invoca a la funcion doListaGenes para crear el archivo
+    gensAestudi.txt, necesario para calcular el coverage de cada gen en el panel
+
+    Parameters
+    ----------
+        ruta : str
+            Path donde esta el manifest que se quiere anotar
+    """
     if os.path.isfile(ruta) :
         print("INFO: Anotando manifest")
         dir = os.path.dirname(ruta)
@@ -23,6 +36,7 @@ def anotarManifest(ruta) :
                 if len(aux) >= 3 :
                     if not aux[0].startswith("chr") :
                         aux[0] = "chr{}".format(aux[0])
+                    # NOTA: En caso de querer cambiar el genoma de referencia, modificar en la siguiente linea hg19 por el genoma de interes
                     cmd = "mysql --user=genome --host=genome-mysql.soe.ucsc.edu -A -P 3306 -sN -D hg19 -e \"select name2 from refGene where chrom = '{chr}' AND txStart <= {nd} AND txEnd >= {st}\"".format(chr = aux[0], nd = aux[2], st = aux[1])
                     pr = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                     std, err = pr.communicate()
@@ -37,8 +51,16 @@ def anotarManifest(ruta) :
             doListaGenes(arx, genes)
 
 def doListaGenes(manifest, genes) :
-    """
-    Crear el archivo con la lista de genes que hay dentro del manifest
+    """Crear el archivo con la lista de genes que hay dentro del manifest
+
+    Este archivo se usa luego para calcular el coverage de las regiones de interes de cada gen dentro del manifest
+
+    Parameters
+    ----------
+        manifest : str
+            Ruta donde esta el manifest del cual se va a extraer la lista de genes
+        genes : str
+            Nombre y ruta que tendra el archivo con la lista de genes
     """
     listaGenes = []
     with open(manifest, "r") as fi :

@@ -5,8 +5,26 @@ import os
 import sys
 import math
 
-#Convereix els bytes en una mesura mes llegible per humans
+"""
+MAIN: Script que elimina los archivos temporales y no necesarios en un panel que se quiere archivar
+"""
+
+#Converteix els bytes en una mesura mes llegible per humans
 def convert_size(size_bytes):
+    """Convertir los bytes pasados por parametro a formato legible por humanos
+
+    Transforma el numero pasado por parametro a bytes (B), kilobytes (KB), megabytes (MB), gigabytes (GB), terabytes (TB), petabytes (PB), exabytes (EB), zettabytes (ZB), yottabytes (YB)
+
+    Parameters
+    ----------
+        size_bytes : int
+            Numero que se quiere convertir a formato legible por humanos
+
+    Returns
+    -------
+        str
+            Numero en formato legible por humanos (8,3GB, 3B, 1,25MB...)
+    """
     ret = ""
     if size_bytes == 0 :
         ret = "0 B"
@@ -19,6 +37,17 @@ def convert_size(size_bytes):
     return ret
 
 def eliminarVariantCalling(ruta) :
+    """Eliminar los archivos temporales del variant calling
+
+    Elimina los archivos temporales de las carpetas de variant calling en la tanda pasada por parametro. Estos archivos temporales son:
+        * cand.reanno.tsv, highMAF.reanno.tsv, raw.hg19_multianno.txt, variants.stats.txt, conseq.reanno.tsv, lowVAF.reanno.tsv, raw.av, raw.reanno.tsv si el variant calling se ha hecho usando
+        Mutect2
+
+    Parameters
+    ----------
+        ruta : str
+            Nombre de la tanda que se quiere archivar
+    """
     print("INFO: Eliminant temporals de la carpeta de variants")
     cont = 0
     pes = 0
@@ -56,6 +85,16 @@ def eliminarVariantCalling(ruta) :
     print("INFO: {} arxius eliminats. {} espai alliberat".format(cont, convert_size(pes)))
 
 def eliminarAliniament(ruta) :
+    """Eliminar los archivos temporales del alineamiento
+
+    Elimina los archivos temporales de las carpetas de alineamiento de la tanda pasada por parametro. Estos archivos temporales son bwa.sam, bwa.sort.bam, bwa.sort.bai, bwa.bed y
+    recaldata.table
+
+    Parameters
+    ----------
+        ruta : str
+            Nombre de la tanda que se quiere archivar
+    """
     print("INFO: Eliminant bams intermedis")
     cont = 0 # Contador de arxius elminats
     pes = 0
@@ -77,6 +116,15 @@ def eliminarAliniament(ruta) :
 
 
 def eliminarFASTQ(ruta) :
+    """Eliminar los archivos FASTQ de la tanda que se quiere archivar
+
+    Elimina los archivos con extension .fastq.gz de la carpeta de tanda pasada por parametro.
+
+    Parameters
+    ----------
+        ruta : str
+            Nombre de la tanda que se quiere archivar
+    """
     print("INFO: Eliminant arxius FASTQ")
     cont = 0
     pes = 0
@@ -90,6 +138,11 @@ def eliminarFASTQ(ruta) :
     print("INFO: {} arxius eliminats. {} espai alliberat".format(cont, convert_size(pes)))
 
 def main(tanda = "") :
+    """Programa principal
+
+    En caso de no recibir el nombre de una tanda en la ejecucion del programa, pregunta al usuario por le numero de tanda que se quiere eliminar. Una vez comprobado que la carpeta con la tanda
+    existe, invoca a eliminarFASTQ, eliminarAliniament y eliminarVariantCalling para que eliminen los datos temporales de las carpetas correspondientes
+    """
     root = "/home/ffuster/panalisi/resultats"
     if tanda == "" :
         tanda = input("REQUEST: Dona'm el numero de tanda que vols netejar: ")

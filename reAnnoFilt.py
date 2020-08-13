@@ -2,7 +2,7 @@
 #!/usr/bin/python
 
 """
-MAIN: Re-anotar y filtrar el archivo de salida de table_annovar
+MAIN: Libreria con funciones para re-anotar y filtrar un archivo de salida de table_annovar. Esta libreria se usa para scripts, como filtMutect o filtStrelka para extraer datos en comun
 """
 import sys
 import getWebInfo as gw
@@ -53,8 +53,20 @@ mafCols = ["1000g2015aug_all", "1000g2015aug_afr", "1000g2015aug_amr", "1000g201
 "gNOMAD_Genome_popmax", "gNOMAD_Genome_raw", "dbSNP_MAF"]
 
 def addFORMAT(dic) :
-    """
+    """Separar los datos de las columnas INFO y FORMAT del vcf en columnas
+
     Separar los datos de las columnas INFO y FORMAT del vcf en columnas. Se devuelven los datos separados en un diccionario. Se comprueba si alguna clave esta ya presente en el diccionario
+    para no sobreescribir los datos de dicha columna.
+
+    Parameters
+    ----------
+        dic : dict
+            Linea del table_annovar (variante) de la que extraer la informacion. Se asume que el diccionario tendra las claves FORMAT e INFO
+
+    Returns
+    -------
+        dict
+            Diccionario con los datos de FORMAT e INFO separados
     """
     claves = dic["FORMAT"].split(":")
     valores = dic["SAMPLE"].split(":")
@@ -84,7 +96,20 @@ def addFORMAT(dic) :
     return minidic
 
 def convertirData(path) :
-    """Abrir un archivo con formato table_annovar y guardar todo el contenido en un diccionario"""
+    """Abrir un archivo con formato table_annovar y guardar todo el contenido en un diccionario
+
+    Convierte un vcf, anotado por ANNOVAR, en un diccionario. Separa los datos de la columna FORMAT y la columna INFO, y los agrega al diccionario, usando la funcion addFORMAT
+
+    Parameters
+    ----------
+        path : str
+            Ruta del archivo a convertir en diccionario
+
+    Returns
+    -------
+        dict
+            Contenido del archivo ANNOVAR en formato diccionario de Python
+    """
     cabecera = True
     temp = {}
     # Columnas dentro del table_annovar
@@ -124,7 +149,20 @@ def convertirData(path) :
     return dc
 
 def filtroPAS(dc) :
-    """Seleccionar solo las variantes que tengan como filtro PASS segun Strelka2"""
+    """Seleccionar solo las variantes que tengan como filtro PASS segun Strelka2
+
+    Dado una lista de diccionarios (tabla de variantes) pasada por parametro, crea una nueva lista con aquellas variantes que han pasado los filtros del variant caller Strelka2
+
+    Parameters
+    ----------
+        dc : list
+            Lista de diccionarios con el contenido que se quiere filtrar
+
+    Returns
+    -------
+        list
+            Lista de diccionarios con aquellas variantes que han pasado este filtro
+    """
     nuevo = []
     for d in dc :
         if d["FILTER"] == "PASS" :
@@ -132,7 +170,21 @@ def filtroPAS(dc) :
     return nuevo
 
 def filtroConseq(dc) :
-    """Selecciona aquellas variantes que son exonicas (excluye sinonimas) y splicing"""
+    """Selecciona aquellas variantes que son exonicas (excluye sinonimas) y splicing
+
+    Dada una lista de diccionarios (lista de variantes) pasada por parametro, crea una nueva lista con aquellas variantes que se encuentren en zonas codificantes (exonic) que no sean
+    sinonimas, o variantes en regiones de splicing.
+
+    Parameters
+    ----------
+        dc : list
+            Lista de diccionarios con el contenido a filtrar
+
+    Returns
+    -------
+        list
+            Lista de diccionarios con aquellas variantes que han pasado este filtro
+    """
     nuevo = []
     for d in dc :
         if d["Func.refGene"] == "splicing" :
@@ -142,7 +194,23 @@ def filtroConseq(dc) :
     return nuevo
 
 def filtrarMAF(dc) :
-    """Clasificar las variantes por su Minor Allele Frequency"""
+    """Clasificar las variantes por su Minor Allele Frequency
+
+    Dada una lista de diccionarios (variantes), separar las variantes respecto a la MAF. Considera MAF alta aquellas variantes con, almenos, una columna de poblacion con valor mayor
+    o igual a 0.01 (1%). El resto se consideran con MAF baja
+
+    Parameters
+    ----------
+        dc : list
+            Lista de diccionarios con el contenido a separar
+
+    Returns
+    -------
+        alta : list
+            Variantes con MAF mayor o igual que el umbral
+        baja : list
+            Variantes con MAF menor que el umbral
+    """
     baja = []
     alta = []
     for l in dc :
@@ -153,7 +221,23 @@ def filtrarMAF(dc) :
     return alta, baja
 
 def filtrarVAF(dc) :
-    """Clasificar las variantes por su Variant Allele Frequency"""
+    """Clasificar las variantes por su Variant Allele Frequency
+
+    Dada una lista de diccionarios (variantes) pasada por parametro, separa los elementos de la lista dependiendo de la frecuencia alelica de la variante (VAF). Se consideran variantes
+    con una VAF alta aquellas que tengan una VAF mayor de 10(%). Si la VAF es menor o igual al 10% se considera que es baja
+
+    Parameters
+    ----------
+        dc : list
+            Lista de diccionarios con el contenido a separar
+
+    Returns
+    -------
+        alta : list
+            Variantes con VAF mayor que el umbral
+        baja : list
+            Variantes con VAF menor o igual al umbral
+    """
     alta = []
     baja = []
     for l in dc :
@@ -164,14 +248,38 @@ def filtrarVAF(dc) :
     return alta, baja
 
 def addWebInfo(dc) :
-    """Agregar la informacion de myvariant.info a aquellas variantes que sean exonicas"""
+    """Agregar la informacion de myvariant.info a aquellas variantes que sean exonicas
+
+    Usa la funcion getMyVariant, de la libreria getWebInfo para conseguir dichos datos. Una vez conseguidos, agrega la informacion al diccionario pasado por parametro
+
+    Parameters
+    ----------
+        dc : dict
+            Variante de la que se va a buscar la informacion en myvariant.info
+
+    Returns
+    -------
+        dict
+            Mismos datos pasados por parametro, junto con los datos obtenidos de myvariant.info
+    """
     for d in dc :
         aux = gw.getMyVariant(d["Chr"], d["Start"], d["Ref"], d["Alt"])
         d.update(aux)
     return dc
 
 def guardarTabla(dc, prefijo) :
-    """Guardar el diccionario pasado por parametro en un archivo de texto con formato de tabla. El prefijo es el nombre que tendra el archivo"""
+    """Guardar las variantes pasadas por parametro en un archivo de texto con formato de tabla.
+
+    Guarda una lista de diccionarios (variantes) en un archivo de con formato tsv. El orden de las columnas viene en la constante allkeys. En caso de no encontrarse la clave dentro del
+    diccionario, se guarda el valor de la constante vacio.
+
+    Parameters
+    ----------
+        dc : list
+            Lista de diccionarios. Cada elemento de la lista es un diccionario con los datos de una variante encontrada
+        prefijo : str
+            Nombre que tendra el archivo. El nombre de archivo se compone de este parametro y la constante sufijo (.reanno.tsv)
+    """
     sufijo = "reanno.tsv"
     filename = "{}.{}".format(prefijo, sufijo)
     with open(filename, "w") as fi :
@@ -187,6 +295,24 @@ def guardarTabla(dc, prefijo) :
     print("INFO: Guardado archivo {}".format(filename))
 
 def maximMaf(dc) :
+    """Obtener el valor maximo de MAF
+
+    Calcula la maxima MAF (Minor Allele Frequency) de todas las columnas con informacion de este tipo en la variante pasada por parametro. El nombre de las columnas con MAF viene definido
+    en la constante mafCols. En caso de no encontrar datos de MAF en las columnas, devuelve NA
+
+    Parameters
+    ----------
+        dc : dict
+            Variante, en formato dict, de la que se quiere obtener el valor de MAF mas alto
+
+    Returns
+    -------
+        maxim : float, str
+            Si se encuentra, almenos, una MAF dentro de las columnas de variantes poblacionales, se devolvera el valor maximo encontrado. En caso de no encontrarse ningun valor de MAF,
+            devuelve 'NA'
+        poblacio : str
+            Nombre de la columna en la que se ha detectado el valor maximo de MAF
+    """
     maxim = -1
     poblacio = ""
     for i in mafCols :
@@ -199,6 +325,25 @@ def maximMaf(dc) :
     return maxim, poblacio
 
 def resumPredictors(d) :
+    """Resumir 11 predictores in silico
+
+    Comprueba los resultados obtenidos en SIFT, Polyphen2 HDIV, Polyphen2 HVAR, LRT, Mutation Taster, Mutation Assessor, FATHMM, Provean, MetaSVM, MetaLR y DANN. Agrupa los resultados obtenidos
+    en formato {}D, {}T, {}U donde:
+        * D es el numero de predictores que predicen la variante como deleterea
+        * T es el numero de predictores que predicen la variante como tolerada
+        * U es el numero de predictores que no pueden dar un resultado fiable a la variante (prediccion desconocida, o no significativa)
+
+    Parameters
+    ----------
+        d : dict
+            Variante en la que se quiere averiguar los resultados de los predictores
+
+    Returns
+    -------
+        str
+            Resumen de los predictores. El formato de la cadena es _D, _T, _U donde D es el numero de predicciones deletereas, T el numero de predicciones toleradas y U el numero de
+            predicciones desconocidas
+    """
     deleterious = 0
     tolerated = 0
     unknown = 0

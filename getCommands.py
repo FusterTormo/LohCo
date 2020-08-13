@@ -498,6 +498,17 @@ def getANNOVAR(vcf, prefix, hgref = "hg19", format = "vcf4") :
         -operation tipo de anotacion que se hara: g indica genomico (posicion que ocupa la coordenada dentro del genoma), f indica filtro, aunque en este caso no se filtre informacion
         -nastring en caso de que no haya informacion de la variante en un campo en concreto de la anotacion, cadena que se escribira
         -otherinfo incluir la informacion del vcf en el archivo de texto final
+
+    Parameters
+    ----------
+        vcf : str
+            Ruta donde esta el archivo vcf que se quiere anotar
+        prefix : str
+            Nombre que tendran los archivos que genere ANNOVAR
+        hgref : str, optional
+            Genoma de referencia usado para hacer el analisis del panel. Se para saber de que base de datos recoger la informacion
+        format : str, optional
+            Tipo de vcf que se ha generado. Este parametro solo hace falta modificarlo en caso de analisis somatico. En dicho caso, se cambiara vcf4 por vcf4old
     """
     if hgref == "hg19" :
         cmd = "{annovar}/convert2annovar.pl -format {format} -outfile {out}.av -includeinfo {input}\n".format(out = prefix, input = vcf, format = format, annovar = annovar)

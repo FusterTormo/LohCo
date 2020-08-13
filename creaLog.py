@@ -118,10 +118,17 @@ def getTanda() :
     sig = max(nums) + 1
     return sig
 
-# TODO: Documentar correctament
 def comprobarArchivos() :
-    """
-    Comprueba si los archivos necesarios para el analisis existen en la ruta especificada en las constantes
+    """Comprobar que existen los archivos externos para el analisis
+
+    Comprueba si los archivos necesarios para el analisis existen en la ruta especificada en las constantes. Estos archivos son: el genoma de referencia, el manifest (regiones de interes
+    en las que se ha focalizado el panel), el manifest comprimido y su indice correspondiente (para analizar el panel usando Strelka2), el archivo de SNPs (para recalibrar bases y para
+    el variant calling usando Mutect2) y la lista de genes en los que se ha focalizado el panel (para analisis de coverage).
+
+    Raises
+    ------
+        IOError
+            Si alguno de los archivos no existe lanzara dicha excepcion
     """
     print("INFO: Buscando los archivos necesarios para ejecutar la pipeline")
     if not os.path.isfile(referencia) :
@@ -147,7 +154,7 @@ def prepararPanel(ruta, acciones) :
     * Averiguar el numero de tanda
     * Montar la estructura de la tanda
     * Copiar los FASTQ
-    * Crear el bash de analisis
+    * Crear el bash de analisis. Dependera de la lista de acciones que se han determinado
     * Crear, si no existe, la lista de los genes que contiene el manifest (gensAestudi.txt)
     * Crear el log con todos los comandos para cada una de las muestras del panel
 
@@ -156,7 +163,8 @@ def prepararPanel(ruta, acciones) :
         ruta : str
             Ruta absoluta donde esta la carpeta con los FASTQ que se van a analizar en esta pipeline
         acciones : list
-            Lista de acciones que se pueden agregar al bash. Valores aceptados: ["copiar","fastqc", "aln", "recal", "mdups", "bamqc", "coverage", "strelkaGerm", "mutectGerm", "vanno", "filtrar", "excel"]
+            Lista de acciones que se pueden agregar al bash. Valores aceptados: ["copiar","fastqc", "aln", "recal", "mdups", "bamqc", "coverage", "strelkaGerm", "mutectGerm", "vanno",
+            "filtrar", "excel"]
     """
     os.chdir(pathAnalisi) # Cambiar el directorio de trabajo a la carpeta de analisis
     tnd = getTanda() # Crear el nombre de la carpeta donde se guardaran los analisis y el nombre del bash con todos los comandos

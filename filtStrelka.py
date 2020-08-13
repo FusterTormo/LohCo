@@ -4,7 +4,15 @@
 import reAnnoFilt as anno
 
 def calcularStrandBias(l) :
-    """Calcular el numero total de reads en forward - numero total de reads en reverse"""
+    """Calcular el numero total de reads en forward - numero total de reads en reverse
+
+    Cuenta cuantos reads hay en forward y cuantos en reverse y los resta para que se pueda considerar si la variante tiene strand bias o no.
+
+    Parameters
+    ----------
+        l : dict
+            Variante en la que se quiere calcular el strand bias score
+    """
     coef = "NP"
     auxF = l["ADF"].split(",")
     auxR = l["ADR"].split(",")
@@ -19,6 +27,20 @@ def calcularStrandBias(l) :
     return str(coef)
 
 def main(ruta, samplename = "noName") :
+    """Programa principal. Filtra los datos de Strelka2 y guarda los datos en archivos .reanno.tsv
+
+    Filtra los datos de Strelka2, previamente anotados con ANNOVAR. Anade informacion util a los datos ya existentes, como un score para strand bias, calidad del mapeo, VAF, coverage,
+    enlaces para IGV, datos sobre la poblacion con MAF mas alta... Tambien llama a la funcion getWebInfo para recoger informacion de MAFs de myvariant.info. Finalmente, filtra los datos y
+    guarda las variantes que no han pasado cada uno de los filtros en archivos .reannot.tsv. Estos archivos se usaran en data2excel para crear el excel final con todas las variantes y
+    los filtros que han pasado. Tambien se crea un archivo de texto con estadisticas del numero de variantes que hay en cada proceso de filtrado
+
+    Parameters
+    ----------
+        ruta : str
+            Path donde esta el archivo hg19_multianno.txt (o hg38_multianno.txt) que se va a reanotar y filtrar.
+        samplename : str, optional
+            Nombre de la muestra. Este dato se incluira a los datos de interes
+    """
     # Leer el archivo multianno de ANNOVAR y guardar los datos en un diccionario
     todas = anno.convertirData(ruta)
     # Agregar las columnas adicionales: "population_max", "predictor_summary". "Strand_bias_score", "Ref_depth", "Alt_depth", "VAF", "IGV_link", "sample"

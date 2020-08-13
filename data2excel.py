@@ -3,19 +3,23 @@
 
 """
 MAIN: Recoge todos los datos del analisis y los guarda en un excel
+Se asume que los datos ya se han filtrado usando filtMutect o filtStrelka, el cual ha creado los archivos .reanno.tsv
 """
 
 import os
 import sys
 import xlsxwriter
 
-# Archivos que se usaran para recoger la informacion que se guardara en el excel final
+"""
+Constantes
+"""
+# Nombre de los archivos en los que esta la informacion que se usa para guardar el excel final
 qc = "../alnQC.txt"
 cov = "../coverage.txt"
-covGens = "../coverage/coverageGeneStats.tsv"
+covGens = "../coverageGeneStats.tsv"
 arxius = ["cand.reanno.tsv", "lowVAF.reanno.tsv", "highMAF.reanno.tsv", "conseq.reanno.tsv", "raw.reanno.tsv"]
 stats = "variants.stats.txt"
-# Orden de las columnas en que se colocaran en cada una de las pestanas del excel
+# Orden de las columnas en que se colocaran en cada una de las pestanas del excel. Estos son los nombres de las columnas en los archivos .reanno.tsv
 orden = ["sample", "IGV_link", "Gene.refGene", "Chr", "Start", "End", "Ref", "Alt", "GT", "GQ", "MQ", "Func.refGene", "ExonicFunc.refGene", "AAChange.refGene", "GeneDetail.refGene",
 "Ref_depth", "Alt_depth", "DP", "AD", "ADF", "ADR", "VAF", "FILTER", "population_max", "population_max_name", "gnomad_exome_AF_popmax", "gnomad_exome_non_topmed_AF_popmax",
 "gnomad_genome_AF_popmax", "gnomad_genome_non_topmed_AF_popmax",
@@ -28,9 +32,20 @@ orden = ["sample", "IGV_link", "Gene.refGene", "Chr", "Start", "End", "Ref", "Al
 "GTEx_V6p_tissue", "GERP++_RS", "phyloP100way_vertebrate", "phyloP20way_mammalian", "phastCons100way_vertebrate", "phastCons20way_mammalian", "SiPhy_29way_logOdds", "Interpro_domain", "GTEx_V6p_gene"]
 
 def convertirArchivo(path) :
-    """
-        Convierte un archivo .reanno.tsv en un diccionario
-        Se asume que tiene la primera fila es la cabecera, la cual se usa para las claves del diccionario
+    """Convertir un archivo .reanno.tsv en un diccionario
+
+    Se asume que tiene la primera fila es la cabecera. La cabecera se usa para las claves del diccionario. Se supone que los nombres de las columnas no estan repetidos. En caso de
+    estarlo, uno de los valores se sobreescribira
+
+    Parameters
+    ----------
+        path : str
+            Ruta del archivo .reanno.tsv que se va a convertir en un diccionario
+
+    Returns
+    -------
+        dict
+            Datos del archivo convertidos en diccionario. Las claves del diccionario son los nombres de cada una de las columnas
     """
     cabecera = True
     datos = []
@@ -50,8 +65,21 @@ def convertirArchivo(path) :
     return datos
 
 def crearCabecera(hoja, libro) :
-    """
-    Escribe la cabecera de las pestanas de variantes
+    """Escribir la cabecera del excel en las pestanas de variantes
+
+    Escribe los nombres que tendra cada una de las columnas del excel.
+
+    Parameters
+    ----------
+        hoja : xlsxwriter.worksheet
+            Hoja excel en la que se quiere escribir la cabecera
+        libro : xlsxwriter.workbook
+            Libro excel para guardar el estilo de la cabecera
+
+    Returns
+    -------
+        int
+            Numero de fila en la que finaliza la cabecera
     """
     titulo = libro.add_format({'bold' : True,
         'align' : 'center',
@@ -81,13 +109,26 @@ def crearCabecera(hoja, libro) :
     return nextLine
 
 def escribirVariantes(hoja, libro, cnt, empiezaEn) :
-    """Escribir los datos del diccionario pasado por parametro en la pestana pasada por parametro
-    hoja : hoja actual
-    libro : libro excel donde se estan guardando los datos
-    cnt : dict
-        Diccionario con las variantes que se va a guardar en el excel
-    empiezaEn : int
-        Fila por la que se empezara a escribir el excel"""
+    """Escribir los datos de un diccionario en una pestana excel
+
+    Escribe los datos del diccionario pasado por parametro en la pestana pasada por parametro. Se asume que son datos de variantes.
+
+    Parameters
+    ----------
+        hoja : xlsxwriter.worksheet
+            Hoja excel donde se van a guardar los datos
+        libro : xlsxwriter.workbook
+            Libro excel donde se estan guardando los datos. Se usa para guardar los estilos de la hoja
+        cnt : dict
+            Diccionario con las variantes que se va a guardar en el excel
+        empiezaEn : int
+            Fila a partir de la que se empezara a escribir los datos del diccionario
+
+    Returns
+    -------
+        int
+            Numero de fila en la finaliza la escritura el contenido del diccionario
+    """
     # Estilos para los predictores
     rojo = libro.add_format({"bg_color" : "#FF4D4D"})
     verde = libro.add_format({"bg_color" : "#43F906"})
@@ -133,8 +174,23 @@ def escribirVariantes(hoja, libro, cnt, empiezaEn) :
     return fila
 
 def ayudaPredictores(hoja, libro, fila) :
-    """Escribe un cuadro con temas de ayuda interesantes para el usuario final a partir de la fila pasada como parametro. Los temas de ayuda son:
-    Los predictores, los coeficientes de strand-bias, las calidades de la variante, dependiendo de si la muestra analizada es somatica o germinal, y la columna summary_predictors"""
+    """Escribir cuadros de ayuda en el excel
+
+    Escribe un cuadro con temas de ayuda interesantes para el usuario final a partir de la fila pasada como parametro. Los temas de ayuda son:
+        * Los predictores
+        * Los coeficientes de strand-bias
+        * Las calidades de la variante, dependiendo de si la muestra analizada es somatica o germinal
+        * La columna summary_predictors (resumen de los predictores)
+
+    Parameters
+    ----------
+        hoja : xlsxwriter.worksheet
+            Hoja excel en la que se va a escribir la ayuda
+        libro : xlsxwriter.Workbook
+            Libro excel en el que se va a escribir la ayuda. Se usa para guardar los estilos de la ayuda
+        fila : int
+            Numero de fila en el que empiezan a escribirse los cuadro de ayuda
+    """
     # Estilos
     titulo = libro.add_format({ 'bold' : True,
         'bg_color' : '#B3C6FF',
@@ -194,6 +250,23 @@ def ayudaPredictores(hoja, libro, fila) :
     hoja.merge_range(fila+13, 10, fila+14, 19, body, bajo)
 
 def escribirEstadisticas(hoja, libro) :
+    """Escribir en una pestana excel las estadisticas del panel
+
+    Escribe informacion de calidad de la muestra analizada en una pestana excel. La informacion de calidad estara guardada en archivos de texto con formato JSON. La ruta de estos
+    archivos esta guardada en las constantes:
+        * qc : Control de calidad de los FASTQ y el bam
+        * cov : Coverage general de la muestra
+        * covGens : Coverage de cada uno de los genes del panel
+        * stats : Histograma de variantes
+
+    Parameters
+    ----------
+        hoja : xlsxwriter.worksheet
+            Hoja excel en la que se van a escribir las estadisticas
+        libro : xlsxwriter.Workbook
+            Libro excel en el que se van a escribir las estadisticas. Se usa para guardar los estilos de las estadisticas
+
+    """
     # Estilos
     titulo = libro.add_format({ 'bold' : True,
         'bg_color' : '#B3FFC6',
@@ -351,20 +424,29 @@ def escribirEstadisticas(hoja, libro) :
 
 
 def crearExcel(nom) :
-    """Recoge la informacion de las variantes desde los archivos .reanno.tsv
-    Convierte los datos de cada archivo en un diccionario
-    Lo escribe en una pestana del archivo excel con el nombre pasado por parametro
-    Recoge la informacion de calidad desde los archivos coverage.txt, alnQC.txt y variants.stats.txt
-    Guarda toda esta informacion en una pestana del excel cuyo nombre se ha pasado por parametro
+    """Escribir las variantes de una muestra en un archivo excel
+
+    Programa principal. Crea un excel separando cada uno de los filtros (elementos de la lista archivos) en una pestana distinta. Finalmente crea una pestana con los parametros de calidad
+    de la muestra. Proceso:
+        * Recoge la informacion de las variantes desde los archivos .reanno.tsv
+        * Convierte los datos de cada archivo .reanno.tsv en un diccionario. Usando la funcion convertirArchivo
+        * Dicho diccionario se escribe en una pestana del archivo excel. Usa las funciones crearCabecera, escribirVariantes y ayudaPredictores
+        * Recoge la informacion de calidad desde los archivos coverage.txt, coverageGeneStats.txt, alnQC.txt y variants.stats.txt. El nombre de estos archivos esta guardado en las
+        constantes
+
+    Parameters
+    ----------
+        nom : str
+            Nombre del archivo excel donde se va a guardar toda la informacion. No es necesario introducir el sufijo .xlsx
     """
     wb = xlsxwriter.Workbook("{}.xlsx".format(nom), {"strings_to_numbers" : True})
-    full = wb.add_worksheet("Filtered_def") #Hoja vacio para colocar las variantes que pasan el filtro visual
+    full = wb.add_worksheet("Filtered_def") #Hoja vacia para colocar las variantes que pasan el filtro visual
     crearCabecera(full, wb)
     full.freeze_panes(1,0)
     #Comprobar si existen los archivos de variantes, leerlos y montarlos en el excel
     for a in arxius :
         if os.path.isfile(a) :
-            aux = a.split(".")[0] # Recoger el nombre que tendra la pestana
+            aux = a.split(".")[0] # Parsear el nombre que tendra la pestana
             full = wb.add_worksheet(aux.capitalize())
             if aux == "cand" :
                 full.activate()
