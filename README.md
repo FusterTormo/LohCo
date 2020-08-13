@@ -34,8 +34,16 @@ El programa pedir&aacute; el n&uacute;mero de tanda que se quiere limpiar. Una v
 En caso de tener un manifest en el que no se sabe a qu&eacute; genes pertenece cada regi&oacute;n se puede usar el *main* para anotar dicho manifest. El *script*, adem&aacute;, crear&aacute; el archivo gensAestudi.txt que se usa durante la fase de c&aacute;lculo de *coverage*.
 
 ## Analizar una muestra por separado
+
+-----Funcionalidad pendiente-----
+
 ## Analisis personalizado
+
+-----Funcionalidad pendiente-----
+
 ## Reanalizar una muestra sin eliminar los datos hechos previamente
+
+-----Funcionalidad pendiente-----
 
 ## Crear un excel a partir de un vcf de variantes
 
