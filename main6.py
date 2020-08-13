@@ -161,7 +161,7 @@ def main() :
             arrayFiles = os.listdir(arrayFolder)
             # Compare arrays with itself
             for a in arrayFiles :
-                arr = lc.conver2region("{}/{}".format(arrayFolder, a), "array")
+                arr = lc.convert2region("{}/{}".format(arrayFolder, a), "array")
                 if not os.path.isfile("arrayVSarray.tsv") :
                     createFile("arrayVSarray.tsv")
                 with open("arrayVSarray.tsv", "a") as fi :
