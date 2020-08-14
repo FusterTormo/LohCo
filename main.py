@@ -19,18 +19,19 @@ import manifestOp as op
 
 def reanalizar() :
     """Reanalizar una muestra sin borrar lo que ya esta guardado"""
-    samp = input("INPUT: Dame el identificador de la muestra a reanalizar: ")
-    cmd = "find /home/ffuster/panalisi/resultats -name  {}*".format(samp)
-    print("Executant {}".format(cmd))
+    samp = input("INPUT: Identificador de la muestra a reanalizar: ")
+    cmd = "find /home/ffuster/panalisi/resultats -name  {}*fastq.gz".format(samp)
     proc = subprocess.Popen(cmd, shell = True, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
     out, err = proc.communicate()
     res = out.decode()
     if res == "" :
         print("INFO: No se ha encontrado la muestra")
     else :
-        # Parsear los resultados para encontrar los fastq
+        # Convertir los resultados a una lista
+        aux = res.split("\n") :
+        print(aux[0])
+
         # Si se encuentran, recoger el directorio donde esta el fastq y lanzar un analisis con dicha muestra
-        print(res.split("\n"))
     # Buscar una mostra en panalisi resultats amb el mateix identificador (usant find -name)
     # Buscar els fastq si no estan, els podria buscar en
     #

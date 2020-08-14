@@ -167,7 +167,7 @@ def encontrar(fq, lista) :
         if l.endswith(fq) :
             ret = l
             break
-            
+
     return ret
 
 def prepararPanel(ruta, acciones) :
@@ -224,6 +224,12 @@ def prepararPanel(ruta, acciones) :
                 fi.write("\trsync -aP {} .\n".format("$gens"))
                 fi.write("\tmv ../{} .\n".format(arxiu))
                 fi.write("}\n\n")
+            else :
+                fi.write("# Crear la estructura de la tanda")
+                fi.write("\tcd {}\n".format(pathAnalisi))
+                fi.write("\tmkdir {tanda} ; cd {tanda}\n\n".format(tanda = tanda))
+                fi.write("\trsync -aP {} .\n".format("$gens"))
+                fi.write("\tmv ../{} .\n".format(arxiu))
 
             fi.write("function analisi {\n")
             fi.write("\tforward=$1\n\treverse=$2\n\treadgroup=$3\n\talias=$4\n")
@@ -328,8 +334,8 @@ def prepararPanel(ruta, acciones) :
                     # Convertir las rutas de los FASTQ en rutas absolutas
                     if not "copiar" in acciones :
                         aux =  params.split(" ")
-                        aux[0] = encontrar(aux[0])
-                        aux[1] = encontrar(aux[1])
+                        aux[0] = encontrar(aux[0], fastqs)
+                        aux[1] = encontrar(aux[1], fastqs)
                         params = " ".join(aux)
                     if id not in hechos :
                         fi.write("analisi {params}\n".format(params = params))
