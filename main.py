@@ -17,14 +17,17 @@ import filtMutect as fim
 import getCommands as gc
 import manifestOp as op
 
-def fastq() :
-    """Analizar una unica muestra"""
-    # TODO: Recoger la ruta absoluta de los FASTQ. Lanzar custom para ver el tipo de analisis a ejecutar
-    pass
-
 def reanalizar() :
     """Reanalizar una muestra sin borrar lo que ya esta guardado"""
-    # # TODO: COMO LO HAGO ??????????
+    samp = input("INPUT: Dame el identificador de la muestra a reanalizar: ")
+    cmd = "find /home/ffuster/panalisi/resultats -name  {}".format(samp)
+    print("Executant {}".cmd)
+    proc = subprocess.Popen(cmd, shell = True, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+    out, err = proc.communicate()
+    print(out)
+    # Buscar una mostra en panalisi resultats amb el mateix identificador (usant find -name)
+    # Buscar els fastq si no estan, els podria buscar en
+    #
     pass
 
 def vcf() :
@@ -155,7 +158,7 @@ def custom() :
                 ordenes.append("vanno")
                 if input("Filtrar variantes? (S/N) ").lower() == "s" :
                     ordenes.append("filtrar")
-                    if input("Convertir los datos en excel? (S/N)").lower() == "s" :
+                    if input("Convertir los datos en excel? (S/N) ").lower() == "s" :
                         ordenes.append("excel")
     print("INFO: Se va a crear un log que ejecutara los siguientes pasos: {}".format(", ".join(ordenes)))
     return ordenes
@@ -172,7 +175,7 @@ def GUI() :
     Menu de interaccion con el usuario. Muestra las opciones de analisis disponibles
     """
     #system.clear()
-    print("------------------------------------------------------\n\t\t\tAnalisis aUtomatico de Paneles\n------------------------------------------------------\n\nOpciones")
+    print("\t\t------------------------------------------------------\n\t\t\tAnalisis aUtomatico de Paneles\n\t\t------------------------------------------------------\n\nOpciones")
     print("1. Analisis tipico del panel")
     print("2. Analisis custom del panel")
     print("3. Analizar una unica muestra")
@@ -198,14 +201,17 @@ def GUI() :
     elif opt == 3 :
         ruta = input("INPUT: Introducir la carpeta donde estan los fastq de la muestra a analizar: ")
         opciones = custom()
-        # TODO: Com guarde les dades??? Vaig directament a crearLog, pero sense la opcio copiar?
+        lanzarPanel(ruta, opciones)
     elif opt == 4 :
         ruta = input("INPUT: Introducir el path absoluto del bam a analizar: ")
         bamQC(ruta)
     elif opt == 5 :
         vcf()
     elif opt == 6 :
-        print("ERROR: Funcion no implementada todavia")
+        reanalizar()
+    else :
+        print("ERROR: Opcion no valida")
+        sys.exit(1)
 
 if __name__ == "__main__" :
     GUI()
