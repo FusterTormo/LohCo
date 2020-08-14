@@ -225,11 +225,11 @@ def prepararPanel(ruta, acciones) :
                 fi.write("\tmv ../{} .\n".format(arxiu))
                 fi.write("}\n\n")
             else :
-                fi.write("# Crear la estructura de la tanda")
-                fi.write("\tcd {}\n".format(pathAnalisi))
-                fi.write("\tmkdir {tanda} ; cd {tanda}\n\n".format(tanda = tanda))
-                fi.write("\trsync -aP {} .\n".format("$gens"))
-                fi.write("\tmv ../{} .\n".format(arxiu))
+                fi.write("# Crear la estructura de la tanda\n")
+                fi.write("cd {}\n".format(pathAnalisi))
+                fi.write("mkdir {tanda} ; cd {tanda}\n".format(tanda = tanda))
+                fi.write("rsync -aP {} .\n".format("$gens"))
+                fi.write("mv ../{} .\n".format(arxiu))
 
             fi.write("function analisi {\n")
             fi.write("\tforward=$1\n\treverse=$2\n\treadgroup=$3\n\talias=$4\n")

@@ -187,7 +187,8 @@ def GUI() :
     print("3. Analizar una unica muestra")
     print("4. Control de calidad de un bam")
     print("5. Anotar y filtrar un vcf")
-    print("6. Reanalizar una muestra, conservando el analisis previo\n")
+    print("6. Reanalizar una muestra, conservando el analisis previo")
+    print("7. Anotar un manifest\n")
     opt = input("INPUT: Numero de opcion: ")
     # Comprobar si la opcion es un numero
     try :
@@ -215,6 +216,9 @@ def GUI() :
         vcf()
     elif opt == 6 :
         reanalizar()
+    elif opt == 7 :
+        ruta = input("INPUT: Introducir la ruta del manifest: ")
+        op.anotarManifest(ruta)
     else :
         print("ERROR: Opcion no valida")
         sys.exit(1)
