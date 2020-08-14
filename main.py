@@ -7,6 +7,7 @@ MAIN: Programa principal. Muestra los pasos a seguir para poder hacer el analisi
 
 import os
 import subprocess
+import sys
 
 import bamQC as bq
 import creaLog as cl
@@ -31,9 +32,9 @@ def vcf() :
 
     Pide al usuario la ruta de un archivo vcf. Anota y filtra los datos de dicho excel. Finalmente guarda todo en un excel. Todos los datos se guardan en la carpeta donde esta el vcf
     """
-    ruta = input("Introducir el path absoluto del vcf: ")
-    name = input("Introducir el nombre de la muestra: ")
-    hg = input("Introducir el genoma de referencia usado (hg19, hg38): ")
+    ruta = input("INPUT: Introducir el path absoluto del vcf: ")
+    name = input("INPUT: Introducir el nombre de la muestra: ")
+    hg = input("INPUT: Introducir el genoma de referencia usado (hg19, hg38): ")
     # Comprobar que tipo de variant calling se ha hecho
     vcal = None
     format = "vcf4"
@@ -91,7 +92,7 @@ def vcf() :
 def bamQC(ruta = None) :
     """Calcula los parametros de calidad de un bam"""
     if ruta == None :
-        ruta = input("Introducir el path absoluto del bam a analizar: ")
+        ruta = input("INPUT: Introducir el path absoluto del bam a analizar: ")
 
     os.chdir(os.path.dirname(ruta))
     bq.bed = "bwa.bed"
@@ -156,24 +157,55 @@ def custom() :
                     ordenes.append("filtrar")
                     if input("Convertir los datos en excel? (S/N)").lower() == "s" :
                         ordenes.append("excel")
-    print("INFO: Se van a ejecutar los siguientes pasos: {}".format(", ".join(ordenes)))
-    ruta = input("Introducir el path absoluto de la carpeta donde estan los FASTQ a analizar: ")
-    cl.prepararPanel(ruta, ordenes)
+    print("INFO: Se va a crear un log que ejecutara los siguientes pasos: {}".format(", ".join(ordenes)))
+    return ordenes
 
 def anotarManifest() :
     ruta = input("Introducir ruta absolute del manifest a anotar: ")
     op.anotarManifest(ruta)
 
+def lanzarPanel(ruta, opciones) :
+    cl.prepararPanel(ruta, opciones)
+
 def GUI() :
     """
     Menu de interaccion con el usuario. Muestra las opciones de analisis disponibles
     """
-    # TODO: Pintar-ho bonico
-    # IDEA: Crear un menu amb els passos que es volen seguir per fer l'analisi mes personalitzat
-    ruta = input("Introducir el path absoluto de la carpeta donde estan los FASTQ a analizar: ")
-    cl.prepararPanel(ruta, ["copiar","fastqc", "aln", "recal", "bamqc", "coverage", "mutectGerm", "vanno", "filtrar", "excel"])
-    # TODO: Preguntar si executar la pipeline usant subprocess
-
+    #system.clear()
+    print("------------------------------------------------------\n\t\t\tAnalisis aUtomatico de Paneles\n------------------------------------------------------\n\nOpciones")
+    print("1. Analisis tipico del panel")
+    print("2. Analisis custom del panel")
+    print("3. Analizar una unica muestra")
+    print("4. Control de calidad de un bam")
+    print("5. Anotar y filtrar un vcf")
+    print("6. Reanalizar una muestra, conservando el analisis previo\n")
+    opt = input("INPUT: Numero de opcion: ")
+    # Comprobar si la opcion es un numero
+    try :
+        opt = int(opt)
+    except ValueError :
+        print("ERROR: La opcion no es un numero")
+        sys.exit(1)
+    # Analizar un panel de forma clasica/estandar
+    if opt == 1 :
+        ruta = input("INPUT: Introducir el path absoluto de la carpeta donde estan los FASTQ a analizar: ")
+        lanzarPanel(ruta, ["copiar","fastqc", "aln", "recal", "bamqc", "coverage", "mutectGerm", "vanno", "filtrar", "excel"])
+    # Analizar el panel usando una pipeline escogida por el usuario
+    elif opt == 2 :
+        ruta = input("INPUT: Introducir el path absoluto de la carpeta donde estan los FASTQ a analizar: ")
+        opciones = custom()
+        lanzarPanel(ruta, opciones)
+    elif opt == 3 :
+        ruta = input("INPUT: Introducir la carpeta donde estan los fastq de la muestra a analizar: ")
+        opciones = custom()
+        # TODO: Com guarde les dades??? Vaig directament a crearLog, pero sense la opcio copiar?
+    elif opt == 4 :
+        ruta = input("INPUT: Introducir el path absoluto del bam a analizar: ")
+        bamQC(ruta)
+    elif opt == 5 :
+        vcf()
+    elif opt == 6 :
+        print("ERROR: Funcion no implementada todavia")
 
 if __name__ == "__main__" :
     GUI()
