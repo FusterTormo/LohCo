@@ -20,22 +20,21 @@ import manifestOp as op
 def reanalizar() :
     """Reanalizar una muestra sin borrar lo que ya esta guardado"""
     samp = input("INPUT: Identificador de la muestra a reanalizar: ")
+    # Buscar la muestra en el directorio de trabajo usando el comando find de bash
     cmd = "find /home/ffuster/panalisi/resultats -name  {}*fastq.gz".format(samp)
     proc = subprocess.Popen(cmd, shell = True, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
     out, err = proc.communicate()
     res = out.decode()
     if res == "" :
-        print("INFO: No se ha encontrado la muestra")
+        print("INFO: No se ha encontrado la muestra en /home/ffuster/panalisi/resultats")
     else :
         # Convertir los resultados a una lista
-        aux = res.split("\n") :
-        print(aux[0])
-
+        aux = res.split("\n")
         # Si se encuentran, recoger el directorio donde esta el fastq y lanzar un analisis con dicha muestra
-    # Buscar una mostra en panalisi resultats amb el mateix identificador (usant find -name)
-    # Buscar els fastq si no estan, els podria buscar en
-    #
-    pass
+        ruta = os.path.dirname(aux[0])
+        acciones = custom()
+        lanzarPanel(ruta, acciones)
+        print("WARNING: Si el directorio {} tiene los fastq de mas de una muestra, se habran creado analisis para todas las muestras. Elimina los analisis a las muestras que no interesan".format(ruta))
 
 def vcf() :
     """Anotar y filtrar un vcf. Guardar los datos en un excel
