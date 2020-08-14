@@ -30,7 +30,7 @@ def reanalizar() :
     else :
         # Parsear los resultados para encontrar los fastq
         # Si se encuentran, recoger el directorio donde esta el fastq y lanzar un analisis con dicha muestra
-        
+        print(res.split("\n"))
     # Buscar una mostra en panalisi resultats amb el mateix identificador (usant find -name)
     # Buscar els fastq si no estan, els podria buscar en
     #

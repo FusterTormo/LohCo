@@ -146,6 +146,30 @@ def comprobarArchivos() :
         print("WARNING: No se encuentra el archivo con la lista de genes del manifest. Creando el archivo")
         op.doListaGenes(manifest, genes)
 
+def encontrar(fq, lista) :
+    """Encontrar un fastq en la lista con los paths absolutos de fastqs
+
+    Parameters
+    ----------
+        fq : str
+            Archivo fastq que se quiere buscar el fastq
+        lista : list
+            Lista de paths absolutos donde se busca el fastq
+
+    Returns
+    -------
+        str, None
+            Ruta absoluta del fastq que se esta buscando
+            None en caso de no encontrar el fastq en la lista
+    """
+    ret = None
+    for l in lista :
+        if l.endswith(fq) :
+            ret = l
+            break
+            
+    return ret
+
 def prepararPanel(ruta, acciones) :
     """
     Programa principal de la libreria. Prepara el log con todos los comandos necesarios para lanzar la pipeline
@@ -301,6 +325,12 @@ def prepararPanel(ruta, acciones) :
                 if params == "No valido" :
                     print("WARNING: Formato de FASTQ no reconocido para el archivo: {}. Se debera montar la orden para analizar manualmente".format(f))
                 else :
+                    # Convertir las rutas de los FASTQ en rutas absolutas
+                    if not "copiar" in acciones :
+                        aux =  params.split(" ")
+                        aux[0] = encontrar(aux[0])
+                        aux[1] = encontrar(aux[1])
+                        params = " ".join(aux)
                     if id not in hechos :
                         fi.write("analisi {params}\n".format(params = params))
                         hechos.append(id)
