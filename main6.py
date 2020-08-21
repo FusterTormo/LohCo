@@ -231,7 +231,15 @@ def main() :
         print("INFO: Checking {} FACETS".format(s))
         # Get all the FACETS done in the submitter
         facetsFiles = getFACETS(workindir)
-        print(facetsFiles)
+        for a in facetsFiles :
+            # Compàre FACETS with itself
+            f = lc.convert2region(b, "facets", "error")
+            if not os.path.isfile("facetsVSfacets.tsv") :
+                createFile("facetsVSfacets.tsv")
+            with open("facetsVSfacets.tsv", "a") as fi :
+                fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = b, cmp = compareTools(f, f)))
+        break
+
 
 
     # # Repeat the analysis, but comparing ascatNGS vs all the other tools
