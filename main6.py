@@ -233,12 +233,32 @@ def main() :
         facetsFiles = getFACETS(workindir)
         for a in facetsFiles :
             # Compàre FACETS with itself
-            f = lc.convert2region(b, "facets", "error")
+            f = lc.convert2region(a, "facets", "error")
             if not os.path.isfile("facetsVSfacets.tsv") :
                 createFile("facetsVSfacets.tsv")
             with open("facetsVSfacets.tsv", "a") as fi :
-                fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = b, cmp = compareTools(f, f)))
-        break
+                fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = a, cmp = compareTools(f, f)))
+
+            # Compare with ASCAT2
+            ascatFolder = "{}/ASCAT2/".format(workindir)
+            if os.path.isdir (ascatFolder) :
+                # Open ASCAT2 folder and get the files available
+                ascatFiles = os.listdir(ascatFolder)
+                # Compare ASCAT2 with itself
+                for b in ascatFiles :
+                    ascat = lc.convert2region("{}/{}".format(ascatFolder, b), "ascatarray", "error")
+                    if not os.path.isfile("facetsVSascat2.tsv") :
+                        createFile("facetsVSascat2.tsv")
+                    with open("facetsVSascat2.tsv", "a") as fi :
+                        fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = b, cmp = compareTools(f, ascat)))
+
+
+            # Compare with SNP-Arrays
+
+            # Compare with ascatNGS
+
+            # Compare with Sequenza
+
 
 
 
