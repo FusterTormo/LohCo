@@ -76,154 +76,177 @@ def main() :
         x = c.execute(query)
         submitters = x.fetchall()
 
+    # for sub in submitters :
+    #     s = sub[0]
+    #     workindir = "{}/{}/{}".format(cancerpath, cancer, s)
+    #     print("INFO: Checking {} ASCAT".format(s))
+    #     ascatFolder = "{}/ASCAT2/".format(workindir)
+    #     if os.path.isdir (ascatFolder) :
+    #         # Open ASCAT2 folder and get the files available
+    #         ascatFiles = os.listdir(ascatFolder)
+    #         # Compare ASCAT2 with itself
+    #         for a in ascatFiles :
+    #             ascat = lc.convert2region("{}/{}".format(ascatFolder, a), "ascatarray")
+    #             if not os.path.isfile("ascat2VSascat2.tsv") :
+    #                 createFile("ascat2VSascat2.tsv")
+    #             with open("ascat2VSascat2.tsv", "a") as fi :
+    #                 fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = a, cmp = compareTools(ascat, ascat)))
+    #         # Open SNP-array folder and get the files that are in
+    #         arrayFolder = "{}/Array/".format(workindir)
+    #         # Compare SNP-Arrays CNV outputs with ASCAT2
+    #         if os.path.isdir(arrayFolder) :
+    #             arrayFiles = os.listdir(arrayFolder)
+    #             # print("INFO: Comparing ASCAT2 and Array outputs in {}".format(s))
+    #             for a in ascatFiles :
+    #                 ascat = lc.convert2region("{}/{}".format(ascatFolder, a), "ascatarray")
+    #                 for b in arrayFiles :
+    #                     arr = lc.convert2region("{}/{}".format(arrayFolder, b), "array")
+    #                     if not os.path.isfile("ascat2VSarray.tsv") :
+    #                         createFile("ascat2VSarray.tsv")
+    #                     with open("ascat2VSarray.tsv", "a") as fi :
+    #                         fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = b, cmp = compareTools(ascat, arr)))
+    #
+    #
+    #         # Compare FACETS LOH/CNV outputs with ASCAT2
+    #         facetsFiles = getFACETS(workindir)
+    #         for a in ascatFiles :
+    #             ascat = lc.convert2region("{}/{}".format(ascatFolder, a), "ascatarray")
+    #             for b in facetsFiles :
+    #                 f = lc.convert2region(b, "facets", "error")
+    #                 if not os.path.isfile("ascat2VSfacets.tsv") :
+    #                     createFile("ascat2VSfacets.tsv")
+    #                 with open("ascat2VSfacets.tsv", "a") as fi :
+    #                     fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = b, cmp = compareTools(ascat, f)))
+    #
+    #         # Compare ascatNGS LOH/CNV outputs with ASCAT2
+    #         # print("INFO: Comparing ASCAT2 and ascatNGS outputs in {}".format(s))
+    #         ascatngsFiles = getAscatNGS(workindir)
+    #         for a in ascatFiles :
+    #             ascat = lc.convert2region("{}/{}".format(ascatFolder, a), "ascatarray")
+    #             for b in ascatngsFiles :
+    #                 ngs = lc.convert2region(b, "ascatngs", "error")
+    #                 if not os.path.isfile("ascat2VSascatNGS.tsv") :
+    #                     createFile("ascat2VSascatNGS.tsv")
+    #                 with open("ascat2VSascatNGS.tsv", "a") as fi :
+    #                     fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = b, cmp = compareTools(ascat, ngs)))
+    #
+    #         # Compare Sequenza LOH/CNV outputs with ASCAT2
+    #         # print("INFO: Comparing ASCAT2 and Sequenza outputs in {}".format(s))
+    #         sequenzaFiles = getSequenza(workindir)
+    #         for a in ascatFiles :
+    #             ascat = lc.convert2region("{}/{}".format(ascatFolder, a), "ascatarray")
+    #             for b in sequenzaFiles :
+    #                 s = lc.convert2region(b, "sequenza", "error")
+    #                 if not os.path.isfile("ascat2VSsequenza.tsv") :
+    #                     createFile("ascat2VSsequenza.tsv")
+    #                 with open("ascat2VSsequenza.tsv", "a") as fi :
+    #                     fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = b, cmp = compareTools(ascat, s)))
+    #
+    # # Move the output data to a new folder
+    # os.mkdir("main6")
+    # os.rename("ascat2VSascat2.tsv", "main6/ascat2VSascat2.tsv")
+    # os.rename("ascat2VSarray.tsv", "main6/ascat2VSarray.tsv")
+    # os.rename("ascat2VSfacets.tsv", "main6/ascat2VSfacets.tsv")
+    # os.rename("ascat2VSascatNGS.tsv", "main6/ascat2VSascatNGS.tsv")
+    # os.rename("ascat2VSsequenza.tsv", "main6/ascat2VSsequenza.tsv")
+    #
+    # # Repeat the analysis, but using Arrays as True set
+    # for sub in submitters :
+    #     s = sub[0]
+    #     workindir = "{}/{}/{}".format(cancerpath, cancer, s)
+    #     print("INFO: Checking {} arrays".format(s))
+    #     # Open SNP-Array folder and get the files available
+    #     arrayFolder = "{}/Array/".format(workindir)
+    #     if os.path.isdir (arrayFolder) :
+    #         arrayFiles = os.listdir(arrayFolder)
+    #         # Compare arrays with itself
+    #         for a in arrayFiles :
+    #             arr = lc.convert2region("{}/{}".format(arrayFolder, a), "array")
+    #             if not os.path.isfile("arrayVSarray.tsv") :
+    #                 createFile("arrayVSarray.tsv")
+    #             with open("arrayVSarray.tsv", "a") as fi :
+    #                 fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = a, cmp = compareTools(arr, arr)))
+    #         # Open ASCAT2 folder to get the files that are in
+    #         ascatFolder = "{}/ASCAT2/".format(workindir)
+    #         # Compare ASCAT2 outputs with Arrays
+    #         if os.path.isdir(ascatFolder) :
+    #             # print("INFO: Comparing ASCAT2 and Array outputs in {}".format(s))
+    #             ascatFiles = os.listdir(ascatFolder)
+    #             for a in arrayFiles :
+    #                 arr = lc.convert2region("{}/{}".format(arrayFolder, a), "array")
+    #                 for b in ascatFiles :
+    #                     ascat = lc.convert2region("{}/{}".format(ascatFolder, b), "ascatarray")
+    #                     if not os.path.isfile("arrayVSascat2.tsv") :
+    #                         createFile("arrayVSascat2.tsv")
+    #                     with open("arrayVSascat2.tsv", "a") as fi :
+    #                         fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = b, cmp = compareTools(arr, ascat)))
+    #
+    #
+    #         # Compare FACETS LOH/CNV outputs with SNP-Array
+    #         # print("INFO: Comparing ASCAT2 and FACETS outputs in {}".format(s))
+    #         facetsFiles = getFACETS(workindir)
+    #         for a in arrayFiles :
+    #             arr = lc.convert2region("{}/{}".format(arrayFolder, a), "array")
+    #             for b in facetsFiles :
+    #                 f = lc.convert2region(b, "facets", "error")
+    #                 if not os.path.isfile("arrayVSfacets.tsv") :
+    #                     createFile("arrayVSfacets.tsv")
+    #                 with open("arrayVSfacets.tsv", "a") as fi :
+    #                     fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = b, cmp = compareTools(arr, f)))
+    #
+    #         # Compare ascatNGS LOH/CNV outputs with SNP-Array
+    #         # print("INFO: Comparing ASCAT2 and ascatNGS outputs in {}".format(s))
+    #         ascatngsFiles = getAscatNGS(workindir)
+    #         for a in arrayFiles :
+    #             arr = lc.convert2region("{}/{}".format(arrayFolder, a), "array")
+    #             for b in ascatngsFiles :
+    #                 ngs = lc.convert2region(b, "ascatngs", "error")
+    #                 if not os.path.isfile("arrayVSascatNGS.tsv") :
+    #                     createFile("arrayVSascatNGS.tsv")
+    #                 with open("arrayVSascatNGS.tsv", "a") as fi :
+    #                     fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = b, cmp = compareTools(arr, ngs)))
+    #
+    #         # Compare Sequenza LOH/CNV outputs with ASCAT2
+    #         # print("INFO: Comparing ASCAT2 and Sequenza outputs in {}".format(s))
+    #         sequenzaFiles = getSequenza(workindir)
+    #         for a in arrayFiles :
+    #             arr = lc.convert2region("{}/{}".format(arrayFolder, a), "array")
+    #             for b in sequenzaFiles :
+    #                 s = lc.convert2region(b, "sequenza", "error")
+    #                 if not os.path.isfile("arrayVSsequenza.tsv") :
+    #                     createFile("arrayVSsequenza.tsv")
+    #                 with open("arrayVSsequenza.tsv", "a") as fi :
+    #                     fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = b, cmp = compareTools(arr, s)))
+    #
+    # os.rename("arrayVSarray.tsv", "main6/arrayVSarray.tsv")
+    # os.rename("arrayVSascat2.tsv", "main6/arrayVSascat2.tsv")
+    # os.rename("arrayVSfacets.tsv", "main6/arrayVSfacets.tsv")
+    # os.rename("arrayVSascatNGS.tsv", "main6/arrayVSascatNGS.tsv")
+    # os.rename("arrayVSsequenza.tsv", "main6/arrayVSsequenza.tsv")
+
+    # Repeat the analysis but comparing FACETS vs all the other tools
     for sub in submitters :
         s = sub[0]
         workindir = "{}/{}/{}".format(cancerpath, cancer, s)
-        print("INFO: Checking {} ASCAT".format(s))
-        ascatFolder = "{}/ASCAT2/".format(workindir)
-        if os.path.isdir (ascatFolder) :
-            # Open ASCAT2 folder and get the files available
-            ascatFiles = os.listdir(ascatFolder)
-            # Compare ASCAT2 with itself
-            for a in ascatFiles :
-                ascat = lc.convert2region("{}/{}".format(ascatFolder, a), "ascatarray")
-                if not os.path.isfile("ascat2VSascat2.tsv") :
-                    createFile("ascat2VSascat2.tsv")
-                with open("ascat2VSascat2.tsv", "a") as fi :
-                    fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = a, cmp = compareTools(ascat, ascat)))
-            # Open SNP-array folder and get the files that are in
-            arrayFolder = "{}/Array/".format(workindir)
-            # Compare SNP-Arrays CNV outputs with ASCAT2
-            if os.path.isdir(arrayFolder) :
-                arrayFiles = os.listdir(arrayFolder)
-                # print("INFO: Comparing ASCAT2 and Array outputs in {}".format(s))
-                for a in ascatFiles :
-                    ascat = lc.convert2region("{}/{}".format(ascatFolder, a), "ascatarray")
-                    for b in arrayFiles :
-                        arr = lc.convert2region("{}/{}".format(arrayFolder, b), "array")
-                        if not os.path.isfile("ascat2VSarray.tsv") :
-                            createFile("ascat2VSarray.tsv")
-                        with open("ascat2VSarray.tsv", "a") as fi :
-                            fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = b, cmp = compareTools(ascat, arr)))
+        print("INFO: Checking {} FACETS".format(s))
+        # Get all the FACETS done in the submitter
+        facetsFiles = getFACETS(workindir)
+        print(facetsFiles)
 
 
-            # Compare FACETS LOH/CNV outputs with ASCAT2
-            facetsFiles = getFACETS(workindir)
-            for a in ascatFiles :
-                ascat = lc.convert2region("{}/{}".format(ascatFolder, a), "ascatarray")
-                for b in facetsFiles :
-                    f = lc.convert2region(b, "facets", "error")
-                    if not os.path.isfile("ascat2VSfacets.tsv") :
-                        createFile("ascat2VSfacets.tsv")
-                    with open("ascat2VSfacets.tsv", "a") as fi :
-                        fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = b, cmp = compareTools(ascat, f)))
-
-            # Compare ascatNGS LOH/CNV outputs with ASCAT2
-            # print("INFO: Comparing ASCAT2 and ascatNGS outputs in {}".format(s))
-            ascatngsFiles = getAscatNGS(workindir)
-            for a in ascatFiles :
-                ascat = lc.convert2region("{}/{}".format(ascatFolder, a), "ascatarray")
-                for b in ascatngsFiles :
-                    ngs = lc.convert2region(b, "ascatngs", "error")
-                    if not os.path.isfile("ascat2VSascatNGS.tsv") :
-                        createFile("ascat2VSascatNGS.tsv")
-                    with open("ascat2VSascatNGS.tsv", "a") as fi :
-                        fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = b, cmp = compareTools(ascat, ngs)))
-
-            # Compare Sequenza LOH/CNV outputs with ASCAT2
-            # print("INFO: Comparing ASCAT2 and Sequenza outputs in {}".format(s))
-            sequenzaFiles = getSequenza(workindir)
-            for a in ascatFiles :
-                ascat = lc.convert2region("{}/{}".format(ascatFolder, a), "ascatarray")
-                for b in sequenzaFiles :
-                    s = lc.convert2region(b, "sequenza", "error")
-                    if not os.path.isfile("ascat2VSsequenza.tsv") :
-                        createFile("ascat2VSsequenza.tsv")
-                    with open("ascat2VSsequenza.tsv", "a") as fi :
-                        fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = b, cmp = compareTools(ascat, s)))
-
-    # Move the output data to a new folder
-    os.mkdir("main6")
-    os.rename("ascat2VSascat2.tsv", "main6/ascat2VSascat2.tsv")
-    os.rename("ascat2VSarray.tsv", "main6/ascat2VSarray.tsv")
-    os.rename("ascat2VSfacets.tsv", "main6/ascat2VSfacets.tsv")
-    os.rename("ascat2VSascatNGS.tsv", "main6/ascat2VSascatNGS.tsv")
-    os.rename("ascat2VSsequenza.tsv", "main6/ascat2VSsequenza.tsv")
-
-    # Repeat the analysis, but using Arrays as True set
-    for sub in submitters :
-        s = sub[0]
-        workindir = "{}/{}/{}".format(cancerpath, cancer, s)
-        print("INFO: Checking {} arrays".format(s))
-        # Open SNP-Array folder and get the files available
-        arrayFolder = "{}/Array/".format(workindir)
-        if os.path.isdir (arrayFolder) :
-            arrayFiles = os.listdir(arrayFolder)
-            # Compare arrays with itself
-            for a in arrayFiles :
-                arr = lc.convert2region("{}/{}".format(arrayFolder, a), "array")
-                if not os.path.isfile("arrayVSarray.tsv") :
-                    createFile("arrayVSarray.tsv")
-                with open("arrayVSarray.tsv", "a") as fi :
-                    fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = a, cmp = compareTools(arr, arr)))
-            # Open ASCAT2 folder to get the files that are in
-            ascatFolder = "{}/ASCAT2/".format(workindir)
-            # Compare ASCAT2 outputs with Arrays
-            if os.path.isdir(ascatFolder) :
-                # print("INFO: Comparing ASCAT2 and Array outputs in {}".format(s))
-                ascatFiles = os.listdir(ascatFolder)
-                for a in arrayFiles :
-                    arr = lc.convert2region("{}/{}".format(arrayFolder, a), "array")
-                    for b in ascatFiles :
-                        ascat = lc.convert2region("{}/{}".format(ascatFolder, b), "ascatarray")
-                        if not os.path.isfile("arrayVSascat2.tsv") :
-                            createFile("arrayVSascat2.tsv")
-                        with open("arrayVSascat2.tsv", "a") as fi :
-                            fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = b, cmp = compareTools(arr, ascat)))
-
-
-            # Compare FACETS LOH/CNV outputs with SNP-Array
-            # print("INFO: Comparing ASCAT2 and FACETS outputs in {}".format(s))
-            facetsFiles = getFACETS(workindir)
-            for a in arrayFiles :
-                arr = lc.convert2region("{}/{}".format(arrayFolder, a), "array")
-                for b in facetsFiles :
-                    f = lc.convert2region(b, "facets", "error")
-                    if not os.path.isfile("arrayVSfacets.tsv") :
-                        createFile("arrayVSfacets.tsv")
-                    with open("arrayVSfacets.tsv", "a") as fi :
-                        fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = b, cmp = compareTools(arr, f)))
-
-            # Compare ascatNGS LOH/CNV outputs with SNP-Array
-            # print("INFO: Comparing ASCAT2 and ascatNGS outputs in {}".format(s))
-            ascatngsFiles = getAscatNGS(workindir)
-            for a in arrayFiles :
-                arr = lc.convert2region("{}/{}".format(arrayFolder, a), "array")
-                for b in ascatngsFiles :
-                    ngs = lc.convert2region(b, "ascatngs", "error")
-                    if not os.path.isfile("arrayVSascatNGS.tsv") :
-                        createFile("arrayVSascatNGS.tsv")
-                    with open("arrayVSascatNGS.tsv", "a") as fi :
-                        fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = b, cmp = compareTools(arr, ngs)))
-
-            # Compare Sequenza LOH/CNV outputs with ASCAT2
-            # print("INFO: Comparing ASCAT2 and Sequenza outputs in {}".format(s))
-            sequenzaFiles = getSequenza(workindir)
-            for a in arrayFiles :
-                arr = lc.convert2region("{}/{}".format(arrayFolder, a), "array")
-                for b in sequenzaFiles :
-                    s = lc.convert2region(b, "sequenza", "error")
-                    if not os.path.isfile("arrayVSsequenza.tsv") :
-                        createFile("arrayVSsequenza.tsv")
-                    with open("arrayVSsequenza.tsv", "a") as fi :
-                        fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = b, cmp = compareTools(arr, s)))
-
-    os.rename("arrayVSarray.tsv", "main6/arrayVSarray.tsv")
-    os.rename("arrayVSascat2.tsv", "main6/arrayVSascat2.tsv")
-    os.rename("arrayVSfacets.tsv", "main6/arrayVSfacets.tsv")
-    os.rename("arrayVSascatNGS.tsv", "main6/arrayVSascatNGS.tsv")
-    os.rename("arrayVSsequenza.tsv", "main6/arrayVSsequenza.tsv")
-
+    # # Repeat the analysis, but comparing ascatNGS vs all the other tools
+    # for sub in submitters :
+    #     s = sub[0]
+    #     workindir = "{}/{}/{}".format(cancerpath, cancer, s)
+    #     print("INFO: Checking {} ascatNGS".format(s))
+    #     # Get all the FACETS done in the submitter
+    #
+    # # Repeat the analysis, but comparing Sequenza vs all the other approximations
+    # for sub in submitters :
+    #     s = sub[0]
+    #     workindir = "{}/{}/{}".format(cancerpath, cancer, s)
+    #     print("INFO: Checking {} Sequenza".format(s))
+    #     # Get all the FACETS done in the submitter
 
 if __name__ == "__main__" :
     main()
