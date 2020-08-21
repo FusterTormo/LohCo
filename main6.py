@@ -252,13 +252,34 @@ def main() :
                     with open("facetsVSascat2.tsv", "a") as fi :
                         fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = b, cmp = compareTools(f, ascat)))
 
-
             # Compare with SNP-Arrays
+            arrayFolder = "{}/Array/".format(workindir)
+            if os.path.isdir(arrayFolder) :
+                arrayFiles = os.listdir(arrayFolder)
+                for b in arrayFiles :
+                    arr = lc.convert2region("{}/{}".format(arrayFolder, b), "array", "error")
+                    if not os.path.isfile("facetsVSarrays.tsv") :
+                        createFile("facetsVSarrays.tsv")
+                    with open("facetsVSarrays.tsv", "a") as fi :
+                        fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = b, cmp = compareTools(f, arr)))
 
             # Compare with ascatNGS
+            ascatngsFiles = getAscatNGS(workindir)
+            for b in ascatngsFiles :
+                ngs = lc.convert2region(b, "ascatngs", "error")
+                if not os.path.isfile("facetsVSascatNGS.tsv") :
+                    createFile("facetsVSascatNGS.tsv")
+                with open("facetsVSascatNGS.tsv", "a") as fi :
+                    fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = b, cmp = compareTools(f, ngs)))
 
             # Compare with Sequenza
-
+            sequenzaFiles = getSequenza(workindir)
+            for b in sequenzaFiles :
+                s = lc.convert2region(b, "sequenza", "error")
+                if not os.path.isfile("facetsVSsequenza.tsv") :
+                    createFile("facetsVSsequenza.tsv")
+                with open("facetsVSsequenza.tsv", "a") as fi :
+                    fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = b, cmp = compareTools(f, s)))
 
 
 
