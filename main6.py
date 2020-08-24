@@ -314,7 +314,7 @@ def main() :
                         fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = b, cmp = compareTools(ngs, ascat)))
 
             # Compare with SNP-Arrays
-            arrayFolder = "{}/Array/"
+            arrayFolder = "{}/Array/".format(workindir)
             if os.path.isdir(arrayFolder) :
                 arrayFiles = os.listdir(arrayFolder)
                 for b in arrayFiles :
