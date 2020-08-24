@@ -321,7 +321,7 @@ def main() :
                     arr = lc.convert2region("{}{}".format(arrayFolder, b), "array", "error")
                     if not os.path.isfile("ascatNGSVSarrays.tsv") :
                         createFile("ascatNGSVSarrays.tsv")
-                    with open("ascatNGSVSarrays.tsv", "a") :
+                    with open("ascatNGSVSarrays.tsv", "a") as fi :
                         fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = b, cmp = compareTools(ngs, arr)))
 
             # Compare with FACETS
