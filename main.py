@@ -35,6 +35,9 @@ def reanalizar() :
         ruta = os.path.dirname(aux[0])
         acciones = custom()
         lanzarPanel(ruta, acciones)
+        if "copiar" in acciones : # Evitar que se copien los FASTQ
+            del(acciones[0])
+
         # Buscar el log que se ha creado al lanzar el panel
         for root, dirs, filenames in os.walk(workindir, topdown = True, ) :
             break
@@ -49,20 +52,20 @@ def reanalizar() :
             cont = fi.readlines()
         for c in range(len(cont)) :
             if cont[c].startswith("mkdir") :
-                cont[c] = "mkdir {smp} ; cd {smp}\n".format(smp = samp)
+                cont[c] = "mkdir {smp} ; cd {smp}\n".format(smp = samp) # Modificar la linea del log que crea la carpeta de la tanda. Se crea una carpeta con el nombre de la muestra
             if cont[c].startswith("mv") :
-                cont[c] = "mv ../log{}.sh .\n".format(samp)
+                cont[c] = "mv ../log{}.sh .\n\n".format(samp) # Como el nombre del log se va modificar posteriormente. Cambiar el nombre del log dentro del log propiamente dicho
+            if cont[c].startswith("cd /") :
+                cont[c] = "" # Eliminar la ultima linea de la funcion analisi puesto que apuntaria a la carpeta de la tanda y esta no se ha creado
 
         # Eliminar los analisis de los FASTQ que no son de la muestra que se ha pedido reanalizar
-        newCont = [x for x in cont if not x.startswith("analizar") or (x.startswith("analizar") and x.find(samp) > -1)]
+        newCont = [x for x in cont if not x.startswith("analisi") or (x.startswith("analisi") and x.find(samp) > -1)]
 
         # Guardar los cambios en el archivo
         with open(logf, "w") as fi :
             for c in newCont :
                 fi.write(c)
         os.rename(logf, "log{}.sh".format(samp)) # Cambiar el nombre logTanda__.sh por el nombre de la muestra
-
-        print("WARNING: Si el directorio {} tiene los fastq de mas de una muestra, se habran creado analisis para todas las muestras. Elimina los analisis a las muestras que no interesan".format(ruta))
 
 def vcf() :
     """Anotar y filtrar un vcf. Guardar los datos en un excel
