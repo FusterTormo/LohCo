@@ -19,14 +19,15 @@ import manifestOp as op
 
 def reanalizar() :
     """Reanalizar una muestra sin borrar lo que ya esta guardado"""
+    workindir = "/home/ffuster/panalisi/resultats"
     samp = input("INPUT: Identificador de la muestra a reanalizar: ")
     # Buscar la muestra en el directorio de trabajo usando el comando find de bash
-    cmd = "find /home/ffuster/panalisi/resultats -name  {}*fastq.gz".format(samp)
+    cmd = "find {wd} -name {smp}*fastq.gz".format(smp = samp, wd = workindir)
     proc = subprocess.Popen(cmd, shell = True, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
     out, err = proc.communicate()
     res = out.decode()
     if res == "" :
-        print("INFO: No se ha encontrado la muestra en /home/ffuster/panalisi/resultats")
+        print("INFO: No se ha encontrado la muestra en {}".format(workindir))
     else :
         # Convertir los resultados a una lista
         aux = res.split("\n")
@@ -34,6 +35,25 @@ def reanalizar() :
         ruta = os.path.dirname(aux[0])
         acciones = custom()
         lanzarPanel(ruta, acciones)
+        # Buscar el log que se ha creado al lanzar el panel
+        for root, dirs, filenames in os.walk(workindir) :
+            for f in filenames :
+                if f.startswith("logTanda") :
+                    logf = f
+                    break
+        # Modificar el log para eliminar las otras muestras que podria haber en el directorio
+        os.chdir(wd)
+        with open(logf, "r") as fi :
+            cont = fi.readlines()
+        for c in cont :
+            if c.startswith("mkdir") :
+                c = "mkdir {smp} ; cd {smp}".format(smp = samp)
+                print(c)
+        # Guardar los cambios en el archivo
+        with open(logf, "w") as fi :
+            fi.write(c)
+        os.rename(logf, "log{}.sh".format(samp)) # Cambiar el nombre logTanda__.sh por el nombre de la muestra
+
         print("WARNING: Si el directorio {} tiene los fastq de mas de una muestra, se habran creado analisis para todas las muestras. Elimina los analisis a las muestras que no interesan".format(ruta))
 
 def vcf() :
@@ -62,7 +82,7 @@ def vcf() :
                 elif "VarScan2" in l :
                     vcal = "VarScan2"
                 elif "configureStrelka" in l :
-                    vcal = "Sterlka2"
+                    vcal = "Strelka2"
             else :
                 break
     if vcal == None :
@@ -209,7 +229,6 @@ def GUI() :
         ruta = input("INPUT: Introducir la carpeta donde estan los fastq de la muestra a analizar: ")
         opciones = custom()
         lanzarPanel(ruta, opciones)
-        ## TODO: Eliminar la creacion de una tanda nueva del log y auto-ejecutar el analisis de la muestra
     elif opt == 4 :
         ruta = input("INPUT: Introducir el path absoluto del bam a analizar: ")
         bamQC(ruta)
