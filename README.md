@@ -39,11 +39,12 @@ En caso de tener un manifest en el que no se sabe a qu&eacute; genes pertenece c
 
 ## Analisis personalizado
 
------Funcionalidad pendiente-----
+Usando la interfaz, el programa preguntar&aacute; qu&eacute; pasos realizar. El usuario solo tiene que ir contestando 's' o 'n' a cada una de las preguntas que hace el programa. Una vez decidido el an&aacute;lisis, el programa preguntar&aacute; por la ruta donde est&aacute;n las muestras a analizar. Autom&aacute;ticamente se crear&aacute; el log para analizar las muestras con los pasos que se han especificado.
 
 ## Reanalizar una muestra sin eliminar los datos hechos previamente
 
------Funcionalidad pendiente-----
+Usando la interfaz, el programa pedir&aacute; el identificador de la muestra que se quiere reanalizar. Una vez introducido, el programa buscar&aacute; la carpeta de la tanda en la que se analiz&oacute; la muestra. Si se encuentra dicha carpeta, el programa preguntar&aacute; por el an&aacute;lisis personalizado que se quiere hacer y crear&aacute; el log con todas las instrucciones necesarias para hacer dicho an&aacute;lisis. Como el an&aacute;lisis se har&aacute; en todas las muestras que est&eacute;n en la carpeta, si hay alguna muestra que no se quiera reanalizar, se recomienda eliminar dichas l&iacute;neas del log de an&aacute;lisis.
+
 
 ## Crear un excel a partir de un vcf de variantes
 
