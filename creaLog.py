@@ -239,14 +239,21 @@ def prepararPanel(ruta, acciones) :
             if "fastqc" in acciones :
                 fi.write("\n\t# Control de calidad. FastQC\n")
                 fi.write("\tmkdir fastqc # Carpeta donde se guardara el control de calidad\n")
-                # Recoger la cadena para invocar fastqc usando la libreria de comandos
-                fi.write("\t" + cmd.getFastQC("../$forward", "fastqc") + "\n")
-                fi.write("\t" + cmd.getFastQC("../$reverse", "fastqc") + "\n")
+                # Recoger la orden para invocar fastqc usando la libreria de comandos
+                if "copiar" in acciones : # Si se han copiado los datos, el path que se pasa a la funcion es relativo.
+                    fi.write("\t" + cmd.getFastQC("../$forward", "fastqc") + "\n")
+                    fi.write("\t" + cmd.getFastQC("../$reverse", "fastqc") + "\n")
+                else : # En caso contrario el path es absoluto
+                    fi.write("\t" + cmd.getFastQC("$forward", "fastqc") + "\n")
+                    fi.write("\t" + cmd.getFastQC("$reverse", "fastqc") + "\n")
                 fi.write("\trm fastqc/*zip # Eliminar los archivos comprimidos, ya se han descomprimido al finalizar FastQC\n")
             if "aln" in acciones :
                 fi.write("\n\t# Alineamiento. BWA\n")
-                # La cadena align tiene cuatro variables: rg es para introducir el read group, fw es para el fastq forward, rv es para el fastq reverse y ref es para el genoma de referencia
-                fi.write("\t" + cmd.getAln("$readgroup", "$ref", "../$forward", "../$reverse", "bwa.sam") + "\n")
+                # La orden align tiene cuatro variables: rg es para introducir el read group, fw es para el fastq forward, rv es para el fastq reverse y ref es para el genoma de referencia
+                if "copiar" in acciones : # Si se han copiado los FASTQ al directorio de la tanda, el path enviado a la funcion sera un path relativo
+                    fi.write("\t" + cmd.getAln("$readgroup", "$ref", "../$forward", "../$reverse", "bwa.sam") + "\n")
+                else : # Si no se han copiado los FASTQ, la ruta que se pasa a la funcion es absoluta
+                    fi.write("\t" + cmd.getAln("$readgroup", "$ref", "$forward", "$reverse", "bwa.sam") + "\n")
                 fi.write("\t" + cmd.getPcSort("bwa.sam", "bwa.sort.bam") + "\n")
                 fi.write("\t" + cmd.getPcIndex("bwa.sort.bam") + "\n")
                 fi.write("\tmkdir alignment\n")
