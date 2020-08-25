@@ -35,6 +35,8 @@ def reanalizar() :
         ruta = os.path.dirname(aux[0])
         acciones = custom()
         lanzarPanel(ruta, acciones)
+        print(acciones)
+        sys.exit()
         if "copiar" in acciones : # Evitar que se copien los FASTQ
             del(acciones[0])
 
@@ -60,12 +62,13 @@ def reanalizar() :
 
         # Eliminar los analisis de los FASTQ que no son de la muestra que se ha pedido reanalizar
         newCont = [x for x in cont if not x.startswith("analisi") or (x.startswith("analisi") and x.find(samp) > -1)]
-
+        newLog = "log{}.sh".format(samp)
         # Guardar los cambios en el archivo
         with open(logf, "w") as fi :
             for c in newCont :
                 fi.write(c)
-        os.rename(logf, "log{}.sh".format(samp)) # Cambiar el nombre logTanda__.sh por el nombre de la muestra
+        os.rename(logf, newLog) # Cambiar el nombre logTanda__.sh por el nombre de la muestra
+        print("INFO: Cambiado el nombre de {} por {}".format(logf, newLog))
 
 def vcf() :
     """Anotar y filtrar un vcf. Guardar los datos en un excel
