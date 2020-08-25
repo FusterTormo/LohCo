@@ -34,11 +34,10 @@ def reanalizar() :
         # Si se encuentran, recoger el directorio donde esta el fastq y lanzar un analisis con dicha muestra
         ruta = os.path.dirname(aux[0])
         acciones = custom()
-        lanzarPanel(ruta, acciones)
-        print(acciones)
-        sys.exit()
         if "copiar" in acciones : # Evitar que se copien los FASTQ
-            del(acciones[0])
+            acciones.remove("copiar")
+            
+        lanzarPanel(ruta, acciones)
 
         # Buscar el log que se ha creado al lanzar el panel
         for root, dirs, filenames in os.walk(workindir, topdown = True, ) :
