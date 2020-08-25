@@ -1,5 +1,5 @@
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
-#!/usr/bin/python
 
 """
 MAIN: Libreria con funciones para re-anotar y filtrar un archivo de salida de table_annovar. Esta libreria se usa para scripts, como filtMutect o filtStrelka para extraer datos en comun
