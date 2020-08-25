@@ -6,9 +6,9 @@ Procesa las muestras de paneles secuenciadas en genomica autom&aacute;ticamente
 ## Uso
 
 ```bash
-python3 main.py
+$PATH_AUP/main.py
 ```
-El programa pedir&aacute; una ruta absoluta donde est&aacute;n los FASTQ reportados por el MiSeq. Con introducir ese dato basta para hacer todo el an&aacute;lisis, aunque se pueden a&ntilde;adir los pasos para realizar un an&aacute;lisis m&aacute;s customizado.
+La interfaz pedir&aacute; una ruta absoluta donde est&aacute;n los FASTQ reportados por el MiSeq. Con introducir ese dato basta para hacer todo el an&aacute;lisis, aunque se pueden a&ntilde;adir los pasos para realizar un an&aacute;lisis m&aacute;s customizado.
 
 # Otras funcionalidades
 ## Limpiar una tanda para archivarla
@@ -35,7 +35,7 @@ En caso de tener un manifest en el que no se sabe a qu&eacute; genes pertenece c
 
 ## Analizar una muestra por separado
 
------Funcionalidad pendiente-----
+~~Funcionalidad pendiente~~
 
 ## Analisis personalizado
 
