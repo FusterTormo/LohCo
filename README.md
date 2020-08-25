@@ -8,7 +8,7 @@ Procesa las muestras de paneles secuenciadas en genomica autom&aacute;ticamente
 ```bash
 $PATH_AUP/main.py
 ```
-La interfaz pedir&aacute; una ruta absoluta donde est&aacute;n los FASTQ reportados por el MiSeq. Con introducir ese dato basta para hacer todo el an&aacute;lisis, aunque se pueden a&ntilde;adir los pasos para realizar un an&aacute;lisis m&aacute;s customizado.
+La interfaz pedir&aacute; una ruta absoluta donde est&aacute;n los FASTQ reportados por el secuenciador. Con introducir ese dato basta para hacer todo el an&aacute;lisis, aunque se pueden a&ntilde;adir los pasos para realizar un an&aacute;lisis m&aacute;s customizado.
 
 # Otras funcionalidades
 ## Limpiar una tanda para archivarla
@@ -18,24 +18,32 @@ Eliminar todos los archivos no importantes generados durante el an&aacute;lisis 
 ### Uso
 
 ```bash
-python3 cleaner.py [numero_de_tanda]
+$PATH_AUP/cleaner.py [numero_de_tanda]
 ```
 
 El programa eliminar&aacute; los archivo temporales de la tanda pasada por par&aacute;metro. Los archivos temporales son los FASTQ, los bams intermedios y los archivos anotados intermedios.
 
 ```bash
-python3 cleaner.py
+$PATH_AUP/cleaner.py
 ```
 
 El programa pedir&aacute; el n&uacute;mero de tanda que se quiere limpiar. Una vez hecho esto, ir&aacute; a la carpeta correspondiente y eliminar&aacute; los archivos FASTQ, los bams intermedios y los vcf y anotaciones intermedias.
 
 ## Anotar un manifest
 
-En caso de tener un manifest en el que no se sabe a qu&eacute; genes pertenece cada regi&oacute;n se puede usar el *main* para anotar dicho manifest. El *script*, adem&aacute;, crear&aacute; el archivo gensAestudi.txt que se usa durante la fase de c&aacute;lculo de *coverage*.
+En caso de tener un manifest en el que no se sabe a qu&eacute; genes pertenece cada regi&oacute;n se puede usar el *main* (la interfaz) para anotar dicho manifest. El *script*, adem&aacute;, crear&aacute; el archivo gensAestudi.txt que se usa durante la fase de c&aacute;lculo de *coverage*.
+
+### Uso
+
+```bash
+$PATH_AUP/main.py
+```
+
+: Opci&oacute;n n&uacute;mero 7
 
 ## Analizar una muestra por separado
 
-~~Funcionalidad pendiente~~
+
 
 ## Analisis personalizado
 
