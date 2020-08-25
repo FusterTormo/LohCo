@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
 """
@@ -187,7 +187,7 @@ def GUI() :
     print("3. Analizar una unica muestra")
     print("4. Control de calidad de un bam")
     print("5. Anotar y filtrar un vcf")
-    print("6. Reanalizar una muestra, conservando el analisis previo")
+    print("6. Reanalizar una muestra de una tanda, conservando el analisis previo")
     print("7. Anotar un manifest\n")
     opt = input("INPUT: Numero de opcion: ")
     # Comprobar si la opcion es un numero
