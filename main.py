@@ -47,13 +47,16 @@ def reanalizar() :
         os.chdir(workindir)
         with open(logf, "r") as fi :
             cont = fi.readlines()
-        for c in cont :
-            if c.startswith("mkdir") :
-                c = "mkdir {smp} ; cd {smp}".format(smp = samp)
-                print(c)
+        for c in range(len(cont)) :
+            if cont[c].startswith("mkdir") :
+                cont[c] = "mkdir {smp} ; cd {smp}".format(smp = samp)
+            if cont[c].startswith("mv") :
+                cont[c] = "mv ../log{}.sh .".format(samp)
+                print(cont[c])
+
         # Guardar los cambios en el archivo
         with open(logf, "w") as fi :
-            fi.write(c)
+            fi.write(cont)
         os.rename(logf, "log{}.sh".format(samp)) # Cambiar el nombre logTanda__.sh por el nombre de la muestra
 
         print("WARNING: Si el directorio {} tiene los fastq de mas de una muestra, se habran creado analisis para todas las muestras. Elimina los analisis a las muestras que no interesan".format(ruta))
