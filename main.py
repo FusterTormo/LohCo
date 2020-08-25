@@ -49,14 +49,16 @@ def reanalizar() :
             cont = fi.readlines()
         for c in range(len(cont)) :
             if cont[c].startswith("mkdir") :
-                cont[c] = "mkdir {smp} ; cd {smp}".format(smp = samp)
+                cont[c] = "mkdir {smp} ; cd {smp}\n".format(smp = samp)
             if cont[c].startswith("mv") :
-                cont[c] = "mv ../log{}.sh .".format(samp)
-                print(cont[c])
+                cont[c] = "mv ../log{}.sh .\n".format(samp)
+
+        # Eliminar los analisis de los FASTQ que no son de la muestra que se ha pedido reanalizar
+        newCont = [x for x in cont if not x.startswith("analizar") or (x.startswith("analizar") and x.find(samp) > -1)]
 
         # Guardar los cambios en el archivo
         with open(logf, "w") as fi :
-            for c in cont :
+            for c in newCont :
                 fi.write(c)
         os.rename(logf, "log{}.sh".format(samp)) # Cambiar el nombre logTanda__.sh por el nombre de la muestra
 
