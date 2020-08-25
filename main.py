@@ -56,7 +56,8 @@ def reanalizar() :
 
         # Guardar los cambios en el archivo
         with open(logf, "w") as fi :
-            fi.write(cont)
+            for c in cont :
+                fi.write(c)
         os.rename(logf, "log{}.sh".format(samp)) # Cambiar el nombre logTanda__.sh por el nombre de la muestra
 
         print("WARNING: Si el directorio {} tiene los fastq de mas de una muestra, se habran creado analisis para todas las muestras. Elimina los analisis a las muestras que no interesan".format(ruta))
