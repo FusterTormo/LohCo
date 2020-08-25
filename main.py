@@ -209,6 +209,7 @@ def GUI() :
         ruta = input("INPUT: Introducir la carpeta donde estan los fastq de la muestra a analizar: ")
         opciones = custom()
         lanzarPanel(ruta, opciones)
+        ## TODO: Eliminar la creacion de una tanda nueva del log y auto-ejecutar el analisis de la muestra
     elif opt == 4 :
         ruta = input("INPUT: Introducir el path absoluto del bam a analizar: ")
         bamQC(ruta)
