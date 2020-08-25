@@ -36,13 +36,15 @@ def reanalizar() :
         acciones = custom()
         lanzarPanel(ruta, acciones)
         # Buscar el log que se ha creado al lanzar el panel
-        for root, dirs, filenames in os.walk(workindir) :
-            for f in filenames :
-                if f.startswith("logTanda") :
-                    logf = f
-                    break
+        for root, dirs, filenames in os.walk(workindir, topdown = True, ) :
+            break
+
+        for f in filenames :
+            if f.startswith("logTanda") :
+                logf = f
+                break
         # Modificar el log para eliminar las otras muestras que podria haber en el directorio
-        os.chdir(wd)
+        os.chdir(workindir)
         with open(logf, "r") as fi :
             cont = fi.readlines()
         for c in cont :
