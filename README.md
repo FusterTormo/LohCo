@@ -3,7 +3,7 @@
 
 Procesa las muestras de paneles secuenciadas autom&aacute;ticamente.
 
-## Uso
+### Uso
 
 ```bash
 $PATH_AUP/main.py
@@ -28,11 +28,11 @@ $PATH_AUP/main.py
 
 Funciona igual que la opci&oacute;n 2, pero para una &uacute;nica muestra. En este caso, buscar&aacute; solo en la carpeta que se ha seleccionado los FASTQ que haya en ella. No buscar&aacute; en subcarpetas. Una vez elegida la opci&oacute;n 3, la interfaz pedir&aacute; la ruta absoluta de la carpeta donde se encuentran los FASTQ que se quieren analizar. Se crear&aacute; el log del an&aacute;lisis y, posteriormente se ejecutar&aacute; dicho an&aacute;lisis.
 
-## Control de calidad de un alineamiento en particular
+### Control de calidad de un alineamiento en particular
 
 El control de calidad se puede ejecutar de dos formas distintas: invocando directamente al *script* de control de calidad (bamQC.py) o usando la interfaz (main.py), opci&oacute;n 4.
 
-### Usando bamQC
+#### Usando bamQC
 
 El control de calidad se debe hacer dentro de la carpeta de la muestra. Por esto, para ejecutar este *script* se debe poner en la carpeta de la muestra. Una vez all&iacute; ejecutamos el *script*. **NOTA:** Se asume que en la carpeta de la muestra hay una subcarpeta llamada *alignment* y que el bam se llama *bwa.recal.bam*.
 
@@ -43,7 +43,7 @@ $PATH_AUP/bamQC.py
 
 El programa crear&aacute; un archivo de texto, en formato JSON, que contiene el n&uacute;mero de *reads* que tiene el FASTQ (suma de los *reads* reportados por FASTQC), los *reads* que tiene el bam (sumatorio de las filas que tiene el bed creado), los *reads* que est&aacute;n dentro del manifest (ON target) y los que no est&aacute;n dentro del manifest (OFF target).
 
-### Usando la interfaz
+#### Usando la interfaz
 
 ```bash
 $PATH_AUP/main.py
@@ -91,7 +91,7 @@ En caso de que no se introduzca un n&uacute;mero de tanda, el programa pedir&aac
 
 ## &iquest;C&oacute;mo hago para modificar los programas que se ejecutan en los an&aacute;lisis?
 
-La liber&iacute;a [getCommands.py](../master/getCommands.py) contiene las &oacute;rdenes para ejecutar cada uno de los programas necesarios para el an&aacute;lisis. En las constantes de esta librer&iacute;a se encuentran las versiones de todos los programas que se usan para el an&aacute;lisis.
+La librer&iacute;a [getCommands.py](../master/getCommands.py) contiene las &oacute;rdenes para ejecutar cada uno de los programas necesarios para el an&aacute;lisis. En las constantes de esta librer&iacute;a se encuentran las versiones de todos los programas que se usan para el an&aacute;lisis.
 
 
 ## El manifest del panel ha cambiado. &iquest;C&oacute;mo cambio el manifest de la pipeline?
@@ -99,4 +99,4 @@ La liber&iacute;a [getCommands.py](../master/getCommands.py) contiene las &oacut
 Existen dos opciones:
 
 1. Crear el *log* de an&aacute;lisis (usando los comandos descritos al inicio de este README) y cambiar manualmente la ruta del manifest. Dicha ruta est&aacute; guardada como una constante en el *log* del an&aacute;lisis.
-2. Cambiar la ruta de la constante manifest en [bamQC](../master/bamQC.py), y [creaLog](../master/creaLog.py)
+2. Cambiar la ruta de la constante manifest en [bamQC](../master/bamQC.py), y [creaLog](../master/creaLog.py).
