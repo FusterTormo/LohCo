@@ -134,9 +134,13 @@ def doTest(gene, region) :
 def main() :
     brca1 = ["17", 43044295, 43170245]
     brca2 = ["13", 32315086, 32400266]
-    print("\nINFO: Checking BRCA1\n")
+    print("INFO: Checking BRCA1")
     txt = doTest("BRCA1", brca1)
     with open("brca1_ascat_facets_ascatngs_sequenza.tsv", "w") as fi :
+        fi.write(txt)
+    print("INFO: Checking BRCA2")
+    txt = doTest("BRCA2", brca2)
+    with open("brca2_ascat_facets_ascatngs_sequenza.tsv", "w") as fi :
         fi.write(txt)
 
 
