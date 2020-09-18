@@ -77,6 +77,7 @@ def checkAscat(folder, reg) :
 
 
 def doTest(gene, region) :
+    output = "ID1\tID2\tgerm\tsom\tASCAT\tFACETS\tascatNGS\tSequenza\n"
     # Get the OV cases
     with dbcon :
         cur = dbcon.cursor()
@@ -115,7 +116,7 @@ def doTest(gene, region) :
                 # Get the copy number output from Sequenza
                 path = "{wd}/{folder}_Sequenza/{case}_segments.txt".format(folder = analysisdir, case = c[0], wd = workindir)
                 seq = lib.getLOH(path, "sequenza", region)
-                print("{} - {} : {} - {} - {} - {}".format(mut_cn, mut_sm, asc, fac, ngs, seq))
+                print("{id1}\t{id2}\t{mtcn}\t{mtsm}\t{cnasc}\t{cnfac}\t{cnngs}\t{cnseq}\n".format(id1 = tm[0], id2 = cn[0], mtcn = mut_cn, mtsm = mut_sm, cnasc = asc, cnfac = fac, cnngs= ngs, cnseq = seq))
 
 def main() :
     brca1 = ["17", 43044295, 43170245]
