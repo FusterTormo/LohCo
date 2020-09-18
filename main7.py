@@ -77,9 +77,6 @@ def checkAscat(folder, reg) :
 
 
 def doTest(gene, region) :
-    # Counters
-    total_pos = {"total" : 0, "ascat2" : 0, "facets" : 0, "ascatNGS" : 0, "sequenza" : 0}
-    positives = {"ascat2" : 0, "facets" : 0, "ascatNGS" : 0, "sequenza" : 0}
     # Get the OV cases
     with dbcon :
         cur = dbcon.cursor()
@@ -101,15 +98,25 @@ def doTest(gene, region) :
                 tf = "{wd}/{sub}/{tumor}".format(wd = wd, sub = c[0], tumor = tm[0])
                 cf = "{wd}/{sub}/{control}".format(wd = wd, sub = c[0], control = cn[0])
                 workindir = "{wd}/{sub}".format(wd = wd, sub = c[0])
+                analysisdir = "{}_VS_{}".format(tm[0].split("-")[0], cn[0].split("-")[0]) # The folder format for FACETS, ascatNGS, and Sequenza is "[tumorUUID]_VS_[controlUUID]"
                 platypust = "{}/platypusGerm/platypus.hg38_multianno.txt".format(tf)
                 platypusc = "{}/platypusGerm/platypus.hg38_multianno.txt".format(cf)
                 # Get the information regarding the worst variant in the gene selected found in platypus variant calling
-                mut = getMutation(platypusc, gene)
-                if mut == "+" :
-                    total_pos["total"] += 1
-                    aux = checkAscat(workindir, region)
-                    print("{} - {}".format(mut, aux))
-                    break
+                mut_cn = getMutation(platypusc, gene)
+                mut_sm = getMutation(platypust, gene)
+                # Get the copy number output from ASCAT2
+                asc = checkAscat(workindir, region)
+                # Get the copy number output from FACETS
+                path = "{wd}/{folder}_FACETS/facets_comp_cncf.tsv".format(wd = workindir, folder = analysisdir)
+                fac = lib.getLOH(path, "facets", region)
+                # Get the copy number output from ascatNGS
+                path = lib.findAscatName("{wd}/{folder}_ASCAT/".format(wd = workindir, folder = analysisdir))
+                ngs = lib.getLOH(path, "ascatngs", region)
+                # Get the copy number output from Sequenza
+                path = "{wd}/{folder}_Sequenza/{case}_segments.txt".format(folder = analysisdir, wd = workindir)
+                seq = lib.getLOH(path, "sequenza", region)
+                print("{} - {} : {} - {} - {} - {}".format(mut_cn, mut_sm, asc, fac, ngs, seq))
+
 def main() :
     brca1 = ["17", 43044295, 43170245]
     brca2 = ["13", 32315086, 32400266]
