@@ -8,6 +8,7 @@ Compares how many coincidences each tool reports. A coincidence is when there is
 """
 
 # Libraries
+import os
 import sqlite3
 import sys
 
@@ -56,21 +57,22 @@ def getMutation(path, gene) :
 
 def checkAscat(folder, reg) :
     ascat = "{}/ASCAT2".format(folder)
-    files = os.listdir(ascat)
     cn = ""
-    if len(files) == 1 :
-        abs = "{}/{}".format(ascat, f)
-        cn = lib.getLOH(abs, "ascatarray", reg)
-    else :
-        for f in files :
-            abs = "{}/{}".format(ascat, f)
-            if cn == "" :
-                cn = lib.getLOH(abs, "ascatarray", reg)
-            else :
-                auxCn = lib.getLOH(abs, "ascatarray", reg)
-                if cn != auxCn : # If the ASCAT2 outpus does not output the same aberration, we do not include the result
-                    cn =  "?"
-                    break
+    if os.path.isdir(ascat) :
+        files = os.listdir(ascat)
+        if len(files) == 1 :
+            abs = "{}/{}".format(ascat, files[0])
+            cn = lib.getLOH(abs, "ascatarray", reg)
+        else :
+            for f in files :
+                abs = "{}/{}".format(ascat, f)
+                if cn == "" :
+                    cn = lib.getLOH(abs, "ascatarray", reg)
+                else :
+                    auxCn = lib.getLOH(abs, "ascatarray", reg)
+                    if cn != auxCn : # If the ASCAT2 outpus does not output the same aberration, we do not include the result
+                        cn =  ""
+                        break
     return cn
 
 
