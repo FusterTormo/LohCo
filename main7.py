@@ -51,7 +51,7 @@ def getMutation(path, gene) :
     elif mut in cts.var_neutral :
         clas =  "?"
     else :
-        print("WARNING: Unknown mutation found {}".format(mut))
+        clas = "NF"
 
     return clas
 
@@ -113,7 +113,7 @@ def doTest(gene, region) :
                 path = lib.findAscatName("{wd}/{folder}_ASCAT/".format(wd = workindir, folder = analysisdir))
                 ngs = lib.getLOH(path, "ascatngs", region)
                 # Get the copy number output from Sequenza
-                path = "{wd}/{folder}_Sequenza/{case}_segments.txt".format(folder = analysisdir, wd = workindir)
+                path = "{wd}/{folder}_Sequenza/{case}_segments.txt".format(folder = analysisdir, case = c[0], wd = workindir)
                 seq = lib.getLOH(path, "sequenza", region)
                 print("{} - {} : {} - {} - {} - {}".format(mut_cn, mut_sm, asc, fac, ngs, seq))
 
