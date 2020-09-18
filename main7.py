@@ -92,21 +92,25 @@ def doTest(gene, region) :
             tumors = q.fetchall()
             q = cur.execute("SELECT uuid, bamName FROM sample WHERE submitter='{}' AND tumor LIKE '%Normal%'".format(c[0]))
             controls = q.fetchall()
-            for tm in tumors :
-                for cn in controls :
-                    # Get the absolute path for the platypus hg38_multianno file in tumor and control
-                    tf = "{wd}/{sub}/{tumor}".format(wd = wd, sub = c[0], tumor = tm[0])
-                    cf = "{wd}/{sub}/{control}".format(wd = wd, sub = c[0], control = cn[0])
-                    workindir = "{wd}/{sub}".format(wd = wd, sub = c[0])
-                    platypust = "{}/platypusGerm/platypus.hg38_multianno.txt".format(tf)
-                    platypusc = "{}/platypusGerm/platypus.hg38_multianno.txt".format(cf)
-                    # Get the information regarding the worst variant in the gene selected found in platypus variant calling
-                    mut = getMutation(platypusc, gene)
-                    if mut == "+" :
-                        total_pos["totals"] += 1
-                        aux = checkAscat(workindir, region)
-                        print("{} - {}".format(mut, aux))
-                        break
+
+        for tm in tumors :
+            print(tm)
+            for cn in controls :
+                print("\t{}".format(cn))
+                # Get the absolute path for the platypus hg38_multianno file in tumor and control
+                tf = "{wd}/{sub}/{tumor}".format(wd = wd, sub = c[0], tumor = tm[0])
+                cf = "{wd}/{sub}/{control}".format(wd = wd, sub = c[0], control = cn[0])
+                workindir = "{wd}/{sub}".format(wd = wd, sub = c[0])
+                platypust = "{}/platypusGerm/platypus.hg38_multianno.txt".format(tf)
+                platypusc = "{}/platypusGerm/platypus.hg38_multianno.txt".format(cf)
+                # Get the information regarding the worst variant in the gene selected found in platypus variant calling
+                mut = getMutation(platypusc, gene)
+                print(mut)
+                if mut == "+" :
+                    total_pos["totals"] += 1
+                    aux = checkAscat(workindir, region)
+                    print("{} - {}".format(mut, aux))
+                    break
 def main() :
     brca1 = ["17", 43044295, 43170245]
     brca2 = ["13", 32315086, 32400266]
