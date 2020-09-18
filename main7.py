@@ -126,7 +126,7 @@ def doTest(gene, region) :
                 # Get the copy number output from Sequenza
                 path = "{wd}/{folder}_Sequenza/{case}_segments.txt".format(folder = analysisdir, case = c[0], wd = workindir)
                 seq = lib.getLOH(path, "sequenza", region)
-                if fac == "Not found" :
+                if seq == "Not found" :
                     seq = "NF"
                 output += "{id1}\t{id2}\t{mtcn}\t{mtsm}\t{cnasc}\t{cnfac}\t{cnngs}\t{cnseq}\n".format(id1 = tm[0], id2 = cn[0], mtcn = mut_cn, mtsm = mut_sm, cnasc = asc, cnfac = fac, cnngs= ngs, cnseq = seq)
     return output
