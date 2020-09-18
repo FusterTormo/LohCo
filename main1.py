@@ -251,7 +251,7 @@ def getWorst(vcf, gene) :
 def getLOH(path, program, gene) :
 	sol = "Not found"
 	if os.path.isfile(path):
-		reg = lc.convert2region(path, program)
+		reg = lc.convert2region(path, program, "error")
 		sol = lg.getCopyNumber(gene[1:3], gene[0], reg)
 
 	return sol

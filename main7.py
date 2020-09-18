@@ -78,14 +78,20 @@ def checkAscat(folder, reg) :
 
 def doTest(gene, region) :
     output = "ID1\tID2\tgerm\tsom\tASCAT\tFACETS\tascatNGS\tSequenza\n"
+    cont = 0
     # Get the OV cases
     with dbcon :
         cur = dbcon.cursor()
         q = cur.execute("SELECT submitter FROM patient WHERE cancer='OV'")
         cases = q.fetchall()
 
+    print("INFO: {} cases found".format(len(cases)))
     # Get bam information from each case and to do the
     for c in cases :
+        cont += 1
+        if cont % 100 == 0 :
+            print("INFO: {} cases checked".format(cont))
+
         with dbcon :
             cur = dbcon.cursor()
             q = cur.execute("SELECT uuid, bamName FROM sample WHERE submitter='{}' AND tumor LIKE '%Tumor%'".format(c[0]))
@@ -111,17 +117,28 @@ def doTest(gene, region) :
                 path = "{wd}/{folder}_FACETS/facets_comp_cncf.tsv".format(wd = workindir, folder = analysisdir)
                 fac = lib.getLOH(path, "facets", region)
                 # Get the copy number output from ascatNGS
+                if fac == "Not found" :
+                    fac = "NF"
                 path = lib.findAscatName("{wd}/{folder}_ASCAT/".format(wd = workindir, folder = analysisdir))
                 ngs = lib.getLOH(path, "ascatngs", region)
+                if ngs == "Not found" :
+                    ngs = "NF"
                 # Get the copy number output from Sequenza
                 path = "{wd}/{folder}_Sequenza/{case}_segments.txt".format(folder = analysisdir, case = c[0], wd = workindir)
                 seq = lib.getLOH(path, "sequenza", region)
-                print("{id1}\t{id2}\t{mtcn}\t{mtsm}\t{cnasc}\t{cnfac}\t{cnngs}\t{cnseq}\n".format(id1 = tm[0], id2 = cn[0], mtcn = mut_cn, mtsm = mut_sm, cnasc = asc, cnfac = fac, cnngs= ngs, cnseq = seq))
+                if fac == "Not found" :
+                    seq = "NF"
+                output += "{id1}\t{id2}\t{mtcn}\t{mtsm}\t{cnasc}\t{cnfac}\t{cnngs}\t{cnseq}\n".format(id1 = tm[0], id2 = cn[0], mtcn = mut_cn, mtsm = mut_sm, cnasc = asc, cnfac = fac, cnngs= ngs, cnseq = seq)
+    return output
 
 def main() :
     brca1 = ["17", 43044295, 43170245]
     brca2 = ["13", 32315086, 32400266]
-    doTest("BRCA1", brca1)
+    print("\nINFO: Checking BRCA1\n")
+    txt = doTest("BRCA1", brca1)
+    with open("brca1_ascat_facets_ascatngs_sequenza.tsv", "w") as fi :
+        fi.write(txt)
+
 
 if __name__ == "__main__" :
     main()
