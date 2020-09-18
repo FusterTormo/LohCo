@@ -57,7 +57,7 @@ def getMutation(path, gene) :
 
 def checkAscat(folder, reg) :
     ascat = "{}/ASCAT2".format(folder)
-    cn = ""
+    cn = "NF"
     if os.path.isdir(ascat) :
         files = os.listdir(ascat)
         if len(files) == 1 :
@@ -71,7 +71,7 @@ def checkAscat(folder, reg) :
                 else :
                     auxCn = lib.getLOH(abs, "ascatarray", reg)
                     if cn != auxCn : # If the ASCAT2 outpus does not output the same aberration, we do not include the result
-                        cn =  ""
+                        cn =  "NF"
                         break
     return cn
 
