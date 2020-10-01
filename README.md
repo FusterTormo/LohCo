@@ -87,6 +87,24 @@ $PATH_AUP/cleaner.py
 
 En caso de que no se introduzca un n&uacute;mero de tanda, el programa pedir&aacute; el n&uacute;mero de tanda que se quiere limpiar. Una vez hecho esto, ir&aacute; a la carpeta correspondiente y eliminar&aacute; los archivos FASTQ, los bams intermedios, los vcf y anotaciones intermedias.
 
+### Crear un informe de la calidad del los FASTQ, el alineamiento y el *coverage*
+
+El *script* crea un informe, en formato web con todos los gr&aacute;ficos que se han generando durante el an&aacute;lisis de la muestra. En este informe, se puede consultar
+* el n&uacute;mero de *reads* secuenciados,
+* el porcentaje de *reads* alineados,
+* el porcentaje de *on* y *off* target,
+* el coverage m&iacute;nimo, m&aacute;ximo, medio y la mediana de la muestra, así como el porcentaje de bases con un *coverage* menor de 30X, 100X, 500X y 1000X,
+* el *coverage* m&iacute;nimo, m&aacute;ximo, medio y la mediana de cada uno de los genes,
+* los gr&aacute;ficos de calidad de las bases, contenido de las bases, porcentaje de GC y porcentaje de duplicados, y
+* los gr&aacute;ficos de cobertura general y de cada gen.
+
+#### Uso
+
+```bash
+cd $CARPETA_DE_LA_MUESTRA_A_ANALIZAR
+$PATH_AUP/infomeQC.py
+```
+
 # FAQs
 
 ## &iquest;C&oacute;mo hago para modificar los programas que se ejecutan en los an&aacute;lisis?
