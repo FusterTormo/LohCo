@@ -89,7 +89,7 @@ En caso de que no se introduzca un n&uacute;mero de tanda, el programa pedir&aac
 
 ### Crear un informe de la calidad del los FASTQ, el alineamiento y el *coverage*
 
-El *script* crea un informe, en formato web con todos los gr&aacute;ficos que se han generando durante el an&aacute;lisis de la muestra. En este informe, se puede consultar
+El *script* crea un informe, en formato web, con todos los gr&aacute;ficos que se han generando durante el an&aacute;lisis de la muestra. En este informe, se puede consultar:
 * el n&uacute;mero de *reads* secuenciados,
 * el porcentaje de *reads* alineados,
 * el porcentaje de *on* y *off* target,
