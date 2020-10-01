@@ -1,0 +1,94 @@
+* {
+	margin: 0;
+	font-family: Arial,Helvetica,Garuda,sans-serif;
+	box-sizing: border-box;
+	padding: 0 20px 0;
+}
+
+header {
+	width: 100%;
+	background-color: #9fff80;
+	padding: 10px;
+	font-size: 2em;
+	font-weight: bold;
+	text-align: center;
+	margin-bottom: 40px;
+	box-shadow: 0 14px 10px -10px #000000;
+}
+
+h1 {
+  color: #33cc00;
+  margin: 10px;
+	margin-top: -40px;
+	padding: 2px;
+}
+
+.cursiva {
+	font-style: italic;
+	margin: 0;
+	padding: 0;
+}
+
+#general {
+	width: 100%;
+	margin-bottom: 50px;
+	height: 400px;
+	overflow-y: auto;
+}
+
+table {
+	width: 30%;
+	display: inline-table;
+	border-collapse: collapse;
+}
+
+table thead {
+	padding: 10px;
+}
+
+tr:nth-child(2n) {
+	background-color: #ecffe6;
+}
+
+tr td:first-child, tr th:first-child {
+	text-align: right;
+}
+
+thead tr th {
+	color: #33cc00;
+}
+
+#FASTQ {
+	padding: 10px;
+	display: inline-block;
+	width: 49%;
+}
+
+img {
+	width: 30%;
+	transition: transform .2s;
+}
+
+img:hover {
+	transform: scale(1.5);
+}
+
+#coverage {
+	padding: 10px;
+	display: inline-block;
+	vertical-align: top;
+	width: 50%;
+	margin-bottom: 50px;
+}
+
+h2 {
+	margin: 10px;
+	padding: 2px;
+	border-bottom: 1px dashed #000000;
+	width: 60%;
+}
+
+a {
+	padding: 0;
+	margin: 0;
+}

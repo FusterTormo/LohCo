@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+	<title>Informe {idMostra}</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="estils.css">
+</head>
+<body>
+	<header>Informe de qualitat {idMostra}</header>
+	<section id="general">
+		{taulesStats}
+	</section>
+	<section id="FASTQ">
+		<h1>Dades de qualitat del FASTQ</h1>
+		<h2>Qualitat de les bases</h2>
+		<a href="fastqc/{dirFASTQ1}/Images/per_base_quality.png" title="Clica a l'imatge per ampliar-la">
+			<img src="fastqc/{dirFASTQ1}/Images/per_base_quality.png">
+		</a>
+		<a href="fastqc/{dirFASTQ2}/Images/per_base_quality.png" title="Clica a l'imatge per ampliar-la">
+			<img src="fastqc/{dirFASTQ2}/Images/per_base_quality.png">
+		</a>
+		<h2>Contingut de les bases dins dels <span class="cursiva">reads</span></h2>
+		<a href="fastqc/{dirFASTQ1}/Images/per_base_sequence_content.png" title="Clica a l'imatge per ampliar-la">
+			<img src="fastqc/{dirFASTQ1}/Images/per_base_sequence_content.png">
+		</a>
+		<a href="fastqc/{dirFASTQ2}/Images/per_base_sequence_content.png" title="Clica a l'imatge per ampliar-la">
+			<img src="fastqc/{dirFASTQ2}/Images/per_base_sequence_content.png">
+		</a>
+		<h2>Percentatge de GC</h2>
+		<a href="fastqc/{dirFASTQ1}/Images/per_sequence_gc_content.png" title="Clica a l'imatge per ampliar-la">
+			<img src="fastqc/{dirFASTQ1}/Images/per_sequence_gc_content.png">
+		</a>
+		<a href="fastqc/{dirFASTQ2}/Images/per_sequence_gc_content.png" title="Clica a l'imatge per ampliar-la">
+			<img src="fastqc/{dirFASTQ2}/Images/per_sequence_gc_content.png">
+		</a>
+		<h2>Duplicats</h2>
+		<a href="fastqc/{dirFASTQ1}/Images/duplication_levels.png" title="Clica a l'imatge per ampliar-la">
+			<img src="fastqc/{dirFASTQ1}/Images/duplication_levels.png">
+		</a>
+		<a href="fastqc/{dirFASTQ2}/Images/duplication_levels.png" title="Clica a l'imatge per ampliar-la">
+			<img src="fastqc/{dirFASTQ2}/Images/duplication_levels.png">
+		</a>
+	</section>
+	<section id="coverage">
+		<h1>Gr&agrave;fiques de <span class="cursiva">coverage</span></h1>
+		<h2>General</h2>
+		<a href="coverage/coverage.png" title="Clica a l'imatge per ampliar-la">
+			<img src="coverage/coverage.png">
+		</a>
+		<h2>Per gens</h2>
+		{imgCoverageGens}
+	</section>
+</body>
+</html>
+
+<!-- Variables necessaries idMostra, dirFASTQ1, dirFASTQ2, imgCoverageGens, taulesStats-->
