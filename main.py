@@ -16,10 +16,13 @@ import filtStrelka as fis
 import filtMutect as fim
 import getCommands as gc
 import manifestOp as op
+import informeQC as qc
+
+#Constantes
+workindir = "/home/ffuster/panalisi/resultats"
 
 def reanalizar() :
     """Reanalizar una muestra sin borrar lo que ya esta guardado"""
-    workindir = "/home/ffuster/panalisi/resultats"
     samp = input("INPUT: Identificador de la muestra a reanalizar: ")
     # Buscar la muestra en el directorio de trabajo usando el comando find de bash
     cmd = "find {wd} -name {smp}*fastq.gz".format(smp = samp, wd = workindir)
@@ -36,7 +39,7 @@ def reanalizar() :
         acciones = custom()
         if "copiar" in acciones : # Evitar que se copien los FASTQ
             acciones.remove("copiar")
-            
+
         lanzarPanel(ruta, acciones)
 
         # Buscar el log que se ha creado al lanzar el panel
@@ -206,6 +209,30 @@ def anotarManifest() :
     ruta = input("Introducir ruta absolute del manifest a anotar: ")
     op.anotarManifest(ruta)
 
+def hacerInforme(ruta) :
+    try :
+        int(ruta) # Si la ruta es un numero, es que se quiere hacer el informe de todas las muestras dentro de una tanda
+        tanda = "{}/tanda{}".format(workindir, ruta)
+        if os.path.isdir(tanda) :
+            for root, dirs, files in os.walk(tanda) :
+                break
+            for d in dirs :
+                print("INFO: Creando informe para {}".format(d))
+                os.chdir("{}/{}".format(tanda, d))
+                qc.crearInforme()
+    except ValueError :
+        cmd = "find {wd} -name {smp}".format(smp = ruta, wd = workindir)
+        proc = subprocess.Popen(cmd, shell = True, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+        out, err = proc.communicate()
+        res = out.decode()
+        if res == "" :
+            print("INFO: No se ha encontrado {} en {}".format(ruta, workindir))
+        else :
+            res = res.strip()
+            print("INFO: Creando informe para la muestra {}".format(res))
+            os.chdir(res)
+            qc.crearInforme()
+
 def lanzarPanel(ruta, opciones) :
     cl.prepararPanel(ruta, opciones)
 
@@ -213,7 +240,7 @@ def GUI() :
     """
     Menu de interaccion con el usuario. Muestra las opciones de analisis disponibles
     """
-    #system.clear()
+    os.system('clear')
     print("\t\t------------------------------------------------------\n\t\t\tAnalisis aUtomatico de Paneles\n\t\t------------------------------------------------------\n\nOpciones")
     print("1. Analisis tipico del panel")
     print("2. Analisis custom del panel")
@@ -221,7 +248,8 @@ def GUI() :
     print("4. Control de calidad de un bam")
     print("5. Anotar y filtrar un vcf")
     print("6. Reanalizar una muestra de una tanda, conservando el analisis previo")
-    print("7. Anotar un manifest\n")
+    print("7. Anotar un manifest")
+    print("8. Crear un informe de la calidad de los FASTQ, el alineamiento y el coverage\n")
     opt = input("INPUT: Numero de opcion: ")
     # Comprobar si la opcion es un numero
     try :
@@ -252,6 +280,9 @@ def GUI() :
     elif opt == 7 :
         ruta = input("INPUT: Introducir la ruta del manifest: ")
         op.anotarManifest(ruta)
+    elif opt == 8 :
+        ruta = input("INPUT: Muestra o numero de tanda en la que realizar el informe: ")
+        hacerInforme(ruta)
     else :
         print("ERROR: Opcion no valida")
         sys.exit(1)
