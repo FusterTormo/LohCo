@@ -240,7 +240,7 @@ def GUI() :
     """
     Menu de interaccion con el usuario. Muestra las opciones de analisis disponibles
     """
-    os.system('clear')
+    #os.system('clear')
     print("\t\t------------------------------------------------------\n\t\t\tAnalisis aUtomatico de Paneles\n\t\t------------------------------------------------------\n\nOpciones")
     print("1. Analisis tipico del panel")
     print("2. Analisis custom del panel")
