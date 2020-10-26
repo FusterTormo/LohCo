@@ -14,6 +14,7 @@ strelka2 = "/opt/strelka-2.9.10"
 samtools = "samtools"
 varscan = "/opt/varscan-2.4.0/VarScan.v2.4.0.jar"
 annovar = "/opt/annovar20200607"
+annovar_db = "/home/ffuster/share/biodata/Indexes/ANNOVAR/humandb/"
 
 def getFastQC(input, output) :
     """Comando para ejecutar FastQC (control de calidad de los FASTQ).
@@ -512,8 +513,8 @@ def getANNOVAR(vcf, prefix, hgref = "hg19", format = "vcf4") :
     """
     if hgref == "hg19" :
         cmd = "{annovar}/convert2annovar.pl -format {format} -outfile {out}.av -includeinfo {input}\n".format(out = prefix, input = vcf, format = format, annovar = annovar)
-        cmd += "{annovar}/table_annovar.pl {input}.av /home/ffuster/share/biodata/Indexes/ANNOVAR/humandb/ -buildver hg19 -out {input} -remove -protocol refGene,avsnp150,1000g2015aug_all,1000g2015aug_afr,1000g2015aug_amr,1000g2015aug_eas,1000g2015aug_eur,1000g2015aug_sas,exac03,gnomad211_exome,gnomad211_genome,esp6500siv2_all,esp6500siv2_ea,esp6500siv2_aa,clinvar_20190305,cosmic70,dbnsfp35a --operation g,f,f,f,f,f,f,f,f,f,f,f,f,f,f,f,f -nastring NA -otherinfo".format(input = prefix, annovar = annovar)
+        cmd += "{annovar}/table_annovar.pl {input}.av {db} -buildver hg19 -out {input} -remove -protocol refGene,avsnp150,1000g2015aug_all,1000g2015aug_afr,1000g2015aug_amr,1000g2015aug_eas,1000g2015aug_eur,1000g2015aug_sas,exac03,gnomad211_exome,gnomad211_genome,esp6500siv2_all,esp6500siv2_ea,esp6500siv2_aa,clinvar_20190305,cosmic70,dbnsfp35a --operation g,f,f,f,f,f,f,f,f,f,f,f,f,f,f,f,f -nastring NA -otherinfo".format(input = prefix, annovar = annovar, db = annovar_db)
     elif hgref == "hg38" :
         cmd = "{annovar}/convert2annovar.pl -format {format} -outfile {out}.av -includeinfo {input}\n".format(out = prefix, input = vcf, format = format, annovar = annovar)
-        cmd += "{annovar}/table_annovar.pl {input}.av /home/ffuster/share/biodata/Indexes/ANNOVAR/humandb/ -buildver hg38 -out {input} -remove -protocol refGene,avsnp150,1000g2015aug_all,1000g2015aug_afr,1000g2015aug_amr,1000g2015aug_eas,1000g2015aug_eur,1000g2015aug_sas,exac03,gnomad211_exome,gnomad30_genome,esp6500siv2_all,esp6500siv2_ea,esp6500siv2_aa,clinvar_20200316,cosmic70,dbnsfp35a --operation g,f,f,f,f,f,f,f,f,f,f,f,f,f,f,f,f -nastring NA -otherinfo".format(input = prefix, annovar = annovar)
+        cmd += "{annovar}/table_annovar.pl {input}.av {db} -buildver hg38 -out {input} -remove -protocol refGene,avsnp150,1000g2015aug_all,1000g2015aug_afr,1000g2015aug_amr,1000g2015aug_eas,1000g2015aug_eur,1000g2015aug_sas,exac03,gnomad211_exome,gnomad30_genome,esp6500siv2_all,esp6500siv2_ea,esp6500siv2_aa,clinvar_20200316,cosmic70,dbnsfp35a --operation g,f,f,f,f,f,f,f,f,f,f,f,f,f,f,f,f -nastring NA -otherinfo".format(input = prefix, annovar = annovar, db = annovar_db)
     return cmd

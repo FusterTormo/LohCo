@@ -22,13 +22,13 @@ import manifestOp as op
 CONSTANTS:
     Rutas de los programas y parametros de cada uno de los pasos dentro de la pipeline
 """
-referencia = "/home/ffuster/share/biodata/solelab/referencies/ucsc/hg19.fa"
+referencia = "/home/ffuster/share/BDsole/referencies/ucsc/hg19.fa"
 manifest = "/home/ffuster/panalisi/resultats/manifest.bed"
 gzmanifest = "/home/ffuster/panalisi/resultats/manifest.bed.gz"
 manifestidx = "/home/ffuster/panalisi/resultats/manifest.bed.gz.tbi"
 
 # Descargado desde https://gnomad.broadinstitute.org/downloads
-dbsnp = "/home/ffuster/share/biodata/solelab/referencies/gnomad.exomes.r2.1.1.sites.vcf"
+dbsnp = "/home/ffuster/share/BDsole/referencies/gnomad.exomes.r2.1.1.sites.vcf"
 genes = "/home/ffuster/panalisi/resultats/gensAestudi.txt"
 
 pathAnalisi = "/home/ffuster/panalisi/resultats" # Ruta donde se ejecutan y guardan los analisis
