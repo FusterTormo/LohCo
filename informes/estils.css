@@ -34,6 +34,7 @@ h1 {
 	margin-bottom: 50px;
 	height: 400px;
 	overflow-y: auto;
+	border-bottom: 3px double black;
 }
 
 table {
@@ -61,11 +62,14 @@ thead tr th {
 #FASTQ {
 	padding: 10px;
 	display: inline-block;
-	width: 49%;
+	width: 35%;
+}
+
+#FASTQ img {
+	width: 45%;
 }
 
 img {
-	width: 30%;
 	transition: transform .2s;
 }
 
@@ -73,12 +77,29 @@ img:hover {
 	transform: scale(1.5);
 }
 
+#variante {
+	padding: 10px;
+	display: inline-block;
+	width: 24%;
+	vertical-align: top;
+}
+
+#variante img, #variante table {
+	width: 100%;
+	display: block;
+	margin-top: 20px;
+}
+
 #coverage {
 	padding: 10px;
 	display: inline-block;
 	vertical-align: top;
-	width: 50%;
+	width: 40%;
 	margin-bottom: 50px;
+}
+
+#coverage img {
+	width: 32%;
 }
 
 h2 {

@@ -3,13 +3,16 @@
 
 import os
 import shutil
+import subprocess
+
+import vcfQC
 
 pathTemplate = "/home/ffuster/AUP/informes/informe.html"
 pathCss = "/home/ffuster/AUP/informes/estils.css"
 
 def crearInforme() :
     # Comprobar que las carpetas existen
-    if os.path.isdir("fastqc") and os.path.isdir("coverage") :
+    if os.path.isdir("fastqc") and os.path.isdir("coverage") and os.path.isdir("variantCalling") :
         dirsFQ = [] # Lista con los directorios donde se han guardado los datos de FastQC
         covs = [] # Lista con los graficos de coverage de cada gen
         mostra = os.getcwd().split("/")[-1] # Identificador de la muestra
@@ -77,19 +80,45 @@ def crearInforme() :
         for c in covs :
             covsTxt += "\t\t<a href=\"coverage/{png}\" title=\"Clica a l'imatge per ampliar-la\">\n\t\t\t<img src=\"coverage/{png}\">\n\t\t</a>\n".format(png = c)
 
+        # Crear el contenido de la seccion de ratios de las variantes
+        # Crear el grafico de barras
+        kaks = ""
+        fwrv = ""
+        hist = ""
+        if os.path.isfile("variantCalling/raw.hg19_multianno.txt") :
+            # Recoger los ratios de estadisticas
+            kaks, fwrv, hist = vcfQC.getRatios("variantCalling/raw.hg19_multianno.txt", False)
+            cnt = "nums <- c({vals})\n".format(vals = ", ".join([str(it) for it in hist.values()]))
+            cnt += "nams <- c('{keys}')\n".format(keys = "', '".join(hist.keys()))
+            cnt += "png('barplotVars.png', width = 720, height = 720)\n"
+            cnt += "barplot(nums, names.arg = nams, main = 'Canvis de base en les SNV', col = c('deepskyblue1', 'firebrick1', 'darkorange', 'forestgreen', 'darkorchid1', 'khaki1'))\n"
+            cnt += "dev.off()"
+            with open("bpScript.R", "w") as fi :
+                fi.write(cnt)
+
+            # Crear el grafico de barras
+            proc = subprocess.Popen("Rscript bpScript.R", shell = True, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+            out, err = proc.communicate()
+            vcf = "<table>\n<tbody><tr><td>Ka/Ks ratio (<a href='https://en.wikipedia.org/wiki/Ka/Ks_ratio' target='_blank'>info</a>)</td><td>{kaks}</td></tr>\n".format(kaks = kaks)
+            vcf += "<tr><td>Variantes FW - Variantes RV (<a href='https://pubmed.ncbi.nlm.nih.gov/28209900' target='_blank'>info</a>)</td><td>{fwrv}</td></tr></tbody></table>\n".format(fwrv = fwrv)
+            if os.path.isfile("barplotVars.png") :
+                vcf += "<a href='barplotVars.png'><img src='barplotVars.png'></a>\n"
+            else :
+                print("WARNING: No se ha podido crear el histograma de las variantes. Descripcion: {}".format(err.decode()))
+
         with open(pathTemplate, "r") as fi :
             txt = fi.read()
 
         # Guardar les dades del informe en un HTML
         with open("informe.html", "w") as fi :
-            fi.write(txt.format(idMostra = mostra, dirFASTQ1 = dirsFQ[0], dirFASTQ2 = dirsFQ[1], imgCoverageGens = covsTxt, taulesStats = tab1+tab2+tab3))
+            fi.write(txt.format(idMostra = mostra, dirFASTQ1 = dirsFQ[0], dirFASTQ2 = dirsFQ[1], imgCoverageGens = covsTxt, taulesStats = tab1+tab2+tab3, taulaVariants = vcf))
 
         # Copiar el full d'estils en la carpeta
         shutil.copyfile(pathCss, "estils.css")
         print("INFO: Creado informe de calidad de coverage y FASTQ")
 
     else :
-        print("ERROR: No encontradas las carpetas necesarias para hacer el informe: {dir}/fastqc y {dir}/coverage".format(dir = os.getcwd()))
+        print("ERROR: No encontradas las carpetas necesarias para hacer el informe: {dir}/fastqc, {dir}/coverage {dir}/variantCalling".format(dir = os.getcwd()))
 
 if __name__ == "__main__" :
     crearInforme()

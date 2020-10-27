@@ -20,7 +20,7 @@
 		<a href="fastqc/{dirFASTQ2}/Images/per_base_quality.png" title="Clica a l'imatge per ampliar-la">
 			<img src="fastqc/{dirFASTQ2}/Images/per_base_quality.png">
 		</a>
-		<h2>Contingut de les bases dins dels <span class="cursiva">reads</span></h2>
+		<h2>Bases per posici&oacute;</h2>
 		<a href="fastqc/{dirFASTQ1}/Images/per_base_sequence_content.png" title="Clica a l'imatge per ampliar-la">
 			<img src="fastqc/{dirFASTQ1}/Images/per_base_sequence_content.png">
 		</a>
@@ -42,6 +42,10 @@
 			<img src="fastqc/{dirFASTQ2}/Images/duplication_levels.png">
 		</a>
 	</section>
+	<section id="variante">
+		<h1>Qualitat de les variants</h1>
+		{taulaVariants}
+	</section>
 	<section id="coverage">
 		<h1>Gr&agrave;fiques de <span class="cursiva">coverage</span></h1>
 		<h2>General</h2>
@@ -54,4 +58,4 @@
 </body>
 </html>
 
-<!-- Variables necessaries idMostra, dirFASTQ1, dirFASTQ2, imgCoverageGens, taulesStats-->
+<!-- Variables necessaries idMostra, dirFASTQ1, dirFASTQ2, imgCoverageGens, taulesStats, taulaVariants-->

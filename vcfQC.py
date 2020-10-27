@@ -9,16 +9,17 @@ MAIN: Extrae parametros de calidad de los archivos vcf. Estos parametros son:
 """
 
 import re
-import subprocess
 import sys
 
-def getRatios(vcf) :
+def getRatios(vcf, imprimir = True) :
     """Calcular las ratios nombradas en el comentario anterior usando el archivo .hg19_multianno.txt crudo creado con ANNOVAR
 
     Parameters
     ----------
         vcf : str
             Ruta donde esta el archivo vcf en el que quiere evaluar la calidad
+        imprimir : bool
+            Mostrar por pantalla los resultados de los ratios obtenidos
 
     Returns
     -------
@@ -76,13 +77,16 @@ def getRatios(vcf) :
                     rv += int(sb[3])
     dnds = float(dns)/float(ds)
     fwrv = int(fw) - int(rv)
-    print("\nParametros de calidad de {}".format(vcf))
-    print("------------------------------------------------")
-    print("Ratio variantes no sinonimas/sinonimas:\t{}".format(dnds))
-    print("Ratio variantes en Forward y Reverse:\t{}".format(fwrv))
-    print("Histograma con los cambios SNV: ")
-    for k,v in hist.items() :
-        print("\t{}\t{}".format(k, v))
+
+    if imprimir :
+        print("\nParametros de calidad de {}".format(vcf))
+        print("------------------------------------------------")
+        print("Ratio variantes no sinonimas/sinonimas:\t{:.2f}".format(dnds))
+        print("Ratio variantes en Forward y Reverse:\t{}".format(fwrv))
+        print("Histograma con los cambios SNV: ")
+        for k,v in hist.items() :
+            print("\t{}\t{}".format(k, v))
+
     return (dnds, fwrv, hist)
 
 if __name__ == "__main__" :
