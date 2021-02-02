@@ -106,29 +106,36 @@ def doTest(gene, region) :
                 cf = "{wd}/{sub}/{control}".format(wd = wd, sub = c[0], control = cn[0])
                 workindir = "{wd}/{sub}".format(wd = wd, sub = c[0])
                 analysisdir = "{}_VS_{}".format(tm[0].split("-")[0], cn[0].split("-")[0]) # The folder format for FACETS, ascatNGS, and Sequenza is "[tumorUUID]_VS_[controlUUID]"
-                platypust = "{}/platypusGerm/platypus.hg38_multianno.txt".format(tf)
-                platypusc = "{}/platypusGerm/platypus.hg38_multianno.txt".format(cf)
-                # Get the information regarding the worst variant in the gene selected found in platypus variant calling
-                mut_cn = getMutation(platypusc, gene)
-                mut_sm = getMutation(platypust, gene)
-                # Get the copy number output from ASCAT2
-                asc = checkAscat(workindir, region)
-                # Get the copy number output from FACETS
-                path = "{wd}/{folder}_FACETS/facets_comp_cncf.tsv".format(wd = workindir, folder = analysisdir)
-                fac = lib.getLOH(path, "facets", region)
-                # Get the copy number output from ascatNGS
-                if fac == "Not found" :
-                    fac = "NF"
-                path = lib.findAscatName("{wd}/{folder}_ASCAT/".format(wd = workindir, folder = analysisdir))
-                ngs = lib.getLOH(path, "ascatngs", region)
-                if ngs == "Not found" :
-                    ngs = "NF"
-                # Get the copy number output from Sequenza
-                path = "{wd}/{folder}_Sequenza/{case}_segments.txt".format(folder = analysisdir, case = c[0], wd = workindir)
-                seq = lib.getLOH(path, "sequenza", region)
-                if seq == "Not found" :
-                    seq = "NF"
-                output += "{id1}\t{id2}\t{mtcn}\t{mtsm}\t{cnasc}\t{cnfac}\t{cnngs}\t{cnseq}\n".format(id1 = tm[0], id2 = cn[0], mtcn = mut_cn, mtsm = mut_sm, cnasc = asc, cnfac = fac, cnngs= ngs, cnseq = seq)
+                # Variant calling paths for Platypus
+                # platypust = "{}/platypusGerm/platypus.hg38_multianno.txt".format(tf)
+                # platypusc = "{}/platypusGerm/platypus.hg38_multianno.txt".format(cf)
+                # Variant calling paths for Strelka2
+                platypust = "{}/strelkaGerm/results/variants/strelka.hg38_multianno.txt".format(tf)
+                platypusc = "{}/strelkaGerm/results/variants/strelka.hg38_multianno.txt".format(cf)
+                if os.path.isfile(platypusc) and os.path.isfile(platypust) :
+                    # Get the information regarding the worst variant in the gene selected found in platypus variant calling
+                    mut_cn = getMutation(platypusc, gene)
+                    mut_sm = getMutation(platypust, gene)
+                    # Get the copy number output from ASCAT2
+                    asc = checkAscat(workindir, region)
+                    # Get the copy number output from FACETS
+                    path = "{wd}/{folder}_FACETS/facets_comp_cncf.tsv".format(wd = workindir, folder = analysisdir)
+                    fac = lib.getLOH(path, "facets", region)
+                    # Get the copy number output from ascatNGS
+                    if fac == "Not found" :
+                        fac = "NF"
+                    path = lib.findAscatName("{wd}/{folder}_ASCAT/".format(wd = workindir, folder = analysisdir))
+                    ngs = lib.getLOH(path, "ascatngs", region)
+                    if ngs == "Not found" :
+                        ngs = "NF"
+                    # Get the copy number output from Sequenza
+                    path = "{wd}/{folder}_Sequenza/{case}_segments.txt".format(folder = analysisdir, case = c[0], wd = workindir)
+                    seq = lib.getLOH(path, "sequenza", region)
+                    if seq == "Not found" :
+                        seq = "NF"
+                    output += "{id1}\t{id2}\t{mtcn}\t{mtsm}\t{cnasc}\t{cnfac}\t{cnngs}\t{cnseq}\n".format(id1 = tm[0], id2 = cn[0], mtcn = mut_cn, mtsm = mut_sm, cnasc = asc, cnfac = fac, cnngs= ngs, cnseq = seq)
+                else :
+                    print("WARNING: Case {} unable to analyse".format(analysisdir))
     return output
 
 def main() :
@@ -136,11 +143,11 @@ def main() :
     brca2 = ["13", 32315086, 32400266]
     print("INFO: Checking BRCA1")
     txt = doTest("BRCA1", brca1)
-    with open("platypus_brca1_ascat_facets_ascatngs_sequenza.tsv", "w") as fi :
+    with open("strelka2_brca1_ascat_facets_ascatngs_sequenza.tsv", "w") as fi :
         fi.write(txt)
     print("INFO: Checking BRCA2")
     txt = doTest("BRCA2", brca2)
-    with open("platypus_brca2_ascat_facets_ascatngs_sequenza.tsv", "w") as fi :
+    with open("strelka2_brca2_ascat_facets_ascatngs_sequenza.tsv", "w") as fi :
         fi.write(txt)
 
 
