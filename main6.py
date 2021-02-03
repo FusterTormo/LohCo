@@ -48,7 +48,11 @@ def getSequenza(path) :
     return sequenza
 
 def getJaccard(comp, a) :
-    return comp[a][a]/(comp[a]["A"] + comp[a]["L"] + comp[a]["N"] + comp[a]["D"] + comp["A"][a] + comp["L"][a] + comp["N"][a] + comp["D"][a])
+    try :
+        return comp[a][a]/(comp[a]["A"] + comp[a]["L"] + comp[a]["N"] + comp[a]["D"] + comp["A"][a] + comp["L"][a] + comp["N"][a] + comp["D"][a])
+    except ZeroDivisionError:
+        return 0
+
 
 def compareTools(reg1, reg2) :
     regs = lc.getFragments(reg1, reg2)
