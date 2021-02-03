@@ -66,10 +66,9 @@ def compareTools(reg1, reg2) :
     jccn = getJaccard(comp, "N")
     jccl = getJaccard(comp, "L")
     jccd = getJaccard(comp, "D")
+    print("{jcca}\t{jccn}\t{jccl}\t{jccd}\t{pur1}\t{pur2}\t{plo1}\t{plo2}".format(jcca = jcca, jccn = jccn, jccl = jccl, jccd = jccd, pur1 = reg1["purity"], pur2 = reg2["purity"], plo1 = reg1["ploidy"], plo2 = reg2["ploidy"]))
     st = "{nr}\t{bs}\t{rs}\t{mcca}\t{mccn}\t{mccl}\t{mccd}\t{jcc}\t{jcca}\t{jccn}\t{jccl}\t{jccd}\t{pur1}\t{pur2}\t{plo1}\t{plo2}".format(
-        nr = num, bs = base, rs = regions, mcca = mat["A"]["MCC"], mccn = mat["N"]["MCC"], mccl = mat["L"]["MCC"], mccd = mat["D"]["MCC"], jcc = jcc,
-        jcca = jcca, jccn = jccn, jccl = jccl, jccd = jccd,
-        pur1 = reg1["purity"], pur2 = reg2["purity"], plo1 = reg1["ploidy"], plo2 = reg2["ploidy"])
+        nr = num, bs = base, rs = regions, mcca = mat["A"]["MCC"], mccn = mat["N"]["MCC"], mccl = mat["L"]["MCC"], mccd = mat["D"]["MCC"], jcc = jcc, jcca = jcca, jccn = jccn, jccl = jccl, jccd = jccd, pur1 = reg1["purity"], pur2 = reg2["purity"], plo1 = reg1["ploidy"], plo2 = reg2["ploidy"])
     return st
 
 def createFile(name) :
