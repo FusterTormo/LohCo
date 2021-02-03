@@ -47,9 +47,11 @@ def getSequenza(path) :
                     sequenza.append(aux2)
     return sequenza
 
+def getJaccard(comp, a) :
+    return comp[a][a]/(comp[a]["A"] + comp[a]["L"] + comp[a]["N"] + comp[a]["D"] + comp["A"][a] + comp["L"][a] + comp["N"][a] + comp["D"][a])
+
 def compareTools(reg1, reg2) :
     print(reg1.keys())
-    sys.exit()
     regs = lc.getFragments(reg1, reg2)
     comp = lc.doComparison2(regs, reg1, reg2)
     mat = ls.doContingency(comp)
@@ -57,8 +59,14 @@ def compareTools(reg1, reg2) :
     num = ls.regionNumber(regs)
     base = ls.baseSimilarity(regs, reg1, reg2)
     regions = ls.regSimilarity(regs, reg1, reg2)
+    jcca = getJaccard(comp, "A")
+    jccn = getJaccard(comp, "N")
+    jccl = getJaccard(comp, "L")
+    jccd = getJaccard(comp, "D")
     st = "{nr}\t{bs}\t{rs}\t{mcca}\t{mccn}\t{mccl}\t{mccd}\t{jcc}\t{jcca}\t{jccn}\t{jccl}\t{jccd}\t{pur1}\t{pur2}\t{plo1}\t{plo2}".format(
-        nr = num, bs = base, rs = regions, mcca = mat["A"]["MCC"], mccn = mat["N"]["MCC"], mccl = mat["L"]["MCC"], mccd = mat["D"]["MCC"], jcc = jcc)
+        nr = num, bs = base, rs = regions, mcca = mat["A"]["MCC"], mccn = mat["N"]["MCC"], mccl = mat["L"]["MCC"], mccd = mat["D"]["MCC"], jcc = jcc,
+        jcca = jcca, jccn = jccn, jccl = jccl, jccd = jccd,
+        pur1 = reg1["purity"], pur2 = reg2["purity"], plo1 = reg1["ploidy"], plo2 = reg2["ploidy"])
     return st
 
 def createFile(name) :
