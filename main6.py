@@ -48,6 +48,8 @@ def getSequenza(path) :
     return sequenza
 
 def compareTools(reg1, reg2) :
+    print(reg1.keys())
+    sys.exit()
     regs = lc.getFragments(reg1, reg2)
     comp = lc.doComparison2(regs, reg1, reg2)
     mat = ls.doContingency(comp)
@@ -55,14 +57,14 @@ def compareTools(reg1, reg2) :
     num = ls.regionNumber(regs)
     base = ls.baseSimilarity(regs, reg1, reg2)
     regions = ls.regSimilarity(regs, reg1, reg2)
-    st = "{nr}\t{bs}\t{rs}\t{mcca}\t{mccn}\t{mccl}\t{mccd}\t{jcc}".format(
+    st = "{nr}\t{bs}\t{rs}\t{mcca}\t{mccn}\t{mccl}\t{mccd}\t{jcc}\t{jcca}\t{jccn}\t{jccl}\t{jccd}\t{pur1}\t{pur2}\t{plo1}\t{plo2}".format(
         nr = num, bs = base, rs = regions, mcca = mat["A"]["MCC"], mccn = mat["N"]["MCC"], mccl = mat["L"]["MCC"], mccd = mat["D"]["MCC"], jcc = jcc)
     return st
 
 def createFile(name) :
     """Creates a new file with the name passed as parameter. Prints the header in the file"""
     with open(name, "w") as fi :
-        fi.write("ID1\tID2\tREGIONS\tBASEsim\tREGIONsim\tMCCamp\tMCCnorm\tMCCloh\tMCCdel\tJCC\n")
+        fi.write("ID1\tID2\tREGIONS\tBASEsim\tREGIONsim\tMCCamp\tMCCnorm\tMCCloh\tMCCdel\tJCC\tJCCamp\tJCCnorm\tJCCloh\tJCCdel\tpurity1\tpurity2\tploidy1\tploidy2\n")
 
 def main() :
     # Constants
