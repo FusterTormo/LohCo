@@ -51,7 +51,6 @@ def getJaccard(comp, a) :
     return comp[a][a]/(comp[a]["A"] + comp[a]["L"] + comp[a]["N"] + comp[a]["D"] + comp["A"][a] + comp["L"][a] + comp["N"][a] + comp["D"][a])
 
 def compareTools(reg1, reg2) :
-    print(reg1.keys())
     regs = lc.getFragments(reg1, reg2)
     comp = lc.doComparison2(regs, reg1, reg2)
     mat = ls.doContingency(comp)
