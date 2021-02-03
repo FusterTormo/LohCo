@@ -152,6 +152,9 @@ def extractAscatArray(path) :
                     ar[chr].append(reg)
                 else :
                     ar[chr] = [reg]
+    ar["likelyhood"] = 'NA'
+    ar["purity"] = 'NA'
+    ar["ploidy"] = 'NA'
     return ar
 
 def extractFacets(path, verbosity = "warning") :
