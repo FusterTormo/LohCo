@@ -49,7 +49,7 @@ def getSequenza(path) :
 
 def getJaccard(comp, a) :
     try :
-        return comp[a][a]/(comp[a]["A"] + comp[a]["L"] + comp[a]["N"] + comp[a]["D"] + comp["A"][a] + comp["L"][a] + comp["N"][a] + comp["D"][a])
+        return comp[a][a]/(comp[a]["A"] + comp[a]["L"] + comp[a]["N"] + comp[a]["D"] + comp["A"][a] + comp["L"][a] + comp["N"][a] + comp["D"][a] -comp[a][a])
     except ZeroDivisionError:
         return 0
 
