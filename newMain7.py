@@ -258,4 +258,19 @@ print("{} cases considered positive in BRCA1".format(totalPos))
 for k in dcPos.keys() :
     print("\t{}".format(k))
     for key, value in dcPos[k].items() :
-        print("{} -> {} found".format(key, value))
+        print("\t\t{} -> {} found".format(key, value))
+    print("{.2f}% LOH".format(100 * (dcPos[k]["D"] + dcPos[k]["L"])/totalPos))
+
+print("\n{} cases considered negative in BRCA1".format(totalNeg))
+for k in dcNeg.keys() :
+    print("\t{}".format(k))
+    for key, value in dcNeg[k].items() :
+        print("\t\t{} -> {} found".format(key, value))
+    print("{.2f}% LOH".format(100 * (dcNeg[k]["D"] + dcNeg[k]["L"])/totalPos))
+
+print("\n{} cases considered unknown in BRCA1".format(totalNeu))
+for k in dcNeu.keys() :
+    print("\t{}".format(k))
+    for key, value in dcNeu[k].items() :
+        print("\t\t{} -> {} found".format(key, value))
+    print("{.2f}% LOH".format(100 * (dcNeu[k]["D"] + dcNeu[k]["L"])/totalPos))
