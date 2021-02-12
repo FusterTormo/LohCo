@@ -11,6 +11,54 @@ import main1 as lib
 dbcon = sqlite3.connect("/g/strcombio/fsupek_cancer2/TCGA_bam/info/info.db")
 wd = "/g/strcombio/fsupek_cancer2/TCGA_bam/OV"
 
+# Functions
+def getMaxMaf(ls) :
+    maf = -1
+    for l in ls :
+        try :
+            aux = float(l)
+            if aux >= maf :
+                maf = aux
+        except ValueError :
+            pass
+    if maf == -1 :
+        maf = "NA"
+
+    return maf
+
+def getVariant(path, gene) :
+    removableVars = ["intergenic", "intronic", "unkwnonw", "downstream", "upstream"]
+    noMaf = []
+    wMaf = {"varType1" : "", "varType2" : "", "maf" : 2}
+
+    # Find the variants called in BRCA1
+    cmd = "grep {gene} {vc}".format(vc = path, gene = gene)
+    pr = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    std, err = pr.communicate()
+    out = std.decode().strip().split("\n")
+    for tmp in out :
+        aux = tmp.split("\t")
+        try :
+            varType = aux[5]
+            varType2 = aux[8]
+            if varType not in removableVars :
+                maf = getMaxMaf(aux[10:39])
+                if maf == "NA" :
+                    noMaf.append([varType, varType2, maf, aux[-1]])
+                else :
+                    if maf < wMaf["maf"] :
+                        wMaf["varType1"] = varType
+                        wMaf["varType2"] = varType2
+                        wMaf["maf"] = maf
+                        wMaf["GT"] = aux[-1]
+        except IndexError :
+            pass
+
+    if wMaf["maf"] < 2 :
+        return (wMaf, noMaf)
+    else :
+        return (None, noMaf)
+
 # Get submitters list
 with dbcon :
       cur = dbcon.cursor()
@@ -34,11 +82,11 @@ for c in cases :
             cf = "{wd}/{sub}/{control}".format(wd = wd, sub = c[0], control = cn[0])
             workindir = "{wd}/{sub}".format(wd = wd, sub = c[0])
             analysisdir = "{}_VS_{}".format(tm[0].split("-")[0], cn[0].split("-")[0]) # The folder format for FACETS, ascatNGS, and Sequenza is "[tumorUUID]_VS_[controlUUID]""
-            vcf = "{}/platypusGerm/platypus.hg38_multianno.txt".format(tf)
+            vct = "{}/platypusGerm/platypus.hg38_multianno.txt".format(tf)
             vcc = "{}/platypusGerm/platypus.hg38_multianno.txt".format(cf)
             # Check both variant calling files exist
-            if os.path.isfile(vcf) :
-                auxDc["vcfFiles"].append(vcf)
+            if os.path.isfile(vct) :
+                auxDc["vcfFiles"].append(vct)
             if os.path.isfile(vcc) :
                 auxDc["vcfFiles"].append(vcc)
             folder = "{}/ASCAT2".format(workindir)
@@ -56,5 +104,9 @@ for c in cases :
             if len(auxDc["vcfFiles"]) > len(submitter["vcfFiles"]) and len(auxDc["lohFiles"]) > len(submitter["vcfFiles"]) :
                 submitter = auxDc.copy()
 
-    print(c)
-    print(submitter)
+    # Get the variants in BRCA1 and BRCA2 genes
+    if len(submitter["vcfFiles"] == 2) :
+        maf, noMaf = getVariant(submitter["vcfFiles"][1], "BRCA1")
+        print(maf)
+        print(noMaf)
+        print()
