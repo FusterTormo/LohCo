@@ -131,13 +131,13 @@ def doLoh(path, region) :
 brca1 = ["17", 43044295, 43170245]
 brca2 = ["13", 32315086, 32400266]
 totalPos = 0
-dcPos = {"ascat2" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0}, "facets" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0},
+dcPos = {"ascat2" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0, "NF" : 0}, "facets" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0},
 "ascatngs" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0}, "sequenza" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0}}
 totalNeg = 0
-dcNeg = {"ascat2" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0}, "facets" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0},
+dcNeg = {"ascat2" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0, "NF" : 0}, "facets" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0},
 "ascatngs" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0}, "sequenza" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0}}
 totalNeu = 0
-dcNeu = {"ascat2" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0}, "facets" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0},
+dcNeu = {"ascat2" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0, "NF" : 0}, "facets" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0},
 "ascatngs" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0}, "sequenza" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0}}
 # Get submitters list
 with dbcon :
