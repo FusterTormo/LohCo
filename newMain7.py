@@ -130,6 +130,15 @@ def doLoh(path, region) :
 # Main program
 brca1 = ["17", 43044295, 43170245]
 brca2 = ["13", 32315086, 32400266]
+totalPos = 0
+dcPos = {"ascat2" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0}, "facets" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0},
+"ascatngs" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0}, "sequenza" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0}}
+totalNeg = 0
+dcNeg = {"ascat2" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0}, "facets" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0},
+"ascatngs" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0}, "sequenza" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0}}
+totalNeu = 0
+dcNeu = {"ascat2" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0}, "facets" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0},
+"ascatngs" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0}, "sequenza" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0}}
 # Get submitters list
 with dbcon :
       cur = dbcon.cursor()
@@ -185,25 +194,58 @@ for c in cases :
         # Get LOH in the region
         try :
             prog1, loh1 = doLoh(submitter["lohFiles"][0], brca1)
+            if varClass == "+" :
+                dcPos[prog1][loh1] += 1
+            elif varClass == "-" :
+                dcNeg[prog1][loh1] += 1
+            elif varClass == "?" :
+                dcNeu[prog1][loh1] += 1
         except IndexError :
             prog1 = None
             loh1 = None
         try :
             prog2, loh2 = doLoh(submitter["lohFiles"][1], brca1)
+            if varClass == "+" :
+                dcPos[prog2][loh2] += 1
+            elif varClass == "-" :
+                dcNeg[prog2][loh2] += 1
+            elif varClass == "?" :
+                dcNeu[prog2][loh2] += 1
         except IndexError :
             prog2 = None
             loh2 = None
         try :
             prog3, loh3 = doLoh(submitter["lohFiles"][2], brca1)
+            if varClass == "+" :
+                dcPos[prog3][loh3] += 1
+            elif varClass == "-" :
+                dcNeg[prog3][loh3] += 1
+            elif varClass == "?" :
+                dcNeu[prog3][loh3] += 1
         except IndexError :
             prog3 = None
             loh3 = None
         try :
             prog4, loh4 = doLoh(submitter["lohFiles"][3], brca1)
+            if varClass == "+" :
+                dcPos[prog4][loh4] += 1
+            elif varClass == "-" :
+                dcNeg[prog4][loh4] += 1
+            elif varClass == "?" :
+                dcNeu[prog4][loh4] += 1
         except IndexError :
             prog4 = None
             loh4 = None
+        # Count the number of each
+        if varClass == "+" :
+            totalPos += 1
+        elif varClass == "-" :
+            totalNeg += 1
+        elif varClass == "?" :
+            totalNeu += 1
         # # IDEA: Podria fer multiprocessing en la busqueda de cada arxiu LOH
         print("{} -> {} - {}".format(submitter["lohFiles"][0], prog1, loh1))
         print("{} -> {} - {}".format(submitter["lohFiles"][1], prog2, loh2))
         print("{} -> {} - {}".format(submitter["lohFiles"][2], prog3, loh3))
+        print(dcPos)
+        
