@@ -3,9 +3,11 @@
 
 import os
 import sqlite3
+import subprocess
 import sys
 
 import main1 as lib
+import libconstants as ctes
 
 # Constants
 dbcon = sqlite3.connect("/g/strcombio/fsupek_cancer2/TCGA_bam/info/info.db")
@@ -44,7 +46,7 @@ def getVariant(path, gene) :
             if varType not in removableVars :
                 maf = getMaxMaf(aux[10:39])
                 if maf == "NA" :
-                    noMaf.append([varType, varType2, maf, aux[-1]])
+                    noMaf.append([{"varType" : varType, "varType2" : varType2, "maf" : maf, "GT": aux[-1]}])
                 else :
                     if maf < wMaf["maf"] :
                         wMaf["varType1"] = varType
@@ -58,6 +60,36 @@ def getVariant(path, gene) :
         return (wMaf, noMaf)
     else :
         return (None, noMaf)
+
+
+def classifyVariants(maf, noMaf) :
+    maxMaf = 0.05
+    classification = "-"
+    if maf is not None :
+        if maf["varType"] == "exonic" :
+            if maf["varType2"] in ctes.var_negative :
+                classification = "-"
+            elif maf["varType2"] in ctes.var_positive :
+                classification = "+"
+            else :
+                if mav["maf"] <= maxMaf :
+                    classification = "+"
+                else :
+                    classification = "?"
+        elif maf["varType"] == "splicing" :
+            classification = "+"
+
+    if classification == "-" or classification == "?" :
+        for v in noMaf :
+            if v["varType"] == "exonic" :
+                if v["varType2"] in ctes.var_neutral or v["varType2"] in ctes.var_positive :
+                    classification == "+"
+                    break
+            elif v["varType"] == "splicing" :
+                classification = "+"
+                break
+    return classification
+
 
 # Get submitters list
 with dbcon :
@@ -105,8 +137,13 @@ for c in cases :
                 submitter = auxDc.copy()
 
     # Get the variants in BRCA1 and BRCA2 genes
-    if len(submitter["vcfFiles"] == 2) :
-        maf, noMaf = getVariant(submitter["vcfFiles"][1], "BRCA1")
-        print(maf)
-        print(noMaf)
-        print()
+    if len(submitter["vcfFiles"]) == 2 :
+        gmmaf, gmnoMaf = getVariant(submitter["vcfFiles"][1], "BRCA1")
+        # IDEA: Podria fer multiprocessing en aquesta busqueda
+        #tmmaf, tmnoMaf = getVariant(submitter["vcfFiles"][0], "BRCA1")
+        # # IDEA: Podria fer multiprocessing en la busqueda de cada arxiu LOH
+        # Classify the variants according to the pathogenicity
+        varClass = classifyVariants(gmmaf, gmnoMaf)
+        print(gmmaf)
+        print(gmnoMaf)
+        print(varClass)
