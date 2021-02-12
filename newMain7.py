@@ -26,10 +26,10 @@ for c in cases :
         controls = q.fetchall()
 
     # Get the pair tumor/control with more files
-    submitter = {"tumor" : "", "control" : "", "vcfFiles" : 0, "lohFiles" : 0}
+    submitter = {"tumor" : "", "control" : "", "vcfFiles" : [], "lohFiles" : []}
     for tm in tumors :
         for cn in controls :
-            auxDc = {"tumor" : tm[0], "control" : cn[0], "vcfFiles" : 0, "lohFiles" : 0}
+            auxDc = {"tumor" : tm[0], "control" : cn[0], "vcfFiles" : [], "lohFiles" : []}
             tf = "{wd}/{sub}/{tumor}".format(wd = wd, sub = c[0], tumor = tm[0])
             cf = "{wd}/{sub}/{control}".format(wd = wd, sub = c[0], control = cn[0])
             workindir = "{wd}/{sub}".format(wd = wd, sub = c[0])
@@ -38,17 +38,23 @@ for c in cases :
             vcc = "{}/platypusGerm/platypus.hg38_multianno.txt".format(cf)
             # Check both variant calling files exist
             if os.path.isfile(vcf) :
-                auxDc["vcfFiles"] += 1
+                auxDc["vcfFiles"].append(vcf)
             if os.path.isfile(vcc) :
-                auxDc["vcfFiles"] += 1
+                auxDc["vcfFiles"].append(vcc)
             folder = "{}/ASCAT2".format(workindir)
             if os.path.isdir(folder) and len(os.listdir(folder)) > 0:
-                auxDc["lohFiles"] += 1
-            if os.path.isfile("{wd}/{folder}_FACETS/facets_comp_cncf.tsv".format(wd = workindir, folder = analysisdir)) :
-                auxDc["lohFiles"] += 1
-            if lib.findAscatName("{wd}/{folder}_ASCAT/".format(wd = workindir, folder = analysisdir)) != "Not found" :
-                auxDc["lohFiles"] += 1
-            if os.path.isfile("{wd}/{folder}_Sequenza/{case}_segments.txt".format(folder = analysisdir, case = c[0], wd = workindir)) :
-                auxDc["lohFiles"] += 1
-            print(c)
-            print(auxDc)
+                auxDc["lohFiles"].append(folder)
+            facets = "{wd}/{folder}_FACETS/facets_comp_cncf.tsv".format(wd = workindir, folder = analysisdir)
+            if os.path.isfile(facets) :
+                auxDc["lohFiles"].append(facets)
+            ascatngs = lib.findAscatName("{wd}/{folder}_ASCAT/".format(wd = workindir, folder = analysisdir))
+            if ascatngs != "Not found" :
+                auxDc["lohFiles"].append(ascatngs)
+            sequenza = "{wd}/{folder}_Sequenza/{case}_segments.txt".format(folder = analysisdir, case = c[0], wd = workindir)
+            if os.path.isfile(sequenza) :
+                auxDc["lohFiles"].append(sequenza)
+            if len(auxDc["vcfFiles"]) > len(submitter["vcfFiles"]) and len(auxDc["lohFiles"]) > len(submitter["vcfFiles"]) :
+                submitter = auxDc.copy()
+
+    print(c)
+    print(submitter)
