@@ -46,7 +46,7 @@ def getVariant(path, gene) :
             if varType not in removableVars :
                 maf = getMaxMaf(aux[10:39])
                 if maf == "NA" :
-                    noMaf.append([{"varType" : varType, "varType2" : varType2, "maf" : maf, "GT": aux[-1]}])
+                    noMaf.append([{"varType1" : varType, "varType2" : varType2, "maf" : maf, "GT": aux[-1]}])
                 else :
                     if maf < wMaf["maf"] :
                         wMaf["varType1"] = varType
@@ -66,7 +66,7 @@ def classifyVariants(maf, noMaf) :
     maxMaf = 0.05
     classification = "-"
     if maf is not None :
-        if maf["varType"] == "exonic" :
+        if maf["varType1"] == "exonic" :
             if maf["varType2"] in ctes.var_negative :
                 classification = "-"
             elif maf["varType2"] in ctes.var_positive :
@@ -76,16 +76,16 @@ def classifyVariants(maf, noMaf) :
                     classification = "+"
                 else :
                     classification = "?"
-        elif maf["varType"] == "splicing" :
+        elif maf["varType1"] == "splicing" :
             classification = "+"
 
     if classification == "-" or classification == "?" :
         for v in noMaf :
-            if v["varType"] == "exonic" :
+            if v["varType1"] == "exonic" :
                 if v["varType2"] in ctes.var_neutral or v["varType2"] in ctes.var_positive :
                     classification == "+"
                     break
-            elif v["varType"] == "splicing" :
+            elif v["varType1"] == "splicing" :
                 classification = "+"
                 break
     return classification
