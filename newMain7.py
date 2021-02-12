@@ -243,9 +243,15 @@ for c in cases :
             totalNeg += 1
         elif varClass == "?" :
             totalNeu += 1
-        # # IDEA: Podria fer multiprocessing en la busqueda de cada arxiu LOH
-        print("{} -> {} - {}".format(submitter["lohFiles"][0], prog1, loh1))
-        print("{} -> {} - {}".format(submitter["lohFiles"][1], prog2, loh2))
-        print("{} -> {} - {}".format(submitter["lohFiles"][2], prog3, loh3))
-        print(dcPos)
-        
+        # # # IDEA: Podria fer multiprocessing en la busqueda de cada arxiu LOH
+        # print("{} -> {} - {}".format(submitter["lohFiles"][0], prog1, loh1))
+        # print("{} -> {} - {}".format(submitter["lohFiles"][1], prog2, loh2))
+        # print("{} -> {} - {}".format(submitter["lohFiles"][2], prog3, loh3))
+        # print(dcPos)
+
+print(totalPos)
+print(dcPos)
+print()
+print(totalNeu)
+print(dcNeu)
+print()
