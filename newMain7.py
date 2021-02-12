@@ -46,7 +46,7 @@ def getVariant(path, gene) :
             if varType not in removableVars :
                 maf = getMaxMaf(aux[10:39])
                 if maf == "NA" :
-                    noMaf.append([{"varType1" : varType, "varType2" : varType2, "maf" : maf, "GT": aux[-1]}])
+                    noMaf.append({"varType1" : varType, "varType2" : varType2, "maf" : maf, "GT": aux[-1]})
                 else :
                     if maf < wMaf["maf"] :
                         wMaf["varType1"] = varType
@@ -72,7 +72,7 @@ def classifyVariants(maf, noMaf) :
             elif maf["varType2"] in ctes.var_positive :
                 classification = "+"
             else :
-                if mav["maf"] <= maxMaf :
+                if maf["maf"] <= maxMaf :
                     classification = "+"
                 else :
                     classification = "?"
@@ -83,14 +83,31 @@ def classifyVariants(maf, noMaf) :
         for v in noMaf :
             if v["varType1"] == "exonic" :
                 if v["varType2"] in ctes.var_neutral or v["varType2"] in ctes.var_positive :
-                    classification == "+"
+                    classification = "+"
                     break
             elif v["varType1"] == "splicing" :
                 classification = "+"
                 break
     return classification
 
+def doLoh(path, region) :
+    program = ""
+    loh = ""
+    # Get from which program is the output
+    if path.endswith("facets_comp_cncf.tsv") :
+        program = "facets"
+    elif path.endswith("copynumber.caveman.csv") :
+        program = "ascatngs"
+    elif path.endswith("_segments.txt") :
+        program = "sequenza"
+    else :
+        program = "ascat2"
+    loh = lib.getLOH(path, program, region)
+    return (program, loh)
 
+# Main program
+brca1 = ["17", 43044295, 43170245]
+brca2 = ["13", 32315086, 32400266]
 # Get submitters list
 with dbcon :
       cur = dbcon.cursor()
@@ -141,9 +158,30 @@ for c in cases :
         gmmaf, gmnoMaf = getVariant(submitter["vcfFiles"][1], "BRCA1")
         # IDEA: Podria fer multiprocessing en aquesta busqueda
         #tmmaf, tmnoMaf = getVariant(submitter["vcfFiles"][0], "BRCA1")
-        # # IDEA: Podria fer multiprocessing en la busqueda de cada arxiu LOH
         # Classify the variants according to the pathogenicity
         varClass = classifyVariants(gmmaf, gmnoMaf)
-        print(gmmaf)
-        print(gmnoMaf)
-        print(varClass)
+        # Get LOH in the region
+        try :
+            prog1, loh1 = doLoh(submitter["lohFiles"][0], brca1)
+        except IndexError :
+            prog1 = None
+            loh1 = None
+        try :
+            prog2, loh2 = doLoh(submitter["lohFiles"][1], brca1)
+        except IndexError :
+            prog2 = None
+            loh2 = None
+        try :
+            prog3, loh3 = doLoh(submitter["lohFiles"][2], brca1)
+        except IndexError :
+            prog3 = None
+            loh3 = None
+        try :
+            prog4, loh4 = doLoh(submitter["lohFiles"][3], brca1)
+        except IndexError :
+            prog4 = None
+            loh4 = None
+        # # IDEA: Podria fer multiprocessing en la busqueda de cada arxiu LOH
+        print("{} -> {} - {}".format(submitter["lohFiles"][0], prog1, loh1))
+        print("{} -> {} - {}".format(submitter["lohFiles"][1], prog2, loh3))
+        print("{} -> {} - {}".format(submitter["lohFiles"][2], prog2, loh3))
