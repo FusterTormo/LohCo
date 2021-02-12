@@ -90,6 +90,24 @@ def classifyVariants(maf, noMaf) :
                 break
     return classification
 
+def checkAscat(ascat, reg) :
+    cn = "NF"
+    files = os.listdir(ascat)
+    if len(files) == 1 :
+        abs = "{}/{}".format(ascat, files[0])
+        cn = lib.getLOH(abs, "ascatarray", reg)
+    else :
+        for f in files :
+            abs = "{}/{}".format(ascat, f)
+            if cn == "" :
+                cn = lib.getLOH(abs, "ascatarray", reg)
+            else :
+                auxCn = lib.getLOH(abs, "ascatarray", reg)
+                if cn != auxCn : # If the ASCAT2 outpus does not output the same aberration, we do not include the result
+                    cn =  "NF"
+                    break
+    return cn
+
 def doLoh(path, region) :
     program = ""
     loh = ""
@@ -102,7 +120,11 @@ def doLoh(path, region) :
         program = "sequenza"
     else :
         program = "ascat2"
-    loh = lib.getLOH(path, program, region)
+    if program == "ascat2" :
+        loh = checkAscat(path, region)
+    else :
+        loh = lib.getLOH(path, program, region)
+
     return (program, loh)
 
 # Main program
@@ -183,5 +205,5 @@ for c in cases :
             loh4 = None
         # # IDEA: Podria fer multiprocessing en la busqueda de cada arxiu LOH
         print("{} -> {} - {}".format(submitter["lohFiles"][0], prog1, loh1))
-        print("{} -> {} - {}".format(submitter["lohFiles"][1], prog2, loh3))
-        print("{} -> {} - {}".format(submitter["lohFiles"][2], prog2, loh3))
+        print("{} -> {} - {}".format(submitter["lohFiles"][1], prog2, loh2))
+        print("{} -> {} - {}".format(submitter["lohFiles"][2], prog3, loh3))
