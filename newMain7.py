@@ -145,7 +145,11 @@ with dbcon :
       q = cur.execute("SELECT submitter FROM patient WHERE cancer='OV'")
       cases = q.fetchall()
 
+print("INFO: Analysis done in {} cases".format(len(cases)))
 for c in cases :
+    if (totalPos + totalNeg + totalNeu) % 100 == 0 :
+        print("{} cases analysed".format(totalPos + totalNeg + totalNeu))
+
     with dbcon :
         cur = dbcon.cursor()
         q = cur.execute("SELECT uuid, bamName FROM sample WHERE submitter='{}' AND tumor LIKE '%Tumor%'".format(c[0]))
@@ -249,9 +253,9 @@ for c in cases :
         # print("{} -> {} - {}".format(submitter["lohFiles"][2], prog3, loh3))
         # print(dcPos)
 
-print(totalPos)
-print(dcPos)
-print()
-print(totalNeu)
-print(dcNeu)
-print()
+print("INFO: Final results\n")
+print("{} cases considered positive in BRCA1".format(totalPos))
+for k in dcPos.keys() :
+    print("\t{}".format(k))
+    for key, value in dcPos[k].items() :
+        print("{} -> {} found".format(key, value))
