@@ -62,8 +62,7 @@ def getVariant(path, gene) :
         return (None, noMaf)
 
 
-def classifyVariants(maf, noMaf) :
-    maxMaf = 0.05
+def classifyVariants(maf, noMaf, maxMaf) :
     classification = "-"
     if maf is not None :
         if maf["varType1"] == "exonic" :
@@ -129,7 +128,7 @@ def doLoh(path, region) :
 
 
 # Main program
-def main(brcagene, genename) :
+def main(brcagene, genename, maxMaf = 0.01) :
     totalPos = 0
     dcPos = {"ascat2" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0, "NF" : 0}, "facets" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0},
     "ascatngs" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0}, "sequenza" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0}}
@@ -194,7 +193,7 @@ def main(brcagene, genename) :
             # IDEA: Podria fer multiprocessing en aquesta busqueda
             #tmmaf, tmnoMaf = getVariant(submitter["vcfFiles"][0], "BRCA1")
             # Classify the variants according to the pathogenicity
-            varClass = classifyVariants(gmmaf, gmnoMaf)
+            varClass = classifyVariants(gmmaf, gmnoMaf, maxMaf)
             # Get LOH in the region
             try :
                 prog1, loh1 = doLoh(submitter["lohFiles"][0], brcagene)
@@ -254,21 +253,21 @@ def main(brcagene, genename) :
             # print(dcPos)
 
     print("INFO: Final results\n")
-    print("{} cases considered positive in BRCA1".format(totalPos))
+    print("{} cases considered positive in {}".format(totalPos, genename))
     for k in dcPos.keys() :
         print("\t{} ({} analyses)".format(k, sum(dcPos[k].values())))
         for key, value in dcPos[k].items() :
             print("\t\t{} -> {} found".format(key, value))
         print("\t\t\t{:.2f}% LOH".format(100 * (dcPos[k]["D"] + dcPos[k]["L"])/totalPos))
 
-    print("\n{} cases considered negative in BRCA1".format(totalNeg))
+    print("\n{} cases considered negative in {}".format(totalNeg, genename))
     for k in dcNeg.keys() :
         print("\t{} ({} analyses)".format(k, sum(dcPos[k].values())))
         for key, value in dcNeg[k].items() :
             print("\t\t{} -> {} found".format(key, value))
         print("\t\t\t{:.2f}% LOH".format(100 * (dcNeg[k]["D"] + dcNeg[k]["L"])/totalPos))
 
-    print("\n{} cases considered unknown in BRCA1".format(totalNeu))
+    print("\n{} cases considered unknown in {}".format(totalNeu, genename))
     for k in dcNeu.keys() :
         print("\t{} ({} analyses)".format(k, sum(dcPos[k].values())))
         for key, value in dcNeu[k].items() :
@@ -277,4 +276,5 @@ def main(brcagene, genename) :
 
 brca1 = ["17", 43044295, 43170245]
 brca2 = ["13", 32315086, 32400266]
-main(brca1, "BRCA1")
+maxMaf = 0.05
+main(brca1, "BRCA1", maxMaf)
