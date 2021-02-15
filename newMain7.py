@@ -128,7 +128,7 @@ def doLoh(path, region) :
 
 
 # Main program
-def main(brcagene, genename, maxMaf = 0.01) :
+def main(brcagene, genename, vcPath, maxMaf = 0.01) :
     totalPos = 0
     dcPos = {"ascat2" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0, "NF" : 0}, "facets" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0},
     "ascatngs" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0}, "sequenza" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0}}
@@ -165,8 +165,8 @@ def main(brcagene, genename, maxMaf = 0.01) :
                 cf = "{wd}/{sub}/{control}".format(wd = wd, sub = c[0], control = cn[0])
                 workindir = "{wd}/{sub}".format(wd = wd, sub = c[0])
                 analysisdir = "{}_VS_{}".format(tm[0].split("-")[0], cn[0].split("-")[0]) # The folder format for FACETS, ascatNGS, and Sequenza is "[tumorUUID]_VS_[controlUUID]""
-                vct = "{}/platypusGerm/platypus.hg38_multianno.txt".format(tf)
-                vcc = "{}/platypusGerm/platypus.hg38_multianno.txt".format(cf)
+                vct = vcPath.format(tf)
+                vcc = vcPath.format(cf)
                 # Check both variant calling files exist
                 if os.path.isfile(vct) :
                     auxDc["vcfFiles"].append(vct)
@@ -252,7 +252,11 @@ def main(brcagene, genename, maxMaf = 0.01) :
             # print("{} -> {} - {}".format(submitter["lohFiles"][2], prog3, loh3))
             # print(dcPos)
 
-    print("INFO: Final results\n")
+    print("INFO: Final results. {} were able to analyse\n".format(totalNeg + totalNeu + totalPos))
+    if vcPath.find("platypusGerm") > 0 :
+        print("INFO: Using Platypus as variant caller")
+    elif vcPath.find("strelkaGerm") > 0 :
+        print("INFO: Using Strelka2 as variant caller")
     print("{} cases considered positive in {}".format(totalPos, genename))
     for k in dcPos.keys() :
         print("\t{} ({} analyses)".format(k, sum(dcPos[k].values())))
@@ -277,4 +281,6 @@ def main(brcagene, genename, maxMaf = 0.01) :
 brca1 = ["17", 43044295, 43170245]
 brca2 = ["13", 32315086, 32400266]
 maxMaf = 0.05
-main(brca1, "BRCA1", maxMaf)
+variantCallingFile = "{}/platypusGerm/platypus.hg38_multianno.txt"
+#variantCallingFile = "{}/strelkaGerm/results/variants/strelka.hg38_multianno.txt"
+main(brca1, "BRCA1", variantCallingFile, maxMaf)
