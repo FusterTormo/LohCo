@@ -266,17 +266,17 @@ def main(brcagene, genename, vcPath, maxMaf = 0.01) :
 
     print("\n{} cases considered negative in {}".format(totalNeg, genename))
     for k in dcNeg.keys() :
-        print("\t{} ({} analyses)".format(k, sum(dcPos[k].values())))
+        print("\t{} ({} analyses)".format(k, sum(dcNeg[k].values())))
         for key, value in dcNeg[k].items() :
             print("\t\t{} -> {} found".format(key, value))
-        print("\t\t\t{:.2f}% LOH".format(100 * (dcNeg[k]["D"] + dcNeg[k]["L"])/totalPos))
+        print("\t\t\t{:.2f}% LOH".format(100 * (dcNeg[k]["D"] + dcNeg[k]["L"])/totalNeg))
 
     print("\n{} cases considered unknown in {}".format(totalNeu, genename))
     for k in dcNeu.keys() :
-        print("\t{} ({} analyses)".format(k, sum(dcPos[k].values())))
+        print("\t{} ({} analyses)".format(k, sum(dcNeu[k].values())))
         for key, value in dcNeu[k].items() :
             print("\t\t{} -> {} found".format(key, value))
-        print("\t\t\t{:.2f}% LOH".format(100 * (dcNeu[k]["D"] + dcNeu[k]["L"])/totalPos))
+        print("\t\t\t{:.2f}% LOH".format(100 * (dcNeu[k]["D"] + dcNeu[k]["L"])/totalNeu))
 
 brca1 = ["17", 43044295, 43170245]
 brca2 = ["13", 32315086, 32400266]
