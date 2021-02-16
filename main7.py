@@ -271,7 +271,7 @@ def main(brcagene, genename, vcPath, maxMaf = 0.01) :
         print("\t{} ({} analyses)".format(k, sum(dcPos[k].values())))
         nf = totalPos - sum(dcPos[k].values()) + dcPos[k]["NF"]
         dcPos[k]["NF"] = nf
-        
+
         for key, value in dcPos[k].items() :
             print("\t\t{} -> {} found".format(key, value))
         print("\t\t\t{:.2f}% LOH".format(100 * (dcPos[k]["D"] + dcPos[k]["L"])/totalPos))
@@ -279,7 +279,7 @@ def main(brcagene, genename, vcPath, maxMaf = 0.01) :
     print("\n{} cases considered negative in {}".format(totalNeg, genename))
     for k in dcNeg.keys() :
         print("\t{} ({} analyses)".format(k, sum(dcNeg[k].values())))
-        nf = totalPos - sum(dcNeg[k].values()) + dcNeg[k]["NF"]
+        nf = totalNeg - sum(dcNeg[k].values()) + dcNeg[k]["NF"]
         dcNeg[k]["NF"] = nf
 
         for key, value in dcNeg[k].items() :
@@ -289,7 +289,7 @@ def main(brcagene, genename, vcPath, maxMaf = 0.01) :
     print("\n{} cases considered unknown in {}".format(totalNeu, genename))
     for k in dcNeu.keys() :
         print("\t{} ({} analyses)".format(k, sum(dcNeu[k].values())))
-        nf = totalPos - sum(dcNeu[k].values()) + dcNeu[k]["NF"]
+        nf = totalNeu - sum(dcNeu[k].values()) + dcNeu[k]["NF"]
         dcNeu[k]["NF"] = nf
 
         for key, value in dcNeu[k].items() :
