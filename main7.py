@@ -260,13 +260,27 @@ def main(brcagene, genename, vcPath, maxMaf = 0.01) :
     print("{} cases considered positive in {}".format(totalPos, genename))
     for k in dcPos.keys() :
         print("\t{} ({} analyses)".format(k, sum(dcPos[k].values())))
+        if "NF" in dcPos[k].keys() :
+            nf = totalPos - sum(dcPos[k].values()) + dcPos["NF"]
+            dcPos["NF"] = nf
+        else :
+            nf = totalPos - sum(dcPos[k].values())
+            dcPos[k]["NF"] = nf
         for key, value in dcPos[k].items() :
             print("\t\t{} -> {} found".format(key, value))
         print("\t\t\t{:.2f}% LOH".format(100 * (dcPos[k]["D"] + dcPos[k]["L"])/totalPos))
 
+    print(dcPos.keys())
+    print(dcPos.values())
     print("\n{} cases considered negative in {}".format(totalNeg, genename))
     for k in dcNeg.keys() :
         print("\t{} ({} analyses)".format(k, sum(dcNeg[k].values())))
+        if "NF" in dcNeg[k].keys() :
+            nf = totalPos - sum(dcNeg[k].values()) + dcNeg["NF"]
+            dcNeg["NF"] = nf
+        else :
+            nf = totalPos - sum(dcNeg[k].values())
+            dcNeg[k]["NF"] = nf
         for key, value in dcNeg[k].items() :
             print("\t\t{} -> {} found".format(key, value))
         print("\t\t\t{:.2f}% LOH".format(100 * (dcNeg[k]["D"] + dcNeg[k]["L"])/totalNeg))
@@ -274,9 +288,16 @@ def main(brcagene, genename, vcPath, maxMaf = 0.01) :
     print("\n{} cases considered unknown in {}".format(totalNeu, genename))
     for k in dcNeu.keys() :
         print("\t{} ({} analyses)".format(k, sum(dcNeu[k].values())))
+        if "NF" in dcNeu[k].keys() :
+            nf = totalPos - sum(dcNeu[k].values()) + dcNeu["NF"]
+            dcNeu["NF"] = nf
+        else :
+            nf = totalPos - sum(dcNeu[k].values())
+            dcNeu[k]["NF"] = nf
         for key, value in dcNeu[k].items() :
             print("\t\t{} -> {} found".format(key, value))
         print("\t\t\t{:.2f}% LOH".format(100 * (dcNeu[k]["D"] + dcNeu[k]["L"])/totalNeu))
+
 
 brca1 = ["17", 43044295, 43170245]
 brca2 = ["13", 32315086, 32400266]
