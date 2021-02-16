@@ -252,7 +252,7 @@ def main(brcagene, genename, vcPath, maxMaf = 0.01) :
             # print("{} -> {} - {}".format(submitter["lohFiles"][2], prog3, loh3))
             # print(dcPos)
 
-    print("INFO: Final results. {} were able to analyse\n".format(totalNeg + totalNeu + totalPos))
+    print("\nINFO: Final results. {} were able to analyse".format(totalNeg + totalNeu + totalPos))
     if vcPath.find("platypusGerm") > 0 :
         print("INFO: Using Platypus as variant caller")
     elif vcPath.find("strelkaGerm") > 0 :
