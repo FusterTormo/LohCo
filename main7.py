@@ -126,6 +126,15 @@ def doLoh(path, region) :
 
     return (program, loh)
 
+def printRstring(var) :
+    str = ""
+    for k in ["ascat2", "facets", "ascatngs", "sequenza"] :
+        str += "{} <- c(".format(k)
+        for v in ["A", "L", "D", "N", "NF"] :
+            str += "{},".format(var[k][v])
+
+        str = str.strip(",") + ")"
+    return str
 
 # Main program
 def main(brcagene, genename, vcPath, maxMaf = 0.01) :
@@ -261,8 +270,8 @@ def main(brcagene, genename, vcPath, maxMaf = 0.01) :
     for k in dcPos.keys() :
         print("\t{} ({} analyses)".format(k, sum(dcPos[k].values())))
         if "NF" in dcPos[k].keys() :
-            nf = totalPos - sum(dcPos[k].values()) + dcPos["NF"]
-            dcPos["NF"] = nf
+            nf = totalPos - sum(dcPos[k].values()) + dcPos[k]["NF"]
+            dcPos[k]["NF"] = nf
         else :
             nf = totalPos - sum(dcPos[k].values())
             dcPos[k]["NF"] = nf
@@ -270,14 +279,12 @@ def main(brcagene, genename, vcPath, maxMaf = 0.01) :
             print("\t\t{} -> {} found".format(key, value))
         print("\t\t\t{:.2f}% LOH".format(100 * (dcPos[k]["D"] + dcPos[k]["L"])/totalPos))
 
-    print(dcPos.keys())
-    print(dcPos.values())
     print("\n{} cases considered negative in {}".format(totalNeg, genename))
     for k in dcNeg.keys() :
         print("\t{} ({} analyses)".format(k, sum(dcNeg[k].values())))
         if "NF" in dcNeg[k].keys() :
-            nf = totalPos - sum(dcNeg[k].values()) + dcNeg["NF"]
-            dcNeg["NF"] = nf
+            nf = totalPos - sum(dcNeg[k].values()) + dcNeg[k]["NF"]
+            dcNeg[k]["NF"] = nf
         else :
             nf = totalPos - sum(dcNeg[k].values())
             dcNeg[k]["NF"] = nf
@@ -289,14 +296,22 @@ def main(brcagene, genename, vcPath, maxMaf = 0.01) :
     for k in dcNeu.keys() :
         print("\t{} ({} analyses)".format(k, sum(dcNeu[k].values())))
         if "NF" in dcNeu[k].keys() :
-            nf = totalPos - sum(dcNeu[k].values()) + dcNeu["NF"]
-            dcNeu["NF"] = nf
+            nf = totalPos - sum(dcNeu[k].values()) + dcNeu[k]["NF"]
+            dcNeu[k]["NF"] = nf
         else :
             nf = totalPos - sum(dcNeu[k].values())
             dcNeu[k]["NF"] = nf
         for key, value in dcNeu[k].items() :
             print("\t\t{} -> {} found".format(key, value))
         print("\t\t\t{:.2f}% LOH".format(100 * (dcNeu[k]["D"] + dcNeu[k]["L"])/totalNeu))
+
+    print("INFO: Variables for R")
+    print("\tPositive")
+    print("\t\t{}".format(printRstring(dcPos)))
+    print("\tNegative")
+    print("\t\t{}".format(printRstring(dcNeg)))
+    print("\tUnknown")
+    print("\t\t{}".format(printRstring(dcNeu)))
 
 
 brca1 = ["17", 43044295, 43170245]
