@@ -6,6 +6,7 @@ import os
 import sqlite3
 import subprocess
 import sys
+import time
 
 import main1 as lib
 import libconstants as ctes
@@ -315,10 +316,12 @@ brca2 = ["13", 32315086, 32400266]
 maxMaf = 0.05
 variantCallingFile = "{}/platypusGerm/platypus.hg38_multianno.txt"
 #variantCallingFile = "{}/strelkaGerm/results/variants/strelka.hg38_multianno.txt"
-p1 = mlt.Process(targer=main, args = (brca1, "BRCA1", variantCallingFile, 0.05))
+p1 = mlt.Process(target=main, args = (brca1, "BRCA1", variantCallingFile, 0.05))
+p2 = mlt.Process(target=main, args = (brca1, "BRCA1", variantCallingFile, 0.03))
+p3 = mlt.Process(target=main, args = (brca1, "BRCA1", variantCallingFile, 0.0))
 p1.start()
-p2 = mlt.Process(targer=main, args = (brca1, "BRCA1", variantCallingFile, 0.03))
+time.sleep(10)
 p2.start()
-p3 = mlt.Process(targer=main, args = (brca1, "BRCA1", variantCallingFile, 0.0))
+time.sleep(10)
 p3.start()
 #main(brca2, "BRCA2", variantCallingFile, maxMaf)
