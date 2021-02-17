@@ -311,3 +311,4 @@ maxMaf = 0.05
 variantCallingFile = "{}/platypusGerm/platypus.hg38_multianno.txt"
 #variantCallingFile = "{}/strelkaGerm/results/variants/strelka.hg38_multianno.txt"
 main(brca1, "BRCA1", variantCallingFile, maxMaf)
+main(brca2, "BRCA2", variantCallingFile, maxMaf)
