@@ -6,6 +6,7 @@ import os
 import sqlite3
 import subprocess
 import sys
+import time
 
 import main1 as lib
 import libconstants as ctes
@@ -138,7 +139,7 @@ def printRstring(var) :
     return str
 
 # Main program
-def main(brcagene, genename, vcPath, maxMaf, output) :
+def main(brcagene, genename, vcPath, maxMaf = 0.01) :
     totalPos = 0
     dcPos = {"ascat2" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0, "NF" : 0}, "facets" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0, "NF" : 0},
     "ascatngs" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0, "NF" : 0}, "sequenza" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0, "NF" : 0}}
@@ -308,26 +309,21 @@ def main(brcagene, genename, vcPath, maxMaf, output) :
     output += "\t\t{}\n".format(printRstring(dcNeg))
     output += "\tUnknown\n"
     output += "\t\t{}\n".format(printRstring(dcNeu))
+    output += "\n------\n"
+    print(output)
 
 
 brca1 = ["17", 43044295, 43170245]
 brca2 = ["13", 32315086, 32400266]
 maxMaf = 0.05
 variantCallingFile = "{}/platypusGerm/platypus.hg38_multianno.txt"
-out1 = ""
-out2 = ""
-out3 = ""
 #variantCallingFile = "{}/strelkaGerm/results/variants/strelka.hg38_multianno.txt"
-p1 = mlt.Process(target=main, args = (brca1, "BRCA1", variantCallingFile, 0.05, out1))
-p2 = mlt.Process(target=main, args = (brca1, "BRCA1", variantCallingFile, 0.03, out2))
-p3 = mlt.Process(target=main, args = (brca1, "BRCA1", variantCallingFile, 0.0, out3))
+p1 = mlt.Process(target=main, args = (brca1, "BRCA1", variantCallingFile, 0.05))
+p2 = mlt.Process(target=main, args = (brca1, "BRCA1", variantCallingFile, 0.03))
+p3 = mlt.Process(target=main, args = (brca1, "BRCA1", variantCallingFile, 0.0))
 p1.start()
+time.sleep(40)
 p2.start()
+time.sleep(40)
 p3.start()
 #main(brca2, "BRCA2", variantCallingFile, maxMaf)
-p1.join()
-p2.join()
-p3.join()
-print(out1)
-print(out2)
-print(out3)
