@@ -138,7 +138,7 @@ def printRstring(var) :
     return str
 
 # Main program
-def main(brcagene, genename, vcPath, maxMaf = 0.01, output) :
+def main(brcagene, genename, vcPath, maxMaf, output) :
     totalPos = 0
     dcPos = {"ascat2" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0, "NF" : 0}, "facets" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0, "NF" : 0},
     "ascatngs" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0, "NF" : 0}, "sequenza" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0, "NF" : 0}}
@@ -297,17 +297,17 @@ def main(brcagene, genename, vcPath, maxMaf = 0.01, output) :
             print("\t\t{} -> {} found".format(key, value))
         print("\t\t\t{:.2f}% LOH".format(100 * (dcNeu[k]["D"] + dcNeu[k]["L"])/totalNeu))
 
-    out = "INFO: Variables for R. Params: Gene: {}, MAF: {} ".format(genename, maxMaf)
+    output = "INFO: Variables for R. Params: Gene: {}, MAF: {} ".format(genename, maxMaf)
     if vcPath.find("platypusGerm") > 0 :
-        out += "Variant caller: Platypus\n"
+        output += "Variant caller: Platypus\n"
     elif vcPath.find("strelkaGerm") > 0 :
-        out += "Variant caller: Strelka2\n"
-    out += "\tPositive\n"
-    out += "\t\t{}\n".format(printRstring(dcPos))
-    out += "\tNegative\n"
-    out += "\t\t{}\n".format(printRstring(dcNeg))
-    out += "\tUnknown\n"
-    out += "\t\t{}\n".format(printRstring(dcNeu))
+        output += "Variant caller: Strelka2\n"
+    output += "\tPositive\n"
+    output += "\t\t{}\n".format(printRstring(dcPos))
+    output += "\tNegative\n"
+    output += "\t\t{}\n".format(printRstring(dcNeg))
+    output += "\tUnknown\n"
+    output += "\t\t{}\n".format(printRstring(dcNeu))
 
 
 brca1 = ["17", 43044295, 43170245]
