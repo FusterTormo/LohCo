@@ -80,15 +80,19 @@ def classifyVariants(maf, noMaf, maxMaf) :
         elif maf["varType1"] == "splicing" :
             classification = "+"
 
-    if classification == "-" or classification == "?" :
-        for v in noMaf :
-            if v["varType1"] == "exonic" :
-                if v["varType2"] in ctes.var_neutral or v["varType2"] in ctes.var_positive :
+    if maxMaf < 0 : # If the MAF has a value below 0, we consider the variants with no MAF as unknown
+        if len(noMaf) > 0 :
+            classification = "?"
+    else :
+        if classification == "-" or classification == "?" :
+            for v in noMaf :
+                if v["varType1"] == "exonic" :
+                    if v["varType2"] in ctes.var_neutral or v["varType2"] in ctes.var_positive :
+                        classification = "+"
+                        break
+                elif v["varType1"] == "splicing" :
                     classification = "+"
                     break
-            elif v["varType1"] == "splicing" :
-                classification = "+"
-                break
     return classification
 
 def checkAscat(ascat, reg) :
@@ -312,18 +316,21 @@ def main(brcagene, genename, vcPath, maxMaf = 0.01) :
     output += "\n------\n"
     print(output)
 
-
-brca1 = ["17", 43044295, 43170245]
-brca2 = ["13", 32315086, 32400266]
-maxMaf = 0.05
-variantCallingFile = "{}/platypusGerm/platypus.hg38_multianno.txt"
-#variantCallingFile = "{}/strelkaGerm/results/variants/strelka.hg38_multianno.txt"
-p1 = mlt.Process(target=main, args = (brca1, "BRCA1", variantCallingFile, 0.05))
-p2 = mlt.Process(target=main, args = (brca1, "BRCA1", variantCallingFile, 0.03))
-p3 = mlt.Process(target=main, args = (brca1, "BRCA1", variantCallingFile, 0.0))
-p1.start()
-time.sleep(40)
-p2.start()
-time.sleep(40)
-p3.start()
-#main(brca2, "BRCA2", variantCallingFile, maxMaf)
+if __name__ == "__main__" :
+    brca1 = ["17", 43044295, 43170245]
+    brca2 = ["13", 32315086, 32400266]
+    maxMaf = 0.05
+    variantCallingFile = "{}/platypusGerm/platypus.hg38_multianno.txt"
+    #variantCallingFile = "{}/strelkaGerm/results/variants/strelka.hg38_multianno.txt"
+    p1 = mlt.Process(target=main, args = (brca1, "BRCA1", variantCallingFile, 0.05))
+    p2 = mlt.Process(target=main, args = (brca1, "BRCA1", variantCallingFile, 0.03))
+    p3 = mlt.Process(target=main, args = (brca1, "BRCA1", variantCallingFile, 0.0))
+    p4 = mlt.Process(target=main, args = (brca1, "BRCA1", variantCallingFile, -1))
+    p1.start()
+    time.sleep(40)
+    p2.start()
+    time.sleep(40)
+    p3.start()
+    time.sleep(40)
+    p4.start()
+    #main(brca2, "BRCA2", variantCallingFile, maxMaf)
