@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+import multiprocessing as mlt
 import os
 import sqlite3
 import subprocess
@@ -296,7 +297,11 @@ def main(brcagene, genename, vcPath, maxMaf = 0.01) :
             print("\t\t{} -> {} found".format(key, value))
         print("\t\t\t{:.2f}% LOH".format(100 * (dcNeu[k]["D"] + dcNeu[k]["L"])/totalNeu))
 
-    print("INFO: Variables for R")
+    print("INFO: Variables for R. Params: Gene: {}, MAF: {}".format(genename, maxMaf), end = " ")
+    if vcPath.find("platypusGerm") > 0 :
+        print("Variant caller: Platypus")
+    elif vcPath.find("strelkaGerm") > 0 :
+        print("Variant caller: Strelka2")
     print("\tPositive")
     print("\t\t{}".format(printRstring(dcPos)))
     print("\tNegative")
@@ -310,5 +315,10 @@ brca2 = ["13", 32315086, 32400266]
 maxMaf = 0.05
 variantCallingFile = "{}/platypusGerm/platypus.hg38_multianno.txt"
 #variantCallingFile = "{}/strelkaGerm/results/variants/strelka.hg38_multianno.txt"
-main(brca1, "BRCA1", variantCallingFile, maxMaf)
-main(brca2, "BRCA2", variantCallingFile, maxMaf)
+p1 = mlt.Process(targer=main, args = (brca1, "BRCA1", variantCallingFile, 0.05))
+p1.start()
+p2 = mlt.Process(targer=main, args = (brca1, "BRCA1", variantCallingFile, 0.03))
+p2.start()
+p3 = mlt.Process(targer=main, args = (brca1, "BRCA1", variantCallingFile, 0.0))
+p3.start()
+#main(brca2, "BRCA2", variantCallingFile, maxMaf)
