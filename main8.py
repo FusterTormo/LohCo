@@ -99,35 +99,31 @@ def getVariant(path, gene) :
 
     return var
 
-def classifyVariants(maf, noMaf, maxMaf) :
+def classifyVariants(vars, maxMaf) :
     classification = "-"
-    if maf is not None :
-        if maf["varType1"] == "exonic" :
-            if maf["varType2"] in ctes.var_negative :
-                classification = "-"
-            elif maf["varType2"] in ctes.var_positive :
+    for v in vars :
+        if v["varType"] == "exonic" :
+            if v["varType2"] in ctes.var_positive :
                 classification = "+"
-            else :
-                if maf["maf"] <= maxMaf :
-                    classification = "+"
-                else :
-                    classification = "?"
-        elif maf["varType1"] == "splicing" :
-            classification = "+"
-
-    if maxMaf < 0 : # If the MAF has a value below 0, we consider the variants with no MAF as unknown
-        if len(noMaf) > 0 :
-            classification = "?"
-    else :
-        if classification == "-" or classification == "?" :
-            for v in noMaf :
-                if v["varType1"] == "exonic" :
-                    if v["varType2"] in ctes.var_neutral or v["varType2"] in ctes.var_positive :
+                break
+            elif v["varType2"] in ctes.var_neutral : # Unknown variants will be reclassified according MAF passed as parameter (maxMaf)
+                if v["maf"] == "NA" :
+                    if maxMaf >= 0 :
                         classification = "+"
                         break
-                elif v["varType1"] == "splicing" :
-                    classification = "+"
-                    break
+                    else : # When maxMaf is equal to -1, that means that mafs that are NA, will not be considered as pathogenic
+                        classification = "?"
+                else :
+                    if maf["maf"] <= maxMaf :
+                        classification = "+"
+                        break
+                    else :
+                        classification = "?"
+        elif v["varType"] == "splicing" :
+            classification = "+"
+            break
+    print(vars)
+    print(classification)
     return classification
 
 def checkAscat(ascat, reg) :
@@ -237,16 +233,15 @@ def main(brcagene, genename, vcPath, maxMaf = 0.01) :
                 if len(auxDc["vcfFiles"]) > len(submitter["vcfFiles"]) and len(auxDc["lohFiles"]) > len(submitter["vcfFiles"]) :
                     submitter = auxDc.copy()
 
-        # Get the variants in BRCA1 and BRCA2 genes
+        # Get the variants in the gene
         if len(submitter["vcfFiles"]) == 2 :
-            cnVar = getVariant(submitter["vcfFiles"][1], genename)
             tmVar = getVariant(submitter["vcfFiles"][0], genename)
-            getVafMean(cnVar, tmVar)
-
-            continue
-            # IDEA: Podria fer multiprocessing en aquesta busqueda
+            cnVar = getVariant(submitter["vcfFiles"][1], genename)
+            # Get the VAF comparison to infer possible LOH
+            meanVaf = round(getVafMean(cnVar, tmVar), 2)
             # Classify the variants according to the pathogenicity
-            varClass = classifyVariants(gmmaf, gmnoMaf, maxMaf)
+            varClass = classifyVariants(cn, maxMaf)
+
             # Get LOH in the region
             try :
                 prog1, loh1 = doLoh(submitter["lohFiles"][0], brcagene)
