@@ -53,7 +53,7 @@ def getVariant(path, gene) :
     removableVars = ["intergenic", "intronic", "unkwnonw", "downstream", "upstream"]
     noMaf = []
     var = {}
-
+    print(path)
     # Find the variants called in the gene passed as parameter
     cmd = "grep {gene} {vc}".format(vc = path, gene = gene)
     pr = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -79,7 +79,6 @@ def getVariant(path, gene) :
         except IndexError :
             pass
 
-    print(var)
     return var
 
 def classifyVariants(maf, noMaf, maxMaf) :
@@ -223,7 +222,12 @@ def main(brcagene, genename, vcPath, maxMaf = 0.01) :
         # Get the variants in BRCA1 and BRCA2 genes
         if len(submitter["vcfFiles"]) == 2 :
             cnVar = getVariant(submitter["vcfFiles"][1], genename)
-            tmVar = getVariant(submitter["vcfFiles"][0], "BRCA1")
+            tmVar = getVariant(submitter["vcfFiles"][0], genename)
+            common = 0
+            for i in cnVar.keys() :
+                if i in tmVar.keys() :
+                    common += 1
+            print("{} variants in common".format(common))
 
             continue
             # IDEA: Podria fer multiprocessing en aquesta busqueda
@@ -353,4 +357,4 @@ if __name__ == "__main__" :
     # p3.start()
     # time.sleep(40)
     # p4.start()
-    main(brca2, "BRCA2", variantCallingFile, maxMaf)
+    main(brca1, "BRCA1", variantCallingFile, maxMaf)
