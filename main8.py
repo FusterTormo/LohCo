@@ -38,7 +38,11 @@ def getVaf(info, vc) :
         for tmp in info.split(";") :
             key, val = tmp.split("=")
             if key == "TR" :
-                num = float(val)
+                try :
+                    num = float(val)
+                except ValueError : # To fix multivariant sites. Get one of the multivariant
+                    aux = val.split(",")[0]
+                    num = float(aux)
             if key == "TC" :
                 den = float(val)
         if num >= 0 and den > 0 :
@@ -53,7 +57,7 @@ def getVariant(path, gene) :
     removableVars = ["intergenic", "intronic", "unkwnonw", "downstream", "upstream"]
     noMaf = []
     var = {}
-    print(path)
+
     # Find the variants called in the gene passed as parameter
     cmd = "grep {gene} {vc}".format(vc = path, gene = gene)
     pr = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
