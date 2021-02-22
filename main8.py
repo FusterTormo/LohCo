@@ -58,9 +58,12 @@ def getVafMean(cn, tm) :
     aux = 0
     for c in cn.keys() :
         if c in tm.keys() :
-            aux = cn[c]["vaf"]/tm[c]["vaf"]
+            aux = tm[c]["vaf"]/cn[c]["vaf"]
             common.append(aux)
-    mean = sum(common)/len(common)
+    if len(common) > 0 :
+        mean = sum(common)/len(common)
+    else :
+        mean = "NA"
     print("{} variants in common. {} mean vaf".format(len(common), mean))
     return mean
 
