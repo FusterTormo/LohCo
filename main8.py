@@ -61,7 +61,7 @@ def getVafMean(cn, tm) :
             aux = tm[c]["vaf"]/cn[c]["vaf"]
             common.append(aux)
     if len(common) > 0 :
-        mean = sum(common)/len(common)
+        mean = round(sum(common)/len(common), 2)
     else :
         mean = "NA"
     print("{} variants in common. {} mean vaf".format(len(common), mean))
@@ -237,7 +237,7 @@ def main(brcagene, genename, vcPath, maxMaf = 0.01) :
             tmVar = getVariant(submitter["vcfFiles"][0], genename)
             cnVar = getVariant(submitter["vcfFiles"][1], genename)
             # Get the VAF comparison to infer possible LOH
-            meanVaf = round(getVafMean(cnVar, tmVar), 2)
+            meanVaf = getVafMean(cnVar, tmVar)
             # Classify the variants according to the pathogenicity
             varClass = classifyVariants(cnVar, maxMaf)
 
