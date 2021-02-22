@@ -53,6 +53,17 @@ def getVaf(info, vc) :
 
     return vaf
 
+def getVafMean(cn, tm) :
+    common = []
+    aux = 0
+    for c in cn.keys() :
+        if c in tm.keys() :
+            aux = cn[c]["vaf"]/tm[c]["vaf"]
+            common.append(aux)
+    mean = sum(common)/len(common)
+    print("{} variants in common. {} mean vaf".format(len(common), mean))
+    return mean
+
 def getVariant(path, gene) :
     removableVars = ["intergenic", "intronic", "unkwnonw", "downstream", "upstream"]
     noMaf = []
@@ -227,11 +238,7 @@ def main(brcagene, genename, vcPath, maxMaf = 0.01) :
         if len(submitter["vcfFiles"]) == 2 :
             cnVar = getVariant(submitter["vcfFiles"][1], genename)
             tmVar = getVariant(submitter["vcfFiles"][0], genename)
-            common = 0
-            for i in cnVar.keys() :
-                if i in tmVar.keys() :
-                    common += 1
-            print("{} variants in common".format(common))
+            getVafMean(cnVar, tmVar)
 
             continue
             # IDEA: Podria fer multiprocessing en aquesta busqueda
