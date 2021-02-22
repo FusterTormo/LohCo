@@ -46,7 +46,7 @@ def getVaf(info, vc) :
             if key == "TC" :
                 den = float(val)
         if num >= 0 and den > 0 :
-            vaf = 100 * num/den
+            vaf = round(100 * num/den,2)
     else :
         print("WARNING: Strelka not implemented yet")
         sys.exit()
@@ -101,8 +101,8 @@ def getVariant(path, gene) :
 
 def classifyVariants(vars, maxMaf) :
     classification = "-"
-    for v in vars :
-        if v["varType"] == "exonic" :
+    for k, v in vars.items() :
+        if v["varType1"] == "exonic" :
             if v["varType2"] in ctes.var_positive :
                 classification = "+"
                 break
@@ -114,16 +114,15 @@ def classifyVariants(vars, maxMaf) :
                     else : # When maxMaf is equal to -1, that means that mafs that are NA, will not be considered as pathogenic
                         classification = "?"
                 else :
-                    if maf["maf"] <= maxMaf :
+                    if v["maf"] <= maxMaf :
                         classification = "+"
                         break
                     else :
                         classification = "?"
-        elif v["varType"] == "splicing" :
+        elif v["varType1"] == "splicing" :
             classification = "+"
             break
-    print(vars)
-    print(classification)
+
     return classification
 
 def checkAscat(ascat, reg) :
@@ -240,7 +239,7 @@ def main(brcagene, genename, vcPath, maxMaf = 0.01) :
             # Get the VAF comparison to infer possible LOH
             meanVaf = round(getVafMean(cnVar, tmVar), 2)
             # Classify the variants according to the pathogenicity
-            varClass = classifyVariants(cn, maxMaf)
+            varClass = classifyVariants(cnVar, maxMaf)
 
             # Get LOH in the region
             try :
@@ -348,6 +347,7 @@ def main(brcagene, genename, vcPath, maxMaf = 0.01) :
     output += "\t\t{}\n".format(printRstring(dcNeu))
     output += "\n------\n"
     print(output)
+    sys.exit()
 
 if __name__ == "__main__" :
     brca1 = ["17", 43044295, 43170245]
