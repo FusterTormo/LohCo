@@ -174,22 +174,14 @@ def printRstring(var) :
 
 # Main program
 def main(brcagene, genename, vcPath, maxMaf = 0.01) :
-    totalPos = 0
-    dcPos = {"ascat2" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0, "NF" : 0}, "facets" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0, "NF" : 0},
-    "ascatngs" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0, "NF" : 0}, "sequenza" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0, "NF" : 0}}
-    totalNeg = 0
-    dcNeg = {"ascat2" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0, "NF" : 0}, "facets" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0, "NF" : 0},
-    "ascatngs" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0, "NF" : 0}, "sequenza" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0, "NF" : 0}}
-    totalNeu = 0
-    dcNeu = {"ascat2" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0, "NF" : 0}, "facets" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0, "NF" : 0},
-    "ascatngs" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0, "NF" : 0}, "sequenza" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0, "NF" : 0}}
+    cont = 0
     # Get submitters list
     with dbcon :
           cur = dbcon.cursor()
           q = cur.execute("SELECT submitter FROM patient WHERE cancer='OV'")
           cases = q.fetchall()
 
-    print("INFO: Analysis done in {} cases".format(len(cases)))
+    print("INFO: Analysis will be done in {} cases".format(len(cases)))
     for c in cases :
         if (totalPos + totalNeg + totalNeu) % 100 == 0 :
             print("{} cases analysed".format(totalPos + totalNeg + totalNeu))
@@ -234,105 +226,46 @@ def main(brcagene, genename, vcPath, maxMaf = 0.01) :
 
         # Get the variants in the gene
         if len(submitter["vcfFiles"]) == 2 :
+            cont += 1
+            temp = {"submitter" : c[0], "cmp" : analysisdir}
+            if cont % 100 == 0 :
+                print("INFO: {} cases analysed".format(cont))
             tmVar = getVariant(submitter["vcfFiles"][0], genename)
             cnVar = getVariant(submitter["vcfFiles"][1], genename)
             # Get the VAF comparison to infer possible LOH
             meanVaf = getVafMean(cnVar, tmVar)
+            temp["vafDif"] = meanVaf
             # Classify the variants according to the pathogenicity
             varClass = classifyVariants(cnVar, maxMaf)
+            temp["germVar"] = varClass
 
             # Get LOH in the region
             try :
-                prog1, loh1 = doLoh(submitter["lohFiles"][0], brcagene)
-                if varClass == "+" :
-                    dcPos[prog1][loh1] += 1
-                elif varClass == "-" :
-                    dcNeg[prog1][loh1] += 1
-                elif varClass == "?" :
-                    dcNeu[prog1][loh1] += 1
+                prog, loh = doLoh(submitter["lohFiles"][0], brcagene)
+                temp[prog] = loh
             except IndexError :
-                prog1 = None
-                loh1 = None
+                pass
             try :
-                prog2, loh2 = doLoh(submitter["lohFiles"][1], brcagene)
-                if varClass == "+" :
-                    dcPos[prog2][loh2] += 1
-                elif varClass == "-" :
-                    dcNeg[prog2][loh2] += 1
-                elif varClass == "?" :
-                    dcNeu[prog2][loh2] += 1
+                prog, loh = doLoh(submitter["lohFiles"][1], brcagene)
+                temp[prog] = loh
             except IndexError :
-                prog2 = None
-                loh2 = None
+                pass
             try :
-                prog3, loh3 = doLoh(submitter["lohFiles"][2], brcagene)
-                if varClass == "+" :
-                    dcPos[prog3][loh3] += 1
-                elif varClass == "-" :
-                    dcNeg[prog3][loh3] += 1
-                elif varClass == "?" :
-                    dcNeu[prog3][loh3] += 1
+                prog, loh = doLoh(submitter["lohFiles"][2], brcagene)
+                temp[prog] = loh
             except IndexError :
-                prog3 = None
-                loh3 = None
+                pass
             try :
-                prog4, loh4 = doLoh(submitter["lohFiles"][3], brcagene)
-                if varClass == "+" :
-                    dcPos[prog4][loh4] += 1
-                elif varClass == "-" :
-                    dcNeg[prog4][loh4] += 1
-                elif varClass == "?" :
-                    dcNeu[prog4][loh4] += 1
+                prog, loh = doLoh(submitter["lohFiles"][3], brcagene)
+                temp[prog] = loh
             except IndexError :
-                prog4 = None
-                loh4 = None
-            # Count the number of each
-            if varClass == "+" :
-                totalPos += 1
-            elif varClass == "-" :
-                totalNeg += 1
-            elif varClass == "?" :
-                totalNeu += 1
-            # # # IDEA: Podria fer multiprocessing en la busqueda de cada arxiu LOH
-            # print("{} -> {} - {}".format(submitter["lohFiles"][0], prog1, loh1))
-            # print("{} -> {} - {}".format(submitter["lohFiles"][1], prog2, loh2))
-            # print("{} -> {} - {}".format(submitter["lohFiles"][2], prog3, loh3))
-            # print(dcPos)
+                pass
+            print(temp)
 
-    print("\nINFO: Final results. {} were able to analyse".format(totalNeg + totalNeu + totalPos))
-    if vcPath.find("platypusGerm") > 0 :
-        print("INFO: Using Platypus as variant caller")
-    elif vcPath.find("strelkaGerm") > 0 :
-        print("INFO: Using Strelka2 as variant caller")
-    print("{} cases considered positive in {}".format(totalPos, genename))
-    for k in dcPos.keys() :
-        print("\t{} ({} analyses)".format(k, sum(dcPos[k].values())))
-        nf = totalPos - sum(dcPos[k].values()) + dcPos[k]["NF"]
-        dcPos[k]["NF"] = nf
+            sys.exit()
 
-        for key, value in dcPos[k].items() :
-            print("\t\t{} -> {} found".format(key, value))
-        print("\t\t\t{:.2f}% LOH".format(100 * (dcPos[k]["D"] + dcPos[k]["L"])/totalPos))
 
-    print("\n{} cases considered negative in {}".format(totalNeg, genename))
-    for k in dcNeg.keys() :
-        print("\t{} ({} analyses)".format(k, sum(dcNeg[k].values())))
-        nf = totalNeg - sum(dcNeg[k].values()) + dcNeg[k]["NF"]
-        dcNeg[k]["NF"] = nf
-
-        for key, value in dcNeg[k].items() :
-            print("\t\t{} -> {} found".format(key, value))
-        print("\t\t\t{:.2f}% LOH".format(100 * (dcNeg[k]["D"] + dcNeg[k]["L"])/totalNeg))
-
-    print("\n{} cases considered unknown in {}".format(totalNeu, genename))
-    for k in dcNeu.keys() :
-        print("\t{} ({} analyses)".format(k, sum(dcNeu[k].values())))
-        nf = totalNeu - sum(dcNeu[k].values()) + dcNeu[k]["NF"]
-        dcNeu[k]["NF"] = nf
-
-        for key, value in dcNeu[k].items() :
-            print("\t\t{} -> {} found".format(key, value))
-        print("\t\t\t{:.2f}% LOH".format(100 * (dcNeu[k]["D"] + dcNeu[k]["L"])/totalNeu))
+    print("\nINFO: Final results. {} had a sample with both vcfs (tumor and control) done".format(cont))
 
     output = "INFO: Variables for R. Params: Gene: {}, MAF: {} ".format(genename, maxMaf)
     if vcPath.find("platypusGerm") > 0 :
@@ -355,15 +288,4 @@ if __name__ == "__main__" :
     maxMaf = 0.05
     variantCallingFile = "{}/platypusGerm/platypus.hg38_multianno.txt"
     #variantCallingFile = "{}/strelkaGerm/results/variants/strelka.hg38_multianno.txt"
-    # p1 = mlt.Process(target=main, args = (brca1, "BRCA1", variantCallingFile, 0.05))
-    # p2 = mlt.Process(target=main, args = (brca1, "BRCA1", variantCallingFile, 0.03))
-    # p3 = mlt.Process(target=main, args = (brca1, "BRCA1", variantCallingFile, 0.0))
-    # p4 = mlt.Process(target=main, args = (brca1, "BRCA1", variantCallingFile, -1))
-    # p1.start()
-    # time.sleep(40)
-    # p2.start()
-    # time.sleep(40)
-    # p3.start()
-    # time.sleep(40)
-    # p4.start()
     main(brca1, "BRCA1", variantCallingFile, maxMaf)
