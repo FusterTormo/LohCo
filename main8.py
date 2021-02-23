@@ -183,9 +183,6 @@ def main(brcagene, genename, vcPath, maxMaf = 0.01) :
 
     print("INFO: Analysis will be done in {} cases".format(len(cases)))
     for c in cases :
-        if (totalPos + totalNeg + totalNeu) % 100 == 0 :
-            print("{} cases analysed".format(totalPos + totalNeg + totalNeu))
-
         with dbcon :
             cur = dbcon.cursor()
             q = cur.execute("SELECT uuid, bamName FROM sample WHERE submitter='{}' AND tumor LIKE '%Tumor%'".format(c[0]))
@@ -267,20 +264,20 @@ def main(brcagene, genename, vcPath, maxMaf = 0.01) :
 
     print("\nINFO: Final results. {} had a sample with both vcfs (tumor and control) done".format(cont))
 
-    output = "INFO: Variables for R. Params: Gene: {}, MAF: {} ".format(genename, maxMaf)
-    if vcPath.find("platypusGerm") > 0 :
-        output += "Variant caller: Platypus\n"
-    elif vcPath.find("strelkaGerm") > 0 :
-        output += "Variant caller: Strelka2\n"
-    output += "\tPositive\n"
-    output += "\t\t{}\n".format(printRstring(dcPos))
-    output += "\tNegative\n"
-    output += "\t\t{}\n".format(printRstring(dcNeg))
-    output += "\tUnknown\n"
-    output += "\t\t{}\n".format(printRstring(dcNeu))
-    output += "\n------\n"
-    print(output)
-    sys.exit()
+    # output = "INFO: Variables for R. Params: Gene: {}, MAF: {} ".format(genename, maxMaf)
+    # if vcPath.find("platypusGerm") > 0 :
+    #     output += "Variant caller: Platypus\n"
+    # elif vcPath.find("strelkaGerm") > 0 :
+    #     output += "Variant caller: Strelka2\n"
+    # output += "\tPositive\n"
+    # output += "\t\t{}\n".format(printRstring(dcPos))
+    # output += "\tNegative\n"
+    # output += "\t\t{}\n".format(printRstring(dcNeg))
+    # output += "\tUnknown\n"
+    # output += "\t\t{}\n".format(printRstring(dcNeu))
+    # output += "\n------\n"
+    # print(output)
+    # sys.exit()
 
 if __name__ == "__main__" :
     brca1 = ["17", 43044295, 43170245]
