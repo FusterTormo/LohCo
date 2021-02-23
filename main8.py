@@ -64,7 +64,7 @@ def getVafMean(cn, tm) :
         mean = round(sum(common)/len(common), 2)
     else :
         mean = "NA"
-    
+
     return mean
 
 def getVariant(path, gene) :
@@ -246,6 +246,32 @@ def main(brcagene, genename, vcPath, maxMaf = 0.01) :
 
     print("\nINFO: Final results. {} had a sample with both vcfs (tumor and control) done".format(cont))
     print(data[-1])
+    if vcPath.find("platypusGerm") > 0 :
+        vc = "Platypus"
+    elif vcPath.find("strelkaGerm") > 0 :
+        vc = "Strelka2"
+    filename = "{}_{}_{}_LOH.tsv".format(genename, maxMaf, vc)
+    print("INFO: Writing output in {}".format(filename))
+    with open(filename, "w") as fi :
+        fi.write("submitter\tanalysis\tGermlineVar\tSomaticVar\tVAFvar\tASCAT2\tFACETS\tascatNGS\tSequenza\n")
+        for l in data :
+            fi.write("{sub}\t{anal}\t{germ}\t{som}\t{vaf}\t".format(sub = l["submitter"], anal = l["cmp"], germ = l["germVar"], som = l["somVar"], vaf = l["vafDif"]))
+            if "ascat2" in l.keys() :
+                fi.write("{}\t".format(l["ascat2"]))
+            else :
+                fi.write("NA\t")
+            if "facets" in l.keys() :
+                fi.write("{}\t".format(l["facets"]))
+            else :
+                fi.write("NA\t")
+            if "ascatngs" in l.keys() :
+                fi.write("{}\t".format(l["ascatngs"]))
+            else :
+                fi.write("NA\t")
+            if "sequenza" in l.keys() :
+                fi.write("{}\n".format(l["sequenza"]))
+            else :
+                fi.write("NA\n")
     # output = "INFO: Variables for R. Params: Gene: {}, MAF: {} ".format(genename, maxMaf)
     # if vcPath.find("platypusGerm") > 0 :
     #     output += "Variant caller: Platypus\n"
@@ -264,7 +290,7 @@ def main(brcagene, genename, vcPath, maxMaf = 0.01) :
 if __name__ == "__main__" :
     brca1 = ["17", 43044295, 43170245]
     brca2 = ["13", 32315086, 32400266]
-    maxMaf = 0.05
+    maxMaf = -1
     variantCallingFile = "{}/platypusGerm/platypus.hg38_multianno.txt"
     #variantCallingFile = "{}/strelkaGerm/results/variants/strelka.hg38_multianno.txt"
     main(brca1, "BRCA1", variantCallingFile, maxMaf)
