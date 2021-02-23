@@ -64,7 +64,7 @@ def getVafMean(cn, tm) :
         mean = round(sum(common)/len(common), 2)
     else :
         mean = "NA"
-    print("{} variants in common. {} mean vaf".format(len(common), mean))
+    
     return mean
 
 def getVariant(path, gene) :

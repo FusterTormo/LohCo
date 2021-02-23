@@ -324,8 +324,9 @@ if __name__ == "__main__" :
     #variantCallingFile = "{}/strelkaGerm/results/variants/strelka.hg38_multianno.txt"
     p1 = mlt.Process(target=main, args = (brca1, "BRCA1", variantCallingFile, 0.05))
     p2 = mlt.Process(target=main, args = (brca1, "BRCA1", variantCallingFile, 0.03))
-    p3 = mlt.Process(target=main, args = (brca1, "BRCA1", variantCallingFile, 0.0))
-    p4 = mlt.Process(target=main, args = (brca1, "BRCA1", variantCallingFile, -1))
+    p3 = mlt.Process(target=main, args = (brca1, "BRCA1", variantCallingFile, 0.01))
+    p4 = mlt.Process(target=main, args = (brca1, "BRCA1", variantCallingFile, 0.0))
+    p5 = mlt.Process(target=main, args = (brca1, "BRCA1", variantCallingFile, -1))
     p1.start()
     time.sleep(40)
     p2.start()
@@ -333,4 +334,6 @@ if __name__ == "__main__" :
     p3.start()
     time.sleep(40)
     p4.start()
+    time.sleep(40)
+    p5.start()
     #main(brca2, "BRCA2", variantCallingFile, maxMaf)
