@@ -233,30 +233,13 @@ def main(brcagene, genename, vcPath, maxMaf = 0.01) :
             meanVaf = getVafMean(cnVar, tmVar)
             temp["vafDif"] = meanVaf
             # Classify the variants according to the pathogenicity
-            varClass = classifyVariants(cnVar, maxMaf)
-            temp["germVar"] = varClass
+            temp["germVar"] = classifyVariants(cnVar, maxMaf)
+            temp["somVar"] = classifyVariants(tmVar, maxMaf)
 
-            # Get LOH in the region
-            try :
-                prog, loh = doLoh(submitter["lohFiles"][0], brcagene)
+            for fic in submitter["lohFiles"] :
+                prog, loh = doLoh(fic, brcagene)
                 temp[prog] = loh
-            except IndexError :
-                pass
-            try :
-                prog, loh = doLoh(submitter["lohFiles"][1], brcagene)
-                temp[prog] = loh
-            except IndexError :
-                pass
-            try :
-                prog, loh = doLoh(submitter["lohFiles"][2], brcagene)
-                temp[prog] = loh
-            except IndexError :
-                pass
-            try :
-                prog, loh = doLoh(submitter["lohFiles"][3], brcagene)
-                temp[prog] = loh
-            except IndexError :
-                pass
+            
             print(temp)
 
             sys.exit()
