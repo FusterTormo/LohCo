@@ -175,6 +175,7 @@ def printRstring(var) :
 # Main program
 def main(brcagene, genename, vcPath, maxMaf = 0.01) :
     cont = 0
+    data = []
     # Get submitters list
     with dbcon :
           cur = dbcon.cursor()
@@ -239,14 +240,12 @@ def main(brcagene, genename, vcPath, maxMaf = 0.01) :
             for fic in submitter["lohFiles"] :
                 prog, loh = doLoh(fic, brcagene)
                 temp[prog] = loh
-            
-            print(temp)
 
-            sys.exit()
+            data.append(temp)
 
 
     print("\nINFO: Final results. {} had a sample with both vcfs (tumor and control) done".format(cont))
-
+    print(data[-1])
     # output = "INFO: Variables for R. Params: Gene: {}, MAF: {} ".format(genename, maxMaf)
     # if vcPath.find("platypusGerm") > 0 :
     #     output += "Variant caller: Platypus\n"
