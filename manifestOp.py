@@ -14,6 +14,9 @@ AYUDA: Comandos para generar los manifest tal y como los necesitan los programas
     tabix -p bed manifest.bed.gz # Crear un indice para el manifest. Puede que la ruta original de tabix sea /opt/htslib-1.10.2/bin/tabix
 """
 
+import os
+import subprocess
+
 def anotarManifest(ruta) :
     """Anotar un maniest. Anadiendo informacion del gen al que pertenece cada region
 
@@ -26,6 +29,17 @@ def anotarManifest(ruta) :
             Path donde esta el manifest que se quiere anotar
     """
     if os.path.isfile(ruta) :
+        print("AYUDA: Pasos previos necesarios para crear un manifest para el genoma de referenia y los variant callers actuales:")
+        print("\tMantener una copia del original")
+        print("\t\tmv manifest.bed manifest_original.bed")
+        print("\tOrdenar el manifest por cromosoma y coordenada")
+        print("\t\tsort -k1,1 -k2,2n -V -s manifest_original.bed > manifestaux.bed")
+        print("\tEliminar los 'chr'")
+        print("\t\tsed 's/chr//g' manifestaux.bed > manifest.bed")
+        print("\tComprimir el archivo para Strelka2. Puede que la ruta original de bgzip sea /opt/htslib-1.10.2/bin/bgzip")
+        print("\t\tbgzip -c manifest.bed > manifest.bed.gz")
+        print("\tCrear un indice para el manifest. Puede que la ruta original de tabix sea /opt/htslib-1.10.2/bin/tabix")
+        print("\t\ttabix -p bed manifest.bed.gz")
         print("INFO: Anotando manifest")
         dir = os.path.dirname(ruta)
         cont = ""
@@ -42,6 +56,8 @@ def anotarManifest(ruta) :
                     std, err = pr.communicate()
                     out = std.decode()
                     genes = list(dict.fromkeys(out.strip().split("\n")))
+                    if genes[0] == "" :
+                        print("WARNING: No se han encontrado genes relacionados con la posicion {c}:{s}-{e}. Revisa la coordenada".format(c = aux[0], s = aux[1], e = aux[2]))
                     cont += "{}\t{}\t{}\t{}\n".format(aux[0], aux[1], aux[2], ",".join(genes))
         with open(arx, "w") as fi :
             fi.write(cont)
