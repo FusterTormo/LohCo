@@ -43,7 +43,7 @@ for c in cases :
             # Get FACETS output file
             folder = "{wd}/{sub}/{pre}_FACETS".format(wd = wd, sub = c[0], pre = prefix)
             file = "{fld}/facets_comp_cncf.tsv".format(fld = folder)
-            if os.path.isfile(folder) :
+            if os.path.isfile(file) :
                 # Check LOH in the gene, add the output to a list
                 loh.append("L")
             # Get Sequenza output file
