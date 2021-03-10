@@ -16,7 +16,7 @@ wd = "/g/strcombio/{cancer_path}/TCGA_bam/{c}".format(c = cancer, cancer_path = 
 
 # Stats
 pairs = 0
-done = 0
+done = []
 
 
 # Get the submitter IDs from the cancer repository
@@ -36,6 +36,8 @@ for c in cases :
         controls = q.fetchall()
 
     for tm in tumors :
+        if c[0] in done : # Don't do the analysis in more than once in the same submitter
+            break
         for cn in controls :
             pairs += 1
             loh = [] # Store the LOH reported by the tools
@@ -58,7 +60,7 @@ for c in cases :
                 # Check LOH in the gene, add the output to a list
                 loh.append("L")
             if len(loh) >= 3 :
-                done += 1
+                done.append(c[0])
                 del(loh)
 
 
@@ -66,4 +68,4 @@ for c in cases :
         # https://appdividend.com/2021/02/08/python-list-count-how-to-count-elements-in-python-list/
 # Check if FACETS/Sequenza/ASCAT2 have reported LOH
 print("INFO: Pairs tumor-control: {}".format(pairs))
-print("INFO: Analysis done in {} pairs".format(done))
+print("INFO: Analysis done in {} pairs".format(len(done)))
