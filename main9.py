@@ -42,7 +42,7 @@ for c in cases :
             prefix = "{}_VS_{}".format(tm[0].split("-")[0], cn[0].split("-")[0])
             # Get FACETS output file
             folder = "{wd}/{sub}/{pre}_FACETS".format(wd = wd, sub = c[0], pre = prefix)
-            file = "{fld}/facets_comp_cncf.tsv".format(fld = folderº)
+            file = "{fld}/facets_comp_cncf.tsv".format(fld = folder)
             if os.path.isfile(folder) :
                 # Check LOH in the gene, add the output to a list
                 loh.append("L")
@@ -54,11 +54,12 @@ for c in cases :
                 loh.append("L")
             # Get ASCAT2 output file
             folder = "{wd}/{sub}/ASCAT2".format(wd = wd, sub = c[0])
-            if os.path.isfolder(folder) :
+            if os.path.isdir(folder) :
                 # Check LOH in the gene, add the output to a list
                 loh.append("L")
-            if len(loh) == 3 :
+            if len(loh) >= 3 :
                 done += 1
+                del(loh)
 
 
         # Count the number of LOH found in the patient
