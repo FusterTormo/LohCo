@@ -6,6 +6,9 @@ import sqlite3
 import subprocess
 import sys
 
+import main1 as lib
+import main8 as asc
+
 # Constants
 brca1 = ["17", 43044295, 43170245] # Gene of interest to search LOH
 cFolder = "fsupek_cancer2"
@@ -18,6 +21,8 @@ wd = "/g/strcombio/{cancer_path}/TCGA_bam/{c}".format(c = cancer, cancer_path = 
 pairs = 0
 done = []
 
+# For the case we want to do it more automatically
+gene = brca1
 
 # Get the submitter IDs from the cancer repository
 with dbcon :
@@ -47,18 +52,24 @@ for c in cases :
             file = "{fld}/facets_comp_cncf.tsv".format(fld = folder)
             if os.path.isfile(file) :
                 # Check LOH in the gene, add the output to a list
-                loh.append("L")
+                aux = lib.getLOH(file, "facets", gene)
+                print(aux)
+                loh.append(aux)
             # Get Sequenza output file
             folder = "{wd}/{sub}/{pre}_Sequenza".format(wd = wd, sub = c[0], pre = prefix)
             file = "{fld}/{case}_segments.txt".format(fld = folder, case = c[0])
             if os.path.isfile(file) :
                 # Check LOH in the gene, add th output to a list
-                loh.append("L")
+                aux = lib.getLOH(file, "sequenza", gene)
+                print(aux)
+                loh.append(aux)
             # Get ASCAT2 output file
             folder = "{wd}/{sub}/ASCAT2".format(wd = wd, sub = c[0])
             if os.path.isdir(folder) :
                 # Check LOH in the gene, add the output to a list
-                loh.append("L")
+                aux = asc.checkAscat(folder, gene)
+                print(aux)
+                loh.append(aux)
             if len(loh) >= 3 :
                 done.append(c[0])
                 del(loh)
