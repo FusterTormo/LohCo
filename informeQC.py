@@ -61,7 +61,7 @@ def crearInforme() :
         tab2 += "</table>\n"
         if os.path.isfile(cte.covstats) :
             header = False
-            with open(covstats, "r") as fi:
+            with open(cte.covstats, "r") as fi:
                 for l in fi :
                     aux = l.strip().split("\t")
                     if not header :
