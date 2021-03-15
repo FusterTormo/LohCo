@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
+import constantes as cte
 import reAnnoFilt as anno
 
 def calcularStrandBias(l) :
@@ -102,7 +103,7 @@ def main(ruta, samplename = "noName") :
         else :
             tiposVariantes[clave] = 1
 
-    with open("variants.stats.txt", "w") as fi :
+    with open(cte.variantstats, "w") as fi :
         fi.write("{")
         fi.write("\'Totales\' : {},".format(len(todas)))
         fi.write("\'Conseq\' : {},".format(len(conseq)))

@@ -17,20 +17,18 @@ import filtMutect as fim
 import getCommands as gc
 import manifestOp as op
 import informeQC as qc
-
-#Constantes
-workindir = "/home/ffuster/panalisi/resultats"
+import constantes as cte
 
 def reanalizar() :
     """Reanalizar una muestra sin borrar lo que ya esta guardado"""
     samp = input("INPUT: Identificador de la muestra a reanalizar: ")
     # Buscar la muestra en el directorio de trabajo usando el comando find de bash
-    cmd = "find {wd} -name {smp}*fastq.gz".format(smp = samp, wd = workindir)
+    cmd = "find {wd} -name {smp}*fastq.gz".format(smp = samp, wd = cte.workindir)
     proc = subprocess.Popen(cmd, shell = True, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
     out, err = proc.communicate()
     res = out.decode()
     if res == "" :
-        print("INFO: No se ha encontrado la muestra en {}".format(workindir))
+        print("INFO: No se ha encontrado la muestra en {}".format(cte.workindir))
     else :
         # Convertir los resultados a una lista
         aux = res.split("\n")
@@ -43,7 +41,7 @@ def reanalizar() :
         lanzarPanel(ruta, acciones)
 
         # Buscar el log que se ha creado al lanzar el panel
-        for root, dirs, filenames in os.walk(workindir, topdown = True, ) :
+        for root, dirs, filenames in os.walk(cte.workindir, topdown = True, ) :
             break
 
         for f in filenames :
@@ -51,7 +49,7 @@ def reanalizar() :
                 logf = f
                 break
         # Modificar el log para eliminar las otras muestras que podria haber en el directorio
-        os.chdir(workindir)
+        os.chdir(cte.workindir)
         with open(logf, "r") as fi :
             cont = fi.readlines()
         for c in range(len(cont)) :
@@ -145,7 +143,7 @@ def bamQC(ruta = None) :
     bq.fastqc = "../fastqc"
     bq.main()
     # El script bamQC.py crea un archivo de texto, llamado alnQC.txt, con un JSON con los datos de interes
-    with open("alnQC.txt", "r") as fi :
+    with open(cte.qcaln, "r") as fi :
         txt = fi.read()
     qc = eval(txt)
     for k, v in qc.items() :
@@ -153,8 +151,8 @@ def bamQC(ruta = None) :
             print("{} - {} ({:.2f} %)".format(k, v, 100*float(v)/float(qc["BAM"])))
         else :
             print("{} - {}".format(k, v))
-    os.remove("bwa.bed")
-    os.remove("alnQC.txt")
+    os.remove(cte.bedoutput)
+    os.remove(cte.qcaln)
 
 def custom() :
     """Crear un analisis customizado usando un wizard"""
@@ -212,7 +210,7 @@ def anotarManifest() :
 def hacerInforme(ruta) :
     try :
         int(ruta) # Si la ruta es un numero, es que se quiere hacer el informe de todas las muestras dentro de una tanda
-        tanda = "{}/tanda{}".format(workindir, ruta)
+        tanda = "{}/tanda{}".format(cte.workindir, ruta)
         if os.path.isdir(tanda) :
             for root, dirs, files in os.walk(tanda) :
                 break
@@ -221,12 +219,12 @@ def hacerInforme(ruta) :
                 os.chdir("{}/{}".format(tanda, d))
                 qc.crearInforme()
     except ValueError :
-        cmd = "find {wd} -name {smp}".format(smp = ruta, wd = workindir)
+        cmd = "find {wd} -name {smp}".format(smp = ruta, wd = cte.workindir)
         proc = subprocess.Popen(cmd, shell = True, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
         out, err = proc.communicate()
         res = out.decode()
         if res == "" :
-            print("INFO: No se ha encontrado {} en {}".format(ruta, workindir))
+            print("INFO: No se ha encontrado {} en {}".format(ruta, cte.workindir))
         else :
             res = res.strip()
             print("INFO: Creando informe para la muestra {}".format(res))

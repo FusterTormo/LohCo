@@ -317,7 +317,7 @@ def getMyVariant(chr, pos, ref, alt, na='NA', assembly = "hg19") :
 
 
 def main() :
-    # Dummy unitary test
+    """ Test unitario para comprobar que funciona """
     header = False
     print(getMyVariant("6", "26093141", "G", "A"))
     # La misma variante, pero usando las coordenadas de hg38, en lugar de hg19 (por defecto segun myvariant)

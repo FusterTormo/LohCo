@@ -4,6 +4,7 @@
 import scipy.stats as stats
 import sys
 
+import constantes as cte
 import getWebInfo as gw
 import reAnnoFilt as anno
 
@@ -95,7 +96,7 @@ def main(ruta, samplename = "noName") :
         else :
             tiposVariantes[clave] = 1
 
-    with open("variants.stats.txt", "w") as fi :
+    with open(cte.variantstats, "w") as fi :
         fi.write("{")
         fi.write("\'Totales\' : {},".format(len(todas)))
         fi.write("\'Conseq\' : {},".format(len(conseq)))

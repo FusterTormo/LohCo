@@ -5,6 +5,8 @@ import os
 import sys
 import math
 
+import constantes as cte
+
 """
 MAIN: Script que elimina los archivos temporales y no necesarios en un panel que se quiere archivar
 """
@@ -74,7 +76,7 @@ def eliminarVariantCalling(ruta) :
             print("WARNING: Opcion no implementada todavia")
         # Eliminar los archivos temporales de un variant calling hecho usando Mutect2
         if "mutect.vcf" in arxius :
-            eliminar = ["cand.reanno.tsv", "highMAF.reanno.tsv", "raw.hg19_multianno.txt", "variants.stats.txt", "conseq.reanno.tsv", "lowVAF.reanno.tsv", "raw.av", "raw.reanno.tsv"]
+            eliminar = ["cand.reanno.tsv", "highMAF.reanno.tsv", "raw.hg19_multianno.txt", cte.variantstats, "conseq.reanno.tsv", "lowVAF.reanno.tsv", "raw.av", "raw.reanno.tsv"]
             for a in arxius :
                 if a in eliminar :
                     pes += os.path.getsize("{dir}/{arx}".format(dir = path, arx = a))

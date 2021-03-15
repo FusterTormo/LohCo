@@ -10,15 +10,17 @@ import os
 import sys
 import xlsxwriter
 
+import constantes as cte
+
 """
-Constantes
+Constantes locales
 """
 # Nombre de los archivos en los que esta la informacion que se usa para guardar el excel final
-qc = "../alnQC.txt"
-cov = "../coverage.txt"
-covGens = "../coverageGeneStats.tsv"
+qc = "../{}".format(cte.qcaln)
+cov = "../{}".format(cte.covarx)
+covGens = "../{}".format(cte.covstats)
 arxius = ["cand.reanno.tsv", "lowVAF.reanno.tsv", "highMAF.reanno.tsv", "conseq.reanno.tsv", "raw.reanno.tsv"]
-stats = "variants.stats.txt"
+stats = cte.variantstats
 # Orden de las columnas en que se colocaran en cada una de las pestanas del excel. Estos son los nombres de las columnas en los archivos .reanno.tsv
 orden = ["sample", "IGV_link", "Gene.refGene", "Chr", "Start", "End", "Ref", "Alt", "GT", "GQ", "MQ", "Func.refGene", "ExonicFunc.refGene", "AAChange.refGene", "GeneDetail.refGene",
 "Ref_depth", "Alt_depth", "DP", "AD", "ADF", "ADR", "VAF", "FILTER", "population_max", "population_max_name", "gnomad_exome_AF_popmax", "gnomad_exome_non_topmed_AF_popmax",

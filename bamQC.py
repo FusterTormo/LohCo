@@ -10,14 +10,13 @@ import subprocess
 import sys
 
 import getCommands as gc
+import constantes as cte
 
-# IDEA: Algunes d'aquestes constants podrien anar en una llibreria de constants
-bed = "alignment/bwa.bed"
-bam = "alignment/bwa.recal.bam"
-fastqc = "fastqc"
+# Constantes locales
+bed = "alignment/{}".format(cte.bedoutput)
+bam = "alignment/{}".format(cte.finalbam)
+fastqc = cte.fastqcdir
 fastqcFI = "fastqc_data.txt"
-manifest = "/home/ffuster/panalisi/resultats/manifest.bed"
-output = "alnQC.txt"
 
 def convertirManifest() :
     """
@@ -31,7 +30,7 @@ def convertirManifest() :
             El manifest convertido en diccionario
     """
     m = {}
-    with open(manifest, "r") as fi :
+    with open(cte.manifest, "r") as fi :
         for l in fi :
             aux = l.split("\t")
             chr = aux[0]
@@ -93,12 +92,12 @@ def main() :
             print("ERROR: No se han encontrado los archivos necesarios para poder ejecutar el control de calidad")
             sys.exit()
 
-    if not os.path.isfile(manifest) :
-        print("ERROR: Manifest no encontrado en ruta {}".format(manifest))
+    if not os.path.isfile(cte.manifest) :
+        print("ERROR: Manifest no encontrado en ruta {}".format(cte.manifest))
         sys.exit()
 
     # Comprobar si existe la carpeta de FASTQC. Extraer la informacion necesaria de los FASTQ en tal caso
-    print("INFO: Leyendo FASTQ")
+    print("INFO: Leyendo FASTQ ({})".format(fastqc))
     if os.path.isdir(fastqc) :
         for dir, dirnames, filenames in os.walk(fastqc) :
             break
@@ -111,10 +110,10 @@ def main() :
                         break
 
     # Comprobar si existe el manifest. Convertirlo en un diccionario para acceder a los reads mas rapidamente
-    print("INFO: Leyendo manifest")
-    if os.path.isfile(manifest) :
+    print("INFO: Leyendo manifest ({})".format(cte.manifest))
+    if os.path.isfile(cte.manifest) :
         dic = convertirManifest()
-        print("INFO: Leyendo alineamiento")
+        print("INFO: Leyendo alineamiento ({})".format(bed))
         if not os.path.isfile(bed) :
             print("INFO: Creando archivo bed con las coordenadas del bam")
             proc = subprocess.Popen(gc.getBam2bed(bam, bed), shell = True, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
@@ -132,8 +131,8 @@ def main() :
     else :
         fqreads = sum(reads)
         breads = on + off
-        print("INFO: Escribiendo resultados en {}".format(output))
-        with open(output, "w") as fi :
+        print("INFO: Escribiendo resultados en {}".format(cte.qcaln))
+        with open(cte.qcaln, "w") as fi :
             fi.write("{")
             fi.write("\'FASTQ\': {},".format(fqreads))
             fi.write("\'BAM': {},".format(breads))

@@ -6,7 +6,7 @@ import sys
 import os
 import re
 
-output = "alnQC.txt"
+import constantes as cte
 
 def pct(bam = "bwaAlign/bwa.nodup.bam") :
     """
@@ -37,11 +37,11 @@ def pct(bam = "bwaAlign/bwa.nodup.bam") :
             if reads > -1 and dups > -1 :
                 pct = dups/reads
                 pct *= 100
-                with open(output, "r") as fi :
+                with open(cte.qcaln, "r") as fi :
                     aux = fi.read().strip("}")
                 aux += ",\'DUPS\': {}".format(pct)
                 aux += "}"
-                with open(output, "w") as fi :
+                with open(cte.qcaln, "w") as fi :
                     fi.write(aux)
         else :
             print("ERROR: Samtools no se ejecuto correctamente. Descripcion: {}".format(err))

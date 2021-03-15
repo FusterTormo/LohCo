@@ -5,10 +5,8 @@ import os
 import shutil
 import subprocess
 
+import constantes as cte
 import vcfQC
-
-pathTemplate = "/home/ffuster/AUP/informes/informe.html"
-pathCss = "/home/ffuster/AUP/informes/estils.css"
 
 def crearInforme() :
     # Comprobar que las carpetas existen
@@ -34,9 +32,9 @@ def crearInforme() :
         tab1 = "<table>"
         tab2 = "<table>"
         tab3 = "<table>"
-        if os.path.isfile("alnQC.txt") :
+        if os.path.isfile(cte.qcaln) :
             tab1 += "<thead><tr><th>Reads en</th><th>Read no.</th></thead>\n<tbody>\n"
-            with open("alnQC.txt", "r") as fi :
+            with open(cte.qcaln, "r") as fi :
                 aux = fi.read()
             aln = eval(aux)
             tab1 += "<tr><th>FASTQ</th><td>{}</td></tr>\n".format(aln["FASTQ"])
@@ -61,9 +59,9 @@ def crearInforme() :
             tab2 += "<tr><th>% Bases cov &le; 1000</th><td>{:.2f}</td></tr>".format(cv["bases1000"])
             tab2 += "</tbody>"
         tab2 += "</table>\n"
-        if os.path.isfile("coverageGeneStats.tsv") :
+        if os.path.isfile(cte.covstats) :
             header = False
-            with open("coverageGeneStats.tsv", "r") as fi:
+            with open(covstats, "r") as fi:
                 for l in fi :
                     aux = l.strip().split("\t")
                     if not header :
@@ -106,7 +104,7 @@ def crearInforme() :
             else :
                 print("WARNING: No se ha podido crear el histograma de las variantes. Descripcion: {}".format(err.decode()))
 
-        with open(pathTemplate, "r") as fi :
+        with open(cte.pathTemplate, "r") as fi :
             txt = fi.read()
 
         # Guardar les dades del informe en un HTML
@@ -114,7 +112,7 @@ def crearInforme() :
             fi.write(txt.format(idMostra = mostra, dirFASTQ1 = dirsFQ[0], dirFASTQ2 = dirsFQ[1], imgCoverageGens = covsTxt, taulesStats = tab1+tab2+tab3, taulaVariants = vcf))
 
         # Copiar el full d'estils en la carpeta
-        shutil.copyfile(pathCss, "estils.css")
+        shutil.copyfile(cte.pathCss, "estils.css")
         print("INFO: Creado informe de calidad de coverage y FASTQ")
 
     else :

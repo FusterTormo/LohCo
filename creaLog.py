@@ -15,25 +15,9 @@ import os
 import re
 import sys
 
+import constantes as cte
 import getCommands as cmd
 import manifestOp as op
-
-"""
-CONSTANTS:
-    Rutas de los programas y parametros de cada uno de los pasos dentro de la pipeline
-"""
-referencia = "/home/ffuster/share/BDsole/referencies/ucsc/hg19.fa"
-manifest = "/home/ffuster/panalisi/resultats/manifest.bed"
-gzmanifest = "/home/ffuster/panalisi/resultats/manifest.bed.gz"
-manifestidx = "/home/ffuster/panalisi/resultats/manifest.bed.gz.tbi"
-
-# Descargado desde https://gnomad.broadinstitute.org/downloads
-dbsnp = "/home/ffuster/share/BDsole/referencies/gnomad.exomes.r2.1.1.sites.vcf"
-genes = "/home/ffuster/panalisi/resultats/gensAestudi.txt"
-
-pathAnalisi = "/home/ffuster/panalisi/resultats" # Ruta donde se ejecutan y guardan los analisis
-prefijoTanda = "tanda" # Prefijo que tiene todas las tandas analizadas
-wd = "~/AUP" # Directorio de trabajo donde estan los scripts
 
 def extraerRG(fastq) :
     """
@@ -108,10 +92,10 @@ def getTanda() :
             Numero asignado para la siguiente tanda que se va a analizar
     """
     nums = []
-    prefijo = len(prefijoTanda)
-    for root, dirs, files in os.walk(pathAnalisi) :
+    prefijo = len(cte.prefijoTanda)
+    for root, dirs, files in os.walk(cte.workindir) :
         for d in dirs :
-            if d.startswith(prefijoTanda) :
+            if d.startswith(cte.prefijoTanda) :
                 aux = int(d[prefijo:])
                 nums.append(aux)
         break
@@ -131,20 +115,20 @@ def comprobarArchivos() :
             Si alguno de los archivos no existe lanzara dicha excepcion
     """
     print("INFO: Buscando los archivos necesarios para ejecutar la pipeline")
-    if not os.path.isfile(referencia) :
+    if not os.path.isfile(cte.genoma_referencia) :
         raise IOError("No se encuentra el genoma de referencia")
-    if not os.path.isfile(manifest) :
-        raise IOError("No se encuentra el manifest")
+    if not os.path.isfile(cte.manifest) :
+        raise IOError("No se encuentra el manifest. Buscando en {}".format(cte.manifest))
     else : #Strelka2 quiere que el bam este comprimido e indexado. Comprobar si estas archivos existen
-        if not os.path.isfile(gzmanifest) :
-            raise IOError("ERROR: No se encuentra el bgzip del manifest, necesario para Strelka2. Ejecuta manifest.sh para crearlo")
-        if not os.path.isfile(manifestidx) :
-            raise IOError("ERROR: No se encuentra el indice del manifest, necesario para Strelka2. Ejecuta manifest.sh para crearlo")
-    if not os.path.isfile(dbsnp) :
-        raise IOError("No se encuentra el archivo de SNPs")
-    if not os.path.isfile(genes) :
+        if not os.path.isfile(cte.gzmanifest) :
+            raise IOError("ERROR: No se encuentra el bgzip del manifest, necesario para Strelka2. Buscado como {}".format(cte.gzmanifest))
+        if not os.path.isfile(cte.manifestidx) :
+            raise IOError("ERROR: No se encuentra el indice del manifest, necesario para Strelka2. Buscado como {}".format(cte.manifestidx))
+    if not os.path.isfile(cte.dbsnp) :
+        raise IOError("No se encuentra el archivo de SNPs. Buscado como {}".format(cte.dbsnp))
+    if not os.path.isfile(cte.genes) :
         print("WARNING: No se encuentra el archivo con la lista de genes del manifest. Creando el archivo")
-        op.doListaGenes(manifest, genes)
+        op.doListaGenes(cte.manifest, cte.genes)
 
 def encontrar(fq, lista) :
     """Encontrar un fastq en la lista con los paths absolutos de fastqs
@@ -190,12 +174,12 @@ def prepararPanel(ruta, acciones) :
             Lista de acciones que se pueden agregar al bash. Valores aceptados: ["copiar","fastqc", "aln", "recal", "mdups", "bamqc", "coverage", "strelkaGerm", "mutectGerm", "vanno",
             "filtrar", "excel"]
     """
-    os.chdir(pathAnalisi) # Cambiar el directorio de trabajo a la carpeta de analisis
+    os.chdir(cte.workindir) # Cambiar el directorio de trabajo a la carpeta de analisis
     tnd = getTanda() # Crear el nombre de la carpeta donde se guardaran los analisis y el nombre del bash con todos los comandos
-    tanda = "{prefijo}{tanda}".format(prefijo = prefijoTanda, tanda = tnd)
+    tanda = "{prefijo}{tanda}".format(prefijo = cte.prefijoTanda, tanda = tnd)
     arxiu = "logTanda{tanda}.sh".format(tanda = tnd)
 
-    print("INFO: Los resultados del analisis se guardaran en {path}/{tanda}".format(path = pathAnalisi, tanda = tanda))
+    print("INFO: Los resultados del analisis se guardaran en {path}/{tanda}".format(path = cte.workindir, tanda = tanda))
     comprobarArchivos() # Esta funcion dispara una excepcion en caso de que no se encuentre alguno de los archivos necesarios para el analisis
     fastqs = getFASTQnames(ruta)
     if len(fastqs) == 0 :
@@ -206,15 +190,15 @@ def prepararPanel(ruta, acciones) :
         with open(arxiu, "w") as fi :
             fi.write("#!/bin/bash\n\n") # Shebang del bash
             fi.write("#Referencias usadas en este analisis\n")
-            fi.write("ref={}\n".format(referencia))
-            fi.write("mani={}\n".format(manifest))
-            fi.write("gzmani={}\n".format(gzmanifest))
-            fi.write("sites={}\n".format(dbsnp))
-            fi.write("gens={}\n\n".format(genes))
+            fi.write("ref={}\n".format(cte.genoma_referencia))
+            fi.write("mani={}\n".format(cte.manifest))
+            fi.write("gzmani={}\n".format(cte.gzmanifest))
+            fi.write("sites={}\n".format(cte.dbsnp))
+            fi.write("gens={}\n\n".format(cte.genes))
             if "copiar" in acciones :
                 #Crear la funcion que copia los datos (FASTQs) en la carpeta de analisis
                 fi.write("function copiar {\n")
-                fi.write("\tcd {}\n".format(pathAnalisi))
+                fi.write("\tcd {}\n".format(cte.workindir))
                 fi.write("\tmkdir {tanda} ; cd {tanda}\n\n".format(tanda = tanda))
                 fi.write("\techo -e \"################################\\n\\tCopiant dades\\n################################\\n\"\n")
                 for f in fastqs :
@@ -226,7 +210,7 @@ def prepararPanel(ruta, acciones) :
                 fi.write("}\n\n")
             else :
                 fi.write("# Crear la estructura de la tanda\n")
-                fi.write("cd {}\n".format(pathAnalisi))
+                fi.write("cd {}\n".format(cte.workindir))
                 fi.write("mkdir {tanda} ; cd {tanda}\n".format(tanda = tanda))
                 fi.write("rsync -aP {} .\n".format("$gens"))
                 fi.write("mv ../{} .\n".format(arxiu))
@@ -276,15 +260,15 @@ def prepararPanel(ruta, acciones) :
             # Estudios de coverage, on target, off target, porcentaje de bases con X coverage...
             if "coverage" in acciones :
                 fi.write("\n\t# Control de calidad del alineamiento y estudio de coverage\n")
-                fi.write("\t" + cmd.getCoverageAll("$mani","alignment/bwa.recal.bam", "coverage.txt") + "\n")
+                fi.write("\t" + cmd.getCoverageAll("$mani","alignment/bwa.recal.bam", cte.covarx) + "\n")
                 fi.write("\t" + cmd.getCoverageBase("$mani", "alignment/bwa.recal.bam", "coverageBase.txt") + "\n")
-                fi.write("\tgrep '^all' coverage.txt > coverageAll.txt\n")
-                fi.write("\trm coverage.txt\n")
-                fi.write("\tRscript {}/coveragePanells.R\n".format(wd))
+                fi.write("\tgrep '^all' {} > coverageAll.txt\n".format(cte.covarx))
+                fi.write("\trm {}\n".format(cte.covarx))
+                fi.write("\tRscript {}/coveragePanells.R\n".format(cte.scriptdir))
                 fi.write("\tmkdir coverage\n")
                 fi.write("\tmv *png coverageAll.txt coverageBase.txt coverage/\n")
             if "bamqc" in acciones :
-                fi.write("\tpython3 {}/bamQC.py\n".format(wd)) # Hay una opcion de lanzar pctDups (calcular porcentaje de duplicados) en caso de exomas
+                fi.write("\tpython3 {}/bamQC.py\n".format(cte.scriptdir)) # Hay una opcion de lanzar pctDups (calcular porcentaje de duplicados) en caso de exomas
             # Variant calling. La carpeta donde se guardan los datos se llama variantCalling. En caso de queren cambiarse, modificar las dos siguientes lineas
             if "strelkaGerm" in acciones :
                 fi.write("\n\t# Variant calling. Strelka2\n")
@@ -303,7 +287,7 @@ def prepararPanel(ruta, acciones) :
                     fi.write("\t" + cmd.getANNOVAR("strelka2.vcf", "raw").replace("\n", "\t\n") + "\n")
                 # Re-anotacion y filtrado de variantes usando myvariant.info
                 if "filtrar" in acciones :
-                    fi.write("\tpython3 {wd}/filtStrelka.py {input} {samplename}".format(wd = wd, input = "raw.hg19_multianno.txt", samplename = "$alias"))
+                    fi.write("\tpython3 {wd}/filtStrelka.py {input} {samplename}".format(wd = cte.scriptdir, input = "raw.hg19_multianno.txt", samplename = "$alias"))
             elif "mutectGerm" in acciones :
                 fi.write("\n\t#Variant calling. Mutect2\n")
                 if "mdups" in acciones :
@@ -319,13 +303,13 @@ def prepararPanel(ruta, acciones) :
                 # Re-anotacion y filtrado de variantes usando myvariant.info
                 if "filtrar" in acciones :
                     if "mutectGerm" in acciones :
-                        fi.write("\tpython3 {wd}/filtMutect.py {input} {samplename}\n".format(wd = wd, input = "raw.hg19_multianno.txt", samplename = "$alias"))
+                        fi.write("\tpython3 {wd}/filtMutect.py {input} {samplename}\n".format(wd = cte.scriptdir, input = "raw.hg19_multianno.txt", samplename = "$alias"))
 
 
             # Juntar los resultados obtenidos en un Excel
             if "excel" in acciones :
-                fi.write("\tpython3 {wd}/data2excel.py {output}\n".format(wd = wd, output = "$alias"))
-            fi.write("\tcd {}/{}\n".format(pathAnalisi, tanda))
+                fi.write("\tpython3 {wd}/data2excel.py {output}\n".format(wd = cte.scriptdir, output = "$alias"))
+            fi.write("\tcd {}/{}\n".format(cte.workindir, tanda))
 
             fi.write("}\n\n")
 
@@ -347,5 +331,5 @@ def prepararPanel(ruta, acciones) :
                     if id not in hechos :
                         fi.write("analisi {params}\n".format(params = params))
                         hechos.append(id)
-        print("INFO: Log guardado como {}".format(arxiu))
+        print("INFO: Log guardado como {}/{}".format(cte.workindir, arxiu))
         os.chmod(arxiu, 0o754) # Dar permiso de ejecuion para el propietario, lectura y escritura para el grupo, y lectura para el resto de usuarios
