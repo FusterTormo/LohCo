@@ -109,7 +109,7 @@ $PATH_AUP/infomeQC.py
 
 ## &iquest;C&oacute;mo hago para modificar los programas que se ejecutan en los an&aacute;lisis?
 
-La librer&iacute;a [getCommands.py](../master/getCommands.py) contiene las &oacute;rdenes para ejecutar cada uno de los programas necesarios para el an&aacute;lisis. En las constantes de esta librer&iacute;a se encuentran las versiones de todos los programas que se usan para el an&aacute;lisis.
+La librer&iacute;a [constantes.py](../master/constantes.py) contiene las &oacute;rdenes para ejecutar cada uno de los programas necesarios para el an&aacute;lisis. Solo ha que modificar las constantes de esta librer&iacute;a por las rutas absolutas de ejecuci&oacute;n del programa(s) que queremos modificar.
 
 
 ## El manifest del panel ha cambiado. &iquest;C&oacute;mo cambio el manifest de la pipeline?
@@ -117,4 +117,4 @@ La librer&iacute;a [getCommands.py](../master/getCommands.py) contiene las &oacu
 Existen dos opciones:
 
 1. Crear el *log* de an&aacute;lisis (usando los comandos descritos al inicio de este README) y cambiar manualmente la ruta del manifest. Dicha ruta est&aacute; guardada como una constante en el *log* del an&aacute;lisis.
-2. Cambiar la ruta de la constante manifest en [bamQC](../master/bamQC.py), y [creaLog](../master/creaLog.py).
+2. Cambiar la ruta de la constante manifest en la librer&iacute;a de [constantes](../master/constantes.py).
