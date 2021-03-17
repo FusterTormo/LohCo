@@ -22,8 +22,8 @@ annovar_db = "/home/ffuster/share/biodata/Indexes/ANNOVAR/humandb/"
 # Rutas de los archivos necesarios para el analisis (genomas de referencia, manifest...)
 genoma_referencia = "/home/ffuster/share/BDsole/referencies/ucsc/hg19.fa"
 manifest = "/home/ffuster/panalisi/resultats/manifest_Roche/manifest.bed"
-gzmanifest = "/home/ffuster/panalisi/resultats/manifest.bed.gz"
-manifestidx = "/home/ffuster/panalisi/resultats/manifest.bed.gz.tbi"
+gzmanifest = "/home/ffuster/panalisi/resultats/manifest_Roche/manifest.bed.gz"
+manifestidx = "/home/ffuster/panalisi/resultats/manifest_Roche/manifest.bed.gz.tbi"
 dbsnp = "/home/ffuster/share/BDsole/referencies/gnomad.exomes.r2.1.1.sites.vcf" # Descargado desde https://gnomad.broadinstitute.org/downloads
 genes = "/home/ffuster/panalisi/resultats/gensAestudi.txt"
 
