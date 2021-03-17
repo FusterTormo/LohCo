@@ -18,7 +18,7 @@ bam = "alignment/{}".format(cte.finalbam)
 fastqc = cte.fastqcdir
 fastqcFI = "fastqc_data.txt"
 
-def convertirManifest() :
+def convertirManifest(manifest) :
     """
     Convierte el manifest en un diccionario
 
@@ -30,7 +30,7 @@ def convertirManifest() :
             El manifest convertido en diccionario
     """
     m = {}
-    with open(cte.manifest, "r") as fi :
+    with open(manifest, "r") as fi :
         for l in fi :
             aux = l.split("\t")
             chr = aux[0]
@@ -72,7 +72,7 @@ def enManifest(read, manifest) :
                 break
     return esta
 
-def main() :
+def main(manifest = cte.manifest, imprimir = False) :
     """
     Programa principal
 
@@ -92,8 +92,8 @@ def main() :
             print("ERROR: No se han encontrado los archivos necesarios para poder ejecutar el control de calidad")
             sys.exit()
 
-    if not os.path.isfile(cte.manifest) :
-        print("ERROR: Manifest no encontrado en ruta {}".format(cte.manifest))
+    if not os.path.isfile(manifest) :
+        print("ERROR: Manifest no encontrado en ruta {}".format(manifest))
         sys.exit()
 
     # Comprobar si existe la carpeta de FASTQC. Extraer la informacion necesaria de los FASTQ en tal caso
@@ -110,9 +110,9 @@ def main() :
                         break
 
     # Comprobar si existe el manifest. Convertirlo en un diccionario para acceder a los reads mas rapidamente
-    print("INFO: Leyendo manifest ({})".format(cte.manifest))
-    if os.path.isfile(cte.manifest) :
-        dic = convertirManifest()
+    print("INFO: Leyendo manifest ({})".format(manifest))
+    if os.path.isfile(manifest) :
+        dic = convertirManifest(manifest)
         print("INFO: Leyendo alineamiento ({})".format(bed))
         if not os.path.isfile(bed) :
             print("INFO: Creando archivo bed con las coordenadas del bam")
@@ -131,14 +131,31 @@ def main() :
     else :
         fqreads = sum(reads)
         breads = on + off
-        print("INFO: Escribiendo resultados en {}".format(cte.qcaln))
-        with open(cte.qcaln, "w") as fi :
-            fi.write("{")
-            fi.write("\'FASTQ\': {},".format(fqreads))
-            fi.write("\'BAM': {},".format(breads))
-            fi.write("\'ON\': {},".format(on))
-            fi.write("\'OFF\': {}".format(off))
-            fi.write("}")
+        if imprimir :
+            print("Reads en FASTQ: {}".format(fqreads))
+            print("Reads en BAM: {}".format(breads))
+            print("Reads ON target: {} ({:.2f} %)".format(on, 100*on/breads))
+            print("Reads OFF target: {} ({:.2f} %)".format(off, 100*off/breads))
+        else :
+            print("INFO: Escribiendo resultados en {}".format(cte.qcaln))
+            with open(cte.qcaln, "w") as fi :
+                fi.write("{")
+                fi.write("\'FASTQ\': {},".format(fqreads))
+                fi.write("\'BAM': {},".format(breads))
+                fi.write("\'ON\': {},".format(on))
+                fi.write("\'OFF\': {}".format(off))
+                fi.write("}")
 
 if __name__ == "__main__" :
-    main()
+    """
+        USO: ./bamQC.py [input.bam] [manifest.bed]
+    """
+    if len(sys.argv) > 1 :
+        bam = sys.argv[1]
+        if len(sys.argv) >= 3 :
+            mani = sys.argv[2]
+            main(mani, True) # Hacer el control de calidad con un bam y un manifest predeterminado
+        else :
+            main(imprimir = True) # Hacer el control de calidad con un bam determinado
+    else :
+        main() # El programa supone que se ha invocado dentro de una carpeta de analisis, donde existe una carpeta alignment con los bams y una carpeta fastqc con los datos de calidad del FASTQ
