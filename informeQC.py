@@ -108,12 +108,13 @@ def crearInforme() :
             txt = fi.read()
 
         # Guardar les dades del informe en un HTML
-        with open("informe.html", "w") as fi :
+        web = cte.pathTemplate.split("/")[-1]
+        with open(web, "w") as fi :
             fi.write(txt.format(idMostra = mostra, dirFASTQ1 = dirsFQ[0], dirFASTQ2 = dirsFQ[1], imgCoverageGens = covsTxt, taulesStats = tab1+tab2+tab3, taulaVariants = vcf))
 
         # Copiar el full d'estils en la carpeta
         shutil.copyfile(cte.pathCss, "estils.css")
-        print("INFO: Creado informe de calidad de coverage y FASTQ")
+        print("INFO: Creado informe de calidad de coverage y FASTQ con nombre {}".format(web))
 
     else :
         print("ERROR: No encontradas las carpetas necesarias para hacer el informe: {dir}/fastqc, {dir}/coverage {dir}/variantCalling".format(dir = os.getcwd()))
