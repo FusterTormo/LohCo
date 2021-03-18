@@ -19,7 +19,7 @@ def recogerDatos(ruta = "./") :
     print("INFO: {} muestras encontradas".format(len(dirs)))
     datos = {}
     for d in dirs :
-        datos[d] = {"FQ" : 0, "BAM" : 0, "ON" : 0, "OFF" : 0, "COV" : {}, "VCF" : {}}
+        datos[d] = {"FQ" : 0, "BAM" : 0, "ON" : 0, "OFF" : 0, "COV" : {}, "VCF" : {}, "COV_PATH" : ""}
         path = "{}/{}".format(ruta, d)
         qc = "{}/{}".format(path, cte.qcaln)
         # Guardar en el diccionario los parametros de calidad del bam
@@ -44,11 +44,6 @@ def recogerDatos(ruta = "./") :
             datos[d]["COV"]["max"] = aux2["maximo"]
             datos[d]["COV"]["avg"] = aux2["media"]
             datos[d]["COV"]["med"] = aux2["mediana"]
-            datos[d]["COV"]["0"] = aux2["bases0"]
-            datos[d]["COV"]["30"] = aux2["bases30"]
-            datos[d]["COV"]["100"] = aux2["bases100"]
-            datos[d]["COV"]["500"] = aux2["bases500"]
-            datos[d]["COV"]["1000"] = aux2["bases1000"]
         else :
             print("WARNING: {} no encontrado. Ejecuta AUP/coveragePanells.R para generarlo".format(cov))
 
@@ -57,7 +52,40 @@ def recogerDatos(ruta = "./") :
         kaks, fwrv, hist = vcfQC.getRatios(anno, False)
         datos[d]["VCF"] = hist
 
+        # Guardar el path del archivo de coverage para el script de R que creara los graficos
+        cov = "{}/coverage/coverageBase.txt".format(path)
+        if os.path.isfile(cov) :
+            datos[d]["COV_PATH"] = cov
+        else :
+            print("WARNING: Archivo de coverage ({}) no encontrado en la muestra {}".format(cov, d))
+
     return datos
+
+def scriptR(datos) :
+    filename = "globalQC.R"
+    fqreads = "fq <- c("
+    noms = "samps <- c("
+    for d in datos.keys() :
+        fqreads += "{},".format(datos[d]["FQ"])
+        noms += "'{}',".format(d)
+
+    fqreads = fqreads.rstrip(",")
+    noms = noms.rstrip(",")
+    fqreads += ")\n"
+    noms += ")\n"
+
+    with open(filename, "w") as fi :
+        fi.write("library(RColorBrewer) # Paleta de colores para los graficos")
+        fi.write("# Grafico de barras con la cantidad de reads de cada muestra\n")
+        fi.write(fqreads)
+        fi.write(noms)
+        fi.write("png('FASTQ_distribution.png', width = 720, height = 720)\n")
+        fi.write("barplot(fq, names.arg = samps, col = brewer.pal(12, 'Set3'))\n")
+        fi.write("dev.off()")
+        for k, v in datos.items() :
+            fi.write("# Grafico de barras con el porcentaje de bases con un coverage determinado\n")
+            fi.write("{smp} <- c()")
+
 
 
 def main() :
@@ -77,6 +105,9 @@ def main() :
         dc = recogerDatos(path)
 
     print(dc)
+    scriptR(dc)
+
+    # Executar el Rscript en la cerpeta que toca
 
 if __name__ == "__main__" :
     main()
