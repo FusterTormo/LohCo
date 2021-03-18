@@ -204,7 +204,7 @@ def custom() :
     return ordenes
 
 def anotarManifest() :
-    ruta = input("Introducir ruta absolute del manifest a anotar: ")
+    ruta = input("INPUT: Introducir ruta absolute del manifest a anotar: ")
     op.anotarManifest(ruta)
 
 def hacerInforme(ruta) :
