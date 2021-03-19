@@ -25,7 +25,7 @@ manifest = "/home/ffuster/panalisi/resultats/manifest_Roche/manifest.bed"
 gzmanifest = "/home/ffuster/panalisi/resultats/manifest_Roche/manifest.bed.gz"
 manifestidx = "/home/ffuster/panalisi/resultats/manifest_Roche/manifest.bed.gz.tbi"
 dbsnp = "/home/ffuster/share/BDsole/referencies/gnomad.exomes.r2.1.1.sites.vcf" # Descargado desde https://gnomad.broadinstitute.org/downloads
-genes = "/home/ffuster/panalisi/resultats/gensAestudi.txt"
+genes = "/home/ffuster/panalisi/resultats/manifest_Roche/gensAestudi.txt"
 
 prefijoTanda = "tanda" # Prefijo que tiene todas las tandas analizadas
 scriptdir = "/home/ffuster/AUP" # Directorio de trabajo donde estan los scripts
