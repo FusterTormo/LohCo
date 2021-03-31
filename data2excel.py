@@ -21,6 +21,9 @@ cov = "../{}".format(cte.covarx)
 covGens = "../{}".format(cte.covstats)
 arxius = ["cand.reanno.tsv", "lowVAF.reanno.tsv", "highMAF.reanno.tsv", "conseq.reanno.tsv", "raw.reanno.tsv"]
 stats = cte.variantstats
+maxMaf = 0.01
+minReads = 25
+
 # Orden de las columnas en que se colocaran en cada una de las pestanas del excel. Estos son los nombres de las columnas en los archivos .reanno.tsv
 orden = ["sample", "IGV_link", "Gene.refGene", "Chr", "Start", "End", "Ref", "Alt", "GT", "GQ", "MQ", "Func.refGene", "ExonicFunc.refGene", "AAChange.refGene", "GeneDetail.refGene",
 "Ref_depth", "Alt_depth", "DP", "AD", "ADF", "ADR", "VAF", "FILTER", "population_max", "population_max_name", "gnomad_exome_AF_popmax", "gnomad_exome_non_topmed_AF_popmax",
@@ -169,6 +172,22 @@ def escribirVariantes(hoja, libro, cnt, empiezaEn) :
                     hoja.write(fila, columna, dic[o])
             elif o == "Chr" and not dic[o].startswith("chr") :
                 hoja.write(fila, columna, "chr{}".format(dic[o]))
+            elif o == "population_max" :
+                try :
+                    if float(dic[o]) >= maxMaf :
+                        hoja.write(fila, columna, dic[o], rojo)
+                    else :
+                        hoja.write(fila, columna, dic[o])
+                except ValueError :
+                    hoja.write(fila, columna, dic[o])
+            elif o == "Alt_depth" :
+                try :
+                    if int(dic[o]) < minReads :
+                        hoja.write(fila, columna, dic[o], naranja)
+                    else :
+                        hoja.write(fila, columna, dic[o])
+                except ValueError :
+                    hoja.write(fila, columna, dic[o])
             else :
                 hoja.write(fila, columna, dic[o])
             columna += 1
