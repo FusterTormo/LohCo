@@ -87,7 +87,7 @@ for c in cases :
                     out = std.decode().strip().split("\n")
                     for o in out :
                         aux = o.split("\t")
-                        if len(aux) > 0 :
+                        if len(aux) > 1 :
                             # Create a histogram that counts the frequency of each position
                             pos = int(aux[1])
                             if pos in variants.keys() :
