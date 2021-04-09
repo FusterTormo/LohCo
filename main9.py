@@ -20,8 +20,9 @@ wd = "/g/strcombio/{cancer_path}/TCGA_bam/{c}".format(c = cancer, cancer_path = 
 # Stats
 pairs = 0
 done = []
+positive = []
 
-# For the case we want to do it more automatically
+# In the case we want to do it more automatically
 gene = brca1
 genename = "BRCA1"
 varCallSuffix = "platypusGerm/platypus.hg38_multianno.txt"
@@ -75,10 +76,11 @@ for c in cases :
                 # Count the number of LOH found in the patient
                 lohs = loh.count("L") + loh.count("D") # Copy number neutral +`copy number lose`
                 if lohs >= 2 :
+                    positive.append(c[0])
                     # Get the gene variants
                     germCall = "{wd}/{sub}/{uuid}/{suffix}".format(wd = wd, sub = c[0], uuid = cn[0], suffix = varCallSuffix)
-                    print(germCall)
-                    cmd = "grep {gene} {vc}".format(vc = varCall, gene = genename)
+                    
+                    cmd = "grep {gene} {vc}".format(vc = germCall, gene = genename)
                     pr = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                     std, err = pr.communicate()
                     out = std.decode().strip().split("\n")
