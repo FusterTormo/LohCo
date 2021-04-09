@@ -77,7 +77,7 @@ def main(ruta, samplename = "noName") :
     anno.guardarTabla(vafAlta, "cand") # Variantes que han pasado todos los filtros anteriores
 
     # Mostrar por pantalla estadisticas basicas
-    print("INFO: Variantes encontradas por Mutect2 {}".format(len(todas))) # Total de variantes reportadas por Strelka2
+    print("INFO: Variantes encontradas por Mutect2: {}".format(len(todas))) # Total de variantes reportadas por Strelka2
     print("INFO: Variantes conseq: {}".format(len(conseq)))
     print("INFO: MAF >= 0.1: {}".format(len(mafAlta)))
     print("INFO: MAF < 0.1: {}".format(len(mafBaja)))
