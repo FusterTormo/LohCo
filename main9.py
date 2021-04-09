@@ -18,9 +18,10 @@ dbcon = sqlite3.connect("/g/strcombio/fsupek_cancer2/TCGA_bam/info/info.db")
 wd = "/g/strcombio/{cancer_path}/TCGA_bam/{c}".format(c = cancer, cancer_path = cFolder)
 
 # Stats
-pairs = 0
-done = []
-positive = []
+pairs = 0 # Number of submitters with pair tumor-control
+done = [] # List of submitters with ASCAT2, FACETS and Sequenza done
+positive = [] # List of submitters where ASCAT2, FACETS and Sequenza reported LOH
+variants = {} # Histogram with the positions (key) and the times a variant is reported in that position (value)
 
 # In the case we want to do it more automatically
 gene = brca1
@@ -34,7 +35,7 @@ with dbcon :
       q = cur.execute("SELECT submitter FROM patient WHERE cancer='{cancer}'".format(cancer = cancer))
       cases = q.fetchall()
 
-print("INFO: Total submitters: {}".format(len(cases)))
+print("INFO: Total submitters in {} cancer: {}".format(cancer, len(cases)))
 # Get the tumors and controls in each submitter
 for c in cases :
     with dbcon :
@@ -83,11 +84,20 @@ for c in cases :
                     pr = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                     std, err = pr.communicate()
                     out = std.decode().strip().split("\n")
-                    
+                    for o in out :
+                        aux = o.split("\t")
+                        pos = int(aux[1])
+                        if pos in variants.keys() :
+                            variants[pos] += 1
+                        else :
+                            variants[pos] = 1
+
+
 
 
 
 # Check if FACETS/Sequenza/ASCAT2 have reported LOH
 print("INFO: Pairs tumor-control: {}".format(pairs))
 print("INFO: Analysis done in {} pairs".format(len(done)))
-print("INFO: {}  had 2 or more LOH reported".format(len(positive)))
+print("INFO: {}  had 2 or more LOH reported in {} gene".format(len(positive), genename))
+print(variants)
