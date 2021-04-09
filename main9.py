@@ -22,6 +22,7 @@ pairs = 0 # Number of submitters with pair tumor-control
 done = [] # List of submitters with ASCAT2, FACETS and Sequenza done
 positive = [] # List of submitters where ASCAT2, FACETS and Sequenza reported LOH
 variants = {} # Histogram with the positions (key) and the times a variant is reported in that position (value)
+data = "" # Text table with the information about the variants found
 
 # In the case we want to do it more automatically
 gene = brca1
@@ -87,12 +88,14 @@ for c in cases :
                     for o in out :
                         aux = o.split("\t")
                         if len(aux) > 0 :
+                            # Create a histogram that counts the frequency of each position
                             pos = int(aux[1])
                             if pos in variants.keys() :
                                 variants[pos] += 1
                             else :
                                 variants[pos] = 1
-
+                            # Store the variant information in a variable
+                            data += "{chr}\t{st}\t{end}\t{ref}\t{alt}\t{ex}\t{typex}\t{sub}\t{idtm}\t{idcn}\n".format(chr = aux[0], st = aux[1], end = aux[2], ref = aux[3], alt = aux[4], ex = aux[5], typex = aux[8], sub = c[0], idtm = tm[0], idcn = cn[0])
 
 
 
@@ -101,4 +104,13 @@ for c in cases :
 print("INFO: Pairs tumor-control: {}".format(pairs))
 print("INFO: Analysis done in {} pairs".format(len(done)))
 print("INFO: {}  had 2 or more LOH reported in {} gene".format(len(positive), genename))
-print(variants)
+
+with open("positionHistogram.tsv", "w") as fi :
+    fi.write("position\ttimes\n")
+    for k, v in variants.items() :
+        fi.write("{}\t{}".format(k, v))
+print("INFO: Variant-position histogram stored as positionHistogram.tsv")
+
+with open("variants.tsv", "w") as fi :
+    fi.write(data)
+print("INFO: Variant information stored as variants.tsv")
