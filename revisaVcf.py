@@ -7,7 +7,7 @@ MAIN: Comprueba si hay variantes multialelicas reportadas en un archivo vcf crea
 
 import sys
 
-def main(path) :
+def main(path, output = "mutect.revised.vcf") :
     """Programa principal. Abre el archivo vcf pasado por parametro y comprueba si hay variantes multialelicas. Crea un nuevo archivo (mutect.revised.vcf) con los datos obtenidos
 
     Comprueba si hay alguna linea en el que el genotipo sea multialelico (0/1/2, 0/1/2/3 y asi sucesivamente). En caso de encontrar alguno, crea tantas lineas adicionales
@@ -23,7 +23,6 @@ def main(path) :
     """
     header = ""
     body = ""
-    output = "mutect.revised.vcf"
     with open(path, "r") as fi :
         for l in fi :
             if l.startswith("#") :
@@ -56,7 +55,9 @@ def main(path) :
         fi.write(body)
 
 if __name__ == "__main__" :
-    if len(sys.argv) >= 2 :
+    if len(sys.argv) > 2 :
+        main(sys.argv[1], sys.argv[2])
+    elif len(sys.argv) == 2 :
         main(sys.argv[1])
     else :
         print("Revisar si un vcf creado por Mutect2 tiene variantes multialelicas")
