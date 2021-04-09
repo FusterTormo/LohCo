@@ -45,7 +45,7 @@ for c in cases :
         controls = q.fetchall()
 
     for tm in tumors :
-        if c[0] in done : # Don't do the analysis in more than once in the same submitter
+        if c[0] in done : # Don't do the analysis more than once in the same submitter
             break
         for cn in controls :
             pairs += 1
@@ -79,16 +79,15 @@ for c in cases :
                     positive.append(c[0])
                     # Get the gene variants
                     germCall = "{wd}/{sub}/{uuid}/{suffix}".format(wd = wd, sub = c[0], uuid = cn[0], suffix = varCallSuffix)
-                    
                     cmd = "grep {gene} {vc}".format(vc = germCall, gene = genename)
                     pr = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                     std, err = pr.communicate()
                     out = std.decode().strip().split("\n")
-                    print(out)
-                    sys.exit()
+                    
 
 
 
 # Check if FACETS/Sequenza/ASCAT2 have reported LOH
 print("INFO: Pairs tumor-control: {}".format(pairs))
 print("INFO: Analysis done in {} pairs".format(len(done)))
+print("INFO: {}  had 2 or more LOH reported".format(len(positive)))
