@@ -61,4 +61,4 @@ if __name__ == "__main__" :
         main(sys.argv[1])
     else :
         print("Revisar si un vcf creado por Mutect2 tiene variantes multialelicas")
-        print("USO: python3 revisaVcf.py archivo.vcf")
+        print("USO: python3 revisaVcf.py archivo.vcf [archivo_de_salida.vcf]")
