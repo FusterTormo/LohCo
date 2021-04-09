@@ -86,11 +86,12 @@ for c in cases :
                     out = std.decode().strip().split("\n")
                     for o in out :
                         aux = o.split("\t")
-                        pos = int(aux[1])
-                        if pos in variants.keys() :
-                            variants[pos] += 1
-                        else :
-                            variants[pos] = 1
+                        if len(aux) > 0 :
+                            pos = int(aux[1])
+                            if pos in variants.keys() :
+                                variants[pos] += 1
+                            else :
+                                variants[pos] = 1
 
 
 
