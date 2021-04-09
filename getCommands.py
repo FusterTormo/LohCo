@@ -378,6 +378,7 @@ def getMutect2(input, referencia, germline, output, regiones = None) :
         cmd += " -L {manifest}".format(manifest = regiones)
     cmd += "\n"
     cmd += "{gatk} FilterMutectCalls -R {ref} -V {id}.vcf --stats {id}.vcf.stats --filtering-stats {id}.filter.tsv -O {id}.filtered.vcf\n".format(ref = referencia, id = output, gatk = cte.gatk)
+    cmd += "python3 {wd}/revisaVcf.py {id}.filtered.vcf {id}.revised.vcf\n".format(wd = cte.scriptdir, id = output)
     cmd += "mkdir variantCalling\n"
     cmd += "cd variantCalling\n"
     cmd += "mv ../mutect* ."
