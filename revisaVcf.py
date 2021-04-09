@@ -23,6 +23,7 @@ def main(path) :
     """
     header = ""
     body = ""
+    output = "mutect.revised.vcf"
     with open(path, "r") as fi :
         for l in fi :
             if l.startswith("#") :
@@ -50,7 +51,7 @@ def main(path) :
                             newformat += ":{}".format(cnt)
                         newline += "{}".format(newformat)
                     body += newline
-    with open("mutect.revised.vcf", "w") as fi :
+    with open(output, "w") as fi :
         fi.write(header)
         fi.write(body)
 
