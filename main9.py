@@ -107,12 +107,14 @@ print("INFO: {}  had 2 or more LOH reported in {} gene".format(len(positive), ge
 
 minim = min(variants.keys())
 maxim = max(variants.keys())
-print(minim)
-print(maxim)
 with open("positionHistogram.tsv", "w") as fi :
     fi.write("position\ttimes\n")
-    for k, v in variants.items() :
-        fi.write("{}\t{}\n".format(k, v))
+    for i in range(minim, maxim+1) :
+        if i in variants.keys() :
+            fi.write("{}\t{}\n".format(i, variants[i]))
+        else :
+            fi.write("{}\t0\n".format(i))
+
 print("INFO: Variant-position histogram stored as positionHistogram.tsv")
 
 with open("variants.tsv", "w") as fi :
