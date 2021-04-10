@@ -105,6 +105,10 @@ print("INFO: Pairs tumor-control: {}".format(pairs))
 print("INFO: Analysis done in {} pairs".format(len(done)))
 print("INFO: {}  had 2 or more LOH reported in {} gene".format(len(positive), genename))
 
+minim = min(variants.keys())
+maxim = max(variants.keys())
+print(minim)
+print(maxim)
 with open("positionHistogram.tsv", "w") as fi :
     fi.write("position\ttimes\n")
     for k, v in variants.items() :
