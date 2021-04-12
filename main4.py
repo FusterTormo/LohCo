@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-"""
+"""MAIN PROGRAM
 TEST REGIONS:
     For each gene
         Get the most significative variant in this gene

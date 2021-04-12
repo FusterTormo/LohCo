@@ -8,6 +8,21 @@ import libcomparison as lc
 import libgetters as lg
 import libstatistics as ls
 
+"""MAIN PROGRAM
+    Compare DNAcopy, ASCAT2, FACETS, ascatNGS, and Sequenza one vs others.
+    The output of this main program is the different comparisons done in a tab-delimited text file.
+    That means, 25 files: i.e. DNAcopy vs itself, vs ASCAT2, vs FACETS, vs ascatNGS, and vs Sequenza.
+    Output files are after used in comparaGoldSet R Notebook to create the plots.
+    Stats calculated:
+        * Bases similarity: Number of bases with same/different aberration reported
+        * Region similarity: Number of regions with same/different aberration reported
+        * Jaccard Index: Number of bases with the same aberration reported divided by all the bases
+        * Matthew's correlation coefficient for each aberration (Amplification, LOH, Deletion and Normal)
+        * Jaccard index for each aberration
+        * Purity repoted by both tools (if this is the case)
+        * Ploidy reported by both tools (if this is the case)
+"""
+
 def getFACETS(path) :
     """ Return the FACETS output files in the submitter folder passed as parameter """
     facets = []

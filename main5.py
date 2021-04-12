@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-"""
+"""MAIN PROGRAM
 TEST REGIONS:
     For each case
         Get the most significative variant in BRCA1, BRCA2, ATM, and PALB2

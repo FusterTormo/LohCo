@@ -11,6 +11,20 @@ import time
 import main1 as lib
 import libconstants as ctes
 
+"""MAIN PROGRAM
+    Count the aberration reported in a gene passed as parameter (BRCA1 or BRCA2 in the tests below).
+    Script checks if the variant calling output file (passed as parameter to add flexibility) is available.
+    Then it gets the worst variant reported by the variant caller in the gene passed as parameter.
+    If the variant is a SNV, it checks if the maximum MAF reported is under the threshold passed as parameter.
+    Then it classifies the case as:
+        * Positive: Pathogenic variant, or SNV with a MAF lower thant the threshold passed as parameter
+        * Negative: No variant, or synonymous variant is the worst variant called
+        * Unkwnown: Other case
+    After that, it checks the copy number reported by ASCAT2, FACETS, ascatNGS and Sequenza and adds the aberration to the corresponding dict.
+    Finally it prints all the counts stdout (including LOH percentage), and in R format to further tests.
+    No R notebook has been created to process this data.
+"""
+
 # Constants
 dbcon = sqlite3.connect("/g/strcombio/fsupek_cancer2/TCGA_bam/info/info.db")
 wd = "/g/strcombio/fsupek_cancer2/TCGA_bam/OV"
