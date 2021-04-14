@@ -90,10 +90,18 @@ for c in cases :
                         if len(aux) > 1 :
                             # Create a histogram that counts the frequency of each position
                             pos = int(aux[1])
-                            if pos in variants.keys() :
+                            ref = aux[2]
+                            alt = aux[3]
+                            if pos in variants.keys()  :
                                 variants[pos] += 1
                             else :
                                 variants[pos] = 1
+                            # In case we prefer to collect the full variant...
+                            """key = "{}-{}-{}".format(pos, ref, alt)
+                            if key in variants.keys() :
+                                variants[key] += 1
+                            else :
+                                variants[key] = 1"""
                             # Store the variant information in a variable
                             data += "{chr}\t{st}\t{end}\t{ref}\t{alt}\t{ex}\t{typex}\t{sub}\t{idtm}\t{idcn}\n".format(chr = aux[0], st = aux[1], end = aux[2], ref = aux[3], alt = aux[4], ex = aux[5], typex = aux[8], sub = c[0], idtm = tm[0], idcn = cn[0])
 
@@ -105,14 +113,19 @@ print("INFO: Pairs tumor-control: {}".format(pairs))
 print("INFO: Analysis done in {} pairs".format(len(done)))
 print("INFO: {}  had 2 or more LOH reported in {} gene".format(len(positive), genename))
 
-with open("positionHistogram.tsv", "w") as fi :
-    fi.write("position\ttimes\n")
-    for k, v in variants.items() :
-        fi.write("{}\t{}\n".format(k, v))
-print("INFO: Variant-position histogram stored as positionHistogram.tsv")
+print("INFO: Variant classification")
+sortList = sorted(variants, key = variants.get, reverse = True)
+for k in sortList :
+    print("{} - {}".format(variants[k], k))
 
+# Print the data in histogram format to do a plot in R that searches for clusters
+# Two possible options to plot the variants
+# 1) From the lowest mutation coordinate
 minim = min(variants.keys())
 maxim = max(variants.keys())
+# 2) From the gene start
+minim = brca1[1]
+maxim = brca1[2]
 with open("positionHistogram2.tsv", "w") as fi :
     fi.write("position\ttimes\n")
     for i in range(minim, maxim+1) :
