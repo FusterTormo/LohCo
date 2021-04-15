@@ -77,53 +77,53 @@ for c in cases :
                 loh.append(aux)
             if len(loh) == 3 :
                 done.append(c[0])
-                # Count the number of LOH found in the patient
-                lohs = loh.count("L") + loh.count("D") # Copy number neutral +`copy number lose`
-                if lohs >= 2 :
-                    positive.append(c[0])
-                    # Get the gene variants
-                    germCall = "{wd}/{sub}/{uuid}/{suffix}".format(wd = wd, sub = c[0], uuid = cn[0], suffix = varCallSuffix)
-                    cmd = "grep {gene} {vc}".format(vc = germCall, gene = genename)
-                    pr = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                    std, err = pr.communicate()
-                    out = std.decode().strip().split("\n")
-                    for o in out :
-                        aux = o.split("\t")
-                        if len(aux) > 1 :
-                            # Create a histogram that counts the frequency of each position
-                            pos = int(aux[1])
-                            ref = aux[2]
-                            alt = aux[3]
-                            if pos in variants.keys()  :
-                                variants[pos] += 1
-                            else :
-                                variants[pos] = 1
-                            # In case we prefer to collect the full variant...
-                            # key = "{}-{}-{}".format(pos, ref, alt)
-                            # if key in variants.keys() :
-                            #     variants[key] += 1
-                            # else :
-                            #     variants[key] = 1
-                            # Store the variant information in a variable
-                            data += "{chr}\t{st}\t{end}\t{ref}\t{alt}\t{ex}\t{typex}\t{sub}\t{idtm}\t{idcn}\n".format(chr = aux[0], st = aux[1], end = aux[2], ref = aux[3], alt = aux[4], ex = aux[5], typex = aux[8], sub = c[0], idtm = tm[0], idcn = cn[0])
-                else :
-                    negative.append(c[0])
-                    germCall = "{wd}/{sub}/{uuid}/{suffix}".format(wd = wd, sub = c[0], uuid = cn[0], suffix = varCallSuffix)
-                    cmd = "grep {gene} {vc}".format(vc = germCall, gene = genename)
-                    pr = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                    std, err = pr.communicate()
-                    out = std.decode().strip().split("\n")
-                    for o in out :
-                        aux = o.split("\t")
-                        if len(aux) > 1 :
-                            # Create a histogram that counts the frequency of each position
-                            pos = int(aux[1])
-                            ref = aux[2]
-                            alt = aux[3]
-                            if pos in negVars.keys()  :
-                                negVars[pos] += 1
-                            else :
-                                negVars[pos] = 1
+            # Count the number of LOH found in the patient
+            lohs = loh.count("L") + loh.count("D") # Copy number neutral +`copy number lose`
+            if lohs >= 2 :
+                positive.append(c[0])
+                # Get the gene variants
+                germCall = "{wd}/{sub}/{uuid}/{suffix}".format(wd = wd, sub = c[0], uuid = cn[0], suffix = varCallSuffix)
+                cmd = "grep {gene} {vc}".format(vc = germCall, gene = genename)
+                pr = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                std, err = pr.communicate()
+                out = std.decode().strip().split("\n")
+                for o in out :
+                    aux = o.split("\t")
+                    if len(aux) > 1 :
+                        # Create a histogram that counts the frequency of each position
+                        pos = int(aux[1])
+                        ref = aux[2]
+                        alt = aux[3]
+                        if pos in variants.keys()  :
+                            variants[pos] += 1
+                        else :
+                            variants[pos] = 1
+                        # In case we prefer to collect the full variant...
+                        # key = "{}-{}-{}".format(pos, ref, alt)
+                        # if key in variants.keys() :
+                        #     variants[key] += 1
+                        # else :
+                        #     variants[key] = 1
+                        # Store the variant information in a variable
+                        data += "{chr}\t{st}\t{end}\t{ref}\t{alt}\t{ex}\t{typex}\t{sub}\t{idtm}\t{idcn}\n".format(chr = aux[0], st = aux[1], end = aux[2], ref = aux[3], alt = aux[4], ex = aux[5], typex = aux[8], sub = c[0], idtm = tm[0], idcn = cn[0])
+            else :
+                negative.append(c[0])
+                germCall = "{wd}/{sub}/{uuid}/{suffix}".format(wd = wd, sub = c[0], uuid = cn[0], suffix = varCallSuffix)
+                cmd = "grep {gene} {vc}".format(vc = germCall, gene = genename)
+                pr = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                std, err = pr.communicate()
+                out = std.decode().strip().split("\n")
+                for o in out :
+                    aux = o.split("\t")
+                    if len(aux) > 1 :
+                        # Create a histogram that counts the frequency of each position
+                        pos = int(aux[1])
+                        ref = aux[2]
+                        alt = aux[3]
+                        if pos in negVars.keys()  :
+                            negVars[pos] += 1
+                        else :
+                            negVars[pos] = 1
 
 
 
