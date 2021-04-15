@@ -120,7 +120,7 @@ for c in cases :
                             pos = int(aux[1])
                             ref = aux[2]
                             alt = aux[3]
-                            if pos in variants.keys()  :
+                            if pos in negVars.keys()  :
                                 negVars[pos] += 1
                             else :
                                 negVars[pos] = 1
