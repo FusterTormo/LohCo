@@ -22,6 +22,8 @@ pairs = 0 # Number of submitters with pair tumor-control
 done = [] # List of submitters with ASCAT2, FACETS and Sequenza done
 positive = [] # List of submitters where ASCAT2, FACETS and Sequenza reported LOH
 variants = {} # Histogram with the positions (key) and the times a variant is reported in that position (value)
+negative = [] # List of submitters where ASCAT2, FACETS and Sequenza do not report LOH (or less than 2 tools report LOH)
+negVars = {} # Histogram with the positions {key} and times a variant is reported in that position (but for negative submitters)
 data = "" # Text table with the information about the variants found
 
 # In the case we want to do it more automatically
@@ -97,14 +99,31 @@ for c in cases :
                             else :
                                 variants[pos] = 1
                             # In case we prefer to collect the full variant...
-                            """key = "{}-{}-{}".format(pos, ref, alt)
-                            if key in variants.keys() :
-                                variants[key] += 1
-                            else :
-                                variants[key] = 1"""
+                            # key = "{}-{}-{}".format(pos, ref, alt)
+                            # if key in variants.keys() :
+                            #     variants[key] += 1
+                            # else :
+                            #     variants[key] = 1
                             # Store the variant information in a variable
                             data += "{chr}\t{st}\t{end}\t{ref}\t{alt}\t{ex}\t{typex}\t{sub}\t{idtm}\t{idcn}\n".format(chr = aux[0], st = aux[1], end = aux[2], ref = aux[3], alt = aux[4], ex = aux[5], typex = aux[8], sub = c[0], idtm = tm[0], idcn = cn[0])
-
+                else :
+                    negative.append(c[0])
+                    germCall = "{wd}/{sub}/{uuid}/{suffix}".format(wd = wd, sub = c[0], uuid = cn[0], suffix = varCallSuffix)
+                    cmd = "grep {gene} {vc}".format(vc = germCall, gene = genename)
+                    pr = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                    std, err = pr.communicate()
+                    out = std.decode().strip().split("\n")
+                    for o in out :
+                        aux = o.split("\t")
+                        if len(aux) > 1 :
+                            # Create a histogram that counts the frequency of each position
+                            pos = int(aux[1])
+                            ref = aux[2]
+                            alt = aux[3]
+                            if pos in variants.keys()  :
+                                negVars[pos] += 1
+                            else :
+                                negVars[pos] = 1
 
 
 
@@ -113,7 +132,7 @@ print("INFO: Pairs tumor-control: {}".format(pairs))
 print("INFO: Analysis done in {} pairs".format(len(done)))
 print("INFO: {}  had 2 or more LOH reported in {} gene".format(len(positive), genename))
 
-print("INFO: Variant classification")
+print("INFO: Positive cases. Variant classification")
 sortList = sorted(variants, key = variants.get, reverse = True)
 for k in sortList :
     print("{} - {}".format(variants[k], k))
@@ -126,7 +145,7 @@ maxim = max(variants.keys())
 # 2) From the gene start
 minim = brca1[1]
 maxim = brca1[2]
-with open("positionHistogram2.tsv", "w") as fi :
+with open("positionHistogram.tsv", "w") as fi :
     fi.write("position\ttimes\n")
     for i in range(minim, maxim+1) :
         if i in variants.keys() :
@@ -134,7 +153,20 @@ with open("positionHistogram2.tsv", "w") as fi :
         else :
             fi.write("{}\t0\n".format(i))
 
-print("INFO: Variant-position histogram stored as positionHistogram.tsv")
+print("INFO: Negative cases. Variant classification")
+sortList = sorted(negVars, key = variants.get, reverse = True)
+for k in sortList :
+    print("{} - {}".format(negVars[k], k))
+
+with open("negativeHistogram.tsv", "w") as fi :
+    fi.write("position\ttimes\n")
+    for i in range(minim, maxim+1) :
+        if i in negVars.keys() :
+            fi.write("{}\t{}\n".format(i, negVars[i]))
+        else :
+            fi.write("{}\t0\n".format(i))
+
+print("INFO: Variant-position histogram stored as positionHistogram.tsv and negativeHistogram.tsv")
 
 with open("variants.tsv", "w") as fi :
     fi.write(data)
