@@ -10,7 +10,7 @@ import main1 as lib
 import main8 as asc
 
 # Constants
-brca1 = ["17", 43044295, 43170245] # Gene of interest to search LOH
+brca1 = ["17", 43044295, 43125483] # Gene of interest to search LOH
 cFolder = "fsupek_cancer2"
 cancer = "OV" # Cancer repository to search
 dbcon = sqlite3.connect("/g/strcombio/fsupek_cancer2/TCGA_bam/info/info.db")
