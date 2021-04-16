@@ -156,7 +156,7 @@ with open("positionHistogram.tsv", "w") as fi :
             fi.write("{}\t0\n".format(i))
 
 print("INFO: Negative cases. Variant classification")
-sortList = sorted(negVars, key = variants.get, reverse = True)
+sortList = sorted(negVars, key = negVars.get, reverse = True)
 for k in sortList :
     print("{} - {}".format(negVars[k], k))
 
