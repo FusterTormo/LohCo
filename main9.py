@@ -41,6 +41,8 @@ with dbcon :
 print("INFO: Total submitters in {} cancer: {}".format(cancer, len(cases)))
 # Get the tumors and controls in each submitter
 for c in cases :
+    if cases.index(c) % 100 == 0 :
+        print("INFO: {} cases executed".format(cases.index(c)))
     with dbcon :
         cur = dbcon.cursor()
         q = cur.execute("SELECT uuid, bamName FROM sample WHERE submitter='{}' AND tumor LIKE '%Tumor%'".format(c[0]))
