@@ -25,6 +25,7 @@ variants = {} # Histogram with the positions (key) and the times a variant is re
 negative = [] # List of submitters where ASCAT2, FACETS and Sequenza do not report LOH (or less than 2 tools report LOH)
 negVars = {} # Histogram with the positions {key} and times a variant is reported in that position (but for negative submitters)
 data = "" # Text table with the information about the variants found
+negData = ""
 
 # In the case we want to do it more automatically
 gene = brca1
@@ -126,7 +127,7 @@ for c in cases :
                             negVars[pos] += 1
                         else :
                             negVars[pos] = 1
-
+                        negData += "{chr}\t{st}\t{end}\t{ref}\t{alt}\t{ex}\t{typex}\t{sub}\t{idtm}\t{idcn}\n".format(chr = aux[0], st = aux[1], end = aux[2], ref = aux[3], alt = aux[4], ex = aux[5], typex = aux[8], sub = c[0], idtm = tm[0], idcn = cn[0])
 
 
 # Check if FACETS/Sequenza/ASCAT2 have reported LOH
@@ -170,6 +171,9 @@ with open("negativeHistogram.tsv", "w") as fi :
 
 print("INFO: Variant-position histogram stored as positionHistogram.tsv and negativeHistogram.tsv")
 
-with open("variants.tsv", "w") as fi :
+with open("posVariants.tsv", "w") as fi :
     fi.write(data)
+
+with open("negVariants.tsv", "w") as fi :
+    fi.write(negData)
 print("INFO: Variant information stored as variants.tsv")
