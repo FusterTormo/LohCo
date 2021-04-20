@@ -147,8 +147,8 @@ for k in sortList :
 minim = min(variants.keys())
 maxim = max(variants.keys())
 # 2) From the gene start
-minim = brca1[1]
-maxim = brca1[2]
+minim = gene[1]
+maxim = gene[2]
 with open("positionHistogram.tsv", "w") as fi :
     fi.write("position\ttimes\n")
     for i in range(minim, maxim+1) :
