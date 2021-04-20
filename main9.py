@@ -109,7 +109,9 @@ for c in cases :
                         # else :
                         #     variants[key] = 1
                         # Store the variant information in a variable
-                        data += "{chr}\t{st}\t{end}\t{ref}\t{alt}\t{ex}\t{typex}\t{sub}\t{idtm}\t{idcn}\n".format(chr = aux[0], st = aux[1], end = aux[2], ref = aux[3], alt = aux[4], ex = aux[5], typex = aux[8], sub = c[0], idtm = tm[0], idcn = cn[0])
+                        # Do not add intergenic, downstream, upstream variants
+                        if aux[5] in ["intronic", "exonic", "splicing", "UTR3", "UTR5"] :
+                            data += "{chr}\t{st}\t{end}\t{ref}\t{alt}\t{ex}\t{typex}\t{sub}\t{idtm}\t{idcn}\n".format(chr = aux[0], st = aux[1], end = aux[2], ref = aux[3], alt = aux[4], ex = aux[5], typex = aux[8], sub = c[0], idtm = tm[0], idcn = cn[0])
             else :
                 negative.append(c[0])
                 germCall = "{wd}/{sub}/{uuid}/{suffix}".format(wd = wd, sub = c[0], uuid = cn[0], suffix = varCallSuffix)
@@ -128,7 +130,9 @@ for c in cases :
                             negVars[pos] += 1
                         else :
                             negVars[pos] = 1
-                        negData += "{chr}\t{st}\t{end}\t{ref}\t{alt}\t{ex}\t{typex}\t{sub}\t{idtm}\t{idcn}\n".format(chr = aux[0], st = aux[1], end = aux[2], ref = aux[3], alt = aux[4], ex = aux[5], typex = aux[8], sub = c[0], idtm = tm[0], idcn = cn[0])
+                        # Do not add intergenic, downstream, upstream variants
+                        if aux[5] in ["intronic", "exonic", "splicing", "UTR3", "UTR5"] :
+                            negData += "{chr}\t{st}\t{end}\t{ref}\t{alt}\t{ex}\t{typex}\t{sub}\t{idtm}\t{idcn}\n".format(chr = aux[0], st = aux[1], end = aux[2], ref = aux[3], alt = aux[4], ex = aux[5], typex = aux[8], sub = c[0], idtm = tm[0], idcn = cn[0])
 
 
 # Check if FACETS/Sequenza/ASCAT2 have reported LOH
