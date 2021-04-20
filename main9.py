@@ -182,3 +182,10 @@ with open("posVariants.tsv", "w") as fi :
 with open("negVariants.tsv", "w") as fi :
     fi.write(negData)
 print("INFO: Variant information stored as variants.tsv")
+print("INFO: Creating the plots")
+cmd = "Rscript main9.R"
+pr = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+std, err = pr.communicate()
+print(std.decode())
+if pr.returncode != 0 :
+    print("WARNING: Error found while running R. Description\n".format(err.decode()))
