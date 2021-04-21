@@ -140,10 +140,10 @@ print("INFO: Pairs tumor-control: {}".format(pairs))
 print("INFO: Analysis done in {} pairs".format(len(done)))
 print("INFO: {}  had 2 or more LOH reported in {} gene".format(len(positive), genename))
 
-print("INFO: Positive cases. Variant classification")
-sortList = sorted(variants, key = variants.get, reverse = True)
-for k in sortList :
-    print("{} - {}".format(variants[k], k))
+# print("INFO: Positive cases. Variant classification")
+# sortList = sorted(variants, key = variants.get, reverse = True)
+# for k in sortList :
+#     print("{} - {}".format(variants[k], k))
 
 # Print the data in histogram format to do a plot in R that searches for clusters
 # Two possible options to plot the variants
@@ -161,10 +161,10 @@ with open("positionHistogram.tsv", "w") as fi :
         else :
             fi.write("{}\t0\n".format(i))
 
-print("INFO: Negative cases. Variant classification")
-sortList = sorted(negVars, key = negVars.get, reverse = True)
-for k in sortList :
-    print("{} - {}".format(negVars[k], k))
+# print("INFO: Negative cases. Variant classification")
+# sortList = sorted(negVars, key = negVars.get, reverse = True)
+# for k in sortList :
+#     print("{} - {}".format(negVars[k], k))
 
 with open("negativeHistogram.tsv", "w") as fi :
     fi.write("position\ttimes\n")
