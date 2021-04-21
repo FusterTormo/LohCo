@@ -15,9 +15,9 @@ brca2 = ["13", 32315508, 32400268]
 cFolder = "fsupek_cancer2"
 cancer = "OV" # Cancer repository to search
 dbcon = sqlite3.connect("/g/strcombio/fsupek_cancer2/TCGA_bam/info/info.db")
-
 wd = "/g/strcombio/{cancer_path}/TCGA_bam/{c}".format(c = cancer, cancer_path = cFolder)
 
+# Variables
 # Stats
 pairs = 0 # Number of submitters with pair tumor-control
 done = [] # List of submitters with ASCAT2, FACETS and Sequenza done
@@ -183,7 +183,7 @@ with open("negVariants.tsv", "w") as fi :
     fi.write(negData)
 print("INFO: Variant information stored as variants.tsv")
 print("INFO: Creating the plots")
-cmd = "Rscript main9.R"
+cmd = "Rscript main9.R {}".format(genename)
 pr = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 std, err = pr.communicate()
 print(std.decode())
