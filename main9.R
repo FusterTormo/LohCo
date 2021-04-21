@@ -5,8 +5,8 @@ gene = sysarg[1][1]
 
 # Load the data
 cat("R-INFO: Loading data\n")
-p <- read.table("positionHistogram.tsv", header = TRUE, sep = "\t")
-n <- read.table("negativeHistogram.tsv", header = TRUE, sep = "\t")
+p <- read.table("~/tempVM/vpn_compartida/positionHistogram.tsv", header = TRUE, sep = "\t")
+n <- read.table("~/tempVM/vpn_compartida/negativeHistogram.tsv", header = TRUE, sep = "\t")
 mt <- matrix(c(p$times, n$times), nrow = 2, byrow = TRUE)
 pos <- read.table("posVariants.tsv", header = FALSE, sep = "\t")
 neg <- read.table("negVariants.tsv", header = FALSE, sep = "\t")

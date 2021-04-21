@@ -5,9 +5,11 @@ import os
 import sqlite3
 import subprocess
 import sys
+import time
 
 import main1 as lib
 import main8 as asc
+import libconstants as cte
 
 # Constants
 brca1 = ["17", 43044295, 43125483] # Gene of interest to search LOH
@@ -18,6 +20,9 @@ cFolder = "fsupek_cancer2"
 cancer = "OV" # Cancer repository to search
 dbcon = sqlite3.connect("/g/strcombio/fsupek_cancer2/TCGA_bam/info/info.db")
 wd = "/g/strcombio/{cancer_path}/TCGA_bam/{c}".format(c = cancer, cancer_path = cFolder)
+
+def getTime() :
+    return time.strftime("%H:%M:%S", time.gmtime())
 
 # Variables
 # Stats
@@ -36,17 +41,19 @@ genename = "BRCA1"
 varCallSuffix = "platypusGerm/platypus.hg38_multianno.txt"
 #varCallSuffix = "strelkaGerm/results/variants/strelka.hg38_multianno.txt"
 
+print("{} INFO: Getting {} submitters".format(getTime(), cancer))
 # Get the submitter IDs from the cancer repository
 with dbcon :
       cur = dbcon.cursor()
       q = cur.execute("SELECT submitter FROM patient WHERE cancer='{cancer}'".format(cancer = cancer))
       cases = q.fetchall()
 
-print("INFO: Total submitters in {} cancer: {}".format(cancer, len(cases)))
+print("{} INFO: Total submitters in {} cancer: {}".format(getTime(), cancer, len(cases)))
 # Get the tumors and controls in each submitter
 for c in cases :
     if cases.index(c) % 100 == 0 :
         print("INFO: {} cases executed".format(cases.index(c)))
+    print("{} INFO: Checking {}".format(getTime(), c[0]))
     with dbcon :
         cur = dbcon.cursor()
         q = cur.execute("SELECT uuid, bamName FROM sample WHERE submitter='{}' AND tumor LIKE '%Tumor%'".format(c[0]))
@@ -138,9 +145,9 @@ for c in cases :
 
 
 # Check if FACETS/Sequenza/ASCAT2 have reported LOH
-print("INFO: Pairs tumor-control: {}".format(pairs))
-print("INFO: Analysis done in {} pairs".format(len(done)))
-print("INFO: {}  had 2 or more LOH reported in {} gene".format(len(positive), genename))
+print("{} INFO: Pairs tumor-control: {}".format(getTime(), pairs))
+print("{} INFO: Analysis done in {} pairs".format(getTime(), len(done)))
+print("{} INFO: {}  had 2 or more LOH reported in {} gene".format(getTime(), len(positive), genename))
 
 # print("INFO: Positive cases. Variant classification")
 # sortList = sorted(variants, key = variants.get, reverse = True)
@@ -176,18 +183,33 @@ with open("negativeHistogram.tsv", "w") as fi :
         else :
             fi.write("{}\t0\n".format(i))
 
-print("INFO: Variant-position histogram stored as positionHistogram.tsv and negativeHistogram.tsv")
+print("{} INFO: Variant-position histogram stored as positionHistogram.tsv and negativeHistogram.tsv".format(getTime()))
 
 with open("posVariants.tsv", "w") as fi :
     fi.write(data)
 
 with open("negVariants.tsv", "w") as fi :
     fi.write(negData)
-print("INFO: Variant information stored as variants.tsv")
-print("INFO: Creating the plots")
+
+print("{} INFO: Variant information stored as variants.tsv".format(getTime()))
+print("{} INFO: Creating the plots".format(getTime()))
 cmd = "Rscript main9.R {}".format(genename)
 pr = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 std, err = pr.communicate()
 print(std.decode())
 if pr.returncode != 0 :
     print("WARNING: Error found while running R. Description\n".format(err.decode()))
+
+# Post-production. Check the positive variants and remove the submitters with a pathogenic variant
+# posSubmitters = [] # Submitters with a pathogenic variant found
+# for v in variants :
+#     if v[7] not in posSubmitters : #Only check variants that are not in submitters with pathogenic variant
+#         if v[6] in cte.var_positive :
+#             posSubmitters.append(v[7])
+#
+# print("INFO: Removed {} submitters with a pathogenic variant".format(len(posSubmitters)))
+# # Create a new dict with the variants from the submitters that are not considered positive
+# posVars = {}
+# for k, v in variants.items() :
+#     if v[7] not in posSubmitters :
+#         posVars
