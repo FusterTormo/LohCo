@@ -16,14 +16,14 @@ colnames(neg) <- c("chr", "start", "end", "ref", "alt", "position", "exonic", "s
 cat("R-INFO: Data loaded successfully. Creating the plots\n")
 # The plots
 # Number of times a position is mutated in BRCA1
-png(width = 1261, height = 906, filename = paste(gene, "_genePos.png"))
+png(width = 1261, height = 906, filename = paste(gene, "_genePos.png", sep = ""))
 plot(p$times, pch = 18, col = "red", main = "Variant position", xlab = "BRCA1 position", ylab = "Variants found")
 points(n$times, pch = 20, col = "blue")
 legend("topleft", fill = c("red", "blue"), legend = c("Positive", "Negative"))
 dev.off()
 
 # Barplot different mutations (exonic, intronic, UTR...)
-png(width = 1261, height = 906, filename = paste(gene, "_varType.png"))
+png(width = 1261, height = 906, filename = paste(gene, "_varType.png", sep = ""))
 e1 <- as.data.frame(table(pos$position))
 e2 <- as.data.frame(table(neg$position))
 both <- merge(e1, e2, by = "Var1", all = TRUE)
@@ -34,7 +34,7 @@ text(p, mt+40, labels = mt)
 dev.off()
 
 # Barplot different exonic mutations
-png(width = 1261, height = 906, filename = paste(gene, "_exonicVarType.png"))
+png(width = 1261, height = 906, filename = paste(gene, "_exonicVarType.png", sep = ""))
 e1 <- as.data.frame(table(pos$exonic))
 e2 <- as.data.frame(table(neg$exonic))
 exonic <- merge(e1, e2, by = "Var1", all = TRUE)
@@ -54,7 +54,7 @@ ggp <- data.frame(name = "Positive", variants = e1$variants)
 ggn <- data.frame(name = "Negative", variants = e2$variants)
 gg <- rbind(ggp, ggn)
 ggplot(gg, aes(y=variants, x=name, fill = name)) + geom_violin(trim = FALSE) + geom_boxplot(width = 0.1) + theme_classic() + scale_x_discrete(name = "") + ggtitle("Variants per submitter")
-ggsave(filename = paste(gene, "_varsXsubmitter.png"), device = "png", dpi = 320, width = 26, height = 26, units = "cm")
+ggsave(filename = paste(gene, "_varsXsubmitter.png", sep = ""), device = "png", dpi = 320, width = 26, height = 26, units = "cm")
 
 # Calculate dN/dS ratio in positive/negative samples
 non <- exonic[exonic$name == "nonsynonymous SNV",][2:3]
