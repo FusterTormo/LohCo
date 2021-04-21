@@ -12,6 +12,8 @@ import main8 as asc
 # Constants
 brca1 = ["17", 43044295, 43125483] # Gene of interest to search LOH
 brca2 = ["13", 32315508, 32400268]
+atm = ["11", 108222832, 108369099]
+palb2 = ["16", 23603165, 23641310]
 cFolder = "fsupek_cancer2"
 cancer = "OV" # Cancer repository to search
 dbcon = sqlite3.connect("/g/strcombio/fsupek_cancer2/TCGA_bam/info/info.db")
@@ -29,8 +31,8 @@ data = "" # Text table with the information about the variants found
 negData = ""
 
 # In the case we want to do it more automatically
-gene = brca2
-genename = "BRCA2"
+gene = brca1
+genename = "BRCA1"
 varCallSuffix = "platypusGerm/platypus.hg38_multianno.txt"
 #varCallSuffix = "strelkaGerm/results/variants/strelka.hg38_multianno.txt"
 
