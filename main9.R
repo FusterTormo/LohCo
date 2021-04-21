@@ -2,7 +2,6 @@ library(ggplot2)
 # Get the gene name for 
 sysarg <- commandArgs(trailingOnly = TRUE)
 gene = sysarg[1][1]
-gene = "test"
 
 # Load the data
 cat("R-INFO: Loading data\n")
