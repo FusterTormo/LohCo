@@ -41,6 +41,7 @@ if file in tools.keys() and repo in cancers.keys() :
 
         for tm in tumors :
             for cn in controls :
+                all += 1
                 prefix = "{}_VS_{}".format(tm[0].split("-")[0], cn[0].split("-")[0])
                 wd = "{tmpath}/{cancer}/{prefix}{suffix}".format(tmpath = cancers[repo], cancer = repo, prefix = prefix, suffix = tool[file]["suffix"])
                 if os.path.isdir(wd) :
@@ -55,5 +56,11 @@ if file in tools.keys() and repo in cancers.keys() :
                         aux = "{}/{}".format(wd, tools[file]["file"])
                         if os.path.isfile(aux) :
                             success += 1
+    print("---------------\n--- Summary ---\n---------------\n")
+    print("\t{} pairs tumor-control".format(all))
+    print("\t{} analyses done".format(done))
+    print("\t{} succeed, {} errors".format(success, done-success))
+
+
 else :
     print("ERROR: Invalid option {} or {}".format(file, repo))
