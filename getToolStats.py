@@ -46,7 +46,7 @@ if file in tools.keys() and repo in cancers.keys() :
             for cn in controls :
                 all += 1
                 prefix = "{}_VS_{}".format(tm[0].split("-")[0], cn[0].split("-")[0])
-                wd = "{tmpath}/{cancer}/{prefix}{suffix}".format(tmpath = cancers[repo], cancer = repo, prefix = prefix, suffix = tools[file]["suffix"])
+                wd = "{tmpath}/{cancer}/{submitter}/{prefix}{suffix}".format(tmpath = cancers[repo], cancer = repo, prefix = prefix, suffix = tools[file]["suffix"], submitter = c[0])
                 if os.path.isdir(wd) :
                     done += 1
                     if file == "ascatNGS" or file == "Sequenza" :
