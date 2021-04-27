@@ -373,7 +373,7 @@ def getMutect2(input, referencia, germline, output, regiones = None) :
         str
             Comandos para ejecutar Mutect2 en el archivo bam que se ha pasado por parametro
     """
-    cmd = "{gatk} Mutect2 -I {input} -R {ref} --germline-resource {gnomad} -O {salida}.vcf".format(input = input, ref = referencia, gnomad = germline, salida = output, gatk = cte.gatk)
+    cmd = "{gatk} Mutect2 -I {input} -R {ref} --germline-resource {gnomad} -O {salida}.vcf --dont-use-soft-clipped-bases true".format(input = input, ref = referencia, gnomad = germline, salida = output, gatk = cte.gatk)
     if regiones != None :
         cmd += " -L {manifest}".format(manifest = regiones)
     cmd += "\n"
