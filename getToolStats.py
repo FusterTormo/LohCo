@@ -8,6 +8,9 @@ MAIN: Get, from a cancer passed as parameter:
     * number of analyses failed
 """
 
+import sqlite3
+import os
+
 cancers = {"OV" : "/g/strcombio/fsupek_cancer2/TCGA_bam", "BRCA" : "/g/strcombio/fsupek_cancer3/TCGA_bam"}
 tools = {
     "FACETS" : {"file" : "facets_comp_cncf.tsv", "suffix" : "_FACETS"},
@@ -18,7 +21,7 @@ tools = {
 
 dbcon = sqlite3.connect("/g/strcombio/fsupek_cancer2/TCGA_bam/info/info.db")
 file = input("Which tool you want to check the analyses?\nOptions: ({}) ".format(" - ".join(tools.keys())))
-repo = input("Which cancer check the tool?\nOptions: ({}) ".format(" - ".join(cancers.keys())))1
+repo = input("Which cancer check the tool?\nOptions: ({}) ".format(" - ".join(cancers.keys())))
 
 all = 0
 done = 0
@@ -26,10 +29,10 @@ success = 0
 
 with dbcon :
       cur = dbcon.cursor()
-      q = cur.execute("SELECT submitter FROM patient WHERE cancer='{cancer}'".format(cancer = cancer))
+      q = cur.execute("SELECT submitter FROM patient WHERE cancer='{cancer}'".format(cancer = repo))
       cases = q.fetchall()
 
-print("{} INFO: Total submitters in {} cancer: {}".format(getTime(), cancer, len(cases)))
+print("INFO: Total submitters in {} cancer: {}".format(repo, len(cases)))
 if file in tools.keys() and repo in cancers.keys() :
     for c in cases :
         with dbcon :
@@ -42,7 +45,7 @@ if file in tools.keys() and repo in cancers.keys() :
         for tm in tumors :
             for cn in controls :
                 prefix = "{}_VS_{}".format(tm[0].split("-")[0], cn[0].split("-")[0])
-                wd = "{tmpath}/{cancer}/{prefix}{suffix}".format(tmpath = cancers[repo], cancer = repo, prefix = prefix, suffix = tool[file]["suffix"])
+                wd = "{tmpath}/{cancer}/{prefix}{suffix}".format(tmpath = cancers[repo], cancer = repo, prefix = prefix, suffix = tools[file]["suffix"])
                 if os.path.isdir(wd) :
                     done += 1
                     if file == "ascatNGS" or file == "Sequenza" :
