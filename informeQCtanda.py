@@ -9,6 +9,43 @@ import sys
 import constantes as cte
 import vcfQC
 
+def datosPlantilla() :
+    """La plantilla necesita
+        * una tabla de variantes (formato <tr><td>CROMOSOMA</td><td>POSICION</td><td>REF</td><td>ALT</td><td>GEN</td><td>VECES</td>),
+        * lista con las imagenes de los coverages de cada gen (formato <img src='IMAGEN'>)
+        * lista con los porcentajes de bases que tiene cada muestra (formato <img src='IMAGEN')
+    """
+    # Crear la tabla de variantes
+    tabVar = ""
+    fullpath = os.getcwd().split("/")[1:-1]
+    cmd = "cut -f1,2,4,5,7 /{}/*/variantCalling/raw.hg19_multianno.txt | sort -k1,1 -V | grep -v Chr | uniq -c | sort -k1 -k2,1 -V".format("/".join(fullpath))
+    proc = subprocess.Popen(cmd, shell = True, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+    out, err = proc.communicate()
+    fils = out.decode().split("\n")
+    for f in fils :
+        tmp = f.split("\t")
+        aux = tmp[0].split()
+        if len(aux) == 2 :
+            times, chr = aux
+            pos = tmp[1]
+            ref = tmp[2]
+            alt = tmp[3]
+            gen = tmp[4]
+            tabVar += "<tr><td>chr{crom}</td><td>{pos}</td><td>{ref}</td><td>{alt}</td><td>{gen}</td><td>{times}</td></tr>\n".format(crom = chr, pos = pos, ref = ref, alt = alt, gen = gen, times = times)
+    # Crear las lista de imagenes con los coverages. Las imagenes que empiezan por cov* son coverages por base en cada gen. Las que acaban en _coverage.png son porcentajes
+    files = os.listdir(os.getcwd())
+    files.sort()
+    covs = ""
+    samps = ""
+    for f in files :
+        if f.endswith(".png") : # Es una imagen
+            if f.endswith("_coverage.png") :
+                samps += "<img src='{}'>\n".format(f)
+            elif f.startswith("cov") :
+                covs += "<img src='{}'>\n".format(f)
+
+    return tabVar, covs, samps
+
 def recogerDatos(ruta = "./") :
     if ruta == "./" :
         print("INFO: Realizando control de calidad en {}".format(os.getcwd()))
@@ -22,7 +59,10 @@ def recogerDatos(ruta = "./") :
     datos = {}
     for d in dirs :
         datos[d] = {"FQ" : 0, "BAM" : 0, "ON" : 0, "OFF" : 0, "COV" : {}, "VCF" : {}, "COV_PATH" : ""}
-        path = "{}/{}".format(ruta, d)
+        if ruta == "./" : # Cambiar la ruta relativa por una ruta absoluta
+            path = "{}/{}".format(os.getcwd(), d)
+        else :
+            path = "{}/{}".format(ruta, d)
         qc = "{}/{}".format(path, cte.qcaln)
         # Guardar en el diccionario los parametros de calidad del bam
         if os.path.isfile(qc) :
@@ -93,6 +133,11 @@ def scriptR(datos) :
         matriu2 = "mt <- matrix(c("
         for k, v in datos.items() :
             sampname = k.replace("-", "").lower() # Eliminar los guiones y convertir a minusculas
+            try : # Comprobar si el identificador de muestra es un numero. En ese caso ponerle una letra delante para que no de errores el script de R
+                int(sampname)
+                sampname = "p{}".format(sampname)
+            except ValueError :
+                pass
             muestras += "{smp} <- c({fq}, {bam}, {on}, {off})\n".format(smp = sampname, fq = v["FQ"], bam = v["BAM"], on = v["ON"], off = v["OFF"])
             coverages += "{smp}.cov <- read.table('{cov}', header = FALSE, sep = '\\t')\n".format(smp = sampname, cov = v["COV_PATH"])
             coverages += "colnames({smp}.cov) <- c('chr', 'start', 'end', 'gene', 'pos', 'coverage')\n".format(smp = sampname)
@@ -115,6 +160,11 @@ def scriptR(datos) :
         fi.write("\n# Graficos de barras con el porcentaje de bases con un coverage determinado\n")
         for k in datos.keys() :
             sampname = k.replace("-", "").lower() # Eliminar los guiones y convertir a minusculas
+            try : # Comprobar si el identificador de muestra es un numero. En ese caso ponerle una letra delante para que no de errores el script de R
+                int(sampname)
+                sampname = "p{}".format(sampname)
+            except ValueError :
+                pass
             fi.write("\ntotal <- length({}.cov$coverage)\n".format(sampname))
             fi.write("men0 <- round(100*length({smp}.cov[{smp}.cov$coverage >= 0,]$coverage)/total, 2)\n".format(smp = sampname))
             fi.write("men30 <- round(100*length({smp}.cov[{smp}.cov$coverage >= 30,]$coverage)/total, 2)\n".format(smp = sampname))
@@ -149,6 +199,11 @@ def scriptR(datos) :
                 it = 1
                 for k in datos.keys() :
                     sampname = k.replace("-", "").lower() # Eliminar los guiones y convertir a minusculas
+                    try : # Comprobar si el identificador de muestra es un numero. En ese caso ponerle una letra delante para que no de errores el script de R
+                        int(sampname)
+                        sampname = "p{}".format(sampname)
+                    except ValueError :
+                        pass
                     all += "aux{}$coverage,".format(sampname)
                     if plot == "" :
                         plot = "plot(aux{smp}$coverage, type = 'l', main = 'Coverage {gen}', col = rainbow({lon})[{it}], ylim = c(0, maxi))\n".format(smp = sampname, gen = g, lon = len(datos), it = it)
@@ -174,9 +229,10 @@ def main() :
     path = ""
     outDir = "informeGlobal"
     if dir.startswith(cte.prefijoTanda) :
-        if os.path.isidir(outDir) :
+        if os.path.isdir(outDir) :
             shutil.rmtree(outDir)
         dc = recogerDatos()
+        tanda = dir.replace(cte.prefijoTanda, "")
     else :
         tanda = input("INPUT: Numero de tanda donde se realiza el control de calidad: ")
         try :
@@ -184,7 +240,7 @@ def main() :
         except ValueError :
             print("ERROR: Numero de tanda erroneo")
             sys.exit(1)
-        path = "{wd}/tanda{tn}".format(wd = cte.workindir, tn = tanda)
+        path = "{wd}/{pre}{tn}".format(wd = cte.workindir, tn = tanda, pre = cte.prefijoTanda)
         if os.path.isdir("{}/{}".format(path, outDir)) :
             shutil.rmtree("{}/{}".format(path, outDir))
         dc = recogerDatos(path)
@@ -213,6 +269,20 @@ def main() :
         print(err.decode())
     else :
         print("INFO: Graficos generados correctamente")
+        print("INFO: Creando web con el informe")
+        # Guardar el contenido de la plantilla en una variable
+        with open(cte.pathAllTemplate, "r") as fi :
+            txt = fi.read()
+
+        vars, bases, cov = datosPlantilla() # Recoger los datos necesarios para rellenar la plantilla
+
+        fic = cte.pathAllTemplate.split("/")[-1]
+        with open(fic, "w") as fi :
+            fi.write(txt.format(tanda = "{}{}".format(cte.prefijoTanda, tanda), variantes = vars, percentBases = cov, covBases = bases))
+
+        shutil.copyfile(cte.pathAllCss, cte.pathAllCss.split("/")[-1])
+        shutil.copyfile(cte.pathAllJs, cte.pathAllJs.split("/")[-1])
+        print("INFO: Todo guardado en {}".format(os.getcwd()))
 
 
 if __name__ == "__main__" :

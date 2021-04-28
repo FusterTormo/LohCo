@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+	<title>Informe {tanda}</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="estilosQC.css">
+	<script src="funcionesQC.js"></script>
+</head>
+<body onload="crearModal()">
+	<header>
+		TODO. Escriure una capçalera
+	</header>
+	<nav>
+			<button type="button" class="boton select" onclick="abrir('variantes', this)">Variantes</button>
+			<button type="button" class="boton" onclick="abrir('qc', this)">FASTQ-QC, SNV-QC</button>
+			<button type="button" class="boton" onclick="abrir('porcentaje', this)">Porcentaje de coverage</button>
+			<button type="button" class="boton" onclick="abrir('coverage', this)">Coverage genes</button>
+	</nav>
+
+	<section id="variantes" class="visible">
+		<div id="buscar">
+			Buscar
+			<input type="text" name="chr" id="chr" autocomplete="off" placeholder="Cromosoma" maxlength="2" onkeyup="buscar('posicion')">
+			<input type="number" name="position" id="position" autocomplete="off" placeholder="Posicion" onkeyup="buscar('posicion')">
+			<input type="text" name="gene" id="gene" autocomplete="off" placeholder="Gen" onkeyup="buscar('gen')">
+		</div>
+		<div>
+			<table>
+				<thead>
+					<tr><th>Cromosoma</th><th>Posici&oacute;n</th><th>Referencia</th><th>Alterado</th><th>Gen</th><th>Encontrada</th></tr>
+				</thead>
+				<tbody id="tabVar">
+					{variantes}
+				</tbody>
+			</table>
+		</div>
+	</section>
+	<section id="qc" class="invisible">
+		<img src="readsQC.png">
+		<img src="snvQC.png">
+	</section>
+	<section id="porcentaje" class="invisible">
+		{percentBases}
+	</section>
+	<section id="coverage" class="invisible">
+		{covBases}
+	</section>
+
+	<div id="elModal" class="modal">
+	  <span class="close">&times;</span>
+	  <img class="modal-content" id="imagen">
+	</div>
+</body>
+</html>

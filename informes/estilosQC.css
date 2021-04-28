@@ -1,0 +1,140 @@
+* {
+	margin: 0;
+	font-family: Arial,Helvetica,Garuda,sans-serif;
+	box-sizing: border-box;
+}
+
+/*Estilos de la cabecera*/
+header {
+	width: 100%;
+	padding: 30px 0;
+	background-color: #9f8cd9;
+	font-size: 2em;
+	font-weight: bold;
+	text-align: center;
+}
+
+/*Estilos de la barra de navegacion (botones)*/
+nav .boton {
+	background-color: #8c66ff;
+	color: #ffffff;
+	float: left;
+	border: none;
+	outline: none;
+	cursor: pointer;
+	padding: 14px 16px;
+	width: 25%;
+	font-size: 16px;
+}
+
+nav .boton:hover {
+	background: #794dff;
+}
+
+nav .select {
+	font-weight: bold;
+	background-color: #794dff;
+}
+
+.visible {
+	display : block;
+}
+
+.invisible {
+	display: none;
+}
+
+section {
+	margin: 50px 20px;
+}
+
+/*Estilos de la pestana de variantes*/
+#variantes table {
+	width: 100%;
+	margin-top: 5px;
+	border-collapse: collapse;
+}
+
+#variantes table tr td, #variantes table tr th {
+	padding: 10px;
+}
+
+#variantes table tr th {
+	border-bottom: 1px solid black;
+	text-align: left;
+}
+
+#variantes table tr:nth-child(even) {
+	background-color: #eee;
+}
+
+/*Estilos de la pestana de parametros de calidad*/
+#qc img {
+	max-width: 50%;
+	height: auto;
+	border: 1px dashed black;
+}
+
+/*Estilos de la pestana de porcentaje de coverage*/
+#porcentaje img {
+	max-width: 24%;
+	height: auto;
+	cursor: pointer;
+	transition: 0.3s;
+}
+
+/*Estilos de la pestana de coverage en cada gen*/
+#coverage img {
+	max-width: 10.5%;
+	height: auto;
+	cursor: pointer;
+	transition: 0.3s;
+}
+
+/* Cuando se pone el cursor en alguna de las imagenes de la seccion #porcentaje y #coverage, se difumina y se le añade un porder para resaltar*/
+#coverage img:hover, #porcentaje img:hover {
+	opacity: 0.7;
+	border: 1px solid #8c66ff;
+}
+
+/*Modal para mostrar las imagenes a tamano completo*/
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1;
+  padding-top: 100px;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0,0,0,0.9);
+}
+
+.modal-content {
+  margin: auto;
+  display: block;
+  width: 80%;
+  max-width: 700px;
+}
+
+.modal-content {
+  animation-name: zoom;
+  animation-duration: 0.6s;
+}
+
+@keyframes zoom {
+  from {transform: scale(0.1)}
+  to {transform: scale(1)}
+}
+
+.close {
+  position: absolute;
+  top: 15px;
+  right: 35px;
+  color: #f1f1f1;
+  font-size: 40px;
+  font-weight: bold;
+  transition: 0.3s;
+  cursor: pointer;
+}
