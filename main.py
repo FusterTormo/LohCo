@@ -10,14 +10,15 @@ import subprocess
 import sys
 
 import bamQC as bq
+import constantes as cte
 import creaLog as cl
 import data2excel as xls
 import filtStrelka as fis
 import filtMutect as fim
 import getCommands as gc
-import manifestOp as op
 import informeQC as qc
-import constantes as cte
+import informeQCtanda as globalqc
+import manifestOp as op
 
 def reanalizar() :
     """Reanalizar una muestra sin borrar lo que ya esta guardado"""
@@ -247,7 +248,8 @@ def GUI() :
     print("5. Anotar y filtrar un vcf")
     print("6. Reanalizar una muestra de una tanda, conservando el analisis previo")
     print("7. Anotar un manifest")
-    print("8. Crear un informe de la calidad de los FASTQ, el alineamiento y el coverage\n")
+    print("8. Crear un informe de la calidad de los FASTQ, el alineamiento y el coverage")
+    print("9. Crear un informe de la tanda")
     opt = input("INPUT: Numero de opcion: ")
     # Comprobar si la opcion es un numero
     try :
@@ -281,6 +283,9 @@ def GUI() :
     elif opt == 8 :
         ruta = input("INPUT: Muestra o numero de tanda en la que realizar el informe: ")
         hacerInforme(ruta)
+    elif opt == 9 :
+        print("\n")
+        globalqc.main()
     else :
         print("ERROR: Opcion no valida")
         sys.exit(1)
