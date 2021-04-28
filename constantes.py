@@ -45,3 +45,8 @@ variantstats = "variants.stats.txt"
 # Ruta para encontrar las plantillas para los informes web
 pathTemplate = "/home/ffuster/AUP/informes/informe.html"
 pathCss = "/home/ffuster/AUP/informes/estils.css"
+
+# Ruta para encontrar las plantillas para los informes web de la tanda entera
+pathAllTemplate = "/home/ffuster/AUP/informes/qcGlobal.html"
+pathAllCss = "/home/ffuster/AUP/informes/estilosQC.css"
+pathAllJs = "/home/ffuster/AUP/informes/funcionesQC.js"
