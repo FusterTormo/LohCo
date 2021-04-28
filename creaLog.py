@@ -331,5 +331,8 @@ def prepararPanel(ruta, acciones) :
                     if id not in hechos :
                         fi.write("analisi {params}\n".format(params = params))
                         hechos.append(id)
+            # Hacer un informe de calidad del panel analizado
+            fi.write("cd {}/{}\n".format(cte.workindir, tanda))
+            fi.write("python3 {wd}/informeQCtanda.py".format(wd = cte.scriptdir))
         print("INFO: Log guardado como {}/{}".format(cte.workindir, arxiu))
         os.chmod(arxiu, 0o754) # Dar permiso de ejecuion para el propietario, lectura y escritura para el grupo, y lectura para el resto de usuarios
