@@ -48,6 +48,8 @@ def getMyVariant(chr, pos, ref, alt, na='NA', assembly = "hg19") :
             Base observada en lugar de la de referencia. Se comprueba que sea un unico caracter (A, C, T o G)
         na : str, optional
             Texto que aparecera cuando no se encuentra informacion en un campo. Por defecto 'NA'
+        assembly : str, optional
+            Genoma de referencia en el que quieren recoger las variantes. Por defecto 'hg19'
     Returns
     -------
         dict
