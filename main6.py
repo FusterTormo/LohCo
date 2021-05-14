@@ -62,6 +62,18 @@ def getSequenza(path) :
                     sequenza.append(aux2)
     return sequenza
 
+# TODO: Comprovar que les rutes dels arxius son correctes
+def getPurple(path) :
+    """Return the PURPLE output files in the submitter folder passed as parameter"""
+    purple = []
+    folders = os.listdir(path)
+    for f in folders :
+        if f.endswith("_PURPLE") :
+            aux = "{abs}/{fa}/TUMOR.purple.cnv.somatic.tsv".format(abs = path, fa = f)
+            if os.path.isfile(aux) :
+                purple.append(aux)
+    return purple
+
 def getJaccard(comp, a) :
     try :
         return comp[a][a]/(comp[a]["A"] + comp[a]["L"] + comp[a]["N"] + comp[a]["D"] + comp["A"][a] + comp["L"][a] + comp["N"][a] + comp["D"][a] -comp[a][a])
@@ -168,6 +180,16 @@ def main() :
                     with open("ascat2VSsequenza.tsv", "a") as fi :
                         fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = b, cmp = compareTools(ascat, seq)))
 
+            purpleFiles = getPurple(workindir)
+            for a in ascatFiles :
+                ascat = lc.convert2region("{}/{}".format(ascatFolder, a), "ascatarray")
+                for b in sequenzaFiles :
+                    purp = lc.convert2region(b, "purple", "error")
+                    if not os.path.isfile("ascat2VSpurple.tsv") :
+                        createFile("ascat2VSpurple.tsv")
+                    with open("ascat2VSpurple.tsv", "a") as fi :
+                        fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = b, cmp = compareTools(ascat, purp)))
+
     # Move the output data to a new folder
     os.mkdir("main6")
     os.rename("ascat2VSascat2.tsv", "main6/ascat2VSascat2.tsv")
@@ -175,6 +197,9 @@ def main() :
     os.rename("ascat2VSfacets.tsv", "main6/ascat2VSfacets.tsv")
     os.rename("ascat2VSascatNGS.tsv", "main6/ascat2VSascatNGS.tsv")
     os.rename("ascat2VSsequenza.tsv", "main6/ascat2VSsequenza.tsv")
+    os.rename("ascat2VSpurple.tsv", "main6/ascat2VSpurple.tsv")
+    # TODO: Eliminar aquesta linia una vegada estiga comprovat que funciona
+    sys.exit()
 
     # Repeat the analysis, but using Arrays as True set
     for sub in submitters :
