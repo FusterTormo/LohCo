@@ -473,11 +473,11 @@ def extractPurple(path, verbosity = "warning") :
             for l in fi :
                 aux = l.strip().split("\t")
                 if l.startswith("purity") :
-                    pur = aux.index("purity")
+                    puri = aux.index("purity")
                     plo = aux.index("ploidy")
                     lik = aux.index("score")
                 else :
-                    pur["purity"] = float(aux[pur])
+                    pur["purity"] = float(aux[puri])
                     pur["ploidy"] = float(aux[plo])
                     pur["likelyhood"] = float(aux[lik])
     elif verbosity == "warning" :

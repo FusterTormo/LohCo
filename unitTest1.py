@@ -22,8 +22,8 @@ import libconstants as cts
 
 print("INFO: Test unitario para comparar el output de un ejemplo de FACETS con los datos del array descargado desde TCGA")
 print("TEST 1) Extraer datos")
-ar = compi.convert2region("/g/strcombio/fsupek_cancer2/TCGA_bam/OV/TCGA-25-1315/194ef01_VS_d57f7ca3_PURPLE/TUMOR.purple.cnv.somatic.tsv", "PURPLE")
-fa = compi.convert2region("/g/strcombio/fsupek_cancer2/TCGA_bam/OV/TCGA-25-1315/194ef01_VS_d57f7ca3_FACETS/facets_comp_cncf.tsv", "FACETS")
+ar = compi.convert2region("/g/strcombio/fsupek_cancer2/TCGA_bam/OV/TCGA-25-1315/1948ef01_VS_d57f7ca3_PURPLE/TUMOR.purple.cnv.somatic.tsv", "PURPLE")
+fa = compi.convert2region("/g/strcombio/fsupek_cancer2/TCGA_bam/OV/TCGA-25-1315/1948ef01_VS_d57f7ca3_FACETS/facets_comp_cncf.tsv", "FACETS")
 print("TEST 2) Buscando las regiones en comun para estudio")
 regs = compi.getFragments(ar, fa)
 print("TEST 3) Crear la tabla comparativa 4x4")
