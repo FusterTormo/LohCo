@@ -417,6 +417,75 @@ def extractSequenza(path, verbosity = "warning") :
 
     return seq
 
+def extractPurple(path, verbosity = "warning") :
+    """Read PURPLE data and return the information in a specific format
+
+    Read PURPLE *.purple.cnv.somatic.tsv file, which stores the raw information about copy number that has been calculated. From this file the information is converted to a list of regions for each chromosome. The
+    structure of the list is as this
+        [0] start position of the region (int)
+        [1] end position of the region (int)
+        [2] copy-number (enum) 'A' if region an amplification is considered in the region, 'D' if a deletion is considered in the region, 'N' if the region is considered copy number normal, 'L' if there is
+            a copy neutral LOH
+        [3] total copy number (tcn) (int). In PURPLE, this value is represented by the copyNumber column
+        [4] low copy number (lcn) (int). In PURPLE, this value is represented by the minorAlleleCopyNumber column
+        [5] NA as PURPLE does not report logR
+    If tcn is bigger that 2, the region is considered (A)mplified
+    If tcn==2, and lcn==1, the region is considered (N)ormal
+    If tcn==2, and lcn==0, the region is considered Copy Number Neutral (L)oss of Heterozygosity
+    If tcn<2, and lcn<=1, the region is considered (D)eleted
+    Additionally, it reads from *.purity.tsv the purity, ploidy and likelyhood data to add it to the REGION variable
+
+    Parameters :
+        path (str) : Path of the file to extract the data
+        verbosity (str) : If the function must be verbose: "warning" means that warning messages must be shown. Otherwise, not
+
+    Returns :
+        REGION : A dict where the key is the chromosome name and the value is a list of the regions in format [start, end, copy-number, tcn, lcn, logR]. Additionally, "ploidy", "purity",
+            and "likelyhood" information in separated keys.
+    """
+    col_c = 0
+    col_s = 1
+    col_e = 2
+    col_tcn = 3
+    col_lcn = 14
+    pur = {}
+    with open(path, "r") as fi :
+        for l in fi :
+            if not l.startswith("chromosome") :
+                aux = l.strip("\n").split("\t")
+                chr = aux[col_c].replace("chr", "") # Remove chr prefix
+                tcn = round(float(aux[col_tcn])) # Convert copy number to int as it is output as float
+                lcn = round(float(aux[col_lcn]))
+                if chr in lc.chromosomes :
+                    reg = [int(float(aux[col_s])), int(float(aux[col_e])), getCN(tcn, lcn), tcn, lcn, "NA"]
+                    if chr in pur.keys() :
+                        pur[chr].append(reg)
+                    else :
+                        pur[chr] = [reg]
+                elif verbosity == "warning" :
+                    print("WARNING: Chromosome {} not found in the chromosomes constant".format(chr))
+    path2 = path.replace(".cnv.somatic.tsv", ".purity.tsv")
+    pur["purity"] = "NA"
+    pur["ploidy"] = "NA"
+    pur["likelyhood"] = "NA"
+    if os.path.isfile(path2) :
+        with open(path2, "r") as fi :
+            for l in fi :
+                aux = l.strip().split("\t")
+                if l.startswith("purity") :
+                    pur = aux.index("purity")
+                    plo = aux.index("ploidy")
+                    lik = aux.index("score")
+                else :
+                    pur["purity"] = float(aux[pur])
+                    pur["ploidy"] = float(aux[plo])
+                    pur["likelyhood"] = float(aux[lik])
+    elif verbosity == "warning" :
+        print("WARNING: File {} not found. Cannot add information regarding purity, ploidy and likelyhood to PURPLE variable".format(path2))
+
+    return pur
+
+
 def getCN(tcn, lcn) :
     """Get the copy number aberration, given the total copy number and the low copy number
 

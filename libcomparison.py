@@ -54,6 +54,8 @@ def convert2region(path, filetype, verbosity = "warning") :
         reg = ex.extractAscat(path, verbosity)
     elif filetype == "sequenza" :
         reg = ex.extractSequenza(path, verbosity)
+    elif filetype == "purple" :
+        reg = ex.extractPurple(path, verbosity)
     elif filetype == "alfred" :
         print("ERROR: Alfred-LOH is not implemented yet")
         sys.exit()
@@ -62,9 +64,6 @@ def convert2region(path, filetype, verbosity = "warning") :
         sys.exit()
     elif filetype == "titan" :
         print("ERROR: Titan is not implemented yet")
-        sys.exit()
-    elif filetype == "purple" :
-        print("ERROR: Purple is not implemented yet")
         sys.exit()
     else :
         raise IOError("ERROR: Type of file not found. Accepted values: 'array', 'ascatarray', 'facets', 'ascat', 'ascatngs', 'sequenza', 'cnacs', 'titan', 'purple', 'alfred'. Cannot continue")
