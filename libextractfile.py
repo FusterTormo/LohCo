@@ -449,6 +449,7 @@ def extractPurple(path, verbosity = "warning") :
     col_tcn = 3
     col_lcn = 14
     pur = {}
+    print("Reading {}".format(path))
     with open(path, "r") as fi :
         for l in fi :
             if not l.startswith("chromosome") :
