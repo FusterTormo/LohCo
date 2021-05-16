@@ -183,7 +183,7 @@ def main() :
             purpleFiles = getPurple(workindir)
             for a in ascatFiles :
                 ascat = lc.convert2region("{}/{}".format(ascatFolder, a), "ascatarray")
-                for b in sequenzaFiles :
+                for b in purpleFiles :
                     purp = lc.convert2region(b, "purple", "error")
                     if not os.path.isfile("ascat2VSpurple.tsv") :
                         createFile("ascat2VSpurple.tsv")

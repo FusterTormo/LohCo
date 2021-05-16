@@ -449,18 +449,21 @@ def extractPurple(path, verbosity = "warning") :
     col_tcn = 3
     col_lcn = 14
     pur = {}
-    print("Reading {}".format(path))
     with open(path, "r") as fi :
         for l in fi :
             if not l.startswith("chromosome") :
                 aux = l.strip("\n").split("\t")
                 chr = aux[col_c].replace("chr", "") # Remove chr prefix
-                tcn = round(float(aux[col_tcn])) # Convert copy number to int as it is output as float
+                try :
+                    tcn = round(float(aux[col_tcn])) # Convert copy number to int as it is output as float
+                except ValueError :
+                    print("WARNING: Invalid value {}".format(aux[col_tcn]))
+                    tcn = -1
                 try :
                     lcn = round(float(aux[col_lcn]))
-                except :
-                    print(aux)
-                    sys.exit()
+                except ValueError :
+                    print("WARNING: Invalid value {}".format(aux[col_tcn]))
+                    lcn = -1
                 if chr in lc.chromosomes :
                     reg = [int(float(aux[col_s])), int(float(aux[col_e])), getCN(tcn, lcn), tcn, lcn, "NA"]
                     if chr in pur.keys() :
