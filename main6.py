@@ -62,7 +62,6 @@ def getSequenza(path) :
                     sequenza.append(aux2)
     return sequenza
 
-# TODO: Comprovar que les rutes dels arxius son correctes
 def getPurple(path) :
     """Return the PURPLE output files in the submitter folder passed as parameter"""
     purple = []
@@ -198,8 +197,6 @@ def main() :
     os.rename("ascat2VSascatNGS.tsv", "main6/ascat2VSascatNGS.tsv")
     os.rename("ascat2VSsequenza.tsv", "main6/ascat2VSsequenza.tsv")
     os.rename("ascat2VSpurple.tsv", "main6/ascat2VSpurple.tsv")
-    # TODO: Eliminar aquesta linia una vegada estiga comprovat que funciona
-    sys.exit()
 
     # Repeat the analysis, but using Arrays as True set
     for sub in submitters :
