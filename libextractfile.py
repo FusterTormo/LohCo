@@ -462,7 +462,7 @@ def extractPurple(path, verbosity = "warning") :
                 try :
                     lcn = round(float(aux[col_lcn]))
                 except ValueError :
-                    print("WARNING: Invalid value {}".format(aux[col_tcn]))
+                    print("WARNING: Invalid value {}".format(aux[col_lcn]))
                     lcn = -1
                 if chr in lc.chromosomes :
                     reg = [int(float(aux[col_s])), int(float(aux[col_e])), getCN(tcn, lcn), tcn, lcn, "NA"]
