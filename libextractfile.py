@@ -455,7 +455,11 @@ def extractPurple(path, verbosity = "warning") :
                 aux = l.strip("\n").split("\t")
                 chr = aux[col_c].replace("chr", "") # Remove chr prefix
                 tcn = round(float(aux[col_tcn])) # Convert copy number to int as it is output as float
-                lcn = round(float(aux[col_lcn]))
+                try :
+                    lcn = round(float(aux[col_lcn]))
+                except :
+                    print(aux)
+                    sys.exit()
                 if chr in lc.chromosomes :
                     reg = [int(float(aux[col_s])), int(float(aux[col_e])), getCN(tcn, lcn), tcn, lcn, "NA"]
                     if chr in pur.keys() :
