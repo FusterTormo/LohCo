@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-MAIN: Get, from a cancer passed as parameter:
+MAIN: Get, from a cancer and a tool defined by the user:
     * number of pairs tumor-control available
     * number of analyses succeed
     * number of analyses failed
