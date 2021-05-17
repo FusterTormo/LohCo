@@ -12,9 +12,12 @@ MAIN: All functions that extract information from the output files from each pro
 """
 FUNCTIONS
     - getFromFile: Read from a text file and return the data in region format
+    - extractAscatArray: Read ASCAT2 file and convert the data to region format
     - extractArray: Read TCGA copy number segments and convert the data to region format
-    - extractFacets:  Read FACETS file information and convert the data to region format
+    - extractFacets: Read FACETS file information and convert the data to region format
     - extractAscat: Read ascatNGS file information and convert the data to region format
+    - extractSequenza: Read Sequenza file information and convert the data to region format
+    - extractPurple: Read PURPLE file information and convert the data to region format
     - getCN: Get the copy number aberration, given the total copy number and the low copy number
     - getAscatLogR: Check in the ascatNGS copynumber file if there is a SNP in the region passed as parameter
 """
@@ -496,7 +499,6 @@ def extractPurple(path, verbosity = "warning") :
         print("WARNING: File {} not found. Cannot add information regarding purity, ploidy and likelyhood to PURPLE variable".format(path2))
 
     return pur
-
 
 def getCN(tcn, lcn) :
     """Get the copy number aberration, given the total copy number and the low copy number
