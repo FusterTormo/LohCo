@@ -11,6 +11,22 @@ import time
 import main1 as lib
 import libconstants as ctes
 
+"""MAIN PROGRAM
+Get the submitters from OV cancer, and the pairs tumor-control from each submitter.
+Check if each has vcf output (variant caller passed as parameter). If both samples (tumor and control) have vcf, check LOH reported by ASCAT2, FACETS and Sequenza in the gene passed as parameter.
+Do not do the same analysis in more than pair in the same submitter.
+Report the statistics in a tsv with the columns
+    * Submitter id
+    * Analysis folder prefix (uuidTM_VS_uuidCN)
+    * Germline worse variant found in the gene
+    * Somatic worse variant found in the gene
+    * Mean difference in VAF (Mean somaticVAF/germlineVAF in the variants reported by both vcf)
+    * ASCAT2 LOH report in the gene
+    * FACETS LOH report in the gene
+    * ascatNGS LOH report in the gene
+    * Sequenza LOH report in the gene
+"""
+
 # Constants
 dbcon = sqlite3.connect("/g/strcombio/fsupek_cancer2/TCGA_bam/info/info.db")
 wd = "/g/strcombio/fsupek_cancer2/TCGA_bam/OV"
