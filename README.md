@@ -136,10 +136,14 @@ To get more examples, check the unitTest files:
 * [unitTest4](../master/unitTest4.py)
 * [unitTest5](../master/unitTest5.py)
 
-Or to the main files:
+Or the main files:
 
 * [main1](../master/main1.py)
 * [main2](../master/main2.py)
 * [main3](../master/main3.py)
 * [main4](../master/main4.py)
 * [main5](../master/main5.py)
+* [main6](../master/main6.py)
+* [main7](../master/main7.py)
+* [main8](../master/main8.py)
+* [main9](../master/main9.py)
