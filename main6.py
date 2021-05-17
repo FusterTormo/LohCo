@@ -274,7 +274,7 @@ def main() :
             # Compare PURPLE LOH/CNV outputs with DNAcopy
             purpleFiles = getPurple(workindir)
             for a in arrayFiles :
-                arr = lc.convert2region("{}/{}".format(arrayFolder, a), "ascatarray")
+                arr = lc.convert2region("{}/{}".format(arrayFolder, a), "array")
                 for b in purpleFiles :
                     purp = lc.convert2region(b, "purple", "error")
                     if not os.path.isfile("arrayVSpurple.tsv") :
