@@ -3,6 +3,7 @@
 
 import os
 import sqlite3
+import sys
 
 import libcomparison as lc
 import libgetters as lg
@@ -106,6 +107,10 @@ def main() :
     dbcon = sqlite3.connect("/g/strcombio/fsupek_cancer2/TCGA_bam/info/info.db")
     cancer = "OV"
     cancerpath = "/g/strcombio/fsupek_cancer2/TCGA_bam/"
+    if os.path.isdir("main6") :
+        print("ERROR: Folder for output already exists. Remove it before to continue")
+        sys.exit(1)
+
     # Get the OV submitters from the database
     with dbcon :
         query = "SELECT submitter FROM patient WHERE cancer='{}'".format(cancer)
@@ -198,7 +203,7 @@ def main() :
     os.rename("ascat2VSsequenza.tsv", "main6/ascat2VSsequenza.tsv")
     os.rename("ascat2VSpurple.tsv", "main6/ascat2VSpurple.tsv")
 
-    # Repeat the analysis, but using Arrays as True set
+    # Repeat the analysis, but using Arrays as Truth set
     for sub in submitters :
         s = sub[0]
         workindir = "{}/{}/{}".format(cancerpath, cancer, s)
@@ -266,11 +271,23 @@ def main() :
                     with open("arrayVSsequenza.tsv", "a") as fi :
                         fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = b, cmp = compareTools(arr, seq)))
 
+            # Compare PURPLE LOH/CNV outputs with DNAcopy
+            purpleFiles = getPurple(workindir)
+            for a in arrayFiles :
+                arr = lc.convert2region("{}/{}".format(arrayFolder, a), "ascatarray")
+                for b in purpleFiles :
+                    purp = lc.convert2region(b, "purple", "error")
+                    if not os.path.isfile("arrayVSpurple.tsv") :
+                        createFile("arrayVSpurple.tsv")
+                    with open("arrayVSpurple.tsv", "a") as fi :
+                        fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = b, cmp = compareTools(arr, purp)))
+
     os.rename("arrayVSarray.tsv", "main6/arrayVSarray.tsv")
     os.rename("arrayVSascat2.tsv", "main6/arrayVSascat2.tsv")
     os.rename("arrayVSfacets.tsv", "main6/arrayVSfacets.tsv")
     os.rename("arrayVSascatNGS.tsv", "main6/arrayVSascatNGS.tsv")
     os.rename("arrayVSsequenza.tsv", "main6/arrayVSsequenza.tsv")
+    os.rename("arrayVSpurple.tsv", "main6/arrayVSpurple.tsv")
 
     # Repeat the analysis but comparing FACETS vs all the other tools
     for sub in submitters :
@@ -329,11 +346,21 @@ def main() :
                 with open("facetsVSsequenza.tsv", "a") as fi :
                     fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = b, cmp = compareTools(f, seq)))
 
+            # Compare with PURPLE
+            purpleFiles = getPurple(workindir)
+            for b in purpleFiles :
+                purp = lc.convert2region(b, "purple", "error")
+                if not os.path.isfile("facetsVSpurple.tsv") :
+                    createFile("facetsVSpurple.tsv")
+                with open("facetsVSpurple.tsv", "a") as fi :
+                    fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = b, cmp = compareTools(f, purp)))
+
     os.rename("facetsVSfacets.tsv", "main6/facetsVSfacets.tsv")
     os.rename("facetsVSascat2.tsv", "main6/facetsVSascat2.tsv")
     os.rename("facetsVSarrays.tsv", "main6/facetsVSarrays.tsv")
     os.rename("facetsVSascatNGS.tsv", "main6/facetsVSascatNGS.tsv")
     os.rename("facetsVSsequenza.tsv", "main6/facetsVSsequenza.tsv")
+    os.rename("facetsVSpurple.tsv", "main6/facetsVSpurple.tsv")
 
     # Repeat the analysis, but comparing ascatNGS vs all the other tools
     for sub in submitters :
@@ -381,6 +408,7 @@ def main() :
                 with open("ascatNGSVSfacets.tsv", "a") as fi :
 
                     fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = b, cmp = compareTools(ngs, f)))
+
             # Compare with Sequenza
             sequenzaFiles = getSequenza(workindir)
             for b in sequenzaFiles :
@@ -390,11 +418,21 @@ def main() :
                 with open("ascatNGSVSsequenza.tsv", "a") as fi:
                     fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = b, cmp = compareTools(ngs, seq)))
 
+            # Compare with PURPLE
+            purpleFiles = getPurple(workindir)
+            for b in purpleFiles :
+                purp = lc.convert2region(b, "purple", "error")
+                if not os.path.isfile("ascatNGSVSpurple.tsv") :
+                    createFile("ascatNGSVSpurple.tsv")
+                with open("ascatNGSVSpurple.tsv", "a") as fi :
+                    fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = b, cmp = compareTools(ngs, purp)))
+
     os.rename("ascatNGSVSascat2.tsv", "main6/ascatNGSVSascat2.tsv")
     os.rename("ascatNGSVSarrays.tsv", "main6/ascatNGSVSarrays.tsv")
     os.rename("ascatNGSVSfacets.tsv", "main6/ascatNGSVSfacets.tsv")
     os.rename("ascatNGSVSascatNGS.tsv", "main6/ascatNGSVSascatNGS.tsv")
     os.rename("ascatNGSVSsequenza.tsv", "main6/ascatNGSVSsequenza.tsv")
+    os.rename("ascatNGSVSpurple.tsv", "main6/ascatNGSVSpurple.tsv")
 
     # Repeat the analysis, but comparing Sequenza vs all the other approximations
     for sub in submitters :
@@ -451,11 +489,92 @@ def main() :
                 with open("sequenzaVSascatNGS.tsv", "a") as fi :
                     fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = b, cmp = compareTools(seq, ngs)))
 
+            # Compare with PURPLE
+            purpleFiles = getPurple(workindir)
+            for b in purpleFiles :
+                purp = lc.convert2region(b, "purple", "error")
+                if not os.path.isfile("sequenzaVSpurple.tsv") :
+                    createFile("sequenzaVSpurple.tsv")
+                with open("sequenzaVSpurple.tsv", "a") as fi :
+                    fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = b, cmp = compareTools(seq, purp)))
+
     os.rename("sequenzaVSascat2.tsv", "main6/sequenzaVSascat2.tsv")
     os.rename("sequenzaVSarrays.tsv", "main6/sequenzaVSarrays.tsv")
     os.rename("sequenzaVSfacets.tsv", "main6/sequenzaVSfacets.tsv")
     os.rename("sequenzaVSascatNGS.tsv", "main6/sequenzaVSascatNGS.tsv")
     os.rename("sequenzaVSsequenza.tsv", "main6/sequenzaVSsequenza.tsv")
+    os.rename("sequenzaVSpurple.tsv", "main6/sequenzaVSpurple.tsv")
+
+    # Repeat the analysis but comparing PURPLE vs all the other tools
+    for sub in submitters :
+        s = sub[0]
+        workindir = "{}/{}/{}".format(cancerpath, cancer, s)
+        print("INFO: Checking {} PURPLE".format(s))
+        # Get all the Sequenza done in the submitter
+        purpleFiles = getPurple(workindir)
+        for a in purpleFiles :
+            # Compare PURPLE vs itself
+            purp = lc.convert2region(a, "purple", "error")
+            if not os.path.isfile("purpleVSpurple.tsv") :
+                createFile("purpleVSpurple.tsv")
+            with open("purpleVSpurple.tsv", "a") as fi :
+                fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = a, cmp = compareTools(purp, purp)))
+
+            # Compare with ASCAT2
+            ascatFolder = "{}/ASCAT2".format(workindir)
+            if os.path.isdir(ascatFolder) :
+                ascatFiles = os.listdir(ascatFolder)
+                for b in ascatFiles :
+                    ascat = lc.convert2region("{}/{}".format(ascatFolder, b), "ascatarray", "error")
+                    if not os.path.isfile("purpleVSascat2.tsv") :
+                        createFile("purpleVSascat2.tsv")
+                    with open("purpleVSascat2.tsv", "a") as fi :
+                        fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = b, cmp = compareTools(purp, ascat)))
+
+            # Compare with SNP-Arrays
+            arrayFolder = "{}/Array".format(workindir)
+            if os.path.isdir(arrayFolder) :
+                arrayFiles = os.listdir(arrayFolder)
+                for b in arrayFiles :
+                    arr = lc.convert2region("{}/{}".format(arrayFolder, b), "array", "error")
+                    if not os.path.isfile("purpleVSarrays.tsv") :
+                        createFile("purpleVSarrays.tsv")
+                    with open("purpleVSarrays.tsv", "a") as fi :
+                        fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = b, cmp = compareTools(purp, arr)))
+
+            # Compare with FACETS
+            facetsFiles = getFACETS(workindir)
+            for b in facetsFiles :
+                f = lc.convert2region(b, "facets", "error")
+                if not os.path.isfile("purpleVSfacets.tsv") :
+                    createFile("purpleVSfacets.tsv")
+                with open("purpleVSfacets.tsv", "a") as fi :
+                    fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = b, cmp = compareTools(purp, f)))
+
+            # Compare with ascatNGS
+            ascatngsFiles = getAscatNGS(workindir)
+            for b in ascatngsFiles :
+                ngs = lc.convert2region(b, "ascatngs", "error")
+                if not os.path.isfile("purpleVSascatNGS.tsv") :
+                    createFile("purpleVSascatNGS.tsv")
+                with open("purpleVSascatNGS.tsv", "a") as fi :
+                    fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = b, cmp = compareTools(purp, ngs)))
+
+            # Compare with Sequenza
+            sequenzaFiles = getSequenza(workindir)
+            for b in sequenzaFiles :
+                seq = lc.convert2region(b, "sequenza", "error")
+                if not os.path.isfile("purpleVSsequenza.tsv") :
+                    createFile("purpleVSsequenza.tsv")
+                with open("purpleVSsequenza.tsv", "a") as fi:
+                    fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = b, cmp = compareTools(purp, seq)))
+
+    os.rename("purpleVSascat2.tsv", "main6/purpleVSascat2.tsv")
+    os.rename("purpleVSarrays.tsv", "main6/purpleVSarrays.tsv")
+    os.rename("purpleVSfacets.tsv", "main6/purpleVSfacets.tsv")
+    os.rename("purpleVSascatNGS.tsv", "main6/purpleVSascatNGS.tsv")
+    os.rename("purpleVSsequenza.tsv", "main6/purpleVSsequenza.tsv")
+    os.rename("purpleVSpurple.tsv", "main6/purpleVSpurple.tsv")
 
 if __name__ == "__main__" :
     main()
