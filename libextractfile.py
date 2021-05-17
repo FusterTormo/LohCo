@@ -457,13 +457,16 @@ def extractPurple(path, verbosity = "warning") :
                 try :
                     tcn = round(float(aux[col_tcn])) # Convert copy number to int as it is output as float
                 except ValueError :
-                    print("WARNING: Invalid value {}".format(aux[col_tcn]))
+                    if verbosity == "warning" :
+                        print("WARNING: Invalid value {}".format(aux[col_tcn]))
                     tcn = -1
                 try :
                     lcn = round(float(aux[col_lcn]))
                 except ValueError :
-                    print("WARNING: Invalid value {}".format(aux[col_lcn]))
+                    if verbosity == "warning" :
+                        print("WARNING: Invalid value {}".format(aux[col_lcn]))
                     lcn = -1
+
                 if chr in lc.chromosomes :
                     reg = [int(float(aux[col_s])), int(float(aux[col_e])), getCN(tcn, lcn), tcn, lcn, "NA"]
                     if chr in pur.keys() :
@@ -472,6 +475,7 @@ def extractPurple(path, verbosity = "warning") :
                         pur[chr] = [reg]
                 elif verbosity == "warning" :
                     print("WARNING: Chromosome {} not found in the chromosomes constant".format(chr))
+
     path2 = path.replace(".cnv.somatic.tsv", ".purity.tsv")
     pur["purity"] = "NA"
     pur["ploidy"] = "NA"
