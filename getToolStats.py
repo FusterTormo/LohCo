@@ -53,7 +53,6 @@ if file in tools.keys() and repo in cancers.keys() :
                         aux = os.listdir(wd)
                         for a in aux :
                             if a.endswith(tools[file]["file"]) :
-                                print(a)
                                 success += 1
                     elif file == "FACETS" or file == "PURPLE" :
                         aux = "{}/{}".format(wd, tools[file]["file"])
