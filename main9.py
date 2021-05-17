@@ -11,6 +11,10 @@ import main1 as lib
 import main8 as asc
 import libconstants as cte
 
+"""MAIN PROGRAM
+Search VUS variants in LOH
+"""
+
 # Constants
 brca1 = ["17", 43044295, 43125483] # Gene of interest to search LOH
 brca2 = ["13", 32315508, 32400268]
