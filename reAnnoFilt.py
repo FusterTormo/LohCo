@@ -7,6 +7,10 @@ MAIN: Libreria con funciones para re-anotar y filtrar un archivo de salida de ta
 import sys
 import getWebInfo as gw
 
+# Constantes
+vafBaja = 10 # VAF para considerar una variante como candidata o de baja VAF. Modificar la documentacion de la funcion filtrarVAF en caso de modificar esta constante
+minMaf = 0.01 # MAF para considerar una variante como poblacional o posible candidata. Modificar la documentacion de la funcion filtrarMAF en caso de modificar esta constante
+
 #Todas las claves con la informacion que se guardara en los archivos de texto
 allkeys = ["Chr", "Start", "End", "Ref", "Alt", "Func.refGene", "Gene.refGene", "GeneDetail.refGene", "ExonicFunc.refGene", "AAChange.refGene", "avsnp150", "1000g2015aug_all",
 "1000g2015aug_afr", "1000g2015aug_amr", "1000g2015aug_eas", "1000g2015aug_eur", "1000g2015aug_sas", "ExAC_ALL", "ExAC_AFR", "ExAC_AMR", "ExAC_EAS", "ExAC_FIN", "ExAC_NFE", "ExAC_OTH",
@@ -214,7 +218,7 @@ def filtrarMAF(dc) :
     baja = []
     alta = []
     for l in dc :
-        if l["population_max"] != "NA" and l["population_max"] >= 0.01 :
+        if l["population_max"] != "NA" and l["population_max"] >= minMaf :
             alta.append(l)
         else :
             baja.append(l)
@@ -241,7 +245,7 @@ def filtrarVAF(dc) :
     alta = []
     baja = []
     for l in dc :
-        if l["VAF"] > 10 :
+        if l["VAF"] > vafBaja :
             alta.append(l)
         else :
             baja.append(l)
