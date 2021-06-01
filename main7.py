@@ -150,12 +150,12 @@ def doLoh(path, region) :
 
 def printRstring(var) :
     str = ""
-    for k in ["ascat2", "facets", "ascatngs", "sequenza"] :
+    for k in ["ascat2", "facets", "ascatngs", "sequenza", "purple"] :
         str += "{} <- c(".format(k)
         for v in ["A", "L", "D", "N", "NF"] :
             str += "{},".format(var[k][v])
 
-        str = str.strip(",") + ")"
+        str = str.strip(",") + ")\n"
     return str
 
 # Main program
@@ -357,12 +357,12 @@ if __name__ == "__main__" :
     variantCallingFile = "{}/platypusGerm/platypus.hg38_multianno.txt"
     #variantCallingFile = "{}/strelkaGerm/results/variants/strelka.hg38_multianno.txt"
     main(brca1, "BRCA1", variantCallingFile, 0.05)
-    main(brca1, "BRCA1", variantCallingFile, 0.03)
-    main(brca1, "BRCA1", variantCallingFile, 0.01)
-    main(brca1, "BRCA1", variantCallingFile, 0.0)
-    main(brca1, "BRCA1", variantCallingFile, -1)
-    main(brca2, "BRCA2", variantCallingFile, 0.05)
-    main(brca2, "BRCA2", variantCallingFile, 0.03)
-    main(brca2, "BRCA2", variantCallingFile, 0.01)
-    main(brca2, "BRCA2", variantCallingFile, 0.0)
-    main(brca2, "BRCA2", variantCallingFile, -1)
+    # main(brca1, "BRCA1", variantCallingFile, 0.03)
+    # main(brca1, "BRCA1", variantCallingFile, 0.01)
+    # main(brca1, "BRCA1", variantCallingFile, 0.0)
+    # main(brca1, "BRCA1", variantCallingFile, -1)
+    # main(brca2, "BRCA2", variantCallingFile, 0.05)
+    # main(brca2, "BRCA2", variantCallingFile, 0.03)
+    # main(brca2, "BRCA2", variantCallingFile, 0.01)
+    # main(brca2, "BRCA2", variantCallingFile, 0.0)
+    # main(brca2, "BRCA2", variantCallingFile, -1)
