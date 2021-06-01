@@ -449,9 +449,9 @@ if __name__ == "__main__" :
     pr2 = "ascatngs"
     print("\n\n\t\tWELCOME TO libstatistics.py UNIT TEST\n\t\t-------------------------------------\n")
     print("Reading FACETS example")
-    fa = comp.convert2region("input_examples/facets_comp_cncf.tsv", pr1)
+    fa = comp.convert2region("/g/strcombio/fsupek_cancer2/TCGA_bam/OV/TCGA-13-0887/4d1eb382_VS_5820c55c_FACETS/facets_comp_cncf.tsv", pr1)
     print("Reading AscatNGS example")
-    s = comp.convert2region("input_examples/TCGA-13-0887-01A-01W.copynumber.caveman.csv", pr2)
+    s = comp.convert2region("/g/strcombio/fsupek_cancer2/TCGA_bam/OV/TCGA-13-0887/4d1eb382_VS_5820c55c_ASCAT/TCGA-13-0887-01A-01W.copynumber.caveman.csv", pr2)
     print("Read complete. Getting the fragments")
     regs = comp.getFragments(fa, s)
     print("Got fragments. Checking the copy number")
