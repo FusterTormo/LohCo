@@ -137,6 +137,8 @@ def doLoh(path, region) :
         program = "ascatngs"
     elif path.endswith("_segments.txt") :
         program = "sequenza"
+    elif path.endswith("TUMOR.purple.cnv.somatic.tsv") :
+        program = "purple"
     else :
         program = "ascat2"
     if program == "ascat2" :
@@ -160,13 +162,16 @@ def printRstring(var) :
 def main(brcagene, genename, vcPath, maxMaf = 0.01) :
     totalPos = 0
     dcPos = {"ascat2" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0, "NF" : 0}, "facets" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0, "NF" : 0},
-    "ascatngs" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0, "NF" : 0}, "sequenza" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0, "NF" : 0}}
+    "ascatngs" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0, "NF" : 0}, "sequenza" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0, "NF" : 0},
+    "purple" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0, "NF" : 0}}
     totalNeg = 0
     dcNeg = {"ascat2" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0, "NF" : 0}, "facets" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0, "NF" : 0},
-    "ascatngs" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0, "NF" : 0}, "sequenza" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0, "NF" : 0}}
+    "ascatngs" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0, "NF" : 0}, "sequenza" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0, "NF" : 0},
+    "purple" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0, "NF" : 0}}
     totalNeu = 0
     dcNeu = {"ascat2" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0, "NF" : 0}, "facets" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0, "NF" : 0},
-    "ascatngs" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0, "NF" : 0}, "sequenza" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0, "NF" : 0}}
+    "ascatngs" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0, "NF" : 0}, "sequenza" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0, "NF" : 0},
+    "purple" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0, "NF" : 0}}
     # Get submitters list
     with dbcon :
           cur = dbcon.cursor()
@@ -213,6 +218,9 @@ def main(brcagene, genename, vcPath, maxMaf = 0.01) :
                 sequenza = "{wd}/{folder}_Sequenza/{case}_segments.txt".format(folder = analysisdir, case = c[0], wd = workindir)
                 if os.path.isfile(sequenza) :
                     auxDc["lohFiles"].append(sequenza)
+                purple = "{wd}/{folder}_PURPLE/TUMOR.purple.cnv.somatic.tsv".format(wd = workindir, folder = analysisdir)
+                if os.path.isfile(purple) :
+                    auxDc["lohFiles"].append(purple)
                 if len(auxDc["vcfFiles"]) > len(submitter["vcfFiles"]) and len(auxDc["lohFiles"]) > len(submitter["vcfFiles"]) :
                     submitter = auxDc.copy()
 
@@ -268,6 +276,18 @@ def main(brcagene, genename, vcPath, maxMaf = 0.01) :
             except IndexError :
                 prog4 = None
                 loh4 = None
+            try :
+                prog5, loh5 = doLoh(submitter["lohFiles"][4], brcagene)
+                if varClass == "+" :
+                    dcPos[prog5][loh5] += 1
+                elif varClass == "-" :
+                    dcNeg[prog5][loh5] += 1
+                elif varClass == "?" :
+                    dcNeu[prog5][loh5] += 1
+            except IndexError :
+                prog5 = None
+                loh5 = None
+
             # Count the number of each
             if varClass == "+" :
                 totalPos += 1
