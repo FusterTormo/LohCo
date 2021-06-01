@@ -60,6 +60,38 @@ def countsXtool(regs1, regs2 = None) :
     else :
         return t1
 
+def basesXtool(regs1, regs2 = None) :
+    """Calculate the number of bases that support each alteration reported by each tool
+
+    Counts the number of bases reported as (A)mplification, (D)eletion, (L)oss of heterozygosity, and (N)ormal reported by each tool. Stores the count information in a dictionary.
+    If no second tool is provided, only calculates the counts for one tool. In the other case, two dictionaries are returned
+
+    Parameters :
+        regs1 (dict) : Dictionary, in REGION format, with the output of one program
+        regs2 (dict) : Dictionary, in REGION format, with the output of the other program. Optional parameter
+
+    Returns :
+        dict : If only one parameter is given, one dictionary is returned with the counts of each alteration. In case two parameters are given, two dictionaries will be returned, each with the
+        counts of each tool
+    """
+    t1 = {"A" : 0, "D" : 0, "L" : 0, "N" : 0}
+    if regs2 != None :
+        t2 = {"A" : 0, "D" : 0, "L" : 0, "N" : 0}
+    for a in cts.chromosomes :
+        if a in regs1.keys() :
+            for i in regs1[a] :
+                bases = int(i[1]) - int(i[0])
+                t1[i[2]] += bases
+        if regs2 != None :
+            if a in regs2.keys() :
+                for j in regs2[a] :
+                    bases = int(i[1]) - int(i[0])
+                    t2[i[2]] += bases
+    if regs2 != None :
+        return (t1, t2)
+    else :
+        return t1
+
 def regionNumber(regs) :
     """Count the number of regions that the getFragments function has created
 
@@ -461,12 +493,16 @@ if __name__ == "__main__" :
     c1, c2 = calculateCounts(dc)
     print("2) Counts per tool")
     counts1, count2 = countsXtool(fa, s)
-    print("3) BED file")
+    print("3) Bases reported in each aberration")
+    bases1, bases2 = basesXtool(fa, s)
+    print(bases1)
+    print(bases2)
+    print("4) BED file")
     print2Bed(fa, pr1, s, pr2, regs)
-    print("4) 4x4 comparison table")
+    print("5) 4x4 comparison table")
     printTable(dc, pr1, pr2)
-    print("5) Contingency table")
+    print("6) Contingency table")
     print(doContingency(dc))
-    print("6) Jaccard index")
+    print("7) Jaccard index")
     jci = comp.doComparison2(regs, fa, s)
     print(jaccardIndex(jci))
