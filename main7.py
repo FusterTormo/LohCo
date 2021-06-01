@@ -159,7 +159,7 @@ def printRstring(var) :
     return str
 
 # Main program
-def main(brcagene, genename, vcPath, maxMaf = 0.01) :
+def main(brcagene, genename, vcPath, maxMaf = 0.01, toR = False) :
     totalPos = 0
     dcPos = {"ascat2" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0, "NF" : 0}, "facets" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0, "NF" : 0},
     "ascatngs" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0, "NF" : 0}, "sequenza" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0, "NF" : 0},
@@ -300,55 +300,75 @@ def main(brcagene, genename, vcPath, maxMaf = 0.01) :
             # print("{} -> {} - {}".format(submitter["lohFiles"][1], prog2, loh2))
             # print("{} -> {} - {}".format(submitter["lohFiles"][2], prog3, loh3))
             # print(dcPos)
+    if toR :
+        # Print the data obtained in R template and create the plots
+        pos = printRstring(dcPos)
+        neg = printRstring(dcNeg)
+        unk = printRstring(dcNeu)
+        params = "# Analysis done in {} samples\n".format(totalNeg + totalNeu + totalPos)
+        if vcPath.find("platypusGerm") > 0 :
+            params += "# Using Platypus variant caller\n"
+        elif vcPath.find("strelkaGerm") > 0 :
+            params += "# Using Strelka2 variant caller\n"
+        params += "# Gene {}\n".format(genename)
+        params += "# MAF to consider the SNV as pathogenic {}\n".format(maxMaf)
+        params += "#\n# {} cases were considered positive\n".format(totalPos)
+        params += "# {} cases were considered negative\n".format(totalNeg)
+        params += "# {} cases were considered neutral\n".format(totalNeu)
+        params += "#####################################\n\n"
+        with open("main7.R", "r") as fi :
+            cnt = fi.read()
+        with open("main7Filled.R", "w") as fi :
+            fi.write(cnt.format(gene = genename, params = params, positive = pos, negative = neg, unknown = unk))
+    else :
+        print("\nINFO: Final results. {} were able to analyse".format(totalNeg + totalNeu + totalPos))
+        if vcPath.find("platypusGerm") > 0 :
+            print("INFO: Using Platypus as variant caller")
+        elif vcPath.find("strelkaGerm") > 0 :
+            print("INFO: Using Strelka2 as variant caller")
+        print("{} cases considered positive in {}".format(totalPos, genename))
+        for k in dcPos.keys() :
+            print("\t{} ({} analyses)".format(k, sum(dcPos[k].values())))
+            nf = totalPos - sum(dcPos[k].values()) + dcPos[k]["NF"]
+            dcPos[k]["NF"] = nf
 
-    print("\nINFO: Final results. {} were able to analyse".format(totalNeg + totalNeu + totalPos))
-    if vcPath.find("platypusGerm") > 0 :
-        print("INFO: Using Platypus as variant caller")
-    elif vcPath.find("strelkaGerm") > 0 :
-        print("INFO: Using Strelka2 as variant caller")
-    print("{} cases considered positive in {}".format(totalPos, genename))
-    for k in dcPos.keys() :
-        print("\t{} ({} analyses)".format(k, sum(dcPos[k].values())))
-        nf = totalPos - sum(dcPos[k].values()) + dcPos[k]["NF"]
-        dcPos[k]["NF"] = nf
+            for key, value in dcPos[k].items() :
+                print("\t\t{} -> {} found".format(key, value))
+            print("\t\t\t{:.2f}% LOH".format(100 * (dcPos[k]["D"] + dcPos[k]["L"])/totalPos))
 
-        for key, value in dcPos[k].items() :
-            print("\t\t{} -> {} found".format(key, value))
-        print("\t\t\t{:.2f}% LOH".format(100 * (dcPos[k]["D"] + dcPos[k]["L"])/totalPos))
+        print("\n{} cases considered negative in {}".format(totalNeg, genename))
+        for k in dcNeg.keys() :
+            print("\t{} ({} analyses)".format(k, sum(dcNeg[k].values())))
+            nf = totalNeg - sum(dcNeg[k].values()) + dcNeg[k]["NF"]
+            dcNeg[k]["NF"] = nf
 
-    print("\n{} cases considered negative in {}".format(totalNeg, genename))
-    for k in dcNeg.keys() :
-        print("\t{} ({} analyses)".format(k, sum(dcNeg[k].values())))
-        nf = totalNeg - sum(dcNeg[k].values()) + dcNeg[k]["NF"]
-        dcNeg[k]["NF"] = nf
+            for key, value in dcNeg[k].items() :
+                print("\t\t{} -> {} found".format(key, value))
+            print("\t\t\t{:.2f}% LOH".format(100 * (dcNeg[k]["D"] + dcNeg[k]["L"])/totalNeg))
 
-        for key, value in dcNeg[k].items() :
-            print("\t\t{} -> {} found".format(key, value))
-        print("\t\t\t{:.2f}% LOH".format(100 * (dcNeg[k]["D"] + dcNeg[k]["L"])/totalNeg))
+        print("\n{} cases considered unknown in {}".format(totalNeu, genename))
+        for k in dcNeu.keys() :
+            print("\t{} ({} analyses)".format(k, sum(dcNeu[k].values())))
+            nf = totalNeu - sum(dcNeu[k].values()) + dcNeu[k]["NF"]
+            dcNeu[k]["NF"] = nf
 
-    print("\n{} cases considered unknown in {}".format(totalNeu, genename))
-    for k in dcNeu.keys() :
-        print("\t{} ({} analyses)".format(k, sum(dcNeu[k].values())))
-        nf = totalNeu - sum(dcNeu[k].values()) + dcNeu[k]["NF"]
-        dcNeu[k]["NF"] = nf
+            for key, value in dcNeu[k].items() :
+                print("\t\t{} -> {} found".format(key, value))
+            print("\t\t\t{:.2f}% LOH".format(100 * (dcNeu[k]["D"] + dcNeu[k]["L"])/totalNeu))
 
-        for key, value in dcNeu[k].items() :
-            print("\t\t{} -> {} found".format(key, value))
-        print("\t\t\t{:.2f}% LOH".format(100 * (dcNeu[k]["D"] + dcNeu[k]["L"])/totalNeu))
-
-    output = "INFO: Variables for R. Params: Gene: {}, MAF: {} ".format(genename, maxMaf)
-    if vcPath.find("platypusGerm") > 0 :
-        output += "Variant caller: Platypus\n"
-    elif vcPath.find("strelkaGerm") > 0 :
-        output += "Variant caller: Strelka2\n"
-    output += "\tPositive\n"
-    output += "\t\t{}\n".format(printRstring(dcPos))
-    output += "\tNegative\n"
-    output += "\t\t{}\n".format(printRstring(dcNeg))
-    output += "\tUnknown\n"
-    output += "\t\t{}\n".format(printRstring(dcNeu))
-    output += "\n------\n"
-    print(output)
+        output = "INFO: Variables for R. Params: Gene: {}, MAF: {} ".format(genename, maxMaf)
+        if vcPath.find("platypusGerm") > 0 :
+            output += "Variant caller: Platypus\n"
+        elif vcPath.find("strelkaGerm") > 0 :
+            output += "Variant caller: Strelka2\n"
+        output += "\tPositive\n"
+        output += "\t\t{}\n".format(printRstring(dcPos))
+        output += "\tNegative\n"
+        output += "\t\t{}\n".format(printRstring(dcNeg))
+        output += "\tUnknown\n"
+        output += "\t\t{}\n".format(printRstring(dcNeu))
+        output += "\n------\n"
+        print(output)
 
 if __name__ == "__main__" :
     brca1 = ["17", 43044295, 43170245]
@@ -360,7 +380,7 @@ if __name__ == "__main__" :
     # main(brca1, "BRCA1", variantCallingFile, 0.03)
     # main(brca1, "BRCA1", variantCallingFile, 0.01)
     # main(brca1, "BRCA1", variantCallingFile, 0.0)
-    # main(brca1, "BRCA1", variantCallingFile, -1)
+    main(brca1, "BRCA1", variantCallingFile, -1, True)
     # main(brca2, "BRCA2", variantCallingFile, 0.05)
     # main(brca2, "BRCA2", variantCallingFile, 0.03)
     # main(brca2, "BRCA2", variantCallingFile, 0.01)
