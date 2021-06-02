@@ -3,8 +3,8 @@
 # Functions
 getLOH <- function(tab) {
   df <- as.data.frame(table(tab))
-  num <- df[df$Var1 == "D",]$Freq + df[df$Var1 == "L",]$Freq
-  loh <- 100*num/sum(df$Freq)
+  num <- df[df$tab == "D",]$Freq + df[df$tab == "L",]$Freq
+  loh <- round(100*num/sum(df$Freq),2)
   return(loh)
 }
 
@@ -19,6 +19,7 @@ pos <- all[all$GermlineVar == '+',]
 neg <- all[all$GermlineVar == "-",]
 neu <- all[all$GermlineVar == "?",]
 
+print(pos$LOHcat)
 cat("R-INFO: ", length(all$submitter), " total cases\n")
 
 cat("R-INFO: ", length(pos$submitter), " considered positive\n")
