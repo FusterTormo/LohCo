@@ -178,6 +178,8 @@ def doLoh(path, region) :
         program = "ascatngs"
     elif path.endswith("_segments.txt") :
         program = "sequenza"
+    elif path.endswith("TUMOR.purple.cnv.somatic.tsv") :
+        program = "purple"
     else :
         program = "ascat2"
     if program == "ascat2" :
@@ -248,7 +250,7 @@ def main(brcagene, genename, vcPath, maxMaf = 0.01) :
                     auxDc["lohFiles"].append(sequenza)
                 purple = "{wd}/{folder}_PURPLE/TUMOR.purple.cnv.somatic.tsv".format(wd = workindir, folder = analysisdir)
                 if os.path.isfile(purple) :
-                    auxDC["lohFiles"].append(purple)
+                    auxDc["lohFiles"].append(purple)
                 if len(auxDc["vcfFiles"]) > len(submitter["vcfFiles"]) and len(auxDc["lohFiles"]) > len(submitter["vcfFiles"]) :
                     submitter = auxDc.copy()
 
