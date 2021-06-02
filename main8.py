@@ -403,7 +403,7 @@ def main(brcagene, genename, vcPath, maxMaf = 0.01) :
                 else :
                     temp["vafVarCat"] = "N"
             else :
-                temp["vafVarCat"] = "NA"
+                temp["vafVarCat"] = "NF"
             # Classify the variants according to the pathogenicity
             temp["germVar"] = classifyVariants(cnVar, maxMaf)
             temp["somVar"] = classifyVariants(tmVar, maxMaf)
