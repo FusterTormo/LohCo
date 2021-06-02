@@ -3,7 +3,13 @@
 # Functions
 getLOH <- function(tab) {
   df <- as.data.frame(table(tab))
-  num <- df[df$tab == "D",]$Freq + df[df$tab == "L",]$Freq
+  dels <- df[df$tab == "D",]$Freq
+  loss <- df[df$tab == "L",]$Freq
+  if (dels < 0)
+    dels <- 0
+  if (loss < 0)
+    loss <- 0
+  num <- dels  + loss
   loh <- round(100*num/sum(df$Freq),2)
   return(loh)
 }
