@@ -5,9 +5,9 @@ getLOH <- function(tab) {
   df <- as.data.frame(table(tab))
   dels <- df[df$tab == "D",]$Freq
   loss <- df[df$tab == "L",]$Freq
-  if (dels < 0)
+  if (length(dels) <= 0)
     dels <- 0
-  if (loss < 0)
+  if (length(loss) <= 0)
     loss <- 0
   num <- dels  + loss
   loh <- round(100*num/sum(df$Freq),2)
@@ -25,7 +25,6 @@ pos <- all[all$GermlineVar == '+',]
 neg <- all[all$GermlineVar == "-",]
 neu <- all[all$GermlineVar == "?",]
 
-print(pos$LOHcat)
 cat("R-INFO: ", length(all$submitter), " total cases\n")
 
 cat("R-INFO: ", length(pos$submitter), " considered positive\n")
