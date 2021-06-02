@@ -230,7 +230,7 @@ def main(brcagene, genename, vcPath, maxMaf = 0.01) :
                 analysisdir = "{}_VS_{}".format(tm[0].split("-")[0], cn[0].split("-")[0]) # The folder format for FACETS, ascatNGS, PURPLE and Sequenza is "[tumorUUID]_VS_[controlUUID]""
                 vct = vcPath.format(tf)
                 vcc = vcPath.format(cf)
-                # Check both variant calling files exist
+                # Check if both variant calling files exist
                 if os.path.isfile(vct) :
                     auxDc["vcfFiles"].append(vct)
                 if os.path.isfile(vcc) :
@@ -251,10 +251,11 @@ def main(brcagene, genename, vcPath, maxMaf = 0.01) :
                 purple = "{wd}/{folder}_PURPLE/TUMOR.purple.cnv.somatic.tsv".format(wd = workindir, folder = analysisdir)
                 if os.path.isfile(purple) :
                     auxDc["lohFiles"].append(purple)
+                # Get which pair tumor-control has more files available and save it for the next analyses
                 if len(auxDc["vcfFiles"]) > len(submitter["vcfFiles"]) and len(auxDc["lohFiles"]) > len(submitter["vcfFiles"]) :
                     submitter = auxDc.copy()
 
-        # Get the variants in the gene
+        # Get the variants in the gene. If there are variant calling files for tumor and control sample
         if len(submitter["vcfFiles"]) == 2 :
             cont += 1
             temp = {"submitter" : c[0], "cmp" : analysisdir}
@@ -265,6 +266,7 @@ def main(brcagene, genename, vcPath, maxMaf = 0.01) :
             # Get the VAF comparison to infer possible LOH
             meanVaf = getVafMean(cnVar, tmVar)
             temp["vafDif"] = meanVaf
+            # Classify the LOH depending on the mean obtained
             if meanVaf != "NA" :
                 if meanVaf > 1.65 :
                     temp["vafVarCat"] = "L"
@@ -275,7 +277,7 @@ def main(brcagene, genename, vcPath, maxMaf = 0.01) :
             # Classify the variants according to the pathogenicity
             temp["germVar"] = classifyVariants(cnVar, maxMaf)
             temp["somVar"] = classifyVariants(tmVar, maxMaf)
-
+            # Get the LOH in all the available LOH files
             for fic in submitter["lohFiles"] :
                 prog, loh = doLoh(fic, brcagene)
                 temp[prog] = loh
@@ -284,17 +286,18 @@ def main(brcagene, genename, vcPath, maxMaf = 0.01) :
 
 
     print("\nINFO: Final results. {} had a sample with both vcfs (tumor and control) done".format(cont))
-    print(data[-1])
+
     if vcPath.find("platypusGerm") > 0 :
         vc = "Platypus"
     elif vcPath.find("strelkaGerm") > 0 :
         vc = "Strelka2"
+
     filename = "{}_{}_{}_LOH.tsv".format(genename, maxMaf, vc)
     print("INFO: Writing output in {}".format(filename))
     with open(filename, "w") as fi :
         fi.write("submitter\tanalysis\tGermlineVar\tSomaticVar\tVAFvar\tLOHcat\tASCAT2\tFACETS\tascatNGS\tSequenza\tPURPLE\n")
         for l in data :
-            fi.write("{sub}\t{anal}\t{germ}\t{som}\t{vaf}\t{catVaf}".format(sub = l["submitter"], anal = l["cmp"], germ = l["germVar"], som = l["somVar"], vaf = l["vafDif"]), catVaf = l["vafVarCat"])
+            fi.write("{sub}\t{anal}\t{germ}\t{som}\t{vaf}\t{catVaf}".format(sub = l["submitter"], anal = l["cmp"], germ = l["germVar"], som = l["somVar"], vaf = l["vafDif"], catVaf = l["vafVarCat"]))
             if "ascat2" in l.keys() :
                 fi.write("{}\t".format(l["ascat2"]))
             else :
@@ -312,28 +315,15 @@ def main(brcagene, genename, vcPath, maxMaf = 0.01) :
             else :
                 fi.write("NA\t")
             if "purple" in l.keys() :
-                fi.write("{}\n").format(l["purple"])
+                fi.write("{}\n".format(l["purple"]))
             else :
                 fi.write("NA\n")
-    # output = "INFO: Variables for R. Params: Gene: {}, MAF: {} ".format(genename, maxMaf)
-    # if vcPath.find("platypusGerm") > 0 :
-    #     output += "Variant caller: Platypus\n"
-    # elif vcPath.find("strelkaGerm") > 0 :
-    #     output += "Variant caller: Strelka2\n"
-    # output += "\tPositive\n"
-    # output += "\t\t{}\n".format(printRstring(dcPos))
-    # output += "\tNegative\n"
-    # output += "\t\t{}\n".format(printRstring(dcNeg))
-    # output += "\tUnknown\n"
-    # output += "\t\t{}\n".format(printRstring(dcNeu))
-    # output += "\n------\n"
-    # print(output)
-    # sys.exit()
+
 
 if __name__ == "__main__" :
     brca1 = ["17", 43044295, 43170245]
     brca2 = ["13", 32315086, 32400266]
-    maxMaf = -1
+    maxMaf = 0.01
     variantCallingFile = "{}/platypusGerm/platypus.hg38_multianno.txt"
     #variantCallingFile = "{}/strelkaGerm/results/variants/strelka.hg38_multianno.txt"
     main(brca1, "BRCA1", variantCallingFile, maxMaf)
