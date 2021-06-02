@@ -297,7 +297,7 @@ def main(brcagene, genename, vcPath, maxMaf = 0.01) :
     with open(filename, "w") as fi :
         fi.write("submitter\tanalysis\tGermlineVar\tSomaticVar\tVAFvar\tLOHcat\tASCAT2\tFACETS\tascatNGS\tSequenza\tPURPLE\n")
         for l in data :
-            fi.write("{sub}\t{anal}\t{germ}\t{som}\t{vaf}\t{catVaf}".format(sub = l["submitter"], anal = l["cmp"], germ = l["germVar"], som = l["somVar"], vaf = l["vafDif"], catVaf = l["vafVarCat"]))
+            fi.write("{sub}\t{anal}\t{germ}\t{som}\t{vaf}\t{catVaf}\t".format(sub = l["submitter"], anal = l["cmp"], germ = l["germVar"], som = l["somVar"], vaf = l["vafDif"], catVaf = l["vafVarCat"]))
             if "ascat2" in l.keys() :
                 fi.write("{}\t".format(l["ascat2"]))
             else :
