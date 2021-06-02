@@ -38,7 +38,7 @@ sysarg <- commandArgs(trailingOnly = TRUE)
 file <- sysarg[1][1]
 
 # Get the gene name. It would be printed in the input file as the first characters before "_"
-gene <- strsplit(file)[[1]][1]
+gene <- strsplit(file, "_")[[1]][1]
 
 # Load data
 cat("R-INFO: Loading data\n")
