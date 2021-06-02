@@ -265,10 +265,13 @@ def main(brcagene, genename, vcPath, maxMaf = 0.01) :
             # Get the VAF comparison to infer possible LOH
             meanVaf = getVafMean(cnVar, tmVar)
             temp["vafDif"] = meanVaf
-            if meanVaf > 1.65 :
-                temp["vafVarCat"] = "L"
+            if meanVaf != "NA" :
+                if meanVaf > 1.65 :
+                    temp["vafVarCat"] = "L"
+                else :
+                    temp["vafVarCat"] = "N"
             else :
-                temp["vafVarCat"] = "N"
+                temp["vafVarCat"] = "NA"
             # Classify the variants according to the pathogenicity
             temp["germVar"] = classifyVariants(cnVar, maxMaf)
             temp["somVar"] = classifyVariants(tmVar, maxMaf)
