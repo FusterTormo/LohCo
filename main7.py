@@ -303,8 +303,11 @@ def main(brcagene, genename, vcPath, maxMaf = 0.01, toR = False) :
     if toR :
         # Print the data obtained in R template and create the plots
         pos = printRstring(dcPos)
+        pos = pos.replace("ascat2", "pa").replace("facets", "pf").replace("ascatngs", "pn").replace("purple", "pp").replace("sequenza", "ps")
         neg = printRstring(dcNeg)
+        neg = neg.replace("ascat2", "na").replace("facets", "nf").replace("ascatngs", "nn").replace("purple", "np").replace("sequenza", "ns")
         unk = printRstring(dcNeu)
+        unk = unk.replace("ascat2", "ua").replace("facets", "uf").replace("ascatngs", "un").replace("purple", "up").replace("sequenza", "us")
         params = "# Analysis done in {} samples\n".format(totalNeg + totalNeu + totalPos)
         if vcPath.find("platypusGerm") > 0 :
             params += "# Using Platypus variant caller\n"
