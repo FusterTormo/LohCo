@@ -21,10 +21,12 @@ Report the statistics in a tsv with the columns
     * Germline worse variant found in the gene
     * Somatic worse variant found in the gene
     * Mean difference in VAF (Mean somaticVAF/germlineVAF in the variants reported by both vcf)
+    * LOH categorization according to VAF mean difference
     * ASCAT2 LOH report in the gene
     * FACETS LOH report in the gene
     * ascatNGS LOH report in the gene
     * Sequenza LOH report in the gene
+    * PURPLE LOH report in the gene
 """
 
 # Constants
@@ -33,6 +35,13 @@ wd = "/g/strcombio/fsupek_cancer2/TCGA_bam/OV"
 
 # Functions
 def getMaxMaf(ls) :
+    """Return the maximum minor allele frequency from the variants list passed as parameter
+
+    Parameters
+    ----------
+        ls : list
+            List of variants
+    """
     maf = -1
     for l in ls :
         try :
@@ -200,6 +209,7 @@ def main(brcagene, genename, vcPath, maxMaf = 0.01) :
 
     print("INFO: Analysis will be done in {} cases".format(len(cases)))
     for c in cases :
+        # Get the pairs: tumors and controls
         with dbcon :
             cur = dbcon.cursor()
             q = cur.execute("SELECT uuid, bamName FROM sample WHERE submitter='{}' AND tumor LIKE '%Tumor%'".format(c[0]))
@@ -215,7 +225,7 @@ def main(brcagene, genename, vcPath, maxMaf = 0.01) :
                 tf = "{wd}/{sub}/{tumor}".format(wd = wd, sub = c[0], tumor = tm[0])
                 cf = "{wd}/{sub}/{control}".format(wd = wd, sub = c[0], control = cn[0])
                 workindir = "{wd}/{sub}".format(wd = wd, sub = c[0])
-                analysisdir = "{}_VS_{}".format(tm[0].split("-")[0], cn[0].split("-")[0]) # The folder format for FACETS, ascatNGS, and Sequenza is "[tumorUUID]_VS_[controlUUID]""
+                analysisdir = "{}_VS_{}".format(tm[0].split("-")[0], cn[0].split("-")[0]) # The folder format for FACETS, ascatNGS, PURPLE and Sequenza is "[tumorUUID]_VS_[controlUUID]""
                 vct = vcPath.format(tf)
                 vcc = vcPath.format(cf)
                 # Check both variant calling files exist
@@ -223,6 +233,7 @@ def main(brcagene, genename, vcPath, maxMaf = 0.01) :
                     auxDc["vcfFiles"].append(vct)
                 if os.path.isfile(vcc) :
                     auxDc["vcfFiles"].append(vcc)
+                # Check the LOH outputs available
                 folder = "{}/ASCAT2".format(workindir)
                 if os.path.isdir(folder) and len(os.listdir(folder)) > 0:
                     auxDc["lohFiles"].append(folder)
@@ -235,6 +246,9 @@ def main(brcagene, genename, vcPath, maxMaf = 0.01) :
                 sequenza = "{wd}/{folder}_Sequenza/{case}_segments.txt".format(folder = analysisdir, case = c[0], wd = workindir)
                 if os.path.isfile(sequenza) :
                     auxDc["lohFiles"].append(sequenza)
+                purple = "{wd}/{folder}_PURPLE/TUMOR.purple.cnv.somatic.tsv".format(wd = workindir, folder = analysisdir)
+                if os.path.isfile(purple) :
+                    auxDC["lohFiles"].append(purple)
                 if len(auxDc["vcfFiles"]) > len(submitter["vcfFiles"]) and len(auxDc["lohFiles"]) > len(submitter["vcfFiles"]) :
                     submitter = auxDc.copy()
 
@@ -249,6 +263,10 @@ def main(brcagene, genename, vcPath, maxMaf = 0.01) :
             # Get the VAF comparison to infer possible LOH
             meanVaf = getVafMean(cnVar, tmVar)
             temp["vafDif"] = meanVaf
+            if meanVaf > 1.65 :
+                temp["vafVarCat"] = "L"
+            else :
+                temp["vafVarCat"] = "N"
             # Classify the variants according to the pathogenicity
             temp["germVar"] = classifyVariants(cnVar, maxMaf)
             temp["somVar"] = classifyVariants(tmVar, maxMaf)
@@ -269,9 +287,9 @@ def main(brcagene, genename, vcPath, maxMaf = 0.01) :
     filename = "{}_{}_{}_LOH.tsv".format(genename, maxMaf, vc)
     print("INFO: Writing output in {}".format(filename))
     with open(filename, "w") as fi :
-        fi.write("submitter\tanalysis\tGermlineVar\tSomaticVar\tVAFvar\tASCAT2\tFACETS\tascatNGS\tSequenza\n")
+        fi.write("submitter\tanalysis\tGermlineVar\tSomaticVar\tVAFvar\tLOHcat\tASCAT2\tFACETS\tascatNGS\tSequenza\tPURPLE\n")
         for l in data :
-            fi.write("{sub}\t{anal}\t{germ}\t{som}\t{vaf}\t".format(sub = l["submitter"], anal = l["cmp"], germ = l["germVar"], som = l["somVar"], vaf = l["vafDif"]))
+            fi.write("{sub}\t{anal}\t{germ}\t{som}\t{vaf}\t{catVaf}".format(sub = l["submitter"], anal = l["cmp"], germ = l["germVar"], som = l["somVar"], vaf = l["vafDif"]), catVaf = l["vafVarCat"])
             if "ascat2" in l.keys() :
                 fi.write("{}\t".format(l["ascat2"]))
             else :
@@ -285,7 +303,11 @@ def main(brcagene, genename, vcPath, maxMaf = 0.01) :
             else :
                 fi.write("NA\t")
             if "sequenza" in l.keys() :
-                fi.write("{}\n".format(l["sequenza"]))
+                fi.write("{}\t".format(l["sequenza"]))
+            else :
+                fi.write("NA\t")
+            if "purple" in l.keys() :
+                fi.write("{}\n").format(l["purple"])
             else :
                 fi.write("NA\n")
     # output = "INFO: Variables for R. Params: Gene: {}, MAF: {} ".format(genename, maxMaf)
