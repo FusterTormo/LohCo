@@ -13,7 +13,7 @@ import libconstants as ctes
 
 """MAIN PROGRAM
 Get the submitters from OV cancer, and the pairs tumor-control from each submitter.
-Check if each has vcf output (variant caller passed as parameter). If both samples (tumor and control) have vcf, check LOH reported by ASCAT2, FACETS and Sequenza in the gene passed as parameter.
+Check if each has vcf output (variant caller passed as parameter). If both samples (tumor and control) have vcf, check LOH reported by ASCAT2, FACETS, ascatNGS, PURPLE and Sequenza in the gene passed as parameter.
 Do not do the same analysis in more than pair in the same submitter.
 Report the statistics in a tsv with the columns
     * Submitter id
@@ -35,12 +35,19 @@ wd = "/g/strcombio/fsupek_cancer2/TCGA_bam/OV"
 
 # Functions
 def getMaxMaf(ls) :
-    """Return the maximum minor allele frequency from the variants list passed as parameter
+    """Return the maximum minor allele frequency from the list passed as parameter
+
+    Calculates the maximum of the list passed as parameter. As "NA" or "." can be introduced, it checks if it is possible to convert each element to float
 
     Parameters
     ----------
         ls : list
-            List of variants
+            List of MAFs
+
+    Returns
+    -------
+        float
+            Maximum MAF. "NA" if it was not possible to get the maximum (e.g. All values in the list were "NA")
     """
     maf = -1
     for l in ls :
@@ -56,6 +63,20 @@ def getMaxMaf(ls) :
     return maf
 
 def getVaf(info, vc) :
+    """Extract the variant allele frequency from the INFO column passed as parameter
+
+    Parameters
+    ----------
+        info : str
+            Column, from the vcf, where VAF (or reads forward/reverse) are stored
+        vc : str
+            Variant caller. This is used to know which schema must follow the info file
+
+    Returns
+    -------
+        float
+            VAF Calulated by dividing the number of alterated reads by the total of reads (in percentage)
+    """
     num = -1
     den = -1
     vaf = -1
@@ -79,6 +100,23 @@ def getVaf(info, vc) :
     return vaf
 
 def getVafMean(cn, tm) :
+    """Calculate the mean vaf difference among the tumor and control variants passed as parameter
+
+    Extracts the variants in common in tumor and in control and calculates the division in each variant. Later extracts the mean of all these variants
+
+    Parameters
+    ----------
+        cn : dict
+            Dict with all the variants found in control sample
+        tm : dict
+            Dict with all the variants found in tumor sample
+
+    Returns
+    -------
+        float | str
+            The mean of the cn/tm division in the variants common in tumor and control
+            If there are not variants, returns "NA"
+    """
     common = []
     aux = 0
     for c in cn.keys() :
@@ -93,6 +131,23 @@ def getVafMean(cn, tm) :
     return mean
 
 def getVariant(path, gene) :
+    """Get the variants reported in the gene passed as parameter
+
+    Using shell commands, gets the variants from the vcf file passed as parameter. Transforms the data in a list of dicts. The dict keys are: varType1 (exonic, intronic...),
+    varType2 (nonsynonymous SNV, frameshift deletion...), maf (maximum MAF in all the MAFs reported), vaf (Variant Allele Frequency), GT (0/1, 1/1...)
+
+    Parameters
+    ----------
+        path : str
+            Path to vcf file. From this file the function will extract the variants in the gene passed as parameter. It will check if the file has Platypus format, or Strelka2 format
+        gene : str
+            Gene name. Variants from this gene will be extracted from the vcf passed as parameter
+
+    Returns
+    -------
+        dict
+            The dict has, chromosome-position as key; and variant type, maf, vaf and genotype as subkeys (see description for further details)
+    """
     removableVars = ["intergenic", "intronic", "unkwnonw", "downstream", "upstream"]
     noMaf = []
     var = {}
@@ -125,6 +180,22 @@ def getVariant(path, gene) :
     return var
 
 def classifyVariants(vars, maxMaf) :
+    """Classify the sample according to the worst variant found
+
+    Parameters
+    ----------
+        vars : dict
+            List of variants reported in the patient
+        maxMaf : float
+            Maximum MAF to consider a nonsynonymous SNV variant as pathogenic. In case that maxMaf is passed as -1. All SNV variants will be considered as neutral
+
+    Returns
+    -------
+        str
+            + if the worst variant is considered pathogenic
+            ? if the worst variant is a nonsynonymous SNV, and maximum MAF is higher than maxMaf
+            - otherwise (the variants are considered not pathogenic)
+    """
     classification = "-"
     for k, v in vars.items() :
         if v["varType1"] == "exonic" :
@@ -151,6 +222,24 @@ def classifyVariants(vars, maxMaf) :
     return classification
 
 def checkAscat(ascat, reg) :
+    """Find the ASCAT2 file in the ASCAT2 folder and get the LOH (or LOHs) in the region passed as parameter
+
+    Check ASCAT2 LOH report in the region passed as parameter. If more than one ASCAT2 files are reported, it checks if all ASCAT2 files report the same aberration. In case the do not
+    it reports "NF".
+
+    Parameters
+    ----------
+        ascat : str
+            ASCAT2 folder to get the ASCAT2 files
+        reg : list
+            List in REGION format to get check the region in which check the ASCAT2 output
+
+    Returns
+    -------
+        str
+            A, D, L, N If the same aberration is found in all ASCAT2 files: (A)mplification, (N)ormal, (L)OH, (D)eletion
+            NF If no ASCAT2 files found, or if the aberration found in the region is not the same in all ASCAT2 files
+    """
     cn = "NF"
     files = os.listdir(ascat)
     if len(files) == 1 :
@@ -163,12 +252,30 @@ def checkAscat(ascat, reg) :
                 cn = lib.getLOH(abs, "ascatarray", reg)
             else :
                 auxCn = lib.getLOH(abs, "ascatarray", reg)
-                if cn != auxCn : # If the ASCAT2 outpus does not output the same aberration, we do not include the result
+                if cn != auxCn : # If the ASCAT2 outputs does not output the same aberration, we do not include the result
                     cn =  "NF"
                     break
     return cn
 
 def doLoh(path, region) :
+    """Get the program and the aberration reported by the program
+
+    Given a file and a region, checks the LOH reported in the region passed as parameter. To do that, checks which program has been passed as parameter.
+
+    Parameters
+    ----------
+        path : str
+            File path to check the LOH in the region
+        region : list
+            List, in REGION, format to get the LOH reported
+
+    Returns
+    -------
+        program : str
+            LOH tool that has created the file passed as parameter. Possible values: facets, ascatngs, sequenza, purple, ascat2
+        loh : str
+            Aberration reported by the tool: (A)mplification, (L)OH, (D)eletion, (N)ormal, Not found (NF), Not Available (NA)
+    """
     program = ""
     loh = ""
     # Get from which program is the output
@@ -190,6 +297,20 @@ def doLoh(path, region) :
     return (program, loh)
 
 def printRstring(var) :
+    """Transform the dict to R schema
+
+    Converts the dict, passed as parameter, that has the number of A, D, L, N, NF found to R syntax
+
+    Parameters
+    ----------
+        var : dict
+            Histogram that counts all the aberrations found
+
+    Returns
+    -------
+        str
+            Data in R format
+    """
     str = ""
     for k in ["ascat2", "facets", "ascatngs", "sequenza"] :
         str += "{} <- c(".format(k)
@@ -201,6 +322,15 @@ def printRstring(var) :
 
 # Main program
 def main(brcagene, genename, vcPath, maxMaf = 0.01) :
+    """Main program
+
+    Obtains, from the data base the cases (submitters) in OV cancer
+    Searches in the database the pairs tumor-normal in each OV submitter
+    For each pair tumor-normal, searches the number of vcf files available as well as the number of LOH output files available
+    If there are 2 vcf files in the pair, gets the LOH reported by all the LOH tools. Additionally it calculates the difference in VAF between tumor and normal variants
+    Prints all the data obtained in a tsv file
+    Name of the file: {gene}_{maxMAF}_{variant_caller}_LOH.tsv
+    """
     cont = 0
     data = []
     # Get submitters list
