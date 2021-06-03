@@ -244,18 +244,49 @@ def checkAscat(ascat, reg) :
     files = os.listdir(ascat)
     if len(files) == 1 :
         abs = "{}/{}".format(ascat, files[0])
-        cn = lib.getLOH(abs, "ascatarray", reg)
+        cn = getLOH(abs, "ascatarray", reg)
     else :
         for f in files :
             abs = "{}/{}".format(ascat, f)
             if cn == "" :
-                cn = lib.getLOH(abs, "ascatarray", reg)
+                cn = getLOH(abs, "ascatarray", reg)
             else :
-                auxCn = lib.getLOH(abs, "ascatarray", reg)
+                auxCn = getLOH(abs, "ascatarray", reg)
                 if cn != auxCn : # If the ASCAT2 outputs does not output the same aberration, we do not include the result
                     cn =  "NF"
                     break
     return cn
+
+def getLOH(path, program, gene) :
+    """Find the copy number (or LOH) in the program passed as parameter in the gene passed as parameter too
+
+    Additionally, get the purity in the sample calculated by the program
+
+    Parameters
+    ----------
+        path : str
+            Output file from the program. Here we will search the LOH (or CNV)
+        program : str
+            Program that has generated the output file passed in the previous parameter. Valid values are: facets, ascatngs, sequenza, purple, and ascatarray
+        gene : list
+            List that contains the chromosome, start and end position of the gene where we want to find the LOH
+
+    Returns
+    -------
+        sol : str
+            LOH found in the region. Values can be A, D, L, or N
+        pur : float|str
+            If the purity has been found in the output file, a float with the purity reported.
+            Otherwise "NA"
+    """
+	sol = "Not found"
+    pur = "Not found"
+	if os.path.isfile(path):
+		reg = lc.convert2region(path, program, "error")
+        pur = lg.getPurity(reg)
+		sol = lg.getCopyNumber(gene[1:3], gene[0], reg)
+
+	return (sol, pur)
 
 def doLoh(path, region) :
     """Get the program and the aberration reported by the program
@@ -278,6 +309,7 @@ def doLoh(path, region) :
     """
     program = ""
     loh = ""
+    purity = ""
     # Get from which program is the output
     if path.endswith("facets_comp_cncf.tsv") :
         program = "facets"
@@ -291,10 +323,11 @@ def doLoh(path, region) :
         program = "ascat2"
     if program == "ascat2" :
         loh = checkAscat(path, region)
+        purity = "NA"
     else :
-        loh = lib.getLOH(path, program, region)
+        loh, purity = getLOH(path, program, region)
 
-    return (program, loh)
+    return (program, loh, purity)
 
 def printRstring(var) :
     """Transform the dict to R schema
@@ -409,8 +442,9 @@ def main(brcagene, genename, vcPath, maxMaf = 0.01) :
             temp["somVar"] = classifyVariants(tmVar, maxMaf)
             # Get the LOH in all the available LOH files
             for fic in submitter["lohFiles"] :
-                prog, loh = doLoh(fic, brcagene)
+                prog, loh, purity = doLoh(fic, brcagene)
                 temp[prog] = loh
+                temp["p_{}".format(prog)] = purity
 
             data.append(temp)
 
