@@ -117,12 +117,24 @@ colors <- c("red", "green", "yellow") # Color for barplots
 xtag <- c("Amp", "LOH", "Del", "Norm", "Not_Av") # Tags for the names
 
 # Create barplots with the absolute data
+png(paste("ASCAT2_abs_", gene, ".png", sep = ""), width = 730, height = 554)
 barplot(ma, beside = TRUE, col = colors, names.arg = xtag, main = paste("ASCAT2 aberrations reported in", gene), ylim = c(0,top))
+dev.off()
+png(paste("FACETS_abs_", gene, ".png", sep = ""), width = 730, height = 554)
 barplot(mf, beside = TRUE, col = colors, names.arg = xtag, main = paste("FACETS aberrations reported in", gene), ylim = c(0,top))
+dev.off()
+png(paste("ascatNGS_abs_", gene, ".png", sep = ""), width = 730, height = 554)
 barplot(mn, beside = TRUE, col = colors, names.arg = xtag, main = paste("ascatNGS aberrations reported in", gene), ylim = c(0,top))
+dev.off()
+png(paste("PURPLE_abs_", gene, ".png", sep = ""), width = 730, height = 554)
 barplot(mp, beside = TRUE, col = colors, names.arg = xtag, main = paste("PURPLE aberrations reported in", gene), ylim = c(0,top))
+dev.off()
+png(paste("Sequenza_abs_", gene, ".png", sep = ""), width = 730, height = 554)
 barplot(ms, beside = TRUE, col = colors, names.arg = xtag, main = paste("Sequenza aberrations reported in", gene), ylim = c(0,top))
+dev.off()
+png(paste("VAFvar_abs_", gene, ".png", sep = ""), width = 730, height = 554)
 barplot(ml, beside = TRUE, col = colors, names.arg = xtag, main = paste("Custom LOH aberrations reported in", gene), ylim = c(0,top))
+dev.off()
 
 # Convert the data to percentages (normalize the data)
 ma[1,] <- ma[1,]/sum(ma[1,])*100
@@ -145,9 +157,21 @@ ml[2,] <- ml[2,]/sum(ml[2,])*100
 ml[3,] <- ml[3,]/sum(ml[3,])*100
 
 # Create the barplots with the normalized data
+png(paste("ASCAT2_norm_", gene, ".png", sep = ""), width = 730, height = 554)
 barplot(ma, beside = TRUE, col = colors, names.arg = xtag, main = paste("ASCAT2 aberrations reported in", gene), ylim = c(0,100))
+dev.off()
+png(paste("ASCAT2_norm_", gene, ".png", sep = ""), width = 730, height = 554)
 barplot(mf, beside = TRUE, col = colors, names.arg = xtag, main = paste("FACETS aberrations reported in", gene), ylim = c(0,100))
+dev.off()
+png(paste("ASCAT2_norm_", gene, ".png", sep = ""), width = 730, height = 554)
 barplot(mn, beside = TRUE, col = colors, names.arg = xtag, main = paste("ascatNGS aberrations reported in", gene), ylim = c(0,100))
+dev.off()
+png(paste("ASCAT2_norm_", gene, ".png", sep = ""), width = 730, height = 554)
 barplot(mp, beside = TRUE, col = colors, names.arg = xtag, main = paste("PURPLE aberrations reported in", gene), ylim = c(0,100))
+dev.off()
+png(paste("ASCAT2_norm_", gene, ".png", sep = ""), width = 730, height = 554)
 barplot(ms, beside = TRUE, col = colors, names.arg = xtag, main = paste("Sequenza aberrations reported in", gene), ylim = c(0,100))
+dev.off()
+png(paste("ASCAT2_norm_", gene, ".png", sep = ""), width = 730, height = 554)
 barplot(ml, beside = TRUE, col = colors, names.arg = xtag, main = paste("Custom LOH aberrations reported in", gene), ylim = c(0,100))
+dev.off()
