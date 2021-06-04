@@ -9,13 +9,13 @@ import libcomparison as lc
 import libstatistics as ls
 
 print("INFO: Loading example from FACETS")
-f = lc.convert2region("/g/strcombio/fsupek_cancer2/TCGA_bam/OV/")
+f = lc.convert2region("/g/strcombio/fsupek_cancer2/TCGA_bam/OV/TCGA-04-1331/c21ab280_VS_82704a7d_FACETS/facets_comp_cncf.tsv", "facets")
 print("INFO: Loading example from ascatNGS")
-n = lc.convert2region("/g/strcombio/fsupek_cancer2/TCGA_bam/OV/")
+a = lc.convert2region("/g/strcombio/fsupek_cancer2/TCGA_bam/OV/TCGA-04-1331/c21ab280_VS_82704a7d_ASCAT/TCGA-04-1331-01A-01W.copynumber.caveman.csv", "ascatngs")
 print("INFO: Loading example from Sequenza")
-s = lc.convert2region("/g/strcombio/fsupek_cancer2/TCGA_bam/OV/")
+s = lc.convert2region("/g/strcombio/fsupek_cancer2/TCGA_bam/OV/TCGA-04-1331/c21ab280_VS_82704a7d_Sequenza/TCGA-04-1331_segments.txt", "sequenza")
 print("INFO: Loading example from PURPLE")
-p = lc.convert2region("/g/strcombio/fsupek_cancer2/TCGA_bam/OV/")
+p = lc.convert2region("/g/strcombio/fsupek_cancer2/TCGA_bam/OV/TCGA-04-1331/c21ab280_VS_82704a7d_PURPLE/TUMOR.purple.cnv.somatic.tsv", "purple")
 print("INFO: Number of regions that have reported each tool")
 print(ls.countsXtool(f))
 print(ls.countsXtool(a))
