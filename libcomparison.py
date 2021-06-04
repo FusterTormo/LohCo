@@ -156,7 +156,8 @@ def getFragments(l1, l2) :
                     else :
                         reg = [last, aux2.pop(0)]
                 last = reg[1] + 1
-                tmpregs.append(reg)
+                if reg[0] < reg[1] :
+                    tmpregs.append(reg)
             # Els dos grups de regions ja s'han acabat. Crear una ultima regio des de la maxima coordenada fins el final del cromosoma
             if last < maxChr[k] :
                 tmpregs.append([last, maxChr[k]])
