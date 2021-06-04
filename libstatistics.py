@@ -6,7 +6,8 @@ MAIN: Functions to extract statistics from the LOH processed data
 
 """
 FUNCTIONS
-    - countsXtool : Calculates the number of each alteration reported by each tool
+    - countsXtool : Calculates the number of regions have each alteration reported by each tool
+    - basesXtool : Calculates the number of bases have each alteration reported by each tool
     - regionNumber : Count the number of regions that the getFragments function has created
     - calculateCounts : Calculates the number of each alteration in each region in common
     - print2Bed : Stores the regions reported by each tool, and the regions once they are put in common
