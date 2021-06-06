@@ -18,22 +18,11 @@ print("INFO: Loading example from Sequenza")
 s = lc.convert2region("/g/strcombio/fsupek_cancer2/TCGA_bam/OV/TCGA-04-1331/c21ab280_VS_82704a7d_Sequenza/TCGA-04-1331_segments.txt", "sequenza")
 print("INFO: Loading example from PURPLE")
 p = lc.convert2region("/g/strcombio/fsupek_cancer2/TCGA_bam/OV/TCGA-04-1331/c21ab280_VS_82704a7d_PURPLE/TUMOR.purple.cnv.somatic.tsv", "purple")
-p2 = lc.getFragments(p,p)
 allbases = []
 it = 0
 current = 0
-for chr in ct.chromosomes :
-	for reg in p2[chr] :
-		start = current + it + reg[0]
-		end = current + it + reg[1]
-		cn = lg.getCopyNumber(reg, chr, p)
-		for base in range(start,end) :
-			allbases.append(cn)
-		print(len(allbases))
-	print(reg)
-	break
 
-sys.exit()
+
 
 """
 print("INFO: Number of regions that have reported each tool")
@@ -41,9 +30,9 @@ print(ls.countsXtool(f))
 print(ls.countsXtool(a))
 print(ls.countsXtool(s))
 print(ls.countsXtool(p))
+"""
 print("INFO: Number of bases that have reported each tool")
 print(ls.basesXtool(f))
 print(ls.basesXtool(a))
 print(ls.basesXtool(s))
 print(ls.basesXtool(p))
-"""
