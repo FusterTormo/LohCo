@@ -412,23 +412,23 @@ def main(cancer = "OV") :
                     temp = os.listdir(folder)[0] # TODO: Check all ASCAT files
                     ascat = "{wd}/{fi}".format(wd = folder, fi = temp)
                     rAscat = lc.convert2region(ascat, "ascatarray", "error")
-                    sAscat = ls.meanCoverage(region)
+                    sAscat = ls.meanCoverage(rAscat)
                 facets = "{wd}/{folder}_FACETS/facets_comp_cncf.tsv".format(wd = workindir, folder = analysisdir)
                 if os.path.isfile(facets) :
                     rFacets = lc.convert2region(facets, "facets", "error")
-                    sFacets = ls.meanCoverage(region)
+                    sFacets = ls.meanCoverage(rFacets)
                 ascatngs = lib.findAscatName("{wd}/{folder}_ASCAT/".format(wd = workindir, folder = analysisdir))
                 if ascatngs != "Not found" :
                     rNgs = lc.convert2region(ascatngs, "ascatngs", "error")
-                    sNgs = ls.meanCoverage(region)
+                    sNgs = ls.meanCoverage(rNgs)
                 sequenza = "{wd}/{folder}_Sequenza/{case}_segments.txt".format(folder = analysisdir, case = c[0], wd = workindir)
                 if os.path.isfile(sequenza) :
                     rSequenza = lc.convert2region(sequenza, "sequenza", "error")
-                    sSequenza = ls.meanCoverage(region)
+                    sSequenza = ls.meanCoverage(rSequenza)
                 purple = "{wd}/{folder}_PURPLE/TUMOR.purple.cnv.somatic.tsv".format(wd = workindir, folder = analysisdir)
                 if os.path.isfile(purple) :
                     rPurple = lc.convert2region(purple, "purple", "error")
-                    sPurple = ls.meanCoverage(region)
+                    sPurple = ls.meanCoverage(rPurple)
                 # Write the output in RAM
 
                 txt += "{sub}\t{an}\t{fmcn}\t{fpu}\t{fpl}\t{fab}\t{acn}\t{aab}\t{scn}\t{spu}\t{spl}\t{sab}\t{pcn}\t{ppu}\t{ppl}\t{pab}\t{ncn}\t{npu}\t{npl}\t{nab}\n".format(
