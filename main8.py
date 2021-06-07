@@ -10,6 +10,7 @@ import time
 
 import main1 as lib
 import libconstants as ctes
+import libcomparison as lc
 
 """MAIN PROGRAM
 Get the submitters from OV cancer, and the pairs tumor-control from each submitter.
@@ -279,14 +280,14 @@ def getLOH(path, program, gene) :
             If the purity has been found in the output file, a float with the purity reported.
             Otherwise "NA"
     """
-	sol = "Not found"
+    sol = "Not found"
     pur = "Not found"
-	if os.path.isfile(path):
-		reg = lc.convert2region(path, program, "error")
+    if os.path.isfile(path):
+        reg = lc.convert2region(path, program, "error")
         pur = lg.getPurity(reg)
-		sol = lg.getCopyNumber(gene[1:3], gene[0], reg)
+        sol = lg.getCopyNumber(gene[1:3], gene[0], reg)
 
-	return (sol, pur)
+    return (sol, pur)
 
 def doLoh(path, region) :
     """Get the program and the aberration reported by the program
