@@ -447,6 +447,7 @@ def main(brcagene, genename, vcPath, maxMaf = 0.01) :
                 temp["p_{}".format(prog)] = purity
 
             data.append(temp)
+            print(temp)
 
 
     print("\nINFO: Final results. {} had a sample with both vcfs (tumor and control) done".format(cont))
@@ -459,7 +460,7 @@ def main(brcagene, genename, vcPath, maxMaf = 0.01) :
     filename = "{}_{}_{}_LOH.tsv".format(genename, maxMaf, vc)
     print("INFO: Writing output in {}".format(filename))
     with open(filename, "w") as fi :
-        fi.write("submitter\tanalysis\tGermlineVar\tSomaticVar\tVAFvar\tLOHcat\tASCAT2\tFACETS\tascatNGS\tSequenza\tPURPLE\n")
+        fi.write("submitter\tanalysis\tGermlineVar\tSomaticVar\tVAFvar\tLOHcat\tASCAT2\tFACETS\tascatNGS\tSequenza\tPURPLE\tp_FACETS\tp_AscatNGS\tp_Sequenza\tp_PURPLE\n")
         for l in data :
             fi.write("{sub}\t{anal}\t{germ}\t{som}\t{vaf}\t{catVaf}\t".format(sub = l["submitter"], anal = l["cmp"], germ = l["germVar"], som = l["somVar"], vaf = l["vafDif"], catVaf = l["vafVarCat"]))
             if "ascat2" in l.keys() :
@@ -479,7 +480,23 @@ def main(brcagene, genename, vcPath, maxMaf = 0.01) :
             else :
                 fi.write("NA\t")
             if "purple" in l.keys() :
-                fi.write("{}\n".format(l["purple"]))
+                fi.write("{}\t".format(l["purple"]))
+            else :
+                fi.write("NA\t")
+            if "p_facets" in l.keys() :
+                fi.write("{}\t".format(l["p_facets"]))
+            else :
+                fi.write("NA\t")
+            if "p_ascatngs" in l.keys() :
+                fi.write("{}\t".format(l["p_ascatngs"]))
+            else :
+                fi.write("NA\t")
+            if "p_sequenza" in l.keys() :
+                fi.write("{}\t".format(l["p_sequenza"]))
+            else :
+                fi.write("NA\t")
+            if "p_purple" in l.keys() :
+                fi.write("{}\n".format(l["p_purple"]))
             else :
                 fi.write("NA\n")
 
