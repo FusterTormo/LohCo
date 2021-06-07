@@ -390,9 +390,6 @@ def main(cancer = "OV") :
 
     print("INFO: Analysis done in {} cases".format(len(cases)))
     for c in cases :
-        if (totalPos + totalNeg + totalNeu) % 100 == 0 :
-            print("{} cases analysed".format(totalPos + totalNeg + totalNeu))
-
         with dbcon :
             cur = dbcon.cursor()
             q = cur.execute("SELECT uuid, bamName FROM sample WHERE submitter='{}' AND tumor LIKE '%Tumor%'".format(c[0]))
@@ -407,18 +404,22 @@ def main(cancer = "OV") :
                 workindir = "{wd}/{sub}".format(wd = wd, sub = c[0])
                 analysisdir = "{}_VS_{}".format(tm[0].split("-")[0], cn[0].split("-")[0]) # The folder format for FACETS, ascatNGS, and Sequenza is "[tumorUUID]_VS_[controlUUID]""
 
+                folder = "{}/ASCAT2".format(workindir)
+                if os.path.isdir(folder) and len(os.listdir(folder)) > 0:
+                    ascat = os.listdir(folder)[0] # TODO: Check all ASCAT files
+                    region = lc.convert2region(ascat, "ascatarray", "error")
+                    stats = ls.meanCoverage(region)
+                    print("ASCAT2\t{}\t{}\t{}".format(c[0], round(region["purity"],2), stats["meanCN"]))
                 facets = "{wd}/{folder}_FACETS/facets_comp_cncf.tsv".format(wd = workindir, folder = analysisdir)
                 if os.path.isfile(facets) :
                     region = lc.convert2region(facets, "facets", "error")
                     stats = ls.meanCoverage(region)
-                    print("FACETS\t{}\t{}\t{}".format(c[0], region["purity"], stats["meanCN"]))
+                    print("FACETS\t{}\t{}\t{}".format(c[0], round(region["purity"],2), stats["meanCN"]))
                 ascatngs = lib.findAscatName("{wd}/{folder}_ASCAT/".format(wd = workindir, folder = analysisdir))
-                # # TODO: Buscar l'arxiu de ascatNGS
                 if ascatngs != "Not found" :
                     region = lc.convert2region(ascatngs, "ascatngs", "error")
                     stats = ls.meanCoverage(region)
                     print("ascatNGS\t{}\t{}\t{}".format(c[0], region["purity"], stats["meanCN"]))
-                # # TODO: Buscar l'arxiu de ASCAT2
                 sequenza = "{wd}/{folder}_Sequenza/{case}_segments.txt".format(folder = analysisdir, case = c[0], wd = workindir)
                 if os.path.isfile(sequenza) :
                     region = lc.convert2region(sequenza, "sequenza", "error")

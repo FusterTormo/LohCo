@@ -11,6 +11,7 @@ import time
 import main1 as lib
 import libconstants as ctes
 import libcomparison as lc
+import libgetters as lg
 
 """MAIN PROGRAM
 Get the submitters from OV cancer, and the pairs tumor-control from each submitter.
