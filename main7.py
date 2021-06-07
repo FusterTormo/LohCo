@@ -409,22 +409,24 @@ def main(cancer = "OV") :
 
                 facets = "{wd}/{folder}_FACETS/facets_comp_cncf.tsv".format(wd = workindir, folder = analysisdir)
                 if os.path.isfile(facets) :
-                    region = lc.convert2region(facets, "facets")
+                    region = lc.convert2region(facets, "facets", "error")
                     stats = ls.meanCoverage(region)
                     print("FACETS\t{}\t{}\t{}".format(c[0], region["purity"], stats["meanCN"]))
                 ascatngs = lib.findAscatName("{wd}/{folder}_ASCAT/".format(wd = workindir, folder = analysisdir))
                 # # TODO: Buscar l'arxiu de ascatNGS
-                # if ascatngs != "Not found" :
-                #     auxDc["lohFiles"].append(ascatngs)
+                if ascatngs != "Not found" :
+                    region = lc.convert2region(ascatngs, "ascatngs", "error")
+                    stats = ls.meanCoverage(region)
+                    print("ascatNGS\t{}\t{}\t{}".format(c[0], region["purity"], stats["meanCN"]))
                 # # TODO: Buscar l'arxiu de ASCAT2
                 sequenza = "{wd}/{folder}_Sequenza/{case}_segments.txt".format(folder = analysisdir, case = c[0], wd = workindir)
                 if os.path.isfile(sequenza) :
-                    region = lc.convert2region(sequenza, "sequenza")
+                    region = lc.convert2region(sequenza, "sequenza", "error")
                     stats = ls.meanCoverage(region)
                     print("Sequenza\t{}\t{}\t{}".format(c[0], region["purity"], stats["meanCN"]))
                 purple = "{wd}/{folder}_PURPLE/TUMOR.purple.cnv.somatic.tsv".format(wd = workindir, folder = analysisdir)
                 if os.path.isfile(purple) :
-                    region = lc.convert2region(purple, "purple")
+                    region = lc.convert2region(purple, "purple", "error")
                     stats = ls.meanCoverage(region)
                     print("PURPLE\t{}\t{}\t{}\n".format(c[0], region["purity"], stats["meanCN"]))
 
