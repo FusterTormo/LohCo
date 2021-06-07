@@ -381,6 +381,8 @@ def main(cancer = "OV") :
     pur_purity, pur_ploidy, pur_aberration, ngs_meanCN, ngs_purity, ngs_ploidy, ngs_aberration"""
 
     wd = "/g/strcombio/fsupek_cancer2/TCGA_bam/{}".format(cancer)
+    txt = "submitter\tcase\tfac_meanCN\tfac_purity\tfac_ploidy\tfac_aberration\tasc_meanCN\tasc_aberration\tseq_meanCN\tseq_purity\tseq_ploidy\tseq_aberration\tpur_meanCN\tpur_purity\t"
+    txt += "pur_ploidy\tpur_aberration\tngs_meanCN\tngs_purity\tngs_ploidy\tngs_aberration\n"
 
     # Get submitters list
     with dbcon :
@@ -405,32 +407,38 @@ def main(cancer = "OV") :
                 analysisdir = "{}_VS_{}".format(tm[0].split("-")[0], cn[0].split("-")[0]) # The folder format for FACETS, ascatNGS, and Sequenza is "[tumorUUID]_VS_[controlUUID]""
 
                 folder = "{}/ASCAT2".format(workindir)
+                # Collect and calculate all the data
                 if os.path.isdir(folder) and len(os.listdir(folder)) > 0:
                     temp = os.listdir(folder)[0] # TODO: Check all ASCAT files
                     ascat = "{wd}/{fi}".format(wd = folder, fi = temp)
-                    region = lc.convert2region(ascat, "ascatarray", "error")
-                    stats = ls.meanCoverage(region)
-                    print("ASCAT2\t{}\tNA\t{}".format(c[0], stats["meanCN"]))
+                    rAscat = lc.convert2region(ascat, "ascatarray", "error")
+                    sAscat = ls.meanCoverage(region)
                 facets = "{wd}/{folder}_FACETS/facets_comp_cncf.tsv".format(wd = workindir, folder = analysisdir)
                 if os.path.isfile(facets) :
-                    region = lc.convert2region(facets, "facets", "error")
-                    stats = ls.meanCoverage(region)
-                    print("FACETS\t{}\t{}\t{}".format(c[0], round(region["purity"],2), stats["meanCN"]))
+                    rFacets = lc.convert2region(facets, "facets", "error")
+                    sFacets = ls.meanCoverage(region)
                 ascatngs = lib.findAscatName("{wd}/{folder}_ASCAT/".format(wd = workindir, folder = analysisdir))
                 if ascatngs != "Not found" :
-                    region = lc.convert2region(ascatngs, "ascatngs", "error")
-                    stats = ls.meanCoverage(region)
-                    print("ascatNGS\t{}\t{}\t{}".format(c[0], region["purity"], stats["meanCN"]))
+                    rNgs = lc.convert2region(ascatngs, "ascatngs", "error")
+                    sNgs = ls.meanCoverage(region)
                 sequenza = "{wd}/{folder}_Sequenza/{case}_segments.txt".format(folder = analysisdir, case = c[0], wd = workindir)
                 if os.path.isfile(sequenza) :
-                    region = lc.convert2region(sequenza, "sequenza", "error")
-                    stats = ls.meanCoverage(region)
-                    print("Sequenza\t{}\t{}\t{}".format(c[0], region["purity"], stats["meanCN"]))
+                    rSequenza = lc.convert2region(sequenza, "sequenza", "error")
+                    sSequenza = ls.meanCoverage(region)
                 purple = "{wd}/{folder}_PURPLE/TUMOR.purple.cnv.somatic.tsv".format(wd = workindir, folder = analysisdir)
                 if os.path.isfile(purple) :
-                    region = lc.convert2region(purple, "purple", "error")
-                    stats = ls.meanCoverage(region)
-                    print("PURPLE\t{}\t{}\t{}\n".format(c[0], region["purity"], stats["meanCN"]))
+                    rPurple = lc.convert2region(purple, "purple", "error")
+                    sPurple = ls.meanCoverage(region)
+                # Write the output in RAM
+
+                txt += "{sub}\t{an}\t{fmcn}\t{fpu}\t{fpl}\t{fab}\t{acn}\t{aab}\t{scn}\t{spu}\t{spl}\t{sab}\t{pcn}\t{ppu}\t{ppl}\t{pab}\t{ncn}\t{npu}\t{npl}\t{nab}\n".format(
+                sub = c[0], an = analysisdir, fmcn = sFacets["meanCN"], fpu = rFacets["purity"], fpl = rFacets["ploidy"], fab = ",".join([sFacets["perA"],sFacets["perL"],sFacets["perD"],sFacets["perN"]]),
+                acn = sAscat["meanCN"], aab = ",".join([sAscat["perA"],sAscat["perL"],sAscat["perD"],sAscat["perN"]]),
+                scn = sSequenza["meanCN"], spu = rSequenza["purity"], spl = rSequenza["ploidy"], sab = ",".join([sSequenza["perA"],sSequenza["perL"],sSequenza["perD"],sSequenza["perN"]]),
+                pcn = sPurple["meanCN"], spu = rPurple["purity"], ppu = rPurple["ploidy"], pab = ",".join([sPurple["perA"],sPurple["perL"],sPurple["perD"],sPurple["perN"]]),
+                ncn = sNgs["meanCN"], npu = rNgs["purity"], npl = rNgs["ploidy"], nab = ",".join([sNgs["perA"],sNgs["perL"],sNgs["perD"],sNgs["perN"]]))
+                print(txt)
+
 
 if __name__ == "__main__" :
     main()
