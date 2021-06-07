@@ -106,6 +106,7 @@ def meanCoverage(regs) :
     bases = 0 # How many bases are reported
     min = 100
     max = -1
+    stats = {}
     for a in cts.chromosomes :
         if a in regs.keys() :
             for i in regs[a] :
@@ -120,8 +121,17 @@ def meanCoverage(regs) :
     leng = allbases - bases # Get the bases that are not reported, assuming they are copy number normal
     totalCN += 2 * leng
     meanCN = round(totalCN/allbases, 2)
-    print("MinCN: {}\nMaxCN: {}".format(min, max))
-    return meanCN
+    stats["minCN"] = min
+    stats["maxCN"] = max
+    stats["meanCN"] = meanCN
+    totals = basesXtool(regs)
+    totals["N"] += leng # Add the pending bases that are assumed as copy number normal to the reported by the tool
+    for a in cts.aberrations :
+        percent = round(100 * totals[a] / allbases, 2)
+        key = "per{}".format(a)
+        stats[key] = percent
+
+    return stats
 
 def regionNumber(regs) :
     """Count the number of regions that the getFragments function has created
