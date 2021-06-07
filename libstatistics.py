@@ -93,6 +93,29 @@ def basesXtool(regs1, regs2 = None) :
     else :
         return t1
 
+def meanCoverage(regs) :
+    """Calculate the mean coverage from a REGION passed as parameter
+
+    To do that, it calculates the number of bases by the addition of all chromsome length. Then it calculates the total copy number from all the regions given (regions with no copy number
+    reported will assume a 2 in tcn). Finally it divides the total copy number obtained by the genome length. Additionally it calculates the percentage of each aberration reported.
+    All data is returned in a dict (keys: "meanCN", "perA", "perD", "perL", "perN")
+    """
+    allbases = sum(cts.lenChromosomes.values())
+    totalCN = 0
+    meanCN = 0
+    leng = 0 # How many bases are reported
+    for a in cts.chromosomes :
+        if a in regs.keys() :
+            for i in regs[a] :
+                leng = int(i[1]) - int(i[0]) # Get region length
+                cn = i[3] # Get total copy number reported
+                totalCN += cn * bases
+                bases += leng
+    leng = allbases - bases # Get the bases that are not reported, assuming they are copy number normal
+    totalCN += 2 * leng
+    meanCN = round(totalCN/allbases, 2)
+    return meanCN
+
 def regionNumber(regs) :
     """Count the number of regions that the getFragments function has created
 

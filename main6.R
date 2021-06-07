@@ -110,5 +110,7 @@ ggplot(datos, aes(grp, JCC, fill = grp)) + geom_violin() + geom_boxplot(width = 
 ggsave("PURPLEVSall.png")
 
 # Violin plots of Jaccard Index by aberration
-
+# Amplifications
+plot(density(dva$MCCamp), type = "l", col = colors[1])
+lines(density(dvn$MCCamp), col = colors[2])
 # Violin plots of Matthew's Correlation Coefficient by aberration
