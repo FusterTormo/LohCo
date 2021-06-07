@@ -104,7 +104,7 @@ def meanCoverage(regs) :
     totalCN = 0
     meanCN = 0
     bases = 0 # How many bases are reported
-    min = 100
+    min = 2
     max = -1
     stats = {}
     for a in cts.chromosomes :

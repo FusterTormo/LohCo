@@ -10,6 +10,8 @@ import time
 
 import main1 as lib
 import libconstants as ctes
+import libcomparison as lc
+import libstatistics as ls
 
 """MAIN PROGRAM
     Count the aberration reported in a gene passed as parameter (BRCA1 or BRCA2 in the tests below).
@@ -159,7 +161,7 @@ def printRstring(var) :
     return str
 
 # Main program
-def main(brcagene, genename, vcPath, maxMaf = 0.01, toR = False) :
+def old_main(brcagene, genename, vcPath, maxMaf = 0.01, toR = False) :
     totalPos = 0
     dcPos = {"ascat2" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0, "NF" : 0}, "facets" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0, "NF" : 0},
     "ascatngs" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0, "NF" : 0}, "sequenza" : {"L" : 0, "A" : 0, "D" : 0, "N" : 0, "NF" : 0},
@@ -373,17 +375,71 @@ def main(brcagene, genename, vcPath, maxMaf = 0.01, toR = False) :
         output += "\n------\n"
         print(output)
 
+def main(cancer = "OV") :
+    """Searches all the available pairs tumor-control from the cancer passed as parameter. Find tools that have output LOH report. Calculate mean copy number. Output all the information
+    in a table file. Columns: submitter, case, fac_meanCN, fac_purity, fac_ploidy, fac_aberration, asc_meanCN, asc_aberration, seq_meanCN, seq_purity, seq_ploidy, seq_aberration, pur_meanCN,
+    pur_purity, pur_ploidy, pur_aberration, ngs_meanCN, ngs_purity, ngs_ploidy, ngs_aberration"""
+
+    wd = "/g/strcombio/fsupek_cancer2/TCGA_bam/{}".format(cancer)
+
+    # Get submitters list
+    with dbcon :
+          cur = dbcon.cursor()
+          q = cur.execute("SELECT submitter FROM patient WHERE cancer='{}'".format(cancer))
+          cases = q.fetchall()
+
+    print("INFO: Analysis done in {} cases".format(len(cases)))
+    for c in cases :
+        if (totalPos + totalNeg + totalNeu) % 100 == 0 :
+            print("{} cases analysed".format(totalPos + totalNeg + totalNeu))
+
+        with dbcon :
+            cur = dbcon.cursor()
+            q = cur.execute("SELECT uuid, bamName FROM sample WHERE submitter='{}' AND tumor LIKE '%Tumor%'".format(c[0]))
+            tumors = q.fetchall()
+            q = cur.execute("SELECT uuid, bamName FROM sample WHERE submitter='{}' AND tumor LIKE '%Normal%'".format(c[0]))
+            controls = q.fetchall()
+
+        for tm in tumors :
+            for cn in controls :
+                tf = "{wd}/{sub}/{tumor}".format(wd = wd, sub = c[0], tumor = tm[0])
+                cf = "{wd}/{sub}/{control}".format(wd = wd, sub = c[0], control = cn[0])
+                workindir = "{wd}/{sub}".format(wd = wd, sub = c[0])
+                analysisdir = "{}_VS_{}".format(tm[0].split("-")[0], cn[0].split("-")[0]) # The folder format for FACETS, ascatNGS, and Sequenza is "[tumorUUID]_VS_[controlUUID]""
+
+                facets = "{wd}/{folder}_FACETS/facets_comp_cncf.tsv".format(wd = workindir, folder = analysisdir)
+                if os.path.isfile(facets) :
+                    region = lc.convert2region(facets, "facets")
+                    stats = ls.meanCoverage(region)
+                    print("FACETS\t{}\t{}\t{}".format(c[0], region["purity"], stats["meanCN"]))
+                ascatngs = lib.findAscatName("{wd}/{folder}_ASCAT/".format(wd = workindir, folder = analysisdir))
+                # # TODO: Buscar l'arxiu de ascatNGS
+                # if ascatngs != "Not found" :
+                #     auxDc["lohFiles"].append(ascatngs)
+                # # TODO: Buscar l'arxiu de ASCAT2
+                sequenza = "{wd}/{folder}_Sequenza/{case}_segments.txt".format(folder = analysisdir, case = c[0], wd = workindir)
+                if os.path.isfile(sequenza) :
+                    region = lc.convert2region(sequenza, "sequenza")
+                    stats = ls.meanCoverage(region)
+                    print("Sequenza\t{}\t{}\t{}".format(c[0], region["purity"], stats["meanCN"]))
+                purple = "{wd}/{folder}_PURPLE/TUMOR.purple.cnv.somatic.tsv".format(wd = workindir, folder = analysisdir)
+                if os.path.isfile(purple) :
+                    region = lc.convert2region(purple, "purple")
+                    stats = ls.meanCoverage(region)
+                    print("PURPLE\t{}\t{}\t{}\n".format(c[0], region["purity"], stats["meanCN"]))
+
 if __name__ == "__main__" :
-    brca1 = ["17", 43044295, 43170245]
-    brca2 = ["13", 32315086, 32400266]
-    maxMaf = 0.05
-    variantCallingFile = "{}/platypusGerm/platypus.hg38_multianno.txt"
+    main()
+    # brca1 = ["17", 43044295, 43170245]
+    # brca2 = ["13", 32315086, 32400266]
+    # maxMaf = 0.05
+    # variantCallingFile = "{}/platypusGerm/platypus.hg38_multianno.txt"
     #variantCallingFile = "{}/strelkaGerm/results/variants/strelka.hg38_multianno.txt"
-    main(brca1, "BRCA1", variantCallingFile, 0.05)
+    # main(brca1, "BRCA1", variantCallingFile, 0.05)
     # main(brca1, "BRCA1", variantCallingFile, 0.03)
     # main(brca1, "BRCA1", variantCallingFile, 0.01)
     # main(brca1, "BRCA1", variantCallingFile, 0.0)
-    main(brca1, "BRCA1", variantCallingFile, -1, True)
+    # main(brca1, "BRCA1", variantCallingFile, -1, True)
     # main(brca2, "BRCA2", variantCallingFile, 0.05)
     # main(brca2, "BRCA2", variantCallingFile, 0.03)
     # main(brca2, "BRCA2", variantCallingFile, 0.01)
