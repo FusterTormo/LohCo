@@ -103,17 +103,24 @@ def meanCoverage(regs) :
     allbases = sum(cts.lenChromosomes.values())
     totalCN = 0
     meanCN = 0
-    leng = 0 # How many bases are reported
+    bases = 0 # How many bases are reported
+    min = 100
+    max = -1
     for a in cts.chromosomes :
         if a in regs.keys() :
             for i in regs[a] :
                 leng = int(i[1]) - int(i[0]) # Get region length
                 cn = i[3] # Get total copy number reported
-                totalCN += cn * bases
+                if cn < min :
+                    min = cn
+                if cn > max :
+                    max = cn
+                totalCN += cn * leng
                 bases += leng
     leng = allbases - bases # Get the bases that are not reported, assuming they are copy number normal
     totalCN += 2 * leng
     meanCN = round(totalCN/allbases, 2)
+    print("MinCN: {}\nMaxCN: {}".format(min, max))
     return meanCN
 
 def regionNumber(regs) :
