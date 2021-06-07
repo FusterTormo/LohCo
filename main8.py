@@ -246,16 +246,16 @@ def checkAscat(ascat, reg) :
     files = os.listdir(ascat)
     if len(files) == 1 :
         abs = "{}/{}".format(ascat, files[0])
-        cn = getLOH(abs, "ascatarray", reg)
+        cn, aux = getLOH(abs, "ascatarray", reg)
     else :
         for f in files :
             abs = "{}/{}".format(ascat, f)
             if cn == "" :
-                cn = getLOH(abs, "ascatarray", reg)
+                cn, aux = getLOH(abs, "ascatarray", reg)
             else :
                 auxCn = getLOH(abs, "ascatarray", reg)
                 if cn != auxCn : # If the ASCAT2 outputs does not output the same aberration, we do not include the result
-                    cn =  "NF"
+                    cn, aux =  "NF"
                     break
     return cn
 

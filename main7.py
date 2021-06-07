@@ -435,7 +435,7 @@ def main(cancer = "OV") :
                 sub = c[0], an = analysisdir, fmcn = sFacets["meanCN"], fpu = rFacets["purity"], fpl = rFacets["ploidy"], fab = ",".join([sFacets["perA"],sFacets["perL"],sFacets["perD"],sFacets["perN"]]),
                 acn = sAscat["meanCN"], aab = ",".join([sAscat["perA"],sAscat["perL"],sAscat["perD"],sAscat["perN"]]),
                 scn = sSequenza["meanCN"], spu = rSequenza["purity"], spl = rSequenza["ploidy"], sab = ",".join([sSequenza["perA"],sSequenza["perL"],sSequenza["perD"],sSequenza["perN"]]),
-                pcn = sPurple["meanCN"], spu = rPurple["purity"], ppu = rPurple["ploidy"], pab = ",".join([sPurple["perA"],sPurple["perL"],sPurple["perD"],sPurple["perN"]]),
+                pcn = sPurple["meanCN"], ppu = rPurple["purity"], ppl = rPurple["ploidy"], pab = ",".join([sPurple["perA"],sPurple["perL"],sPurple["perD"],sPurple["perN"]]),
                 ncn = sNgs["meanCN"], npu = rNgs["purity"], npl = rNgs["ploidy"], nab = ",".join([sNgs["perA"],sNgs["perL"],sNgs["perD"],sNgs["perN"]]))
                 print(txt)
 
