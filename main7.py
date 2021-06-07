@@ -406,10 +406,11 @@ def main(cancer = "OV") :
 
                 folder = "{}/ASCAT2".format(workindir)
                 if os.path.isdir(folder) and len(os.listdir(folder)) > 0:
-                    ascat = os.listdir(folder)[0] # TODO: Check all ASCAT files
+                    temp = os.listdir(folder)[0] # TODO: Check all ASCAT files
+                    ascat = "{wd}/{fi}".format(wd = folder, fi = temp)
                     region = lc.convert2region(ascat, "ascatarray", "error")
                     stats = ls.meanCoverage(region)
-                    print("ASCAT2\t{}\t{}\t{}".format(c[0], round(region["purity"],2), stats["meanCN"]))
+                    print("ASCAT2\t{}\tNA\t{}".format(c[0], stats["meanCN"]))
                 facets = "{wd}/{folder}_FACETS/facets_comp_cncf.tsv".format(wd = workindir, folder = analysisdir)
                 if os.path.isfile(facets) :
                     region = lc.convert2region(facets, "facets", "error")
