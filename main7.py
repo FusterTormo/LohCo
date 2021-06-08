@@ -375,6 +375,9 @@ def old_main(brcagene, genename, vcPath, maxMaf = 0.01, toR = False) :
         output += "\n------\n"
         print(output)
 
+def convertToCSV(data) :
+    return ";".join([str(data["perA"]),str(data["perL"]),str(data["perD"]),str(data["perN"])])
+
 def main(cancer = "OV") :
     """Searches all the available pairs tumor-control from the cancer passed as parameter. Find tools that have output LOH report. Calculate mean copy number. Output all the information
     in a table file. Columns: submitter, case, fac_meanCN, fac_purity, fac_ploidy, fac_aberration, asc_meanCN, asc_aberration, seq_meanCN, seq_purity, seq_ploidy, seq_aberration, pur_meanCN,
@@ -429,14 +432,14 @@ def main(cancer = "OV") :
                 if os.path.isfile(purple) :
                     rPurple = lc.convert2region(purple, "purple", "error")
                     sPurple = ls.meanCoverage(rPurple)
-                # Write the output in RAM
 
+                # Write the output in RAM
                 txt += "{sub}\t{an}\t{fmcn}\t{fpu}\t{fpl}\t{fab}\t{acn}\t{aab}\t{scn}\t{spu}\t{spl}\t{sab}\t{pcn}\t{ppu}\t{ppl}\t{pab}\t{ncn}\t{npu}\t{npl}\t{nab}\n".format(
-                sub = c[0], an = analysisdir, fmcn = sFacets["meanCN"], fpu = rFacets["purity"], fpl = rFacets["ploidy"], fab = ",".join([sFacets["perA"],sFacets["perL"],sFacets["perD"],sFacets["perN"]]),
-                acn = sAscat["meanCN"], aab = ",".join([sAscat["perA"],sAscat["perL"],sAscat["perD"],sAscat["perN"]]),
-                scn = sSequenza["meanCN"], spu = rSequenza["purity"], spl = rSequenza["ploidy"], sab = ",".join([sSequenza["perA"],sSequenza["perL"],sSequenza["perD"],sSequenza["perN"]]),
-                pcn = sPurple["meanCN"], ppu = rPurple["purity"], ppl = rPurple["ploidy"], pab = ",".join([sPurple["perA"],sPurple["perL"],sPurple["perD"],sPurple["perN"]]),
-                ncn = sNgs["meanCN"], npu = rNgs["purity"], npl = rNgs["ploidy"], nab = ",".join([sNgs["perA"],sNgs["perL"],sNgs["perD"],sNgs["perN"]]))
+                sub = c[0], an = analysisdir, fmcn = sFacets["meanCN"], fpu = rFacets["purity"], fpl = rFacets["ploidy"], fab = convertToCSV(sFacets),
+                acn = sAscat["meanCN"], aab = convertToCSV(sAscat),
+                scn = sSequenza["meanCN"], spu = rSequenza["purity"], spl = rSequenza["ploidy"], sab = convertToCSV(sSequenza),
+                pcn = sPurple["meanCN"], ppu = rPurple["purity"], ppl = rPurple["ploidy"], pab = convertToCSV(sPurple),
+                ncn = sNgs["meanCN"], npu = rNgs["purity"], npl = rNgs["ploidy"], nab = convertToCSV(sNgs))
                 print(txt)
 
 
