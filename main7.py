@@ -386,6 +386,7 @@ def main(cancer = "OV") :
     wd = "/g/strcombio/fsupek_cancer2/TCGA_bam/{}".format(cancer)
     txt = "submitter\tcase\tfac_meanCN\tfac_purity\tfac_ploidy\tfac_aberration\tasc_meanCN\tasc_aberration\tseq_meanCN\tseq_purity\tseq_ploidy\tseq_aberration\tpur_meanCN\tpur_purity\t"
     txt += "pur_ploidy\tpur_aberration\tngs_meanCN\tngs_purity\tngs_ploidy\tngs_aberration\n"
+    na = "NA"
 
     # Get submitters list
     with dbcon :
@@ -408,6 +409,16 @@ def main(cancer = "OV") :
                 cf = "{wd}/{sub}/{control}".format(wd = wd, sub = c[0], control = cn[0])
                 workindir = "{wd}/{sub}".format(wd = wd, sub = c[0])
                 analysisdir = "{}_VS_{}".format(tm[0].split("-")[0], cn[0].split("-")[0]) # The folder format for FACETS, ascatNGS, and Sequenza is "[tumorUUID]_VS_[controlUUID]""
+                rAscat = {"purity" : na, "ploidy" : na}
+                sAscat = {"meanCN" : na, "perA" : na, "perL" : na, "perD" : na, "perN" : na}
+                rFacets = {"purity" : na, "ploidy" : na}
+                sFacets = {"meanCN" : na, "perA" : na, "perL" : na, "perD" : na, "perN" : na}
+                rNgs = {"purity" : na, "ploidy" : na}
+                sNgs = {"meanCN" : na, "perA" : na, "perL" : na, "perD" : na, "perN" : na}
+                rSequenza = {"purity" : na, "ploidy" : na}
+                sSequenza = {"meanCN" : na, "perA" : na, "perL" : na, "perD" : na, "perN" : na}
+                rPurple = {"purity" : na, "ploidy" : na}
+                sPurple = {"meanCN" : na, "perA" : na, "perL" : na, "perD" : na, "perN" : na}
 
                 folder = "{}/ASCAT2".format(workindir)
                 # Collect and calculate all the data
