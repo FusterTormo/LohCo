@@ -115,7 +115,7 @@ ml <- matrix(c(pl, nl, ul), nrow = 3, byrow = TRUE)
 # Constants that will be used in the barplots
 top <- max(ma, mf, mn, mp, ms, ml) # Maximum for the ylim parameter
 colors <- c("red", "green", "yellow") # Color for barplots
-xtag <- c("Amp", "LOH", "Del", "Norm", "Not_Av") # Tags for the names
+xtag <- c("Amp", "Del", "LOH", "Norm", "Not_Av") # Tags for the names
 
 # Create barplots with the absolute data
 png(paste("ASCAT2_abs_", gene, ".png", sep = ""), width = 730, height = 554)
