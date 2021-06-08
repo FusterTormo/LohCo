@@ -510,3 +510,5 @@ if __name__ == "__main__" :
     variantCallingFile = "{}/platypusGerm/platypus.hg38_multianno.txt"
     #variantCallingFile = "{}/strelkaGerm/results/variants/strelka.hg38_multianno.txt"
     main(brca1, "BRCA1", variantCallingFile, maxMaf)
+    main(brca2, "BRCA2", variantCallingFile, maxMAF)
+    print("INFO: Run main8.R with the output files *LOH.tsv to get the final results and to create the plots")
