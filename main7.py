@@ -387,6 +387,8 @@ def main(cancer = "OV") :
     txt = "submitter\tcase\tfac_meanCN\tfac_purity\tfac_ploidy\tfac_aberration\tasc_meanCN\tasc_aberration\tseq_meanCN\tseq_purity\tseq_ploidy\tseq_aberration\tpur_meanCN\tpur_purity\t"
     txt += "pur_ploidy\tpur_aberration\tngs_meanCN\tngs_purity\tngs_ploidy\tngs_aberration\n"
     na = "NA"
+    outputFile = "meanCN.tsv"
+    count = 0
 
     # Get submitters list
     with dbcon :
@@ -396,6 +398,10 @@ def main(cancer = "OV") :
 
     print("INFO: Analysis done in {} cases".format(len(cases)))
     for c in cases :
+        count += 1
+        if count % 100 == 0 :
+            print("INFO: {} cases done".format(count))
+
         with dbcon :
             cur = dbcon.cursor()
             q = cur.execute("SELECT uuid, bamName FROM sample WHERE submitter='{}' AND tumor LIKE '%Tumor%'".format(c[0]))
@@ -451,8 +457,10 @@ def main(cancer = "OV") :
                 scn = sSequenza["meanCN"], spu = rSequenza["purity"], spl = rSequenza["ploidy"], sab = convertToCSV(sSequenza),
                 pcn = sPurple["meanCN"], ppu = rPurple["purity"], ppl = rPurple["ploidy"], pab = convertToCSV(sPurple),
                 ncn = sNgs["meanCN"], npu = rNgs["purity"], npl = rNgs["ploidy"], nab = convertToCSV(sNgs))
-                print(txt)
 
+    with open(outputFile, "w") as fi :
+        fi.write(txt)
+    print("INFO: Data stored in {} file".format(outputFile))
 
 if __name__ == "__main__" :
     main()
