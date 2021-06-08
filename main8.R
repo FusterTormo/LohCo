@@ -16,16 +16,17 @@ getLOH <- function(tab) {
 
 convert2vector <- function(tab) {
   df <- as.data.frame(table(tab))
-  a <- df[df$tab == "A",]$Freq
+  colnames(df) <- c("AB", "Freq")
+  a <- df[df$AB == "A",]$Freq
   if (length(a) <= 0)
     a <- 0
-  l <- df[df$tab == "L",]$Freq
+  l <- df[df$AB == "L",]$Freq
   if (length(l) <= 0)
     l <- 0
-  d <- df[df$tab == "D",]$Freq
+  d <- df[df$AB == "D",]$Freq
   if (length(d) <= 0)
     d <- 0
-  n <- df[df$tab == "N",]$Freq
+  n <- df[df$AB == "N",]$Freq
   if (length(n) <= 0)
     n <- 0
   nf <- length(tab) - a - l - d - n
