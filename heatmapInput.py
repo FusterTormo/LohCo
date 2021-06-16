@@ -18,12 +18,9 @@ def getJCC(sub, fil) :
         aux = l.split("\t")
         try :
             if l != "" :
-                dat = float(aux[col])
+                dat = round(float(aux[col]), 2)
         except ValueError :
             pass
-        except IndexError :
-            print("ERROR: Not found data in {}. Grep found:".format(fil))
-            print(l)
 
     if dat == -1 :
         dat = "NA"
@@ -48,5 +45,5 @@ for c in cases :
     ascatngs = getJCC(c[0], "main6/ascat2VSascatNGS.tsv")
     sequenza = getJCC(c[0], "main6/ascat2VSsequenza.tsv")
     purple = getJCC(c[0], "main6/ascat2VSpurple.tsv")
-    if purple != "NA" :
+    if ascatngs != "NA" :
         break
