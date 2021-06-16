@@ -3,6 +3,7 @@
 
 """Extracts the best Jaccard Index for each submitter"""
 
+import os
 import sqlite3
 import subprocess
 
@@ -24,13 +25,13 @@ def getJCC(sub, fil) :
 
     if dat == -1 :
         dat = "NA"
-    print("Returned: {} in {}".format(dat, fil))
-
+    
     return dat
 
 """Main program"""
 
 dbcon = sqlite3.connect("/g/strcombio/fsupek_cancer2/TCGA_bam/info/info.db")
+line = "submitter\tascat2\tdnacopy\tfacets\tascatngs\tsequenza\tpurple\n"
 # Get submitters list
 with dbcon :
       cur = dbcon.cursor()
@@ -45,5 +46,9 @@ for c in cases :
     ascatngs = getJCC(c[0], "main6/ascat2VSascatNGS.tsv")
     sequenza = getJCC(c[0], "main6/ascat2VSsequenza.tsv")
     purple = getJCC(c[0], "main6/ascat2VSpurple.tsv")
-    if ascatngs != "NA" :
-        break
+    line += "{sub}\t{a}\t{d}\t{f}\t{n}\t{s}\t{p}\n".format(sub = c[0], a = ascat, d = dnacopy, f = facets, n = ascatngs, s = sequenza, p = purple)
+
+with open("main6/ascat2_heatmap.tsv", "w") :
+    fi.write(line)
+
+print("INFO: Data written as main6/ascat2_heatmap.tsv")
