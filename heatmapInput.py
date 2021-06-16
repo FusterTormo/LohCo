@@ -19,13 +19,13 @@ def getJCC(sub, fil) :
         aux = l.split("\t")
         try :
             if l != "" :
-                dat = round(float(aux[col]), 2)
+                dat = round(float(aux[col]), 4)
         except ValueError :
             pass
 
     if dat == -1 :
         dat = "NA"
-    
+
     return dat
 
 """Main program"""
@@ -48,7 +48,7 @@ for c in cases :
     purple = getJCC(c[0], "main6/ascat2VSpurple.tsv")
     line += "{sub}\t{a}\t{d}\t{f}\t{n}\t{s}\t{p}\n".format(sub = c[0], a = ascat, d = dnacopy, f = facets, n = ascatngs, s = sequenza, p = purple)
 
-with open("main6/ascat2_heatmap.tsv", "w") :
+with open("main6/ascat2_heatmap.tsv", "w") as fi :
     fi.write(line)
 
 print("INFO: Data written as main6/ascat2_heatmap.tsv")
