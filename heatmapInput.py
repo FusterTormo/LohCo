@@ -3,6 +3,7 @@
 
 """Extracts the best Jaccard Index for each submitter"""
 
+import sqlite3
 import subprocess
 
 def JCC(sub, fil) :
@@ -31,6 +32,9 @@ def JCC(sub, fil) :
 
     return dat
 
+"""Main program"""
+
+dbcon = sqlite3.connect("/g/strcombio/fsupek_cancer2/TCGA_bam/info/info.db")
 # Get submitters list
 with dbcon :
       cur = dbcon.cursor()
