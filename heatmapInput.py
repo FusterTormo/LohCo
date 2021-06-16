@@ -17,7 +17,8 @@ def getJCC(sub, fil) :
     for l in out :
         aux = l.split("\t")
         try :
-            dat = float(aux[col])
+            if l != "" :
+                dat = float(aux[col])
         except ValueError :
             pass
         except IndexError :
@@ -45,6 +46,7 @@ for c in cases :
     dnacopy = getJCC(c[0], "main6/ascat2VSarray.tsv")
     facets = getJCC(c[0], "main6/ascat2VSfacets.tsv")
     ascatngs = getJCC(c[0], "main6/ascat2VSascatNGS.tsv")
-    sequenza = getjcc(c[0], "main6/ascat2VSsequenza.tsv")
-    purple = getJcc(c[0], "main6/ascat2VSpurple.tsv")
-    break
+    sequenza = getJCC(c[0], "main6/ascat2VSsequenza.tsv")
+    purple = getJCC(c[0], "main6/ascat2VSpurple.tsv")
+    if purple != "NA" :
+        break
