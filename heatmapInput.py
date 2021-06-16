@@ -20,6 +20,9 @@ def getJCC(sub, fil) :
             dat = float(aux[col])
         except ValueError :
             pass
+        except IndexError :
+            print("ERROR: Not found data in {}. Grep found:".format(fil))
+            print(l)
 
     if dat == -1 :
         dat = "NA"
