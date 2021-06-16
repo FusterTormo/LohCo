@@ -6,25 +6,20 @@
 import sqlite3
 import subprocess
 
-def JCC(sub, fil) :
+def getJCC(sub, fil) :
     cmd = "grep {} {}".format(sub, fil)
     pr = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     std, err = pr.communicate()
     out = std.decode().strip().split("\n")
     header = True
-    col = -1
+    col = 10 # Column number for Jaccard index
     dat = -1
     for l in out :
         aux = l.split("\t")
-        if header :
-            col = aux.index("JCC")
-            print("Index found: {}".format(col))
-            header = False
-        else :
-            try :
-                dat = float(aux[col])
-            except ValueError :
-                pass
+        try :
+            dat = float(aux[col])
+        except ValueError :
+            pass
 
     if dat == -1 :
         dat = "NA"
