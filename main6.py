@@ -100,7 +100,7 @@ def compareTools(reg1, reg2) :
 def createFile(name) :
     """Creates a new file with the name passed as parameter. Prints the header in the file"""
     with open(name, "w") as fi :
-        fi.write("ID1\tID2\tREGIONS\tBASEsim\tREGIONsim\tMCCamp\tMCCnorm\tMCCloh\tMCCdel\tJCC\tJCCamp\tJCCnorm\tJCCloh\tJCCdel\tpurity1\tpurity2\tploidy1\tploidy2\n")
+        fi.write("submitter\tID1\tID2\tREGIONS\tBASEsim\tREGIONsim\tMCCamp\tMCCnorm\tMCCloh\tMCCdel\tJCC\tJCCamp\tJCCnorm\tJCCloh\tJCCdel\tpurity1\tpurity2\tploidy1\tploidy2\n")
 
 def main() :
     # Constants
@@ -132,7 +132,7 @@ def main() :
                 if not os.path.isfile("ascat2VSascat2.tsv") :
                     createFile("ascat2VSascat2.tsv")
                 with open("ascat2VSascat2.tsv", "a") as fi :
-                    fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = a, cmp = compareTools(ascat, ascat)))
+                    fi.write("{sub}\t{id1}\t{id2}\t{cmp}\n".format(sub = sub[0], id1 = a, id2 = a, cmp = compareTools(ascat, ascat)))
             # Open SNP-array folder and get the files that are in
             arrayFolder = "{}/Array/".format(workindir)
             # Compare SNP-Arrays CNV outputs with ASCAT2
@@ -146,7 +146,7 @@ def main() :
                         if not os.path.isfile("ascat2VSarray.tsv") :
                             createFile("ascat2VSarray.tsv")
                         with open("ascat2VSarray.tsv", "a") as fi :
-                            fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = b, cmp = compareTools(ascat, arr)))
+                            fi.write("{sub}\t{id1}\t{id2}\t{cmp}\n".format(sub = sub[0], id1 = a, id2 = b, cmp = compareTools(ascat, arr)))
 
 
             # Compare FACETS LOH/CNV outputs with ASCAT2
@@ -158,7 +158,7 @@ def main() :
                     if not os.path.isfile("ascat2VSfacets.tsv") :
                         createFile("ascat2VSfacets.tsv")
                     with open("ascat2VSfacets.tsv", "a") as fi :
-                        fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = b, cmp = compareTools(ascat, f)))
+                        fi.write("{sub}\t{id1}\t{id2}\t{cmp}\n".format(sub = sub[0], id1 = a, id2 = b, cmp = compareTools(ascat, f)))
 
             # Compare ascatNGS LOH/CNV outputs with ASCAT2
             # print("INFO: Comparing ASCAT2 and ascatNGS outputs in {}".format(s))
@@ -170,7 +170,7 @@ def main() :
                     if not os.path.isfile("ascat2VSascatNGS.tsv") :
                         createFile("ascat2VSascatNGS.tsv")
                     with open("ascat2VSascatNGS.tsv", "a") as fi :
-                        fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = b, cmp = compareTools(ascat, ngs)))
+                        fi.write("{sub}\t{id1}\t{id2}\t{cmp}\n".format(sub = sub[0], id1 = a, id2 = b, cmp = compareTools(ascat, ngs)))
 
             # Compare Sequenza LOH/CNV outputs with ASCAT2
             # print("INFO: Comparing ASCAT2 and Sequenza outputs in {}".format(s))
@@ -182,7 +182,7 @@ def main() :
                     if not os.path.isfile("ascat2VSsequenza.tsv") :
                         createFile("ascat2VSsequenza.tsv")
                     with open("ascat2VSsequenza.tsv", "a") as fi :
-                        fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = b, cmp = compareTools(ascat, seq)))
+                        fi.write("{sub}\t{id1}\t{id2}\t{cmp}\n".format(sub = sub[0], id1 = a, id2 = b, cmp = compareTools(ascat, seq)))
 
             purpleFiles = getPurple(workindir)
             for a in ascatFiles :
@@ -192,7 +192,7 @@ def main() :
                     if not os.path.isfile("ascat2VSpurple.tsv") :
                         createFile("ascat2VSpurple.tsv")
                     with open("ascat2VSpurple.tsv", "a") as fi :
-                        fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = b, cmp = compareTools(ascat, purp)))
+                        fi.write("{sub}\t{id1}\t{id2}\t{cmp}\n".format(sub = sub[0], id1 = a, id2 = b, cmp = compareTools(ascat, purp)))
 
     # Move the output data to a new folder
     os.mkdir("main6")
@@ -218,7 +218,7 @@ def main() :
                 if not os.path.isfile("arrayVSarray.tsv") :
                     createFile("arrayVSarray.tsv")
                 with open("arrayVSarray.tsv", "a") as fi :
-                    fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = a, cmp = compareTools(arr, arr)))
+                    fi.write("{sub}\t{id1}\t{id2}\t{cmp}\n".format(sub = sub[0], id1 = a, id2 = a, cmp = compareTools(arr, arr)))
             # Open ASCAT2 folder to get the files that are in
             ascatFolder = "{}/ASCAT2/".format(workindir)
             # Compare ASCAT2 outputs with Arrays
@@ -232,7 +232,7 @@ def main() :
                         if not os.path.isfile("arrayVSascat2.tsv") :
                             createFile("arrayVSascat2.tsv")
                         with open("arrayVSascat2.tsv", "a") as fi :
-                            fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = b, cmp = compareTools(arr, ascat)))
+                            fi.write("{sub}\t{id1}\t{id2}\t{cmp}\n".format(sub = sub[0], id1 = a, id2 = b, cmp = compareTools(arr, ascat)))
 
 
             # Compare FACETS LOH/CNV outputs with SNP-Array
@@ -245,7 +245,7 @@ def main() :
                     if not os.path.isfile("arrayVSfacets.tsv") :
                         createFile("arrayVSfacets.tsv")
                     with open("arrayVSfacets.tsv", "a") as fi :
-                        fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = b, cmp = compareTools(arr, f)))
+                        fi.write("{sub}\t{id1}\t{id2}\t{cmp}\n".format(sub = sub[0], id1 = a, id2 = b, cmp = compareTools(arr, f)))
 
             # Compare ascatNGS LOH/CNV outputs with SNP-Array
             # print("INFO: Comparing ASCAT2 and ascatNGS outputs in {}".format(s))
@@ -257,7 +257,7 @@ def main() :
                     if not os.path.isfile("arrayVSascatNGS.tsv") :
                         createFile("arrayVSascatNGS.tsv")
                     with open("arrayVSascatNGS.tsv", "a") as fi :
-                        fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = b, cmp = compareTools(arr, ngs)))
+                        fi.write("{sub}\t{id1}\t{id2}\t{cmp}\n".format(sub = sub[0], id1 = a, id2 = b, cmp = compareTools(arr, ngs)))
 
             # Compare Sequenza LOH/CNV outputs with ASCAT2
             # print("INFO: Comparing ASCAT2 and Sequenza outputs in {}".format(s))
@@ -269,7 +269,7 @@ def main() :
                     if not os.path.isfile("arrayVSsequenza.tsv") :
                         createFile("arrayVSsequenza.tsv")
                     with open("arrayVSsequenza.tsv", "a") as fi :
-                        fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = b, cmp = compareTools(arr, seq)))
+                        fi.write("{sub}\t{id1}\t{id2}\t{cmp}\n".format(sub = sub[0], id1 = a, id2 = b, cmp = compareTools(arr, seq)))
 
             # Compare PURPLE LOH/CNV outputs with DNAcopy
             purpleFiles = getPurple(workindir)
@@ -280,7 +280,7 @@ def main() :
                     if not os.path.isfile("arrayVSpurple.tsv") :
                         createFile("arrayVSpurple.tsv")
                     with open("arrayVSpurple.tsv", "a") as fi :
-                        fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = b, cmp = compareTools(arr, purp)))
+                        fi.write("{sub}\t{id1}\t{id2}\t{cmp}\n".format(sub = sub[0], id1 = a, id2 = b, cmp = compareTools(arr, purp)))
 
     os.rename("arrayVSarray.tsv", "main6/arrayVSarray.tsv")
     os.rename("arrayVSascat2.tsv", "main6/arrayVSascat2.tsv")
@@ -302,7 +302,7 @@ def main() :
             if not os.path.isfile("facetsVSfacets.tsv") :
                 createFile("facetsVSfacets.tsv")
             with open("facetsVSfacets.tsv", "a") as fi :
-                fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = a, cmp = compareTools(f, f)))
+                fi.write("{sub}\t{id1}\t{id2}\t{cmp}\n".format(sub = sub[0], id1 = a, id2 = a, cmp = compareTools(f, f)))
 
             # Compare with ASCAT2
             ascatFolder = "{}/ASCAT2".format(workindir)
@@ -315,7 +315,7 @@ def main() :
                     if not os.path.isfile("facetsVSascat2.tsv") :
                         createFile("facetsVSascat2.tsv")
                     with open("facetsVSascat2.tsv", "a") as fi :
-                        fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = b, cmp = compareTools(f, ascat)))
+                        fi.write("{sub}\t{id1}\t{id2}\t{cmp}\n".format(sub = sub[0], id1 = a, id2 = b, cmp = compareTools(f, ascat)))
 
             # Compare with SNP-Arrays
             arrayFolder = "{}/Array".format(workindir)
@@ -326,7 +326,7 @@ def main() :
                     if not os.path.isfile("facetsVSarrays.tsv") :
                         createFile("facetsVSarrays.tsv")
                     with open("facetsVSarrays.tsv", "a") as fi :
-                        fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = b, cmp = compareTools(f, arr)))
+                        fi.write("{sub}\t{id1}\t{id2}\t{cmp}\n".format(sub = sub[0], id1 = a, id2 = b, cmp = compareTools(f, arr)))
 
             # Compare with ascatNGS
             ascatngsFiles = getAscatNGS(workindir)
@@ -335,7 +335,7 @@ def main() :
                 if not os.path.isfile("facetsVSascatNGS.tsv") :
                     createFile("facetsVSascatNGS.tsv")
                 with open("facetsVSascatNGS.tsv", "a") as fi :
-                    fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = b, cmp = compareTools(f, ngs)))
+                    fi.write("{sub}\t{id1}\t{id2}\t{cmp}\n".format(sub = sub[0], id1 = a, id2 = b, cmp = compareTools(f, ngs)))
 
             # Compare with Sequenza
             sequenzaFiles = getSequenza(workindir)
@@ -344,7 +344,7 @@ def main() :
                 if not os.path.isfile("facetsVSsequenza.tsv") :
                     createFile("facetsVSsequenza.tsv")
                 with open("facetsVSsequenza.tsv", "a") as fi :
-                    fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = b, cmp = compareTools(f, seq)))
+                    fi.write("{sub}\t{id1}\t{id2}\t{cmp}\n".format(sub = sub[0], id1 = a, id2 = b, cmp = compareTools(f, seq)))
 
             # Compare with PURPLE
             purpleFiles = getPurple(workindir)
@@ -353,7 +353,7 @@ def main() :
                 if not os.path.isfile("facetsVSpurple.tsv") :
                     createFile("facetsVSpurple.tsv")
                 with open("facetsVSpurple.tsv", "a") as fi :
-                    fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = b, cmp = compareTools(f, purp)))
+                    fi.write("{sub}\t{id1}\t{id2}\t{cmp}\n".format(sub = sub[0], id1 = a, id2 = b, cmp = compareTools(f, purp)))
 
     os.rename("facetsVSfacets.tsv", "main6/facetsVSfacets.tsv")
     os.rename("facetsVSascat2.tsv", "main6/facetsVSascat2.tsv")
@@ -375,7 +375,7 @@ def main() :
             if not os.path.isfile("ascatNGSVSascatNGS.tsv") :
                 createFile("ascatNGSVSascatNGS.tsv")
             with open("ascatNGSVSascatNGS.tsv", "a") as fi :
-                fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = a, cmp = compareTools(ngs, ngs)))
+                fi.write("{sub}\t{id1}\t{id2}\t{cmp}\n".format(sub = sub[0], id1 = a, id2 = a, cmp = compareTools(ngs, ngs)))
 
             # Compare with ASCAT2
             ascatFolder = "{}/ASCAT2/".format(workindir)
@@ -386,7 +386,7 @@ def main() :
                     if not os.path.isfile("ascatNGSVSascat2.tsv") :
                         createFile("ascatNGSVSascat2.tsv")
                     with open("ascatNGSVSascat2.tsv", "a") as fi :
-                        fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = b, cmp = compareTools(ngs, ascat)))
+                        fi.write("{sub}\t{id1}\t{id2}\t{cmp}\n".format(sub = sub[0], id1 = a, id2 = b, cmp = compareTools(ngs, ascat)))
 
             # Compare with SNP-Arrays
             arrayFolder = "{}/Array/".format(workindir)
@@ -397,7 +397,7 @@ def main() :
                     if not os.path.isfile("ascatNGSVSarrays.tsv") :
                         createFile("ascatNGSVSarrays.tsv")
                     with open("ascatNGSVSarrays.tsv", "a") as fi :
-                        fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = b, cmp = compareTools(ngs, arr)))
+                        fi.write("{sub}\t{id1}\t{id2}\t{cmp}\n".format(sub = sub[0], id1 = a, id2 = b, cmp = compareTools(ngs, arr)))
 
             # Compare with FACETS
             facetsFiles = getFACETS(workindir)
@@ -407,7 +407,7 @@ def main() :
                     createFile("ascatNGSVSfacets.tsv")
                 with open("ascatNGSVSfacets.tsv", "a") as fi :
 
-                    fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = b, cmp = compareTools(ngs, f)))
+                    fi.write("{sub}\t{id1}\t{id2}\t{cmp}\n".format(sub = sub[0], id1 = a, id2 = b, cmp = compareTools(ngs, f)))
 
             # Compare with Sequenza
             sequenzaFiles = getSequenza(workindir)
@@ -416,7 +416,7 @@ def main() :
                 if not os.path.isfile("ascatNGSVSsequenza.tsv") :
                     createFile("ascatNGSVSsequenza.tsv")
                 with open("ascatNGSVSsequenza.tsv", "a") as fi:
-                    fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = b, cmp = compareTools(ngs, seq)))
+                    fi.write("{sub}\t{id1}\t{id2}\t{cmp}\n".format(sub = sub[0], id1 = a, id2 = b, cmp = compareTools(ngs, seq)))
 
             # Compare with PURPLE
             purpleFiles = getPurple(workindir)
@@ -425,7 +425,7 @@ def main() :
                 if not os.path.isfile("ascatNGSVSpurple.tsv") :
                     createFile("ascatNGSVSpurple.tsv")
                 with open("ascatNGSVSpurple.tsv", "a") as fi :
-                    fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = b, cmp = compareTools(ngs, purp)))
+                    fi.write("{sub}\t{id1}\t{id2}\t{cmp}\n".format(sub = sub[0], id1 = a, id2 = b, cmp = compareTools(ngs, purp)))
 
     os.rename("ascatNGSVSascat2.tsv", "main6/ascatNGSVSascat2.tsv")
     os.rename("ascatNGSVSarrays.tsv", "main6/ascatNGSVSarrays.tsv")
@@ -447,7 +447,7 @@ def main() :
             if not os.path.isfile("sequenzaVSsequenza.tsv") :
                 createFile("sequenzaVSsequenza.tsv")
             with open("sequenzaVSsequenza.tsv", "a") as fi :
-                fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = a, cmp = compareTools(seq, seq)))
+                fi.write("{sub}\t{id1}\t{id2}\t{cmp}\n".format(sub = sub[0], id1 = a, id2 = a, cmp = compareTools(seq, seq)))
 
             # Compare with ASCAT2
             ascatFolder = "{}/ASCAT2".format(workindir)
@@ -458,7 +458,7 @@ def main() :
                     if not os.path.isfile("sequenzaVSascat2.tsv") :
                         createFile("sequenzaVSascat2.tsv")
                     with open("sequenzaVSascat2.tsv", "a") as fi :
-                        fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = b, cmp = compareTools(seq, ascat)))
+                        fi.write("{sub}\t{id1}\t{id2}\t{cmp}\n".format(sub = sub[0], id1 = a, id2 = b, cmp = compareTools(seq, ascat)))
 
             # Compare with SNP-Arrays
             arrayFolder = "{}/Array".format(workindir)
@@ -469,7 +469,7 @@ def main() :
                     if not os.path.isfile("sequenzaVSarrays.tsv") :
                         createFile("sequenzaVSarrays.tsv")
                     with open("sequenzaVSarrays.tsv", "a") as fi :
-                        fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = b, cmp = compareTools(seq, arr)))
+                        fi.write("{sub}\t{id1}\t{id2}\t{cmp}\n".format(sub = sub[0], id1 = a, id2 = b, cmp = compareTools(seq, arr)))
 
             # Compare with FACETS
             facetsFiles = getFACETS(workindir)
@@ -478,7 +478,7 @@ def main() :
                 if not os.path.isfile("sequenzaVSfacets.tsv") :
                     createFile("sequenzaVSfacets.tsv")
                 with open("sequenzaVSfacets.tsv", "a") as fi :
-                    fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = b, cmp = compareTools(seq, f)))
+                    fi.write("{sub}\t{id1}\t{id2}\t{cmp}\n".format(sub = sub[0], id1 = a, id2 = b, cmp = compareTools(seq, f)))
 
             # Compare with ascatNGS
             ascatngsFiles = getAscatNGS(workindir)
@@ -487,7 +487,7 @@ def main() :
                 if not os.path.isfile("sequenzaVSascatNGS.tsv") :
                     createFile("sequenzaVSascatNGS.tsv")
                 with open("sequenzaVSascatNGS.tsv", "a") as fi :
-                    fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = b, cmp = compareTools(seq, ngs)))
+                    fi.write("{sub}\t{id1}\t{id2}\t{cmp}\n".format(sub = sub[0], id1 = a, id2 = b, cmp = compareTools(seq, ngs)))
 
             # Compare with PURPLE
             purpleFiles = getPurple(workindir)
@@ -496,7 +496,7 @@ def main() :
                 if not os.path.isfile("sequenzaVSpurple.tsv") :
                     createFile("sequenzaVSpurple.tsv")
                 with open("sequenzaVSpurple.tsv", "a") as fi :
-                    fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = b, cmp = compareTools(seq, purp)))
+                    fi.write("{sub}\t{id1}\t{id2}\t{cmp}\n".format(sub = sub[0], id1 = a, id2 = b, cmp = compareTools(seq, purp)))
 
     os.rename("sequenzaVSascat2.tsv", "main6/sequenzaVSascat2.tsv")
     os.rename("sequenzaVSarrays.tsv", "main6/sequenzaVSarrays.tsv")
@@ -518,7 +518,7 @@ def main() :
             if not os.path.isfile("purpleVSpurple.tsv") :
                 createFile("purpleVSpurple.tsv")
             with open("purpleVSpurple.tsv", "a") as fi :
-                fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = a, cmp = compareTools(purp, purp)))
+                fi.write("{sub}\t{id1}\t{id2}\t{cmp}\n".format(sub = sub[0], id1 = a, id2 = a, cmp = compareTools(purp, purp)))
 
             # Compare with ASCAT2
             ascatFolder = "{}/ASCAT2".format(workindir)
@@ -529,7 +529,7 @@ def main() :
                     if not os.path.isfile("purpleVSascat2.tsv") :
                         createFile("purpleVSascat2.tsv")
                     with open("purpleVSascat2.tsv", "a") as fi :
-                        fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = b, cmp = compareTools(purp, ascat)))
+                        fi.write("{sub}\t{id1}\t{id2}\t{cmp}\n".format(sub = sub[0], id1 = a, id2 = b, cmp = compareTools(purp, ascat)))
 
             # Compare with SNP-Arrays
             arrayFolder = "{}/Array".format(workindir)
@@ -540,7 +540,7 @@ def main() :
                     if not os.path.isfile("purpleVSarrays.tsv") :
                         createFile("purpleVSarrays.tsv")
                     with open("purpleVSarrays.tsv", "a") as fi :
-                        fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = b, cmp = compareTools(purp, arr)))
+                        fi.write("{sub}\t{id1}\t{id2}\t{cmp}\n".format(sub = sub[0], id1 = a, id2 = b, cmp = compareTools(purp, arr)))
 
             # Compare with FACETS
             facetsFiles = getFACETS(workindir)
@@ -549,7 +549,7 @@ def main() :
                 if not os.path.isfile("purpleVSfacets.tsv") :
                     createFile("purpleVSfacets.tsv")
                 with open("purpleVSfacets.tsv", "a") as fi :
-                    fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = b, cmp = compareTools(purp, f)))
+                    fi.write("{sub}\t{id1}\t{id2}\t{cmp}\n".format(sub = sub[0], id1 = a, id2 = b, cmp = compareTools(purp, f)))
 
             # Compare with ascatNGS
             ascatngsFiles = getAscatNGS(workindir)
@@ -558,7 +558,7 @@ def main() :
                 if not os.path.isfile("purpleVSascatNGS.tsv") :
                     createFile("purpleVSascatNGS.tsv")
                 with open("purpleVSascatNGS.tsv", "a") as fi :
-                    fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = b, cmp = compareTools(purp, ngs)))
+                    fi.write("{sub}\t{id1}\t{id2}\t{cmp}\n".format(sub = sub[0], id1 = a, id2 = b, cmp = compareTools(purp, ngs)))
 
             # Compare with Sequenza
             sequenzaFiles = getSequenza(workindir)
@@ -567,7 +567,7 @@ def main() :
                 if not os.path.isfile("purpleVSsequenza.tsv") :
                     createFile("purpleVSsequenza.tsv")
                 with open("purpleVSsequenza.tsv", "a") as fi:
-                    fi.write("{id1}\t{id2}\t{cmp}\n".format(id1 = a, id2 = b, cmp = compareTools(purp, seq)))
+                    fi.write("{sub}\t{id1}\t{id2}\t{cmp}\n".format(sub = sub[0], id1 = a, id2 = b, cmp = compareTools(purp, seq)))
 
     os.rename("purpleVSascat2.tsv", "main6/purpleVSascat2.tsv")
     os.rename("purpleVSarrays.tsv", "main6/purpleVSarrays.tsv")
