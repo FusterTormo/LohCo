@@ -56,8 +56,8 @@ print("{} INFO: Total submitters in {} cancer: {}".format(getTime(), cancer, len
 # Get the tumors and controls in each submitter
 for c in cases :
     if cases.index(c) % 100 == 0 :
-        print("INFO: {} cases executed".format(cases.index(c)))
-    print("{} INFO: Checking {}".format(getTime(), c[0]))
+        print("{} INFO: {} cases executed".format(getTime(), cases.index(c)))
+
     with dbcon :
         cur = dbcon.cursor()
         q = cur.execute("SELECT uuid, bamName FROM sample WHERE submitter='{}' AND tumor LIKE '%Tumor%'".format(c[0]))
@@ -115,8 +115,6 @@ for c in cases :
                     if len(aux) > 1 :
                         # Create a histogram that counts the frequency of each position
                         pos = int(aux[1])
-                        ref = aux[2]
-                        alt = aux[3]
                         if pos in variants.keys()  :
                             variants[pos] += 1
                         else :
@@ -211,13 +209,17 @@ if pr.returncode != 0 :
     print("WARNING: Error found while running R. Description\n".format(err.decode()))
 
 # Post-production. Check the positive variants and remove the submitters with a pathogenic variant
-# posSubmitters = [] # Submitters with a pathogenic variant found
-# for v in variants :
-#     if v[7] not in posSubmitters : #Only check variants that are not in submitters with pathogenic variant
-#         if v[6] in cte.var_positive :
-#             posSubmitters.append(v[7])
-#
-# print("INFO: Removed {} submitters with a pathogenic variant".format(len(posSubmitters)))
+posSubmitters = [] # Submitters with a pathogenic variant found
+posData = []
+for v in data.split("\n") :
+    if v[7] not in posSubmitters : #Only check variants that are not in submitters with pathogenic variant
+        if v[6] in cte.var_positive :
+            posSubmitters.append(v[7])
+        else :
+            posData.append(v)
+
+print("INFO: Removed {} submitters with a pathogenic variant".format(len(posSubmitters)))
+print("INFO: Removed {} variants".format(len(data.split("\n")) - len(posData)))
 # # Create a new dict with the variants from the submitters that are not considered positive
 # posVars = {}
 # for k, v in variants.items() :
