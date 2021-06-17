@@ -219,12 +219,14 @@ def filterVariants(data) :
 
     # Check if the variant is reported in ClinVar
     for v in posData :
-        aux = v.split("\t")
         vcf = "{wd}/{sub}/{uuid}/{suffix}".format(wd = wd, sub = aux[7], uuid = aux[9], suffix = varCallSuffix)
         with open(vcf, "r") as fi :
             cnt = fi.readlines()
         search = "{}\t{}".format(aux[0], aux[1])
-        print("{fic}--{s}--{out}\n\n".format(out = cnt.index(search), fic = vcf, s = search))
+        try :
+            print("{fic}--{s}--{out}\n\n".format(out = cnt.index(search), fic = vcf, s = search))
+        except :
+            print("Variant {} not found in {}".format(search, vcf))
 
 
 
