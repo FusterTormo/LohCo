@@ -1,7 +1,13 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-"""Extracts the best Jaccard Index for each submitter"""
+"""
+MAIN: Prepares files to be readed by pcaMain6, which will plot heatmap and PCA.
+Reads output files from main6
+Extracts the best Jaccard Index for each submitter. To extract other column, change variable in line 22 (col)
+Stores the data (using ASCAT2 and DNAcopy as truth set) in text files. With the columns:
+    Submitter   ASCAT2  DNAcopy FACETS  ascatNGS    Sequenza    PURPLE
+"""
 
 import os
 import sqlite3
