@@ -86,6 +86,12 @@ for c in cases :
                 # Check LOH in the gene, add th output to a list
                 aux = lib.getLOH(file, "sequenza", gene)
                 loh.append(aux)
+            # Get PURPLE output file
+            folder = "{wd}/{sub}/{pre}_PURPLE".format(wd = wd, sub = c[0], pre = prefix)
+            file = "{fld}/TUMOR.purple.cnv.somatic.tsv".format(fld = folder)
+            if os.path.isfile(file) :
+                aux = lib.getLOH(file, "purple", gene)
+                loh.append(aux)
             # Get ASCAT2 output file
             folder = "{wd}/{sub}/ASCAT2".format(wd = wd, sub = c[0])
             if os.path.isdir(folder) :
