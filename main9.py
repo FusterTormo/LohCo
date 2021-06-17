@@ -217,23 +217,24 @@ def filterVariants(data) :
     print("INFO: Removed {} submitters with a pathogenic variant".format(len(posSubmitters)))
     print("INFO: Removed {} variants".format(len(data.split("\n")) - len(posData)))
 
+    vcf = "clinvar.vcf"
+    with open(vcf, "r") as fi :
+        cnt = fi.readlines()
+
     # Check if the variant is reported in ClinVar
     for v in posData :
         aux = v.split("\t")
-        vcf = "{wd}/{sub}/{uuid}/platypusGerm/platyGermline.vcf".format(wd = wd, sub = aux[7], uuid = aux[9], suffix = varCallSuffix)
-        with open(vcf, "r") as fi :
-            cnt = fi.readlines()
         # As ANNOVAR changes the position in insertions/deletions, we substract 1 to the start position
         if aux[4] == "-" :
             pos = int(aux[1]) - 1
         else :
             pos = int(aux[1])
-        search = "{}\t{}".format(aux[0], pos)
+        search = "{}\t{}".format(aux[0].replace("chr", ""), pos)
         found = False
         for line in cnt :
             if not line.startswith("#") :
                 if line.startswith(search) :
-                    # print("{fic}--{s}--{out}\n\n".format(out = line, fic = vcf, s = search))
+                    print(line)
                     found = True
                     break
         if not found :
