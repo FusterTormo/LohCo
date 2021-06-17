@@ -61,4 +61,4 @@ non <- exonic[exonic$name == "nonsynonymous SNV",][2:3]
 syn <- exonic[exonic$name == "synonymous SNV",][2:3]
 aux <- non/syn
 cat("R-INFO: dN/dS ratio for positive cases: ", non$positive , "/", syn$positive, "= ", aux$positive, "\n")
-cat("R-INFO: dN/dS ratio for positive cases: ", non$negative , "/", syn$negative, "= ", aux$negative, "\n")
+cat("R-INFO: dN/dS ratio for negative cases: ", non$negative , "/", syn$negative, "= ", aux$negative, "\n")
