@@ -211,7 +211,8 @@ if pr.returncode != 0 :
 # Post-production. Check the positive variants and remove the submitters with a pathogenic variant
 posSubmitters = [] # Submitters with a pathogenic variant found
 posData = []
-for v in data.split("\n") :
+for d in data.split("\n") :
+    v = d.split("\t")
     if len(v) > 8 :
         if v[7] not in posSubmitters : #Only check variants that are not in submitters with pathogenic variant
             if v[6] in cte.var_positive :
