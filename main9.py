@@ -212,14 +212,27 @@ if pr.returncode != 0 :
 posSubmitters = [] # Submitters with a pathogenic variant found
 posData = []
 for v in data.split("\n") :
-    if v[7] not in posSubmitters : #Only check variants that are not in submitters with pathogenic variant
-        if v[6] in cte.var_positive :
-            posSubmitters.append(v[7])
-        else :
-            posData.append(v)
+    if len(v) > 8 :
+        if v[7] not in posSubmitters : #Only check variants that are not in submitters with pathogenic variant
+            if v[6] in cte.var_positive :
+                posSubmitters.append(v[7])
+            else :
+                posData.append(v)
 
 print("INFO: Removed {} submitters with a pathogenic variant".format(len(posSubmitters)))
 print("INFO: Removed {} variants".format(len(data.split("\n")) - len(posData)))
+
+# Check if the variant is reported in ClinVar
+for v in posData :
+    aux = v.split("\t")
+    vcf = "{wd}/{sub}/{uuid}/{suffix}".format(wd = wd, sub = aux[8], uuid = aux[10], suffix = varCallSuffix)
+    with open(vcf, "r") as fi :
+        cnt = fi.readlines()
+    search = "{}\t{}".format(aux[0], aux[1])
+    print("{fic}--{s}--{out}\n\n".format(out = cnt.index(search), fic = vcf, s = search))
+
+
+
 # # Create a new dict with the variants from the submitters that are not considered positive
 # posVars = {}
 # for k, v in variants.items() :
