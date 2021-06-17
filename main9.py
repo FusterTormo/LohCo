@@ -224,7 +224,7 @@ def filterVariants(data) :
         with open(vcf, "r") as fi :
             cnt = fi.readlines()
         # As ANNOVAR changes the position in insertions/deletions, we substract 1 to the start position
-        if aux[3] == '-' or aux[4] == "-" :
+        if aux[4] == "-" :
             pos = int(aux[1]) - 1
         else :
             pos = int(aux[1])
