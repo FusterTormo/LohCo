@@ -220,7 +220,7 @@ def filterVariants(data) :
     # Check if the variant is reported in ClinVar
     for v in posData :
         aux = v.split("\t")
-        vcf = "{wd}/{sub}/{uuid}/{suffix}".format(wd = wd, sub = aux[8], uuid = aux[10], suffix = varCallSuffix)
+        vcf = "{wd}/{sub}/{uuid}/{suffix}".format(wd = wd, sub = aux[7], uuid = aux[9], suffix = varCallSuffix)
         with open(vcf, "r") as fi :
             cnt = fi.readlines()
         search = "{}\t{}".format(aux[0], aux[1])
@@ -236,6 +236,6 @@ def filterVariants(data) :
 
 if __name__ == "__main__" :
     # pos_variants = getData()
-    with open("posVariants", "r") as fi :
+    with open("posVariants.tsv", "r") as fi :
         pos_variants = fi.read()
     filterVariants(pos_variants)
