@@ -223,7 +223,12 @@ def filterVariants(data) :
         vcf = "{wd}/{sub}/{uuid}/platypusGerm/platyGermline.vcf".format(wd = wd, sub = aux[7], uuid = aux[9], suffix = varCallSuffix)
         with open(vcf, "r") as fi :
             cnt = fi.readlines()
-        search = "{}\t{}".format(aux[0], aux[1])
+        # As ANNOVAR changes the position in insertions/deletions, we substract 1 to the start position
+        if aux[3] == '-' or aux[4] == "-" :
+            pos = int(aux[1]) - 1
+        else :
+            pos = int(aux[1])
+        search = "{}\t{}".format(aux[0], pos)
         found = False
         for line in cnt :
             if not line.startswith("#") :
