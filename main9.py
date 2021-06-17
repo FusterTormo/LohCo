@@ -223,10 +223,12 @@ def filterVariants(data) :
         with open(vcf, "r") as fi :
             cnt = fi.readlines()
         search = "{}\t{}".format(aux[0], aux[1])
-        try :
-            print("{fic}--{s}--{out}\n\n".format(out = cnt.index(search), fic = vcf, s = search))
-        except :
-            print("Variant {} not found in {}".format(search, vcf))
+        for line in cnt :
+            if not line.startswith("#") :
+                if line.startswith(search) :
+                    print("{fic}--{s}--{out}\n\n".format(out = line, fic = vcf, s = search))
+                else :
+                    print("Variant {} not found in {}".format(search, vcf))
 
 
 
