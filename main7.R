@@ -45,6 +45,21 @@ ggsave("cnSvN.png")
 ggplot(cn, aes(PURPLE, ascatNGS)) + geom_point() + geom_smooth(method = "lm") + ggtitle("Mean copy number") + theme_minimal()
 ggsave("cnPvS.png")
 
+# Mean CN correlation
+ploidy <- data.frame(FACETS = full$fac_ploidy, Sequenza = full$seq_ploidy, PURPLE = full$pur_ploidy, ascatNGS = full$ngs_ploidy)
+ggplot(ploidy, aes(FACETS, Sequenza)) + geom_point() + geom_smooth(method = "lm") + ggtitle("Ploidy") + theme_minimal()
+ggsave("plFvS.png")
+ggplot(ploidy, aes(FACETS, PURPLE)) + geom_point() + geom_smooth(method = "lm") + ggtitle("Ploidy") + theme_minimal()
+ggsave("plFvP.png")
+ggplot(ploidy, aes(FACETS, ascatNGS)) + geom_point() + geom_smooth(method = "lm") + ggtitle("Ploidy") + theme_minimal()
+ggsave("plFvN.png")
+ggplot(ploidy, aes(Sequenza, PURPLE)) + geom_point() + geom_smooth(method = "lm") + ggtitle("Ploidy") + theme_minimal()
+ggsave("plSvP.png")
+ggplot(ploidy, aes(Sequenza, ascatNGS)) + geom_point() + geom_smooth(method = "lm") + ggtitle("Ploidy") + theme_minimal()
+ggsave("plSvN.png")
+ggplot(ploidy, aes(PURPLE, ascatNGS)) + geom_point() + geom_smooth(method = "lm") + ggtitle("Ploidy") + theme_minimal()
+ggsave("plPvS.png")
+
 # Copy number reported
 png("allCN.png", width = 720, height = 554)
 boxplot(cn, col = hue_pal()(5), main = "Mean copy number reported")
