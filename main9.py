@@ -294,7 +294,7 @@ def filterVariants(data, filename) :
         # if not found :
         #     print("Variant {} not found in {}".format(search, vcf))
 
-        txt += "{d1}\t{d2}\t{dss}\t{sig}\n".format(d1 = "\t".join(v[0:-1]), d2 = v[-1].strip(), dss = supData["disease"], sig = supData["significance"])
+        txt += "{data}\t{dss}\t{sig}\n".format(data = v.strip(), dss = supData["disease"], sig = supData["significance"])
 
     print("{} INFO: ClinVar annotated variants stores as posVariants.annotated.tsv".format(getTime()))
     with open(filename, "w") as fi :
