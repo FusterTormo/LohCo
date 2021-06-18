@@ -83,8 +83,6 @@ def getClinVar(clinvar, variant) :
             # Revision status
             if tmp[0] == "CLNREVSTAT" :
                 data["revStatus"] = tmp[1]
-    else :
-        print("{}\n{}\n".format("-".join(aux), "-".join(aux2)))
 
     return data
 
@@ -259,6 +257,7 @@ def filterVariants(data) :
     # Post-production. Check the positive variants and remove the submitters with a pathogenic variant
     posSubmitters = [] # Submitters with a pathogenic variant found
     posData = []
+    data = ""
     for d in data.split("\n") :
         v = d.split("\t")
         if len(v) > 8 :
@@ -295,6 +294,11 @@ def filterVariants(data) :
         if not found :
             print("Variant {} not found in {}".format(search, vcf))
 
+        data += "{d1}\t{d2}\t{dss}\t{sig}\n".format(d1 = "\t".join(v[0:-1]), d2 = v[-1].strip(), dss = supData["disease"], sig = supData["significance"])
+
+    print("{} INFO: ClinVar annotated variants stores as posVariants.annotated.tsv".format(getTime()))
+    with open("posVariants.annotated.tsv", "w") as fi :
+        fi.write(data)
 
 
 
