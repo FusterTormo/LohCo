@@ -57,7 +57,18 @@ def getClinVar(clinvar, variant) :
     cln_alt = tmp[4]
     info = tmp[7]
     aux2 = tmp[0:5]
-    if ref = cln_ref and alt == cln_alt :
+    # Indel scenario. VCF syntax is different to ANNOVAR syntax. Converting the VCF syntax to ANNOVAR syntax
+    if len(cln_ref) > 1 or len(cln_alt) > 1 :
+        if len(cln_ref) == 1 :
+            cln_ref = "-"
+        else :
+            cln_ref = cln_ref[1:]
+        if len(cln_alt) == 1 :
+            cln_alt = "-"
+        else :
+            cln_alt = cln_alt[1:]
+
+    if ref == cln_ref and alt == cln_alt :
         for i in info.split(";") :
             tmp = i.split("=")
             # Database name identifiers in pairs "OMIM:MMMMMMM"
