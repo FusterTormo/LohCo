@@ -45,38 +45,36 @@ def getClinVar(clinvar, variant) :
         * CLNREVSTAT: ClinVar review status for the Variation ID
     """
 
-    data = {"db" : {}, "disease" : "NA", "significance" : "NA", "revStatus" : "NA"}
+    data = {"db" : "NA", "disease" : "NA", "significance" : "NA", "revStatus" : "NA"}
     # Check if the variant is exactly the same as the reported by ClinVar
     tmp = variant.split("\t")
-    cro = tmp[0].replace("chr", "")
-    sta = int(tmp[1])
     ref = tmp[3]
     alt = tmp[4]
+    aux = tmp[0:5]
     # Extract the interesting data from the clinvar line
     tmp = clinvar.split("\t")
-    cln_chr = tmp[0]
-    cln_pos = int(tmp[1])
     cln_ref = tmp[3]
     cln_alt = tmp[4]
     info = tmp[7]
-    for i in info.split(";") :
-        tmp = i.split("=")
-        # Database name identifiers in pairs "OMIM:MMMMMMM"
-        if tmp[0] == "CLNDISDB" :
-            for j in tmp[1].split(";") :
-                aux = j.split(":")
-                data["db"][aux[0]] = aux[1]
-        # Diagnostic name
-        if tmp[0] == "CLNDN" :
-            data["disease"] = tmp[1]
-        # Clinical significance
-        if tmp[0] == "CLNSIG" :
-            data["significance"] = tmp[1]
-        # Revision status
-        if tmp[0] == "CLNREVSTAT" :
-            data["revStatus"] = tmp[1]
+    aux2 = tmp[0:5]
+    if ref = cln_ref and alt == cln_alt :
+        for i in info.split(";") :
+            tmp = i.split("=")
+            # Database name identifiers in pairs "OMIM:MMMMMMM"
+            if tmp[0] == "CLNDISDB" :
+                data["db"] = ",".join(aux[1:])
+            # Diagnostic name
+            if tmp[0] == "CLNDN" :
+                data["disease"] = tmp[1]
+            # Clinical significance
+            if tmp[0] == "CLNSIG" :
+                data["significance"] = tmp[1]
+            # Revision status
+            if tmp[0] == "CLNREVSTAT" :
+                data["revStatus"] = tmp[1]
+    else :
+        print("{}\n{}\n".format("-".join(aux), "-".join(aux2)))
 
-    print(data)
     return data
 
 def getData() :
