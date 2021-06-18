@@ -251,9 +251,9 @@ def getData() :
     if pr.returncode != 0 :
         print("WARNING: Error found while running R. Description\n".format(err.decode()))
 
-    return data
+    return data, negData
 
-def filterVariants(data) :
+def filterVariants(data, filename) :
     # Post-production. Check the positive variants and remove the submitters with a pathogenic variant
     posSubmitters = [] # Submitters with a pathogenic variant found
     posData = []
@@ -291,13 +291,13 @@ def filterVariants(data) :
                     supData = getClinVar(line, v)
                     found = True
                     break
-        if not found :
-            print("Variant {} not found in {}".format(search, vcf))
+        # if not found :
+        #     print("Variant {} not found in {}".format(search, vcf))
 
         txt += "{d1}\t{d2}\t{dss}\t{sig}\n".format(d1 = "\t".join(v[0:-1]), d2 = v[-1].strip(), dss = supData["disease"], sig = supData["significance"])
 
     print("{} INFO: ClinVar annotated variants stores as posVariants.annotated.tsv".format(getTime()))
-    with open("posVariants.annotated.tsv", "w") as fi :
+    with open(filename, "w") as fi :
         fi.write(txt)
 
 
@@ -309,7 +309,8 @@ def filterVariants(data) :
 #         posVars
 
 if __name__ == "__main__" :
-    # pos_variants = getData()
-    with open("posVariants.tsv", "r") as fi :
-        pos_variants = fi.read()
-    filterVariants(pos_variants)
+    pos_variants, neg_variants = getData()
+    # with open("posVariants.tsv", "r") as fi :
+    #     pos_variants = fi.read()
+    filterVariants(pos_variants, "posVariants.annotated.tsv")
+    filterVariants(neg_variants, "negVariants.annotated.tsv")
