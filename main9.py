@@ -296,7 +296,7 @@ def filterVariants(data, filename) :
 
         txt += "{data}\t{dss}\t{sig}\n".format(data = v.strip(), dss = supData["disease"], sig = supData["significance"])
 
-    print("{} INFO: ClinVar annotated variants stores as posVariants.annotated.tsv".format(getTime()))
+    print("{} INFO: ClinVar annotated variants stores as {}".format(getTime(), filename))
     with open(filename, "w") as fi :
         fi.write(txt)
 
