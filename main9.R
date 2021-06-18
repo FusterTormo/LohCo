@@ -12,6 +12,10 @@ pos <- read.table("posVariants.tsv", header = FALSE, sep = "\t")
 neg <- read.table("negVariants.tsv", header = FALSE, sep = "\t")
 colnames(pos) <- c("chr", "start", "end", "ref", "alt", "position", "exonic", "submitter", "tm", "cn")
 colnames(neg) <- c("chr", "start", "end", "ref", "alt", "position", "exonic", "submitter", "tm", "cn")
+fpos <- read.table("posVariants.annotated.tsv", header = FALSE, sep = "\t")
+fneg <- read.table("negVariants.annotated.tsv", header = FALSE, sep = "\t")
+colnames(fpos) <- c("chr", "start", "end", "ref", "alt", "position", "exonic", "submitter", "tm", "cn", "disease", "significance")
+colnames(fneg) <- c("chr", "start", "end", "ref", "alt", "position", "exonic", "submitter", "tm", "cn", "disease", "significance")
 
 cat("R-INFO: Data loaded successfully. Creating the plots\n")
 # The plots
@@ -19,6 +23,15 @@ cat("R-INFO: Data loaded successfully. Creating the plots\n")
 png(width = 1261, height = 906, filename = paste(gene, "_genePos.png", sep = ""))
 plot(p$times, pch = 18, col = "red", main = "Variant position", xlab = "BRCA1 position", ylab = "Variants found")
 points(n$times, pch = 20, col = "blue")
+legend("topleft", fill = c("red", "blue"), legend = c("Positive", "Negative"))
+dev.off()
+
+# Zoom by selecting only the positions with more than 1 variant
+pzoom <- p[p$times > 1,]
+nzoom <- n[n$position %in% pzoom$position,]
+png(width = 1261, height = 906, filename = paste(gene, "_zoom_genePos.png", sep = ""))
+plot(pzoom$times, pch = 18, col = "red", main = "Variant position", xlab = "BRCA1 position", ylab = "Variants found")
+points(nzoom$times, pch = 20, col = "blue")
 legend("topleft", fill = c("red", "blue"), legend = c("Positive", "Negative"))
 dev.off()
 
@@ -55,6 +68,25 @@ ggn <- data.frame(name = "Negative", variants = e2$variants)
 gg <- rbind(ggp, ggn)
 ggplot(gg, aes(y=variants, x=name, fill = name)) + geom_violin(trim = FALSE) + geom_boxplot(width = 0.1) + theme_classic() + scale_x_discrete(name = "") + ggtitle("Variants per submitter")
 ggsave(filename = paste(gene, "_varsXsubmitter.png", sep = ""), device = "png", dpi = 320, width = 26, height = 26, units = "cm")
+
+# Plot the SNV changes
+# TODO. Create the matrix with all the C>A, A>G... changes
+# TODO. Do a beside barplot with this matrix
+snv <- paste0(pos$ref, ">", pos$alt)
+posSNV <- as.data.frame(table(snv))
+snv <- paste0(neg$ref, ">", neg$alt)
+negSNV <- as.data.frame(table(snv))
+
+# Type of variants
+# TODO. Get the exonic variant type per group (positive, negative)
+
+# Descriptive statistics of the number of variants per submitter
+tmp <- as.data.frame(table(pos$submitter))
+cat("R-INFO: Mean variants per submitter in positive cases: ", mean(tmp$Freq))
+cat("R-INFO: Median variants per submitter in positive cases: ", median(tmp$Freq))
+tmp <- as.data.frame(table(neg$submitter))
+cat("R-INFO: Mean variants per submitter in positive cases: ", mean(tmp$Freq))
+cat("R-INFO: Median variants per submitter in positive cases: ", median(tmp$Freq))
 
 # Calculate dN/dS ratio in positive/negative samples
 non <- exonic[exonic$name == "nonsynonymous SNV",][2:3]
