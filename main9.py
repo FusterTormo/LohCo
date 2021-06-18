@@ -32,7 +32,52 @@ varCallSuffix = "platypusGerm/platypus.hg38_multianno.txt"
 #varCallSuffix = "strelkaGerm/results/variants/strelka.hg38_multianno.txt"
 
 def getTime() :
+    """Returns current time (hours:minutes:seconds) in a fancy format"""
     return time.strftime("%H:%M:%S", time.gmtime())
+
+def getClinVar(clinvar, variant) :
+    """Extract the important information from ClinVar
+
+    Columns extracted (description given in clinvar vcf file)
+        * CLNDISDB: Tag-value pairs of disease database name and identifier, e.g. OMIM:NNNNNN
+        * CLNDN: ClinVar's preferred disease name for the concept specified by disease identifiers in CLNDISDB
+        * CLNSIG: Clinical significance for this single variant
+        * CLNREVSTAT: ClinVar review status for the Variation ID
+    """
+
+    data = {"db" : {}, "disease" : "NA", "significance" : "NA", "revStatus" : "NA"}
+    # Check if the variant is exactly the same as the reported by ClinVar
+    tmp = variant.split("\t")
+    cro = tmp[0].replace("chr", "")
+    sta = int(tmp[1])
+    ref = tmp[3]
+    alt = tmp[4]
+    # Extract the interesting data from the clinvar line
+    tmp = clinvar.split("\t")
+    cln_chr = tmp[0]
+    cln_pos = int(tmp[1])
+    cln_ref = tmp[3]
+    cln_alt = tmp[4]
+    info = tmp[7]
+    for i in info.split(";") :
+        tmp = i.split("=")
+        # Database name identifiers in pairs "OMIM:MMMMMMM"
+        if tmp[0] == "CLNDISDB" :
+            for j in tmp[1].split(";") :
+                aux = j.split(":")
+                data["db"][aux[0]] = aux[1]
+        # Diagnostic name
+        if tmp[0] == "CLNDN" :
+            data["disease"] = tmp[1]
+        # Clinical significance
+        if tmp[0] == "CLNSIG" :
+            data["significance"] = tmp[1]
+        # Revision status
+        if tmp[0] == "CLNREVSTAT" :
+            data["revStatus"] = tmp[1]
+
+    print(data)
+    return data
 
 def getData() :
     # Variables
@@ -231,14 +276,16 @@ def filterVariants(data) :
             pos = int(aux[1])
         search = "{}\t{}".format(aux[0].replace("chr", ""), pos)
         found = False
+        supData = {"db" : {}, "disease" : "NA", "significance" : "NA", "revStatus" : "NA"}
         for line in cnt :
             if not line.startswith("#") :
                 if line.startswith(search) :
-                    print(line)
+                    supData = getClinVar(line, v)
                     found = True
                     break
         if not found :
             print("Variant {} not found in {}".format(search, vcf))
+
 
 
 
