@@ -8,7 +8,8 @@ library(scales)
 full <- read.table("meanCN.tsv", sep = "\t", header = TRUE)
 
 # Purity correlation between LOH tools
-purity <- data.frame(FACETS = full$fac_purity, Sequenza = full$seq_purity, PURPLE = full$pur_purity, ascatNGS = full$ngs_purity)
+auxPurity <- data.frame(FACETS = full$fac_purity, Sequenza = full$seq_purity, PURPLE = full$pur_purity, ascatNGS = full$ngs_purity)
+purity <- auxPurity[!is.na(auxPurity$FACETS) & !is.na(auxPurity$Sequenza) & !is.na(auxPurity$PURPLE) & !is.na(auxPurity$ascatNGS),]
 ggplot(purity, aes(FACETS, Sequenza)) + geom_point() + geom_smooth(method = "lm") + ggtitle("Purity correlation") + theme_minimal()
 ggsave("purityFvS.png")
 ggplot(purity, aes(FACETS, PURPLE)) + geom_point() + geom_smooth(method = "lm") + ggtitle("Purity correlation") + theme_minimal()
@@ -23,7 +24,8 @@ ggplot(purity, aes(PURPLE, ascatNGS)) + geom_point() + geom_smooth(method = "lm"
 ggsave("purityPvN.png")
 
 # Mean CN correlation
-cn <- data.frame(ASCAT2 = full$asc_meanCN, FACETS = full$fac_meanCN, Sequenza = full$seq_meanCN, PURPLE = full$pur_meanCN, ascatNGS = full$ngs_meanCN)
+auxCn <- data.frame(ASCAT2 = full$asc_meanCN, FACETS = full$fac_meanCN, Sequenza = full$seq_meanCN, PURPLE = full$pur_meanCN, ascatNGS = full$ngs_meanCN)
+cn <- auxCn[!is.na(auxCn$ASCAT2) & !is.na(auxCn$FACETS) & !is.na(auxCn$Sequenza) & !is.na(auxCn$PURPLE) & !is.na(auxCn$ascatNGS),]
 ggplot(cn, aes(ASCAT2, FACETS)) + geom_point() + geom_smooth(method = "lm") + ggtitle("Mean copy number") + theme_minimal()
 ggsave("cnAvF.png")
 ggplot(cn, aes(ASCAT2, Sequenza)) + geom_point() + geom_smooth(method = "lm") + ggtitle("Mean copy number") + theme_minimal()
@@ -45,8 +47,9 @@ ggsave("cnSvN.png")
 ggplot(cn, aes(PURPLE, ascatNGS)) + geom_point() + geom_smooth(method = "lm") + ggtitle("Mean copy number") + theme_minimal()
 ggsave("cnPvS.png")
 
-# Mean CN correlation
-ploidy <- data.frame(FACETS = full$fac_ploidy, Sequenza = full$seq_ploidy, PURPLE = full$pur_ploidy, ascatNGS = full$ngs_ploidy)
+# Ploidy correlation
+auxPloidy <- data.frame(FACETS = full$fac_ploidy, Sequenza = full$seq_ploidy, PURPLE = full$pur_ploidy, ascatNGS = full$ngs_ploidy)
+ploidy <- auxPloidy[!is.na(auxPloidy$FACETS) & !is.na(auxPloidy$Sequenza) & !is.na(auxPloidy$PURPLE) & !is.na(auxPloidy$ascatNGS),]
 ggplot(ploidy, aes(FACETS, Sequenza)) + geom_point() + geom_smooth(method = "lm") + ggtitle("Ploidy") + theme_minimal()
 ggsave("plFvS.png")
 ggplot(ploidy, aes(FACETS, PURPLE)) + geom_point() + geom_smooth(method = "lm") + ggtitle("Ploidy") + theme_minimal()
@@ -60,7 +63,7 @@ ggsave("plSvN.png")
 ggplot(ploidy, aes(PURPLE, ascatNGS)) + geom_point() + geom_smooth(method = "lm") + ggtitle("Ploidy") + theme_minimal()
 ggsave("plPvS.png")
 
-# Copy number reported
+# Copy number reported. Notice that data for boxplot comes from the no NAs data
 png("allCN.png", width = 720, height = 554)
 boxplot(cn, col = hue_pal()(5), main = "Mean copy number reported")
 dev.off()
@@ -68,30 +71,60 @@ png("allCN_outliers.png", width = 720, height = 554)
 boxplot(cn, col = hue_pal()(5), main = "Mean copy number reported", outline = FALSE)
 dev.off()
 
+# Ploidy reported. Same happens here than before
+png("ploidyCN.png", width = 720, height = 554)
+boxplot(ploidy, col = hue_pal()(4), main = "Ploidy reported")
+dev.off()
+
 # Aberration percentage reported by each tool
 colors <- hue_pal()(4)
-tmp <- strsplit(full$asc_aberration, ";")
-ascat <- matrix(as.numeric(unlist(tmp)), ncol = 4, byrow = TRUE)
-png("ascat2Aberrations.png", width = 720, height = 554)
-boxplot(ascat, names = c("Amp", "LOH", "Del", "WT"), col = colors, main = "ASCAT2")
-dev.off()
-tmp <- strsplit(full$fac_aberration, ";")
-facets <- matrix(as.numeric(unlist(tmp)), ncol = 4, byrow = TRUE)
-png("facetsAberrations.png", width = 720, height = 554)
-boxplot(facets, names = c("Amp", "LOH", "Del", "WT"), col = colors, main = "FACETS")
-dev.off()
-tmp <- strsplit(full$seq_aberration, ";")
-sequenza <- matrix(as.numeric(unlist(tmp)), ncol = 4, byrow = TRUE)
-png("sequenzaAberrations.png", width = 720, height = 554)
-boxplot(sequenza, names = c("Amp", "LOH", "Del", "WT"), col = colors, main = "Sequenza")
-dev.off()
-tmp <- strsplit(full$pur_aberration, ";")
-purple <- matrix(as.numeric(unlist(tmp)), ncol = 4, byrow = TRUE)
-png("purpleAberrations.png", width = 720, height = 554)
-boxplot(purple, names = c("Amp", "LOH", "Del", "WT"), col = colors, main = "PURPLE")
-dev.off()
-tmp <- strsplit(full$ngs_aberration, ";")
-ascatngs <- matrix(as.numeric(unlist(tmp)), ncol = 4, byrow = TRUE)
-png("ascatngsAberrations.png", width = 720, height = 554)
-boxplot(ascatngs, names = c("Amp", "LOH", "Del", "WT"), col = colors, main = "ascatNGS")
-dev.off()
+tmp.nas <- full[full$asc_aberration != "NA;NA;NA;NA",]$asc_aberration
+tmp <- strsplit(tmp.nas, ";")
+mt <- matrix(as.numeric(unlist(tmp)), ncol = 4, byrow = TRUE)
+ascat <- rbind(data.frame(AB = "Amplification", percent = mt[,1]), 
+               data.frame(AB = "LOH", percent = mt[,2]),
+               data.frame(AB = "Deletion", percent = mt[,3]),
+               data.frame(AB = "Wild-type", percent = mt[,4]))
+ggplot(ascat, aes(AB, percent, fill = AB)) + geom_violin() + theme_minimal() + theme(legend.position = "none") + xlab("Aberration") + ylab("Aberration percet per sample")
+ggsave("ascat2Aberrations.png")
+
+tmp.nas <- full[full$fac_aberration != "NA;NA;NA;NA",]$fac_aberration
+tmp <- strsplit(tmp.nas, ";")
+mt <- matrix(as.numeric(unlist(tmp)), ncol = 4, byrow = TRUE)
+facets <- rbind(data.frame(AB = "Amplification", percent = mt[,1]), 
+               data.frame(AB = "LOH", percent = mt[,2]),
+               data.frame(AB = "Deletion", percent = mt[,3]),
+               data.frame(AB = "Wild-type", percent = mt[,4]))
+ggplot(facets, aes(AB, percent, fill = AB)) + geom_violin() + theme_minimal() + theme(legend.position = "none") + xlab("Aberration") + ylab("Aberration percet per sample")
+ggsave("facetsAberrations.png")
+
+tmp.nas <- full[full$seq_aberration != "NA;NA;NA;NA",]$seq_aberration
+tmp <- strsplit(tmp.nas, ";")
+mt <- matrix(as.numeric(unlist(tmp)), ncol = 4, byrow = TRUE)
+sequenza <- rbind(data.frame(AB = "Amplification", percent = mt[,1]), 
+               data.frame(AB = "LOH", percent = mt[,2]),
+               data.frame(AB = "Deletion", percent = mt[,3]),
+               data.frame(AB = "Wild-type", percent = mt[,4]))
+ggplot(sequenza, aes(AB, percent, fill = AB)) + geom_violin() + theme_minimal() + theme(legend.position = "none") + xlab("Aberration") + ylab("Aberration percet per sample")
+ggsave("sequenzaAberrations.png")
+
+tmp.nas <- full[full$pur_aberration != "NA;NA;NA;NA",]$pur_aberration
+tmp <- strsplit(tmp.nas, ";")
+mt <- matrix(as.numeric(unlist(tmp)), ncol = 4, byrow = TRUE)
+purple <- rbind(data.frame(AB = "Amplification", percent = mt[,1]), 
+               data.frame(AB = "LOH", percent = mt[,2]),
+               data.frame(AB = "Deletion", percent = mt[,3]),
+               data.frame(AB = "Wild-type", percent = mt[,4]))
+ggplot(purple, aes(AB, percent, fill = AB)) + geom_violin() + theme_minimal() + theme(legend.position = "none") + xlab("Aberration") + ylab("Aberration percet per sample")
+ggsave("purpleAberrations.png")
+
+tmp.nas <- full[full$ngs_aberration != "NA;NA;NA;NA",]$ngs_aberration
+tmp <- strsplit(tmp.nas, ";")
+mt <- matrix(as.numeric(unlist(tmp)), ncol = 4, byrow = TRUE)
+ascatngs <- rbind(data.frame(AB = "Amplification", percent = mt[,1]), 
+               data.frame(AB = "LOH", percent = mt[,2]),
+               data.frame(AB = "Deletion", percent = mt[,3]),
+               data.frame(AB = "Wild-type", percent = mt[,4]))
+ggplot(ascatngs, aes(AB, percent, fill = AB)) + geom_violin() + theme_minimal() + theme(legend.position = "none") + xlab("Aberration") + ylab("Aberration percet per sample")
+ggsave("ascatngsAberrations.png")
+
