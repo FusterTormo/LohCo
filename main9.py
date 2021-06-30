@@ -151,7 +151,7 @@ def getData() :
                     # Check LOH in the gene, add the output to a list
                     aux = asc.checkAscat(folder, gene)
                     loh.append(aux)
-                if len(loh) == 3 :
+                if len(loh) >= 3 :
                     done.append(c[0])
                 # Count the number of LOH found in the patient
                 lohs = loh.count("L") + loh.count("D") # Copy number neutral +`copy number lose`
@@ -271,8 +271,14 @@ def filterVariants(data, filename) :
     print("INFO: Removed {} variants".format(len(data.split("\n")) - len(posData)))
 
     vcf = "clinvar.vcf"
+
     with open(vcf, "r") as fi :
-        cnt = fi.readlines()
+        # cnt = fi.readlines()
+        for l in fi :
+            if not l.startswith("#") :
+                aux = l.strip().split("\t")
+                idx = "{}-{}".format(aux[0], aux[1])
+                cnt[ids] = l
 
     # Check if the variant is reported in ClinVar
     for v in posData :
@@ -282,21 +288,27 @@ def filterVariants(data, filename) :
             pos = int(aux[1]) - 1
         else :
             pos = int(aux[1])
-        search = "{}\t{}".format(aux[0].replace("chr", ""), pos)
-        found = False
+
+        search = "{}-{}".format(aux[0].replace("chr", ""), pos)
         supData = {"db" : {}, "disease" : "NA", "significance" : "NA", "revStatus" : "NA"}
-        for line in cnt :
-            if not line.startswith("#") :
-                if line.startswith(search) :
-                    supData = getClinVar(line, v)
-                    found = True
-                    break
+        if search in cnt.keys() :
+            supData = getClinVar(cnt[search], v)
+        # Versio antiga
+        # search = "{}\t{}".format(aux[0].replace("chr", ""), pos)
+        # supData = {"db" : {}, "disease" : "NA", "significance" : "NA", "revStatus" : "NA"}
+        # found = False
+        # for line in cnt :
+        #     if not line.startswith("#") :
+        #         if line.startswith(search) :
+        #             supData = getClinVar(line, v)
+        #             found = True
+        #             break
         # if not found :
         #     print("Variant {} not found in {}".format(search, vcf))
 
         txt += "{data}\t{dss}\t{sig}\n".format(data = v.strip(), dss = supData["disease"], sig = supData["significance"])
 
-    print("{} INFO: ClinVar annotated variants stores as {}".format(getTime(), filename))
+    print("{} INFO: ClinVar annotated variants stored as {}".format(getTime(), filename))
     with open(filename, "w") as fi :
         fi.write(txt)
 
