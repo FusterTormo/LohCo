@@ -270,11 +270,13 @@ def filterVariants(data, filename) :
     print("INFO: Removed {} submitters with a pathogenic variant".format(len(posSubmitters)))
     print("INFO: Removed {} variants".format(len(data.split("\n")) - len(posData)))
 
-    """Versio antiga"""
+    """Versio antiga. Per comprovar que ambdos anoten be
     vcf = "clinvar.vcf"
+    with open(vcf, "r") as fi :
+        fi.readlines()
 
     for v in posData :
-         aux = v.split("\t")
+        aux = v.split("\t")
         # As ANNOVAR changes the position in insertions/deletions, we substract 1 to the start position
         if aux[4] == "-" :
             pos = int(aux[1]) - 1
@@ -289,10 +291,11 @@ def filterVariants(data, filename) :
                     supData = getClinVar(line, v)
                     found = True
                     break
-                    
-        txt += "{data}\t{dss}\t{sig}\n".format(data = v.strip(), dss = supData["disease"], sig = supData["significance"])
 
-    """Versio nova
+        txt += "{data}\t{dss}\t{sig}\n".format(data = v.strip(), dss = supData["disease"], sig = supData["significance"])
+    """
+
+    """Versio nova"""
     vcf = "clinvar.vcf"
     cnt = {}
     with open(vcf, "r") as fi :
@@ -300,9 +303,11 @@ def filterVariants(data, filename) :
             if not l.startswith("#") :
                 aux = l.strip().split("\t")
                 idx = "{}-{}".format(aux[0], aux[1])
-                cnt[idx] = l
+                if idx not in cnt.keys() : # PATCH!! Get the first element if there are position duplicates
+                    cnt[idx] = l
 
     # Check if the variant is reported in ClinVar
+    keyword = "cancer" # If the variant has this keyword. It can be considered pathogenic
     for v in posData :
         aux = v.split("\t")
         # As ANNOVAR changes the position in insertions/deletions, we substract 1 to the start position
@@ -316,12 +321,24 @@ def filterVariants(data, filename) :
         if search in cnt.keys() :
             supData = getClinVar(cnt[search], v)
 
+        if supData["disease"].find("cancer") > 0 :
+            posSubmitters.append(aux[7])
+
         txt += "{data}\t{dss}\t{sig}\n".format(data = v.strip(), dss = supData["disease"], sig = supData["significance"])
 
-    """
+    print("INFO: Removed {} submitters")
+    auxList = []
+    # Remove the variants that come from a positive submitter (a submitter with a positive/pathogenic variant)
+    for v in posData :
+        aux = v.split("\t")
+        if v[7] not in posSubmitters :
+            auxList.append(v)
+
+    print("INFO: Removed {} variants".format(len(posData) - len(auxList)))
+
     print("{} INFO: ClinVar annotated variants stored as {}".format(getTime(), filename))
-    with open(filename, "w") as fi :
-        fi.write(txt)
+    # with open(filename, "w") as fi :
+    #     fi.write(txt)
 
 
 
