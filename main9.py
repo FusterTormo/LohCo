@@ -270,10 +270,32 @@ def filterVariants(data, filename) :
     print("INFO: Removed {} submitters with a pathogenic variant".format(len(posSubmitters)))
     print("INFO: Removed {} variants".format(len(data.split("\n")) - len(posData)))
 
+    """Versio antiga"""
+    vcf = "clinvar.vcf"
+
+    for v in posData :
+         aux = v.split("\t")
+        # As ANNOVAR changes the position in insertions/deletions, we substract 1 to the start position
+        if aux[4] == "-" :
+            pos = int(aux[1]) - 1
+        else :
+            pos = int(aux[1])
+        search = "{}\t{}".format(aux[0].replace("chr", ""), pos)
+        found = False
+        supData = {"db" : {}, "disease" : "NA", "significance" : "NA", "revStatus" : "NA"}
+        for line in cnt :
+            if not line.startswith("#") :
+                if line.startswith(search) :
+                    supData = getClinVar(line, v)
+                    found = True
+                    break
+                    
+        txt += "{data}\t{dss}\t{sig}\n".format(data = v.strip(), dss = supData["disease"], sig = supData["significance"])
+
+    """Versio nova
     vcf = "clinvar.vcf"
     cnt = {}
     with open(vcf, "r") as fi :
-        # cnt = fi.readlines()
         for l in fi :
             if not l.startswith("#") :
                 aux = l.strip().split("\t")
@@ -293,21 +315,10 @@ def filterVariants(data, filename) :
         supData = {"db" : {}, "disease" : "NA", "significance" : "NA", "revStatus" : "NA"}
         if search in cnt.keys() :
             supData = getClinVar(cnt[search], v)
-        # Versio antiga
-        # search = "{}\t{}".format(aux[0].replace("chr", ""), pos)
-        # supData = {"db" : {}, "disease" : "NA", "significance" : "NA", "revStatus" : "NA"}
-        # found = False
-        # for line in cnt :
-        #     if not line.startswith("#") :
-        #         if line.startswith(search) :
-        #             supData = getClinVar(line, v)
-        #             found = True
-        #             break
-        # if not found :
-        #     print("Variant {} not found in {}".format(search, vcf))
 
         txt += "{data}\t{dss}\t{sig}\n".format(data = v.strip(), dss = supData["disease"], sig = supData["significance"])
 
+    """
     print("{} INFO: ClinVar annotated variants stored as {}".format(getTime(), filename))
     with open(filename, "w") as fi :
         fi.write(txt)
@@ -321,8 +332,8 @@ def filterVariants(data, filename) :
 #         posVars
 
 if __name__ == "__main__" :
-    pos_variants, neg_variants = getData()
-    # with open("posVariants.tsv", "r") as fi :
-    #     pos_variants = fi.read()
+    # pos_variants, neg_variants = getData()
+    with open("posVariants.tsv", "r") as fi :
+        pos_variants = fi.read()
     filterVariants(pos_variants, "posVariants.annotated.tsv")
-    filterVariants(neg_variants, "negVariants.annotated.tsv")
+    # filterVariants(neg_variants, "negVariants.annotated.tsv")
