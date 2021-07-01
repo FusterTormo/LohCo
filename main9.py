@@ -270,32 +270,6 @@ def filterVariants(data, filename) :
     print("INFO: Removed {} submitters with a pathogenic variant".format(len(posSubmitters)))
     print("INFO: Removed {} variants".format(len(data.split("\n")) - len(posData)))
 
-    """Versio antiga. Per comprovar que ambdos anoten be
-    vcf = "clinvar.vcf"
-    with open(vcf, "r") as fi :
-        fi.readlines()
-
-    for v in posData :
-        aux = v.split("\t")
-        # As ANNOVAR changes the position in insertions/deletions, we substract 1 to the start position
-        if aux[4] == "-" :
-            pos = int(aux[1]) - 1
-        else :
-            pos = int(aux[1])
-        search = "{}\t{}".format(aux[0].replace("chr", ""), pos)
-        found = False
-        supData = {"db" : {}, "disease" : "NA", "significance" : "NA", "revStatus" : "NA"}
-        for line in cnt :
-            if not line.startswith("#") :
-                if line.startswith(search) :
-                    supData = getClinVar(line, v)
-                    found = True
-                    break
-
-        txt += "{data}\t{dss}\t{sig}\n".format(data = v.strip(), dss = supData["disease"], sig = supData["significance"])
-    """
-
-    """Versio nova"""
     vcf = "clinvar.vcf"
     cnt = {}
     with open(vcf, "r") as fi :
@@ -321,17 +295,17 @@ def filterVariants(data, filename) :
         if search in cnt.keys() :
             supData = getClinVar(cnt[search], v)
 
-        if supData["disease"].find("cancer") > 0 :
+        if supData["disease"].find("cancer") > 0 and aux[7] not in posSubmitters :
             posSubmitters.append(aux[7])
 
         txt += "{data}\t{dss}\t{sig}\n".format(data = v.strip(), dss = supData["disease"], sig = supData["significance"])
 
-    print("INFO: Removed {} submitters")
+    print("INFO: Removed {} submitters".format(len(posSubmitters)))
     auxList = []
     # Remove the variants that come from a positive submitter (a submitter with a positive/pathogenic variant)
     for v in posData :
         aux = v.split("\t")
-        if v[7] not in posSubmitters :
+        if aux[7] not in posSubmitters :
             auxList.append(v)
 
     print("INFO: Removed {} variants".format(len(posData) - len(auxList)))
