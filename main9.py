@@ -271,14 +271,14 @@ def filterVariants(data, filename) :
     print("INFO: Removed {} variants".format(len(data.split("\n")) - len(posData)))
 
     vcf = "clinvar.vcf"
-
+    cnt = {}
     with open(vcf, "r") as fi :
         # cnt = fi.readlines()
         for l in fi :
             if not l.startswith("#") :
                 aux = l.strip().split("\t")
                 idx = "{}-{}".format(aux[0], aux[1])
-                cnt[ids] = l
+                cnt[idx] = l
 
     # Check if the variant is reported in ClinVar
     for v in posData :
