@@ -309,10 +309,11 @@ def filterVariants(data, filename) :
             auxList.append(v)
 
     print("INFO: Removed {} variants".format(len(posData) - len(auxList)))
+    posData = auxList
 
     print("{} INFO: ClinVar annotated variants stored as {}".format(getTime(), filename))
-    # with open(filename, "w") as fi :
-    #     fi.write(txt)
+    with open(filename, "w") as fi :
+        fi.write(txt)
 
 
 
@@ -327,4 +328,4 @@ if __name__ == "__main__" :
     with open("posVariants.tsv", "r") as fi :
         pos_variants = fi.read()
     filterVariants(pos_variants, "posVariants.annotated.tsv")
-    # filterVariants(neg_variants, "negVariants.annotated.tsv")
+    filterVariants(neg_variants, "negVariants.annotated.tsv")
