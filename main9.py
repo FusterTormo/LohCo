@@ -278,27 +278,27 @@ def filterVariants(data, filename) :
                 posSubmitters.append(v[7])
 
             # As ANNOVAR changes the position in insertions/deletions, we substract 1 to the start position
-            if aux[4] == "-" :
-                pos = int(aux[1]) - 1
+            if v[4] == "-" :
+                pos = int(v[1]) - 1
             else :
-                pos = int(aux[1])
+                pos = int(v[1])
 
-            search = "{}-{}".format(aux[0].replace("chr", ""), pos)
+            search = "{}-{}".format(v[0].replace("chr", ""), pos)
             supData = {"db" : {}, "disease" : "NA", "significance" : "NA", "revStatus" : "NA"}
             if search in cnt.keys() :
-                supData = getClinVar(cnt[search], v)
+                supData = getClinVar(cnt[search], d)
 
             # Check if the variant is associated with cancer
-            if supData["disease"].find("cancer") > 0 and aux[7] not in posSubmitters :
-                posSubmitters.append(aux[7])
+            if supData["disease"].find("cancer") > 0 and v[7] not in posSubmitters :
+                posSubmitters.append(v[7])
 
             # Check if the submitter is considered a positive case
-            aux.append(supData["disease"])
-            aux.append(supData["significance"])
+            v.append(supData["disease"])
+            v.append(supData["significance"])
             if v[7] in posSubmitters :
-                ispos.append(aux)
+                ispos.append(v)
             else :
-                nopos.append(aux)
+                nopos.append(v)
 
     print("INFO: {} submitters removed".format(len(posSubmitters)))
     print("INFO: {} variants removed".format(len(ispos)))
@@ -380,5 +380,7 @@ if __name__ == "__main__" :
     # pos_variants, neg_variants = getData()
     with open("posVariants.tsv", "r") as fi :
         pos_variants = fi.read()
+    with open("negVariants.tsv", "r") as fi :
+        neg_variants = fi.read()
     filterVariants(pos_variants, "posVariants.annotated.tsv")
     filterVariants(neg_variants, "negVariants.annotated.tsv")
