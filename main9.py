@@ -301,8 +301,16 @@ def filterVariants(data, filename) :
                 nopos.append(v)
 
     print("INFO: {} submitters removed".format(len(posSubmitters)))
-    print("INFO: {} variants removed".format(len(ispos)))
-    print("INFO: {} variants preserved".format(len(nopos)))
+    print("INFO: {} variants removed. Data saved as {}_pathogenic.tsv".format(len(ispos), filename))
+    with open("{}_pathogenic.tsv".format(filename), "w") as fi :
+        for v in ispos :
+            fi.write("\t".join(v))
+            fi.write("\n")
+    print("INFO: {} variants preserved. Data saved as {}_negative.tsv".format(len(nopos), filename))
+    with open("{}_negative.tsv".format(filename), "w") as fi :
+        for v in nopos :
+            fi.write("\t".join(v))
+            fi.write("\n")
 
 
 
@@ -382,5 +390,5 @@ if __name__ == "__main__" :
         pos_variants = fi.read()
     with open("negVariants.tsv", "r") as fi :
         neg_variants = fi.read()
-    filterVariants(pos_variants, "posVariants.annotated.tsv")
-    filterVariants(neg_variants, "negVariants.annotated.tsv")
+    filterVariants(pos_variants, "posVariants.annotated")
+    filterVariants(neg_variants, "negVariants.annotated")
