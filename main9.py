@@ -254,6 +254,59 @@ def getData() :
     return data, negData
 
 def filterVariants(data, filename) :
+    """Check the variants and remove the submitters (and their variants) with a pathogenic (positive) variant"""
+    posSubmitters = [] # Submitters where a pathogenic variant is found
+    nopos = [] # Variants that are not considered positive (like frameshift indels, stopgains...)
+    ispos = []
+    keyword = "cancer" # If the variant has this keyword. It can be considered pathogenic
+    vcf = "clinvar.vcf"
+    cnt = {} # Data from clinvar vcf
+    # Get ClinVar data
+    with open(vcf, "r") as fi :
+        for l in fi :
+            if not l.startswith("#") :
+                aux = l.strip().split("\t")
+                idx = "{}-{}".format(aux[0], aux[1])
+                if idx not in cnt.keys() : # PATCH!! Get the first element if there are position duplicates
+                    cnt[idx] = l
+
+    for d in data.split("\n") :
+        v = d.split("\t")
+        if len(v) > 8 :
+            # Check if the variant type is considered positive
+            if v[6] in cte.var_positive :
+                posSubmitters.append(v[7])
+
+            # As ANNOVAR changes the position in insertions/deletions, we substract 1 to the start position
+            if aux[4] == "-" :
+                pos = int(aux[1]) - 1
+            else :
+                pos = int(aux[1])
+
+            search = "{}-{}".format(aux[0].replace("chr", ""), pos)
+            supData = {"db" : {}, "disease" : "NA", "significance" : "NA", "revStatus" : "NA"}
+            if search in cnt.keys() :
+                supData = getClinVar(cnt[search], v)
+
+            # Check if the variant is associated with cancer
+            if supData["disease"].find("cancer") > 0 and aux[7] not in posSubmitters :
+                posSubmitters.append(aux[7])
+
+            # Check if the submitter is considered a positive case
+            aux.append(supData["disease"])
+            aux.append(supData["significance"])
+            if v[7] in posSubmitters :
+                ispos.append(aux)
+            else :
+                nopos.append(aux)
+
+    print("INFO: {} submitters removed".format(len(posSubmitters)))
+    print("INFO: {} variants removed".format(len(ispos)))
+    print("INFO: {} variants preserved".format(len(nopos)))
+
+
+
+def old_filterVariants(data, filename) :
     # Post-production. Check the positive variants and remove the submitters with a pathogenic variant
     posSubmitters = [] # Submitters with a pathogenic variant found
     posData = []
