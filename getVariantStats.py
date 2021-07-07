@@ -32,7 +32,10 @@ def main() :
         q = cur.execute("SELECT s.submitter, uuid FROM patient p join sample s on s.submitter=p.submitter WHERE cancer='{cancer}'".format(cancer = repo))
         cases = q.fetchall()
 
+    print("INFO: {} cases found".format(len(cases)))
     for c in cases :
+        if len(cases) % 100 == 0 :
+            print("INFO: {} cases processed".format(len(cases)))
         ficP = "{wd}/{cancer}/{sub}/{uuid}/platypusGerm/platypus.hg38_multianno.txt".format(wd = cancers[repo], cancer = repo, sub = c[0], uuid = c[1])
         ficS = "{wd}/{cancer}/{sub}/{uuid}/strelkaGerm/results/variants/strelka.hg38_multianno.txt".format(wd = cancers[repo], cancer = repo, sub = c[0], uuid = c[1])
         if os.path.isfile(ficP) : # Check if platypus file exists
@@ -53,8 +56,7 @@ def main() :
                             pneg += 1
         else :
             print("WARNING: {} not found".format(ficP))
-        print(cmd)
-        print("{} variants. {} positive, {} negative".format(pall, ppos, pneg))
+
         if os.path.isfile(ficS) :
             cmd = "grep {gene} {file}".format(gene = gene, file = ficS)
             pr = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -74,10 +76,7 @@ def main() :
         else :
             print("WARNING: {} not found".format(ficS))
 
-        print(cmd)
-        print("{} variants. {} positive, {} negative".format(sall, spos, sneg))
-        if ppos > 0 :
-            break
-
+    print("\t{} variants reported by Platypus:\n\t\t{} Positve\n\t\t{} Negative".format(pall, ppos, pneg))
+    print("\t{} variants reported by Strelka:\n\t\t{} Positve\n\t\t{} Negative".format(sall, spos, sneg))
 if __name__ == "__main__" :
     main()
