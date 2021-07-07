@@ -38,7 +38,7 @@ def main() :
         if c[2].find("Tumor") > 0 :
             tumors += 1
             sample = "Tumor"
-        elif c[2].find("Normal") 0 :
+        elif c[2].find("Normal") > 0 :
             controls += 1
             sample = "Control"
         else :
