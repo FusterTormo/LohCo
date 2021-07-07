@@ -9,6 +9,7 @@ MAIN: Get, the number of variants reported by Strelka2, and Platypus in a gene d
 
 import libconstants as cte
 
+import subprocess
 import sqlite3
 import os
 
@@ -52,6 +53,8 @@ def main() :
                             pneg += 1
         else :
             print("WARNING: {} not found".format(ficP))
+        print(cmd)
+        print("{} variants. {} positive, {} negative".format(pall, ppos, pneg))
         if os.path.isfile(ficS) :
             cmd = "grep {gene} {file}".format(gene = gene, file = ficS)
             pr = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -70,11 +73,11 @@ def main() :
                             sneg += 1
         else :
             print("WARNING: {} not found".format(ficS))
-        print(cmd)
-        print("{} variants. {} positive, {} negative".format(pall, ppos, pneg))
+
         print(cmd)
         print("{} variants. {} positive, {} negative".format(sall, spos, sneg))
-        break
+        if ppos > 0 :
+            break
 
 if __name__ == "__main__" :
     main()
