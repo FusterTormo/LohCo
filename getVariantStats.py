@@ -34,8 +34,9 @@ def main() :
 
     print("INFO: {} cases found".format(len(cases)))
     for c in cases :
-        if len(cases) % 100 == 0 :
-            print("INFO: {} cases processed".format(len(cases)))
+        if cases.index(c) % 100 == 0 :
+            print("{} INFO: {} cases executed".format(getTime(), cases.index(c)))
+            
         ficP = "{wd}/{cancer}/{sub}/{uuid}/platypusGerm/platypus.hg38_multianno.txt".format(wd = cancers[repo], cancer = repo, sub = c[0], uuid = c[1])
         ficS = "{wd}/{cancer}/{sub}/{uuid}/strelkaGerm/results/variants/strelka.hg38_multianno.txt".format(wd = cancers[repo], cancer = repo, sub = c[0], uuid = c[1])
         if os.path.isfile(ficP) : # Check if platypus file exists
