@@ -312,6 +312,19 @@ def filterVariants(data, filename) :
             fi.write("\t".join(v))
             fi.write("\n")
 
+    return ispos, nopos
+
+def groupVariants(patho, nega) :
+    """Count the number of variants in each group"""
+    groups = {}
+    for p in patho :
+        key = "{chr}-{sta}-{end}-{ref}-{alt}".format(chr = p[0], sta = p[1], end = p[2], ref = p[3], alt = p[4])
+        if key in groups.keys() :
+            groups[key] += 1
+        else :
+            groups[key] = 1
+    for key, val in groups.items() :
+        print("{} - {}".format(key, val))
 
 
 def old_filterVariants(data, filename) :
@@ -390,5 +403,6 @@ if __name__ == "__main__" :
         pos_variants = fi.read()
     with open("negVariants.tsv", "r") as fi :
         neg_variants = fi.read()
-    filterVariants(pos_variants, "posVariants.annotated")
-    filterVariants(neg_variants, "negVariants.annotated")
+    patho, nega = filterVariants(pos_variants, "posVariants.annotated")
+    groupVariants(patho, nega)
+    #patho, nega = filterVariants(neg_variants, "negVariants.annotated")
