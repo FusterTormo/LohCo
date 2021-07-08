@@ -298,7 +298,7 @@ def filterVariants(data, filename) :
             v.append(supData["significance"])
             tmplist.append(v)
 
-    for d in tmplist :
+    for v in tmplist :
         if v[7] in posSubmitters :
             ispos.append(v)
         else :
@@ -343,9 +343,9 @@ def groupVariants(patho, nega) :
         else :
             st += "NF\t"
         if "Pathogenic" in v.keys() :
-            st += "{}\n".format(v["Pathogenic"])
+            st += "{}".format(v["Pathogenic"])
         else :
-            st += "NF\t"
+            st += "NF"
 
         print(st)
 
