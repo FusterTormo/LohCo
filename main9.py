@@ -318,36 +318,32 @@ def filterVariants(data, filename) :
 
     return ispos, nopos
 
-def groupVariants(patho, nega) :
+def groupVariants(patho, nega, filename) :
     """Count the number of variants in each group"""
     groups = {}
 
     for n in nega :
-        key = "{chr}-{sta}-{end}-{ref}-{alt}-{func}-{exonic}".format(chr = n[0], sta = n[1], end = n[2], ref = n[3], alt = n[4], func = n[5], exonic = n[6])
+        key = "{chr};{sta};{end};{ref};{alt};{func};{exonic}".format(chr = n[0], sta = n[1], end = n[2], ref = n[3], alt = n[4], func = n[5], exonic = n[6])
         if key in groups.keys() :
             groups[key]["No_pathogenic"] += 1
         else :
             groups[key] = {"No_pathogenic" : 1, "Pathogenic" : 0}
 
     for p in patho :
-        key = "{chr}-{sta}-{end}-{ref}-{alt}-{func}-{exonic}".format(chr = p[0], sta = p[1], end = p[2], ref = p[3], alt = p[4], func = p[5], exonic = p[6])
+        key = "{chr};{sta};{end};{ref};{alt};{func};{exonic}".format(chr = p[0], sta = p[1], end = p[2], ref = p[3], alt = p[4], func = p[5], exonic = p[6])
         if key in groups.keys() :
             groups[key]["Pathogenic"] += 1
         else :
             groups[key] = {"Pathogenic" : 1, "No_pathogenic" : 0}
 
-    for k, v in groups.items() :
-        st = "{}\t".format(k)
-        if "No_pathogenic" in v.keys() :
-            st += "{}\t".format(v["No_pathogenic"])
-        else :
-            st += "NF\t"
-        if "Pathogenic" in v.keys() :
-            st += "{}".format(v["Pathogenic"])
-        else :
-            st += "NF"
+    with open(filename, "w") as fi :
+        fi.write("Chr\tStart\tEnd\tRef\tAlt\tType\tExonicType\tInNegative\tInPathogenic\n")
+        for k, v in groups.items() :
+            fi.write(k.replace(";", "\t"))
+            fi.write("{}\t".format(v["No_pathogenic"]))
+            fi.write("{}\n".format(v["Pathogenic"]))
 
-        print(st)
+    print("INFO: Output stored as {}".format(filename))
 
 
 def old_filterVariants(data, filename) :
@@ -420,5 +416,6 @@ if __name__ == "__main__" :
     with open("negVariants.tsv", "r") as fi :
         neg_variants = fi.read()
     patho, nega = filterVariants(pos_variants, "posVariants.annotated")
-    groupVariants(patho, nega)
-    #patho, nega = filterVariants(neg_variants, "negVariants.annotated")
+    groupVariants(patho, nega, "posVariants.grouped.tsv")
+    patho, nega = filterVariants(neg_variants, "negVariants.annotated")
+    groupVariants(patho, nega, "negVariants.grouped.tsv")
