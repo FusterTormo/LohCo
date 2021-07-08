@@ -323,14 +323,14 @@ def groupVariants(patho, nega) :
         if key in groups.keys() :
             groups[key]["No_pathogenic"] += 1
         else :
-            groups[key]["No_pathogenic"] = 1
+            groups[key] = {"No_pathogenic" : 1, "Pathogenic" : 0}
 
     for p in patho :
         key = "{chr}-{sta}-{end}-{ref}-{alt}-{func}-{exonic}".format(chr = p[0], sta = p[1], end = p[2], ref = p[3], alt = p[4], func = p[5], exonic = p[6])
         if key in groups.keys() :
             groups[key]["Pathogenic"] += 1
         else :
-            groups[key]["Pathogenic"] = 1
+            groups[key] = {"Pathogenic" : 1, "No_pathogenic" : 0}
 
     for k, v in groups.items() :
         st = "{}\t".format(k)
