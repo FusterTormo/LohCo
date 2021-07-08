@@ -317,14 +317,33 @@ def filterVariants(data, filename) :
 def groupVariants(patho, nega) :
     """Count the number of variants in each group"""
     groups = {}
-    for p in patho :
-        key = "{chr}-{sta}-{end}-{ref}-{alt}".format(chr = p[0], sta = p[1], end = p[2], ref = p[3], alt = p[4])
+
+    for n in nega :
+        key = "{chr}-{sta}-{end}-{ref}-{alt}-{func}-{exonic}".format(chr = n[0], sta = n[1], end = n[2], ref = n[3], alt = n[4], func = n[5], exonic = n[6])
         if key in groups.keys() :
-            groups[key] += 1
+            groups[key]["No_pathogenic"] += 1
         else :
-            groups[key] = 1
-    for key, val in groups.items() :
-        print("{} - {}".format(key, val))
+            groups[key]["No_pathogenic"] = 1
+
+    for p in patho :
+        key = "{chr}-{sta}-{end}-{ref}-{alt}-{func}-{exonic}".format(chr = p[0], sta = p[1], end = p[2], ref = p[3], alt = p[4], func = p[5], exonic = p[6])
+        if key in groups.keys() :
+            groups[key]["Pathogenic"] += 1
+        else :
+            groups[key]["Pathogenic"] = 1
+
+    for k, v in groups.items() :
+        st = "{}\t".format(k)
+        if "No_pathogenic" in v.keys() :
+            st += "{}\t".format(v["No_pathogenic"])
+        else :
+            st += "NF\t"
+        if "Pathogenic" in v.keys() :
+            st += "{}\n".format(v["Pathogenic"])
+        else :
+            st += "NF\t"
+
+        print(st)
 
 
 def old_filterVariants(data, filename) :
