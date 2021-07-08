@@ -256,6 +256,7 @@ def getData() :
 def filterVariants(data, filename) :
     """Check the variants and remove the submitters (and their variants) with a pathogenic (positive) variant"""
     posSubmitters = [] # Submitters where a pathogenic variant is found
+    tmplist = []
     nopos = [] # Variants that are not considered positive (like frameshift indels, stopgains...)
     ispos = []
     keyword = "cancer" # If the variant has this keyword. It can be considered pathogenic
@@ -295,10 +296,13 @@ def filterVariants(data, filename) :
             # Check if the submitter is considered a positive case
             v.append(supData["disease"])
             v.append(supData["significance"])
-            if v[7] in posSubmitters :
-                ispos.append(v)
-            else :
-                nopos.append(v)
+            tmplist.append(v)
+
+    for d in tmplist :
+        if v[7] in posSubmitters :
+            ispos.append(v)
+        else :
+            nopos.append(v)
 
     print("INFO: {} submitters removed".format(len(posSubmitters)))
     print("INFO: {} variants removed. Data saved as {}_pathogenic.tsv".format(len(ispos), filename))
@@ -408,13 +412,6 @@ def old_filterVariants(data, filename) :
     with open(filename, "w") as fi :
         fi.write(txt)
 
-
-
-# # Create a new dict with the variants from the submitters that are not considered positive
-# posVars = {}
-# for k, v in variants.items() :
-#     if v[7] not in posSubmitters :
-#         posVars
 
 if __name__ == "__main__" :
     # pos_variants, neg_variants = getData()
