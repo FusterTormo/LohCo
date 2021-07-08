@@ -151,7 +151,7 @@ def getData() :
                     # Check LOH in the gene, add the output to a list
                     aux = asc.checkAscat(folder, gene)
                     loh.append(aux)
-                if len(loh) == 3 :
+                if len(loh) >= 3 :
                     done.append(c[0])
                 # Count the number of LOH found in the patient
                 lohs = loh.count("L") + loh.count("D") # Copy number neutral +`copy number lose`
@@ -254,6 +254,67 @@ def getData() :
     return data, negData
 
 def filterVariants(data, filename) :
+    """Check the variants and remove the submitters (and their variants) with a pathogenic (positive) variant"""
+    posSubmitters = [] # Submitters where a pathogenic variant is found
+    nopos = [] # Variants that are not considered positive (like frameshift indels, stopgains...)
+    ispos = []
+    keyword = "cancer" # If the variant has this keyword. It can be considered pathogenic
+    vcf = "clinvar.vcf"
+    cnt = {} # Data from clinvar vcf
+    # Get ClinVar data
+    with open(vcf, "r") as fi :
+        for l in fi :
+            if not l.startswith("#") :
+                aux = l.strip().split("\t")
+                idx = "{}-{}".format(aux[0], aux[1])
+                if idx not in cnt.keys() : # PATCH!! Get the first element if there are position duplicates
+                    cnt[idx] = l
+
+    for d in data.split("\n") :
+        v = d.split("\t")
+        if len(v) > 8 :
+            # Check if the variant type is considered positive
+            if v[6] in cte.var_positive :
+                posSubmitters.append(v[7])
+
+            # As ANNOVAR changes the position in insertions/deletions, we substract 1 to the start position
+            if v[4] == "-" :
+                pos = int(v[1]) - 1
+            else :
+                pos = int(v[1])
+
+            search = "{}-{}".format(v[0].replace("chr", ""), pos)
+            supData = {"db" : {}, "disease" : "NA", "significance" : "NA", "revStatus" : "NA"}
+            if search in cnt.keys() :
+                supData = getClinVar(cnt[search], d)
+
+            # Check if the variant is associated with cancer
+            if supData["disease"].find("cancer") > 0 and v[7] not in posSubmitters :
+                posSubmitters.append(v[7])
+
+            # Check if the submitter is considered a positive case
+            v.append(supData["disease"])
+            v.append(supData["significance"])
+            if v[7] in posSubmitters :
+                ispos.append(v)
+            else :
+                nopos.append(v)
+
+    print("INFO: {} submitters removed".format(len(posSubmitters)))
+    print("INFO: {} variants removed. Data saved as {}_pathogenic.tsv".format(len(ispos), filename))
+    with open("{}_pathogenic.tsv".format(filename), "w") as fi :
+        for v in ispos :
+            fi.write("\t".join(v))
+            fi.write("\n")
+    print("INFO: {} variants preserved. Data saved as {}_negative.tsv".format(len(nopos), filename))
+    with open("{}_negative.tsv".format(filename), "w") as fi :
+        for v in nopos :
+            fi.write("\t".join(v))
+            fi.write("\n")
+
+
+
+def old_filterVariants(data, filename) :
     # Post-production. Check the positive variants and remove the submitters with a pathogenic variant
     posSubmitters = [] # Submitters with a pathogenic variant found
     posData = []
@@ -271,10 +332,17 @@ def filterVariants(data, filename) :
     print("INFO: Removed {} variants".format(len(data.split("\n")) - len(posData)))
 
     vcf = "clinvar.vcf"
+    cnt = {}
     with open(vcf, "r") as fi :
-        cnt = fi.readlines()
+        for l in fi :
+            if not l.startswith("#") :
+                aux = l.strip().split("\t")
+                idx = "{}-{}".format(aux[0], aux[1])
+                if idx not in cnt.keys() : # PATCH!! Get the first element if there are position duplicates
+                    cnt[idx] = l
 
     # Check if the variant is reported in ClinVar
+    keyword = "cancer" # If the variant has this keyword. It can be considered pathogenic
     for v in posData :
         aux = v.split("\t")
         # As ANNOVAR changes the position in insertions/deletions, we substract 1 to the start position
@@ -282,21 +350,29 @@ def filterVariants(data, filename) :
             pos = int(aux[1]) - 1
         else :
             pos = int(aux[1])
-        search = "{}\t{}".format(aux[0].replace("chr", ""), pos)
-        found = False
+
+        search = "{}-{}".format(aux[0].replace("chr", ""), pos)
         supData = {"db" : {}, "disease" : "NA", "significance" : "NA", "revStatus" : "NA"}
-        for line in cnt :
-            if not line.startswith("#") :
-                if line.startswith(search) :
-                    supData = getClinVar(line, v)
-                    found = True
-                    break
-        # if not found :
-        #     print("Variant {} not found in {}".format(search, vcf))
+        if search in cnt.keys() :
+            supData = getClinVar(cnt[search], v)
+
+        if supData["disease"].find("cancer") > 0 and aux[7] not in posSubmitters :
+            posSubmitters.append(aux[7])
 
         txt += "{data}\t{dss}\t{sig}\n".format(data = v.strip(), dss = supData["disease"], sig = supData["significance"])
 
-    print("{} INFO: ClinVar annotated variants stores as {}".format(getTime(), filename))
+    print("INFO: Removed {} submitters".format(len(posSubmitters)))
+    auxList = []
+    # Remove the variants that come from a positive submitter (a submitter with a positive/pathogenic variant)
+    for v in posData :
+        aux = v.split("\t")
+        if aux[7] not in posSubmitters :
+            auxList.append(v)
+
+    print("INFO: Removed {} variants".format(len(posData) - len(auxList)))
+    posData = auxList
+
+    print("{} INFO: ClinVar annotated variants stored as {}".format(getTime(), filename))
     with open(filename, "w") as fi :
         fi.write(txt)
 
@@ -309,8 +385,10 @@ def filterVariants(data, filename) :
 #         posVars
 
 if __name__ == "__main__" :
-    pos_variants, neg_variants = getData()
-    # with open("posVariants.tsv", "r") as fi :
-    #     pos_variants = fi.read()
-    filterVariants(pos_variants, "posVariants.annotated.tsv")
-    filterVariants(neg_variants, "negVariants.annotated.tsv")
+    # pos_variants, neg_variants = getData()
+    with open("posVariants.tsv", "r") as fi :
+        pos_variants = fi.read()
+    with open("negVariants.tsv", "r") as fi :
+        neg_variants = fi.read()
+    filterVariants(pos_variants, "posVariants.annotated")
+    filterVariants(neg_variants, "negVariants.annotated")
