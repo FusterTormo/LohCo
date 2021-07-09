@@ -111,98 +111,100 @@ def getData() :
         if cases.index(c) % 100 == 0 :
             print("{} INFO: {} cases executed".format(getTime(), cases.index(c)))
 
-        with dbcon :
-            cur = dbcon.cursor()
-            q = cur.execute("SELECT uuid, bamName FROM sample WHERE submitter='{}' AND tumor LIKE '%Tumor%'".format(c[0]))
-            tumors = q.fetchall()
-            q = cur.execute("SELECT uuid, bamName FROM sample WHERE submitter='{}' AND tumor LIKE '%Normal%'".format(c[0]))
-            controls = q.fetchall()
+        if c[0] not in done : # Don't do the analysis more than once in the same submitter
+            # Get the tumor and control samples from the submitter    
+            with dbcon :
+                cur = dbcon.cursor()
+                q = cur.execute("SELECT uuid, bamName FROM sample WHERE submitter='{}' AND tumor LIKE '%Tumor%'".format(c[0]))
+                tumors = q.fetchall()
+                q = cur.execute("SELECT uuid, bamName FROM sample WHERE submitter='{}' AND tumor LIKE '%Normal%'".format(c[0]))
+                controls = q.fetchall()
 
-        for tm in tumors :
-            if c[0] in done : # Don't do the analysis more than once in the same submitter
-                break
-            for cn in controls :
-                pairs += 1
-                loh = [] # Store the LOH reported by the tools
-                prefix = "{}_VS_{}".format(tm[0].split("-")[0], cn[0].split("-")[0])
-                # Get FACETS output file
-                folder = "{wd}/{sub}/{pre}_FACETS".format(wd = wd, sub = c[0], pre = prefix)
-                file = "{fld}/facets_comp_cncf.tsv".format(fld = folder)
-                if os.path.isfile(file) :
-                    # Check LOH in the gene, add the output to a list
-                    aux = lib.getLOH(file, "facets", gene)
-                    loh.append(aux)
-                # Get Sequenza output file
-                folder = "{wd}/{sub}/{pre}_Sequenza".format(wd = wd, sub = c[0], pre = prefix)
-                file = "{fld}/{case}_segments.txt".format(fld = folder, case = c[0])
-                if os.path.isfile(file) :
-                    # Check LOH in the gene, add th output to a list
-                    aux = lib.getLOH(file, "sequenza", gene)
-                    loh.append(aux)
-                # Get PURPLE output file
-                folder = "{wd}/{sub}/{pre}_PURPLE".format(wd = wd, sub = c[0], pre = prefix)
-                file = "{fld}/TUMOR.purple.cnv.somatic.tsv".format(fld = folder)
-                if os.path.isfile(file) :
-                    aux = lib.getLOH(file, "purple", gene)
-                    loh.append(aux)
-                # Get ASCAT2 output file
-                folder = "{wd}/{sub}/ASCAT2".format(wd = wd, sub = c[0])
-                if os.path.isdir(folder) :
-                    # Check LOH in the gene, add the output to a list
-                    aux = asc.checkAscat(folder, gene)
-                    loh.append(aux)
-                if len(loh) >= 3 :
-                    done.append(c[0])
-                # Count the number of LOH found in the patient
-                lohs = loh.count("L") + loh.count("D") # Copy number neutral +`copy number lose`
-                if lohs >= 2 :
-                    positive.append(c[0])
-                    # Get the gene variants
-                    germCall = "{wd}/{sub}/{uuid}/{suffix}".format(wd = wd, sub = c[0], uuid = cn[0], suffix = varCallSuffix)
-                    cmd = "grep {gene} {vc}".format(vc = germCall, gene = genename)
-                    pr = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                    std, err = pr.communicate()
-                    out = std.decode().strip().split("\n")
-                    for o in out :
-                        aux = o.split("\t")
-                        if len(aux) > 1 :
-                            # Create a histogram that counts the frequency of each position
-                            pos = int(aux[1])
-                            if pos in variants.keys()  :
-                                variants[pos] += 1
-                            else :
-                                variants[pos] = 1
-                            # In case we prefer to collect the full variant...
-                            # key = "{}-{}-{}".format(pos, ref, alt)
-                            # if key in variants.keys() :
-                            #     variants[key] += 1
-                            # else :
-                            #     variants[key] = 1
-                            # Store the variant information in a variable
-                            # Do not add intergenic, downstream, upstream variants
-                            if aux[5] in ["intronic", "exonic", "splicing", "UTR3", "UTR5"] :
-                                data += "{chr}\t{st}\t{end}\t{ref}\t{alt}\t{ex}\t{typex}\t{sub}\t{idtm}\t{idcn}\n".format(chr = aux[0], st = aux[1], end = aux[2], ref = aux[3], alt = aux[4], ex = aux[5], typex = aux[8], sub = c[0], idtm = tm[0], idcn = cn[0])
-                else :
-                    negative.append(c[0])
-                    germCall = "{wd}/{sub}/{uuid}/{suffix}".format(wd = wd, sub = c[0], uuid = cn[0], suffix = varCallSuffix)
-                    cmd = "grep {gene} {vc}".format(vc = germCall, gene = genename)
-                    pr = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                    std, err = pr.communicate()
-                    out = std.decode().strip().split("\n")
-                    for o in out :
-                        aux = o.split("\t")
-                        if len(aux) > 1 :
-                            # Create a histogram that counts the frequency of each position
-                            pos = int(aux[1])
-                            ref = aux[2]
-                            alt = aux[3]
-                            if pos in negVars.keys()  :
-                                negVars[pos] += 1
-                            else :
-                                negVars[pos] = 1
-                            # Do not add intergenic, downstream, upstream variants
-                            if aux[5] in ["intronic", "exonic", "splicing", "UTR3", "UTR5"] :
-                                negData += "{chr}\t{st}\t{end}\t{ref}\t{alt}\t{ex}\t{typex}\t{sub}\t{idtm}\t{idcn}\n".format(chr = aux[0], st = aux[1], end = aux[2], ref = aux[3], alt = aux[4], ex = aux[5], typex = aux[8], sub = c[0], idtm = tm[0], idcn = cn[0])
+            for tm in tumors :
+                for cn in controls :
+                    pairs += 1
+                    loh = [] # Store the LOH reported by the tools
+                    prefix = "{}_VS_{}".format(tm[0].split("-")[0], cn[0].split("-")[0])
+                    # Get FACETS output file
+                    folder = "{wd}/{sub}/{pre}_FACETS".format(wd = wd, sub = c[0], pre = prefix)
+                    file = "{fld}/facets_comp_cncf.tsv".format(fld = folder)
+                    if os.path.isfile(file) :
+                        # Check LOH in the gene, add the output to a list
+                        aux = lib.getLOH(file, "facets", gene)
+                        loh.append(aux)
+                    # Get Sequenza output file
+                    folder = "{wd}/{sub}/{pre}_Sequenza".format(wd = wd, sub = c[0], pre = prefix)
+                    file = "{fld}/{case}_segments.txt".format(fld = folder, case = c[0])
+                    if os.path.isfile(file) :
+                        # Check LOH in the gene, add th output to a list
+                        aux = lib.getLOH(file, "sequenza", gene)
+                        loh.append(aux)
+                    # Get PURPLE output file
+                    folder = "{wd}/{sub}/{pre}_PURPLE".format(wd = wd, sub = c[0], pre = prefix)
+                    file = "{fld}/TUMOR.purple.cnv.somatic.tsv".format(fld = folder)
+                    if os.path.isfile(file) :
+                        aux = lib.getLOH(file, "purple", gene)
+                        loh.append(aux)
+                    # Get ASCAT2 output file
+                    folder = "{wd}/{sub}/ASCAT2".format(wd = wd, sub = c[0])
+                    if os.path.isdir(folder) :
+                        # Check LOH in the gene, add the output to a list
+                        aux = asc.checkAscat(folder, gene)
+                        loh.append(aux)
+                    if len(loh) >= 3 :
+                        done.append(c[0])
+                    # Count the number of LOH found in the patient
+                    lohs = loh.count("L") + loh.count("D") # Copy number neutral +`copy number lose`
+                    if lohs >= 2 :
+                        positive.append(c[0])
+                        # Get the gene variants
+                        germCall = "{wd}/{sub}/{uuid}/{suffix}".format(wd = wd, sub = c[0], uuid = cn[0], suffix = varCallSuffix)
+                        cmd = "grep {gene} {vc}".format(vc = germCall, gene = genename)
+                        pr = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                        std, err = pr.communicate()
+                        out = std.decode().strip().split("\n")
+                        for o in out :
+                            aux = o.split("\t")
+                            if len(aux) > 1 :
+                                # Create a histogram that counts the frequency of each position
+                                pos = int(aux[1])
+                                if pos in variants.keys()  :
+                                    variants[pos] += 1
+                                else :
+                                    variants[pos] = 1
+                                # In case we prefer to collect the full variant...
+                                # key = "{}-{}-{}".format(pos, ref, alt)
+                                # if key in variants.keys() :
+                                #     variants[key] += 1
+                                # else :
+                                #     variants[key] = 1
+                                # Store the variant information in a variable
+                                # Do not add intergenic, downstream, upstream variants
+                                if aux[5] in ["intronic", "exonic", "splicing", "UTR3", "UTR5"] :
+                                    data += "{chr}\t{st}\t{end}\t{ref}\t{alt}\t{ex}\t{typex}\t{loh}\t{sub}\t{idtm}\t{idcn}\n".format(
+                                        chr = aux[0], st = aux[1], end = aux[2], ref = aux[3], alt = aux[4], ex = aux[5], typex = aux[8], sub = c[0], idtm = tm[0], idcn = cn[0], loh = lohs)
+                    else :
+                        negative.append(c[0])
+                        germCall = "{wd}/{sub}/{uuid}/{suffix}".format(wd = wd, sub = c[0], uuid = cn[0], suffix = varCallSuffix)
+                        cmd = "grep {gene} {vc}".format(vc = germCall, gene = genename)
+                        pr = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                        std, err = pr.communicate()
+                        out = std.decode().strip().split("\n")
+                        for o in out :
+                            aux = o.split("\t")
+                            if len(aux) > 1 :
+                                # Create a histogram that counts the frequency of each position
+                                pos = int(aux[1])
+                                ref = aux[2]
+                                alt = aux[3]
+                                if pos in negVars.keys()  :
+                                    negVars[pos] += 1
+                                else :
+                                    negVars[pos] = 1
+                                # Do not add intergenic, downstream, upstream variants
+                                if aux[5] in ["intronic", "exonic", "splicing", "UTR3", "UTR5"] :
+                                    negData += "{chr}\t{st}\t{end}\t{ref}\t{alt}\t{ex}\t{typex}\t{loh}\t{sub}\t{idtm}\t{idcn}\n".format(
+                                        chr = aux[0], st = aux[1], end = aux[2], ref = aux[3], alt = aux[4], ex = aux[5], typex = aux[8], sub = c[0], idtm = tm[0], idcn = cn[0], loh = lohs)
 
 
     # Check if FACETS/Sequenza/ASCAT2 have reported LOH
@@ -340,7 +342,7 @@ def groupVariants(patho, nega, filename) :
         fi.write("Chr\tStart\tEnd\tRef\tAlt\tType\tExonicType\tInNegative\tInPathogenic\n")
         for k, v in groups.items() :
             fi.write(k.replace(";", "\t"))
-            fi.write("{}\t".format(v["No_pathogenic"]))
+            fi.write("\t{}\t".format(v["No_pathogenic"]))
             fi.write("{}\n".format(v["Pathogenic"]))
 
     print("INFO: Output stored as {}".format(filename))
@@ -410,11 +412,11 @@ def old_filterVariants(data, filename) :
 
 
 if __name__ == "__main__" :
-    # pos_variants, neg_variants = getData()
-    with open("posVariants.tsv", "r") as fi :
-        pos_variants = fi.read()
-    with open("negVariants.tsv", "r") as fi :
-        neg_variants = fi.read()
+    pos_variants, neg_variants = getData()
+    # with open("posVariants.tsv", "r") as fi :
+    #     pos_variants = fi.read()
+    # with open("negVariants.tsv", "r") as fi :
+    #     neg_variants = fi.read()
     patho, nega = filterVariants(pos_variants, "posVariants.annotated")
     groupVariants(patho, nega, "posVariants.grouped.tsv")
     patho, nega = filterVariants(neg_variants, "negVariants.annotated")
