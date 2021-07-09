@@ -112,7 +112,7 @@ def getData() :
             print("{} INFO: {} cases executed".format(getTime(), cases.index(c)))
 
         if c[0] not in done : # Don't do the analysis more than once in the same submitter
-            # Get the tumor and control samples from the submitter    
+            # Get the tumor and control samples from the submitter
             with dbcon :
                 cur = dbcon.cursor()
                 q = cur.execute("SELECT uuid, bamName FROM sample WHERE submitter='{}' AND tumor LIKE '%Tumor%'".format(c[0]))
@@ -277,8 +277,8 @@ def filterVariants(data, filename) :
         v = d.split("\t")
         if len(v) > 8 :
             # Check if the variant type is considered positive
-            if v[6] in cte.var_positive :
-                posSubmitters.append(v[7])
+            if v[6] in cte.var_positive or v[5] in cte.var_positive:
+                posSubmitters.append(v[8])
 
             # As ANNOVAR changes the position in insertions/deletions, we substract 1 to the start position
             if v[4] == "-" :
@@ -292,8 +292,8 @@ def filterVariants(data, filename) :
                 supData = getClinVar(cnt[search], d)
 
             # Check if the variant is associated with cancer
-            if supData["disease"].find("cancer") > 0 and v[7] not in posSubmitters :
-                posSubmitters.append(v[7])
+            if supData["disease"].find("cancer") > 0 and v[8] not in posSubmitters :
+                posSubmitters.append(v[8])
 
             # Check if the submitter is considered a positive case
             v.append(supData["disease"])
@@ -301,7 +301,7 @@ def filterVariants(data, filename) :
             tmplist.append(v)
 
     for v in tmplist :
-        if v[7] in posSubmitters :
+        if v[8] in posSubmitters :
             ispos.append(v)
         else :
             nopos.append(v)
@@ -346,70 +346,6 @@ def groupVariants(patho, nega, filename) :
             fi.write("{}\n".format(v["Pathogenic"]))
 
     print("INFO: Output stored as {}".format(filename))
-
-
-def old_filterVariants(data, filename) :
-    # Post-production. Check the positive variants and remove the submitters with a pathogenic variant
-    posSubmitters = [] # Submitters with a pathogenic variant found
-    posData = []
-    txt = ""
-    for d in data.split("\n") :
-        v = d.split("\t")
-        if len(v) > 8 :
-            if v[7] not in posSubmitters : #Only check variants that are not in submitters with pathogenic variant
-                if v[6] in cte.var_positive :
-                    posSubmitters.append(v[7])
-                else :
-                    posData.append(d)
-
-    print("INFO: Removed {} submitters with a pathogenic variant".format(len(posSubmitters)))
-    print("INFO: Removed {} variants".format(len(data.split("\n")) - len(posData)))
-
-    vcf = "clinvar.vcf"
-    cnt = {}
-    with open(vcf, "r") as fi :
-        for l in fi :
-            if not l.startswith("#") :
-                aux = l.strip().split("\t")
-                idx = "{}-{}".format(aux[0], aux[1])
-                if idx not in cnt.keys() : # PATCH!! Get the first element if there are position duplicates
-                    cnt[idx] = l
-
-    # Check if the variant is reported in ClinVar
-    keyword = "cancer" # If the variant has this keyword. It can be considered pathogenic
-    for v in posData :
-        aux = v.split("\t")
-        # As ANNOVAR changes the position in insertions/deletions, we substract 1 to the start position
-        if aux[4] == "-" :
-            pos = int(aux[1]) - 1
-        else :
-            pos = int(aux[1])
-
-        search = "{}-{}".format(aux[0].replace("chr", ""), pos)
-        supData = {"db" : {}, "disease" : "NA", "significance" : "NA", "revStatus" : "NA"}
-        if search in cnt.keys() :
-            supData = getClinVar(cnt[search], v)
-
-        if supData["disease"].find("cancer") > 0 and aux[7] not in posSubmitters :
-            posSubmitters.append(aux[7])
-
-        txt += "{data}\t{dss}\t{sig}\n".format(data = v.strip(), dss = supData["disease"], sig = supData["significance"])
-
-    print("INFO: Removed {} submitters".format(len(posSubmitters)))
-    auxList = []
-    # Remove the variants that come from a positive submitter (a submitter with a positive/pathogenic variant)
-    for v in posData :
-        aux = v.split("\t")
-        if aux[7] not in posSubmitters :
-            auxList.append(v)
-
-    print("INFO: Removed {} variants".format(len(posData) - len(auxList)))
-    posData = auxList
-
-    print("{} INFO: ClinVar annotated variants stored as {}".format(getTime(), filename))
-    with open(filename, "w") as fi :
-        fi.write(txt)
-
 
 if __name__ == "__main__" :
     pos_variants, neg_variants = getData()
