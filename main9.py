@@ -348,12 +348,13 @@ def groupVariants(patho, nega, filename) :
     print("INFO: Output stored as {}".format(filename))
 
 if __name__ == "__main__" :
-    pos_variants, neg_variants = getData()
-    # with open("posVariants.tsv", "r") as fi :
-    #     pos_variants = fi.read()
-    # with open("negVariants.tsv", "r") as fi :
-    #     neg_variants = fi.read()
-    patho, nega = filterVariants(pos_variants, "posVariants.annotated")
-    groupVariants(patho, nega, "posVariants.grouped.tsv")
-    patho, nega = filterVariants(neg_variants, "negVariants.annotated")
-    groupVariants(patho, nega, "negVariants.grouped.tsv")
+    #pos_variants, neg_variants = getData()
+    with open("posVariants.tsv", "r") as fi :
+        pos_variants = fi.read()
+    with open("negVariants.tsv", "r") as fi :
+        neg_variants = fi.read()
+    # patho, nega = filterVariants(pos_variants, "posVariants.annotated")
+    # groupVariants(patho, nega, "posVariants.grouped.tsv")
+    # patho, nega = filterVariants(neg_variants, "negVariants.annotated")
+    # groupVariants(patho, nega, "negVariants.grouped.tsv")
+    groupVariants(pos_variants, neg_variants, "allVariants.grouped.tsv")
