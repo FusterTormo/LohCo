@@ -21,8 +21,8 @@ def main() :
     gene = input("Get the variants from which gene? ")
     platy = {"posT" : 0, "posC" : 0, "negT" : 0, "negC" : 0} # Variant classification in Platypus reported variants
     elka = {"posT" : 0, "posC" : 0, "negT" : 0, "negC" : 0}
-    pall = 0 # Total variants detected by Platypus
-    sall = 0 # Total variants detected by Strelka2
+    pall = {"Tumor" : 0, "Control" : 0} # Total variants detected by Platypus
+    sall = {"Tumor" : 0, "Control" : 0}  # Total variants detected by Strelka2
     tumors = 0 # Bam files corresponding to tumor samples
     controls = 0 # Bam files corresponding to control samples
     sample = ""
@@ -55,7 +55,7 @@ def main() :
             std, err = pr.communicate()
             out = std.decode().strip().split("\n")
             for o in out :
-                pall += 1
+                pall[sample] += 1
                 aux = o.split("\t")
                 if len(aux) > 1 :
                     if aux[5].find("splicing") > 0 :
@@ -83,7 +83,7 @@ def main() :
             std, err = pr.communicate()
             out = std.decode().strip().split("\n")
             for o in out :
-                sall += 1
+                sall[sample] += 1
                 aux = o.split("\t")
                 if len(aux) > 1 :
                     if aux[5].find("splicing") > 0 :
