@@ -26,8 +26,8 @@ dbcon = sqlite3.connect("/g/strcombio/fsupek_cancer2/TCGA_bam/info/info.db")
 wd = "/g/strcombio/{cancer_path}/TCGA_bam/{c}".format(c = cancer, cancer_path = cFolder)
 
 # In the case we want to do it more automatically
-gene = brca1
-genename = "BRCA1"
+gene = brca2
+genename = "BRCA2"
 varCallSuffix = "platypusGerm/platypus.hg38_multianno.txt"
 #varCallSuffix = "strelkaGerm/results/variants/strelka.hg38_multianno.txt"
 
