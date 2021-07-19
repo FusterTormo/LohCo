@@ -353,8 +353,16 @@ if __name__ == "__main__" :
         pos_variants = fi.read()
     with open("negVariants.tsv", "r") as fi :
         neg_variants = fi.read()
-    # patho, nega = filterVariants(pos_variants, "posVariants.annotated")
+    patho, nega = filterVariants(pos_variants, "posVariants.annotated")
     # groupVariants(patho, nega, "posVariants.grouped.tsv")
     # patho, nega = filterVariants(neg_variants, "negVariants.annotated")
     # groupVariants(patho, nega, "negVariants.grouped.tsv")
+    aux = []
+    for d in pos_variants.split("\n") :
+        aux.append(d.split("\t"))
+    pos_variants = aux
+    aux = []
+    for d in neg_variants.split("\n") :
+        aux.append(d.split("\t"))
+    neg_variants = aux
     groupVariants(pos_variants, neg_variants, "allVariants.grouped.tsv")

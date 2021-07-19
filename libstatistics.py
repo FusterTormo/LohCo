@@ -96,9 +96,9 @@ def basesXtool(regs1, regs2 = None) :
 def meanCoverage(regs) :
     """Calculate the mean coverage from a REGION passed as parameter
 
-    To do that, it calculates the number of bases by the addition of all chromsome length. Then it calculates the total copy number from all the regions given (regions with no copy number
-    reported will assume a 2 in tcn). Finally it divides the total copy number obtained by the genome length. Additionally it calculates the percentage of each aberration reported.
-    All data is returned in a dict (keys: "meanCN", "perA", "perD", "perL", "perN")
+    To do that, it calculates the number of bases divided by the addition of all chromsome length. Then it calculates the total copy number from all the regions given
+    (regions with no copy number reported will assume a 2 in tcn). Finally it divides the total copy number obtained by the genome length. Additionally it calculates the percentage
+    of each aberration reported. All data is returned in a dict (keys: "meanCN", "perA", "perD", "perL", "perN")
     """
     allbases = sum(cts.lenChromosomes.values())
     totalCN = 0
