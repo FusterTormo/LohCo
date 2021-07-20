@@ -26,8 +26,8 @@ dbcon = sqlite3.connect("/g/strcombio/fsupek_cancer2/TCGA_bam/info/info.db")
 wd = "/g/strcombio/{cancer_path}/TCGA_bam/{c}".format(c = cancer, cancer_path = cFolder)
 
 # In the case we want to do it more automatically
-gene = brca2
-genename = "BRCA2"
+gene = brca1
+genename = "BRCA1"
 varCallSuffix = "platypusGerm/platypus.hg38_multianno.txt"
 #varCallSuffix = "strelkaGerm/results/variants/strelka.hg38_multianno.txt"
 
@@ -348,21 +348,22 @@ def groupVariants(patho, nega, filename) :
     print("INFO: Output stored as {}".format(filename))
 
 if __name__ == "__main__" :
-    #pos_variants, neg_variants = getData()
-    with open("posVariants.tsv", "r") as fi :
-        pos_variants = fi.read()
-    with open("negVariants.tsv", "r") as fi :
-        neg_variants = fi.read()
+    print("INFO: Getting the variants in {} gene written in each {} file".format(genename, varCallSuffix))
+    pos_variants, neg_variants = getData()
+    # with open("posVariants.tsv", "r") as fi :
+    #     pos_variants = fi.read()
+    # with open("negVariants.tsv", "r") as fi :
+    #     neg_variants = fi.read()
     patho, nega = filterVariants(pos_variants, "posVariants.annotated")
-    # groupVariants(patho, nega, "posVariants.grouped.tsv")
-    # patho, nega = filterVariants(neg_variants, "negVariants.annotated")
-    # groupVariants(patho, nega, "negVariants.grouped.tsv")
-    aux = []
-    for d in pos_variants.split("\n") :
-        aux.append(d.split("\t"))
-    pos_variants = aux
-    aux = []
-    for d in neg_variants.split("\n") :
-        aux.append(d.split("\t"))
-    neg_variants = aux
+    groupVariants(patho, nega, "posVariants.grouped.tsv")
+    patho, nega = filterVariants(neg_variants, "negVariants.annotated")
+    groupVariants(patho, nega, "negVariants.grouped.tsv")
+    # aux = []
+    # for d in pos_variants.split("\n") :
+    #     aux.append(d.split("\t"))
+    # pos_variants = aux
+    # aux = []
+    # for d in neg_variants.split("\n") :
+    #     aux.append(d.split("\t"))
+    # neg_variants = aux
     groupVariants(pos_variants, neg_variants, "allVariants.grouped.tsv")
