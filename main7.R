@@ -79,52 +79,52 @@ dev.off()
 # Aberration percentage reported by each tool
 colors <- hue_pal()(4)
 tmp.nas <- full[full$asc_aberration != "NA;NA;NA;NA",]$asc_aberration
-tmp <- strsplit(tmp.nas, ";")
+tmp <- strsplit(as.character(tmp.nas), ";")
 mt <- matrix(as.numeric(unlist(tmp)), ncol = 4, byrow = TRUE)
 ascat <- rbind(data.frame(AB = "Amplification", percent = mt[,1]), 
                data.frame(AB = "LOH", percent = mt[,2]),
                data.frame(AB = "Deletion", percent = mt[,3]),
                data.frame(AB = "Wild-type", percent = mt[,4]))
-ggplot(ascat, aes(AB, percent, fill = AB)) + geom_violin() + theme_minimal() + theme(legend.position = "none") + xlab("Aberration") + ylab("Aberration percet per sample")
+ggplot(ascat, aes(AB, percent, fill = AB)) + geom_violin() + theme_minimal() + theme(legend.position = "none") + ggtitle("ASCAT2") + xlab("Aberration") + ylab("Aberration percent per sample")
 ggsave("ascat2Aberrations.png")
 
 tmp.nas <- full[full$fac_aberration != "NA;NA;NA;NA",]$fac_aberration
-tmp <- strsplit(tmp.nas, ";")
+tmp <- strsplit(as.character(tmp.nas), ";")
 mt <- matrix(as.numeric(unlist(tmp)), ncol = 4, byrow = TRUE)
 facets <- rbind(data.frame(AB = "Amplification", percent = mt[,1]), 
                data.frame(AB = "LOH", percent = mt[,2]),
                data.frame(AB = "Deletion", percent = mt[,3]),
                data.frame(AB = "Wild-type", percent = mt[,4]))
-ggplot(facets, aes(AB, percent, fill = AB)) + geom_violin() + theme_minimal() + theme(legend.position = "none") + xlab("Aberration") + ylab("Aberration percet per sample")
+ggplot(facets, aes(AB, percent, fill = AB)) + geom_violin() + theme_minimal() + theme(legend.position = "none") + ggtitle("FACETS") + xlab("Aberration") + ylab("Aberration percet per sample")
 ggsave("facetsAberrations.png")
 
 tmp.nas <- full[full$seq_aberration != "NA;NA;NA;NA",]$seq_aberration
-tmp <- strsplit(tmp.nas, ";")
+tmp <- strsplit(as.character(tmp.nas), ";")
 mt <- matrix(as.numeric(unlist(tmp)), ncol = 4, byrow = TRUE)
 sequenza <- rbind(data.frame(AB = "Amplification", percent = mt[,1]), 
                data.frame(AB = "LOH", percent = mt[,2]),
                data.frame(AB = "Deletion", percent = mt[,3]),
                data.frame(AB = "Wild-type", percent = mt[,4]))
-ggplot(sequenza, aes(AB, percent, fill = AB)) + geom_violin() + theme_minimal() + theme(legend.position = "none") + xlab("Aberration") + ylab("Aberration percet per sample")
+ggplot(sequenza, aes(AB, percent, fill = AB)) + geom_violin() + theme_minimal() + theme(legend.position = "none") + ggtitle("Sequenza") + xlab("Aberration") + ylab("Aberration percet per sample")
 ggsave("sequenzaAberrations.png")
 
 tmp.nas <- full[full$pur_aberration != "NA;NA;NA;NA",]$pur_aberration
-tmp <- strsplit(tmp.nas, ";")
+tmp <- strsplit(as.character(tmp.nas), ";")
 mt <- matrix(as.numeric(unlist(tmp)), ncol = 4, byrow = TRUE)
 purple <- rbind(data.frame(AB = "Amplification", percent = mt[,1]), 
                data.frame(AB = "LOH", percent = mt[,2]),
                data.frame(AB = "Deletion", percent = mt[,3]),
                data.frame(AB = "Wild-type", percent = mt[,4]))
-ggplot(purple, aes(AB, percent, fill = AB)) + geom_violin() + theme_minimal() + theme(legend.position = "none") + xlab("Aberration") + ylab("Aberration percet per sample")
+ggplot(purple, aes(AB, percent, fill = AB)) + geom_violin() + theme_minimal() + theme(legend.position = "none") + ggtitle("PURPLE") + xlab("Aberration") + ylab("Aberration percet per sample")
 ggsave("purpleAberrations.png")
 
 tmp.nas <- full[full$ngs_aberration != "NA;NA;NA;NA",]$ngs_aberration
-tmp <- strsplit(tmp.nas, ";")
+tmp <- strsplit(as.character(tmp.nas), ";")
 mt <- matrix(as.numeric(unlist(tmp)), ncol = 4, byrow = TRUE)
 ascatngs <- rbind(data.frame(AB = "Amplification", percent = mt[,1]), 
                data.frame(AB = "LOH", percent = mt[,2]),
                data.frame(AB = "Deletion", percent = mt[,3]),
                data.frame(AB = "Wild-type", percent = mt[,4]))
-ggplot(ascatngs, aes(AB, percent, fill = AB)) + geom_violin() + theme_minimal() + theme(legend.position = "none") + xlab("Aberration") + ylab("Aberration percet per sample")
+ggplot(ascatngs, aes(AB, percent, fill = AB)) + geom_violin() + theme_minimal() + theme(legend.position = "none") + ggtitle("ascatNGS") + xlab("Aberration") + ylab("Aberration percet per sample")
 ggsave("ascatngsAberrations.png")
 
