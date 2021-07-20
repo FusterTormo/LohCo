@@ -23,6 +23,24 @@ ggsave("puritySvN.png")
 ggplot(purity, aes(PURPLE, ascatNGS)) + geom_point() + geom_smooth(method = "lm") + ggtitle("Purity correlation") + theme_minimal()
 ggsave("purityPvN.png")
 
+# Mean CN vs ploidy correlation
+auxPl <- data.frame(ploidy = full$fac_ploidy, meancn = full$fac_meanCN)
+fac <- auxPl[!is.na(auxPl$ploidy) & !is.na(auxPl$meancn),]
+ggplot(fac, aes(ploidy, meancn)) + geom_point() + geom_smooth(method = "lm") + theme_minimal() + ggtitle("FACETS ploidy vs mean CN") + xlab("Ploidy") + ylab("Mean CN")
+ggsave("FACETSploVScn.png")
+auxPl <- data.frame(ploidy = full$seq_ploidy, meancn = full$seq_meanCN)
+seq <- auxPl[!is.na(auxPl$ploidy) & !is.na(auxPl$meancn),]
+ggplot(seq, aes(ploidy, meancn)) + geom_point() + geom_smooth(method = "lm") + theme_minimal() + ggtitle("Sequenza ploidy vs mean CN") + xlab("Ploidy") + ylab("Mean CN")
+ggsave("SEQUENZAploVScn.png")
+auxPl <- data.frame(ploidy = full$ngs_ploidy, meancn = full$ngs_meanCN)
+ngs <- auxPl[!is.na(auxPl$ploidy) & !is.na(auxPl$meancn),]
+ggplot(ngs, aes(ploidy, meancn)) + geom_point() + geom_smooth(method = "lm") + theme_minimal() + ggtitle("ascatNGS ploidy vs mean CN") + xlab("Ploidy") + ylab("Mean CN")
+ggsave("ASCATNGSploVScn.png")
+auxPl <- data.frame(ploidy = full$pur_ploidy, meancn = full$pur_meanCN)
+pur <- auxPl[!is.na(auxPl$ploidy) & !is.na(auxPl$meancn),]
+ggplot(pur, aes(ploidy, meancn)) + geom_point() + geom_smooth(method = "lm") + theme_minimal() + ggtitle("PURPLE ploidy vs mean CN") + xlab("Ploidy") + ylab("Mean CN")
+ggsave("PURPLEploVScn.png")
+
 # Mean CN correlation
 auxCn <- data.frame(ASCAT2 = full$asc_meanCN, FACETS = full$fac_meanCN, Sequenza = full$seq_meanCN, PURPLE = full$pur_meanCN, ascatNGS = full$ngs_meanCN)
 cn <- auxCn[!is.na(auxCn$ASCAT2) & !is.na(auxCn$FACETS) & !is.na(auxCn$Sequenza) & !is.na(auxCn$PURPLE) & !is.na(auxCn$ascatNGS),]
