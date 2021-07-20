@@ -251,7 +251,7 @@ def getData() :
     std, err = pr.communicate()
     print(std.decode())
     if pr.returncode != 0 :
-        print("WARNING: Error found while running R. Description\n".format(err.decode()))
+        print("{} WARNING: Error found while running R. Description\n".format(getTime(), err.decode()))
 
     return data, negData
 
@@ -306,13 +306,13 @@ def filterVariants(data, filename) :
         else :
             nopos.append(v)
 
-    print("INFO: {} submitters removed".format(len(posSubmitters)))
-    print("INFO: {} variants removed. Data saved as {}_pathogenic.tsv".format(len(ispos), filename))
+    print("{} INFO: {} submitters removed".format(getTime(), len(posSubmitters)))
+    print("{} INFO: {} variants removed. Data saved as {}_pathogenic.tsv".format(getTime(), len(ispos), filename))
     with open("{}_pathogenic.tsv".format(filename), "w") as fi :
         for v in ispos :
             fi.write("\t".join(v))
             fi.write("\n")
-    print("INFO: {} variants preserved. Data saved as {}_negative.tsv".format(len(nopos), filename))
+    print("{} INFO: {} variants preserved. Data saved as {}_negative.tsv".format(getTime(), len(nopos), filename))
     with open("{}_negative.tsv".format(filename), "w") as fi :
         for v in nopos :
             fi.write("\t".join(v))
@@ -345,10 +345,10 @@ def groupVariants(patho, nega, filename) :
             fi.write("\t{}\t".format(v["No_pathogenic"]))
             fi.write("{}\n".format(v["Pathogenic"]))
 
-    print("INFO: Output stored as {}".format(filename))
+    print("{} INFO: Output stored as {}".format(getTime(), filename))
 
 if __name__ == "__main__" :
-    print("INFO: Getting the variants in {} gene written in each {} file".format(genename, varCallSuffix))
+    print("{} INFO: Getting the variants in {} gene written in each {} file".format(getTime(), genename, varCallSuffix))
     pos_variants, neg_variants = getData()
     # with open("posVariants.tsv", "r") as fi :
     #     pos_variants = fi.read()
@@ -358,12 +358,12 @@ if __name__ == "__main__" :
     groupVariants(patho, nega, "posVariants.grouped.tsv")
     patho, nega = filterVariants(neg_variants, "negVariants.annotated")
     groupVariants(patho, nega, "negVariants.grouped.tsv")
-    # aux = []
-    # for d in pos_variants.split("\n") :
-    #     aux.append(d.split("\t"))
-    # pos_variants = aux
-    # aux = []
-    # for d in neg_variants.split("\n") :
-    #     aux.append(d.split("\t"))
-    # neg_variants = aux
+    aux = []
+    for d in pos_variants.split("\n") :
+        aux.append(d.split("\t"))
+    pos_variants = aux
+    aux = []
+    for d in neg_variants.split("\n") :
+        aux.append(d.split("\t"))
+    neg_variants = aux
     groupVariants(pos_variants, neg_variants, "allVariants.grouped.tsv")
