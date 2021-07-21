@@ -11,13 +11,13 @@ import libconstants as ct
 import libgetters as lg
 
 print("INFO: Loading example from FACETS")
-f = lc.convert2region("/g/strcombio/fsupek_cancer2/TCGA_bam/OV/TCGA-04-1331/c21ab280_VS_82704a7d_FACETS/facets_comp_cncf.tsv", "facets")
+f = lc.convert2region("/g/strcombio/fsupek_cancer2/TCGA_bam/OV/TCGA-13-0757/1f1f7441_VS_26fa0e90_FACETS/facets_comp_cncf.tsv", "facets")
 print("INFO: Loading example from ascatNGS")
-a = lc.convert2region("/g/strcombio/fsupek_cancer2/TCGA_bam/OV/TCGA-04-1331/c21ab280_VS_82704a7d_ASCAT/TCGA-04-1331-01A-01W.copynumber.caveman.csv", "ascatngs")
+a = lc.convert2region("/g/strcombio/fsupek_cancer2/TCGA_bam/OV/TCGA-13-0757/1f1f7441_VS_26fa0e90_ASCAT/TCGA-04-1331-01A-01W.copynumber.caveman.csv", "ascatngs")
 print("INFO: Loading example from Sequenza")
-s = lc.convert2region("/g/strcombio/fsupek_cancer2/TCGA_bam/OV/TCGA-04-1331/c21ab280_VS_82704a7d_Sequenza/TCGA-04-1331_segments.txt", "sequenza")
+s = lc.convert2region("/g/strcombio/fsupek_cancer2/TCGA_bam/OV/TCGA-13-0757/1f1f7441_VS_26fa0e90_Sequenza/TCGA-04-1331_segments.txt", "sequenza")
 print("INFO: Loading example from PURPLE")
-p = lc.convert2region("/g/strcombio/fsupek_cancer2/TCGA_bam/OV/TCGA-04-1331/c21ab280_VS_82704a7d_PURPLE/TUMOR.purple.cnv.somatic.tsv", "purple")
+p = lc.convert2region("/g/strcombio/fsupek_cancer2/TCGA_bam/OV/TCGA-13-0757/1f1f7441_VS_26fa0e90_PURPLE/TUMOR.purple.cnv.somatic.tsv", "purple")
 allbases = []
 it = 0
 current = 0
