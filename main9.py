@@ -360,10 +360,12 @@ if __name__ == "__main__" :
     groupVariants(patho, nega, "negVariants.grouped.tsv")
     aux = []
     for d in pos_variants.split("\n") :
-        aux.append(d.split("\t"))
+        if d != "" :
+            aux.append(d.split("\t"))
     pos_variants = aux
     aux = []
     for d in neg_variants.split("\n") :
-        aux.append(d.split("\t"))
+        if d != "" :
+            aux.append(d.split("\t"))
     neg_variants = aux
     groupVariants(pos_variants, neg_variants, "allVariants.grouped.tsv")
