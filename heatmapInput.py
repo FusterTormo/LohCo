@@ -25,7 +25,9 @@ def getJCC(sub, fil) :
         aux = l.split("\t")
         try :
             if l != "" :
-                dat = round(float(aux[col]), 4)
+                aux = round(float(aux[col]), 4)
+                if aux > dat :
+                    dat = aux
         except ValueError :
             pass
 
