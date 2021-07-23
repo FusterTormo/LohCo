@@ -79,7 +79,7 @@ ggsave("plSvP.png")
 ggplot(ploidy, aes(Sequenza, ascatNGS)) + geom_point() + geom_smooth(method = "lm") + ggtitle("Ploidy") + theme_minimal()
 ggsave("plSvN.png")
 ggplot(ploidy, aes(PURPLE, ascatNGS)) + geom_point() + geom_smooth(method = "lm") + ggtitle("Ploidy") + theme_minimal()
-ggsave("plPvS.png")
+ggsave("plPvN.png")
 
 # Copy number reported. Notice that data for boxplot comes from the no NAs data
 png("allCN.png", width = 720, height = 554)
