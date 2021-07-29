@@ -64,42 +64,64 @@ def getMaxMaf(ls) :
 
     return maf
 
-def getVaf(info, vc) :
-    """Extract the variant allele frequency from the INFO column passed as parameter
+def getPlatypusVaf(info) :
+    """Extract the variant allele frequency from the INFO column passed as parameter. This function is called when the variant caller used is Platypus
 
     Parameters
     ----------
         info : str
             Column, from the vcf, where VAF (or reads forward/reverse) are stored
-        vc : str
-            Variant caller. This is used to know which schema must follow the info file
 
     Returns
     -------
         float
-            VAF Calulated by dividing the number of alterated reads by the total of reads (in percentage)
+            VAF Calulated by dividing the number of alterated reads by the total of reads (as percentage)
     """
     num = -1
     den = -1
     vaf = -1
-    if vc == "platypus" :
-        for tmp in info.split(";") :
-            key, val = tmp.split("=")
-            if key == "TR" :
-                try :
-                    num = float(val)
-                except ValueError : # To fix multivariant sites. Get one of the multivariant
-                    aux = val.split(",")[0]
-                    num = float(aux)
-            if key == "TC" :
-                den = float(val)
-        if num >= 0 and den > 0 :
-            vaf = round(100 * num/den,2)
-    else :
-        print("WARNING: Strelka not implemented yet")
-        sys.exit()
+    for tmp in info.split(";") :
+        key, val = tmp.split("=")
+        if key == "TR" :
+            try :
+                num = float(val)
+            except ValueError : # To fix multivariant sites. Get one of the multivariant
+                aux = val.split(",")[0]
+                num = float(aux)
+        if key == "TC" :
+            den = float(val)
+    if num >= 0 and den > 0 :
+        vaf = round(100 * num/den,2)
 
     return vaf
+
+def getStrelka2Vaf(format, sample) :
+    """Calculate the variant allele frequence (VAF) from the FORMAT/SAMPLE column passed as parameter. This function is called when the variant caller used is Strelka2
+
+    Parameters
+    ----------
+        format : str
+            Values order in sample column. From this data the function extracts where is the AD column
+        sample : str
+            Values to extract the VAF once the function knows where the AD column is
+
+    Returns
+    -------
+        float
+            VAF Calulated by dividing the number of alterated reads by the total of reads (as percentage)
+    """
+    ref = -1
+    alt = -1
+    vaf = -1
+    index = -1
+
+    index = format.split(":").index("AD")
+    tmp = sample.split(":")[index]
+    ref, alt = tmp.split(",")
+    vaf = round(100 * alt/(ref+alt), 2)
+
+    return vaf
+
 
 def getVafMean(cn, tm) :
     """Calculate the mean vaf difference among the tumor and control variants passed as parameter
@@ -171,10 +193,11 @@ def getVariant(path, gene) :
                 maf = getMaxMaf(aux[10:39])
                 if path.endswith("platypus.hg38_multianno.txt") :
                     vc = "platypus"
+                    vaf = getPlatypusVaf(aux[47])
                 elif path.endswith("strelka.hg38_multianno.txt") :
                     vc = "strelka2"
+                    vaf = getStrelka2Vaf(aux[48], aux[49])
 
-                vaf = getVaf(aux[47], vc)
                 var[key] = {"varType1" : varType, "varType2" : varType2, "maf" : maf, "vaf" : vaf, "GT" : aux[-1]}
         except IndexError :
             pass
