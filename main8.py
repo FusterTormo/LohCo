@@ -118,7 +118,7 @@ def getStrelka2Vaf(format, sample) :
     index = format.split(":").index("AD")
     tmp = sample.split(":")[index]
     ref, alt = tmp.split(",")
-    vaf = round(100 * alt/(ref+alt), 2)
+    vaf = round(100 * float(alt)/float(ref+alt), 2)
 
     return vaf
 
