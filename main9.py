@@ -111,8 +111,8 @@ def getData() :
     posHist = {} # Histogram with the positions (key) and the times a variant is reported in that position (value)
     negative = [] # List of submitters where ASCAT2, FACETS and Sequenza do not report LOH (or less than 2 tools report LOH)
     negHist = {} # Histogram with the positions {key} and times a variant is reported in that position (but for negative submitters)
-    posData = "" # Two-dimension list with the information of each variant found in LOH submitters
-    negData = "" # Two-dimension list with the information of each variant found in no-LOH submitters
+    posData = [] # Two-dimension list with the information of each variant found in LOH submitters
+    negData = [] # Two-dimension list with the information of each variant found in no-LOH submitters
 
     print("{} INFO: Getting {} submitters".format(getTime(), cancer))
     # Get the submitter IDs from the cancer repository
