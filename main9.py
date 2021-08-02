@@ -24,6 +24,8 @@ cFolder = "fsupek_cancer2"
 cancer = "OV" # Cancer repository to search
 dbcon = sqlite3.connect("/g/strcombio/fsupek_cancer2/TCGA_bam/info/info.db")
 wd = "/g/strcombio/{cancer_path}/TCGA_bam/{c}".format(c = cancer, cancer_path = cFolder)
+keyword = "cancer" # If the variant has this keyword in ClinVar annotations. It will be considered pathogenic
+vcf = "clinvar.vcf" # Path to ClinVar database
 
 # In the case we want to do it more automatically
 gene = palb2
@@ -255,16 +257,9 @@ def getData() :
 
     return data, negData
 
-def filterVariants(data, filename) :
-    """Check the variants and remove the submitters (and their variants) with a pathogenic (positive) variant"""
-    posSubmitters = [] # Submitters where a pathogenic variant is found
-    tmplist = []
-    nopos = [] # Variants that are not considered positive (like frameshift indels, stopgains...)
-    ispos = []
-    keyword = "cancer" # If the variant has this keyword. It can be considered pathogenic
-    vcf = "clinvar.vcf"
-    cnt = {} # Data from clinvar vcf
-    # Get ClinVar data
+def readClinVar() :
+    """Read ClinVar vcf database. Convert the variants and its annotations in a python dict, where the key is the pair chr-position"""
+    cnt = {}
     with open(vcf, "r") as fi :
         for l in fi :
             if not l.startswith("#") :
@@ -272,6 +267,34 @@ def filterVariants(data, filename) :
                 idx = "{}-{}".format(aux[0], aux[1])
                 if idx not in cnt.keys() : # PATCH!! Get the first element if there are position duplicates
                     cnt[idx] = l
+    return cnt
+
+def annotateClinVar(data, cnt) :
+    """Add ClinVar information to the variants list passed as parameter (data)"""
+    anno = []
+    for d in data :
+        chrom = d[0].replace("chr", "")
+        # As ANNOVAR changes the position in insertions/deletions, we substract 1 to the start position
+        if d[1] == "-" :
+            pos = int(v[1]) - 1
+        else :
+            pos = int(v[1])
+
+        search = "{}-{}".format(chrom, pos)
+        supData = {"db" : {}, "disease" : "NA", "significance" : "NA", "revStatus" : "NA"}
+        if search in cnt.keys() :
+            supData = getClinVar(cnt[search], d)
+
+def filterVariants(data, filename, cnt = None) :
+    """Check the variants and remove the submitters (and their variants) with a pathogenic (positive) variant"""
+    posSubmitters = [] # Submitters where a pathogenic variant is found
+    tmplist = []
+    nopos = [] # Variants that are not considered positive (like frameshift indels, stopgains...)
+    ispos = []
+
+    # Get ClinVar data
+    if cnt == None :
+        cnt = readClinVar()
 
     for d in data.split("\n") :
         v = d.split("\t")
@@ -358,13 +381,14 @@ def groupVariants(patho, nega, filename) :
 if __name__ == "__main__" :
     print("{} INFO: Getting the variants in {} gene written in each {} file".format(getTime(), genename, varCallSuffix))
     pos_variants, neg_variants = getData()
+    clinvar = readClinVar()
     # with open("posVariants.tsv", "r") as fi :
     #     pos_variants = fi.read()
     # with open("negVariants.tsv", "r") as fi :
     #     neg_variants = fi.read()
-    patho, nega = filterVariants(pos_variants, "posVariants.annotated")
+    patho, nega = filterVariants(pos_variants, "posVariants.annotated", clinvar)
     groupVariants(patho, nega, "posVariants.grouped.tsv")
-    patho, nega = filterVariants(neg_variants, "negVariants.annotated")
+    patho, nega = filterVariants(neg_variants, "negVariants.annotated", clinvar)
     groupVariants(patho, nega, "negVariants.grouped.tsv")
     aux = []
     for d in pos_variants.split("\n") :
@@ -376,4 +400,5 @@ if __name__ == "__main__" :
         if d != "" :
             aux.append(d.split("\t"))
     neg_variants = aux
+    pos_variants = annotateClinVar(pos_variants, clinvar)
     groupVariants(pos_variants, neg_variants, "allVariants.grouped.tsv")
