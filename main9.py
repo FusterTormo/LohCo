@@ -212,7 +212,7 @@ def getData() :
                             if len(aux) > 1 :
                                 # Create a histogram that counts the frequency of each position
                                 pos = int(aux[1])
-                                if pos in negVars.keys()  :
+                                if pos in negHist.keys()  :
                                     negHist[pos] += 1
                                 else :
                                     negHist[pos] = 1
