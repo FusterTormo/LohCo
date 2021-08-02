@@ -323,6 +323,7 @@ def filterVariants(data, filename) :
 def groupVariants(patho, nega, filename) :
     """Count the number of variants in each group"""
     groups = {}
+    addinfo = {}
 
     for n in nega :
         key = "{chr};{sta};{end};{ref};{alt};{func};{exonic}".format(chr = n[0], sta = n[1], end = n[2], ref = n[3], alt = n[4], func = n[5], exonic = n[6])
@@ -333,15 +334,21 @@ def groupVariants(patho, nega, filename) :
 
     for p in patho :
         key = "{chr};{sta};{end};{ref};{alt};{func};{exonic}".format(chr = p[0], sta = p[1], end = p[2], ref = p[3], alt = p[4], func = p[5], exonic = p[6])
+        if key not in addinfo.keys() :
+            addinfo[key] = "{}\t{}".format(p[-2], p[-1])
         if key in groups.keys() :
             groups[key]["Pathogenic"] += 1
         else :
             groups[key] = {"Pathogenic" : 1, "No_pathogenic" : 0}
 
     with open(filename, "w") as fi :
-        fi.write("Chr\tStart\tEnd\tRef\tAlt\tType\tExonicType\tInNegative\tInPathogenic\n")
+        fi.write("Chr\tStart\tEnd\tRef\tAlt\tType\tExonicType\tClinVarDisease\tClinVarSignf\tInNegative\tInPathogenic\n")
         for k, v in groups.items() :
             fi.write(k.replace(";", "\t"))
+            if k in addinfo :
+                fi.write(addinfo[k])
+            else :
+                fi.write("NA\tNA")
             fi.write("\t{}\t".format(v["No_pathogenic"]))
             fi.write("{}\n".format(v["Pathogenic"]))
 
