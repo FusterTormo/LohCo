@@ -15,19 +15,26 @@ import libconstants as cte
 Search VUS variants in LOH
 """
 
+"""
+USAGE:
+"""
+
 # Constants
-brca1 = ["17", 43044295, 43125483] # Gene of interest to search LOH
+# Gene of interest to search LOH
+brca1 = ["17", 43044295, 43125483]
 brca2 = ["13", 32315508, 32400268]
 atm = ["11", 108222832, 108369099]
 palb2 = ["16", 23603165, 23641310]
+# Cancer repository of interest, and full path to files
 cFolder = "fsupek_cancer2"
 cancer = "OV" # Cancer repository to search
 dbcon = sqlite3.connect("/g/strcombio/fsupek_cancer2/TCGA_bam/info/info.db")
 wd = "/g/strcombio/{cancer_path}/TCGA_bam/{c}".format(c = cancer, cancer_path = cFolder)
+# Constants for ClinVar
 keyword = "cancer" # If the variant has this keyword in ClinVar annotations. It will be considered pathogenic
 vcf = "clinvar.vcf" # Path to ClinVar database
 
-# In the case we want to do it more automatically
+# Input data. Main file read this variables to do the analysis
 gene = palb2
 genename = "PALB2"
 varCallSuffix = "platypusGerm/platypus.hg38_multianno.txt"
@@ -89,16 +96,23 @@ def getClinVar(clinvar, variant) :
     return data
 
 def getData() :
+    """Get LOH and variants information for each submitter in the gene of interest
+
+    Classify the submitters as
+        * Positive: When 2 or more LOH tools report LOH (CNN-LOH or CNL-LOH) in the gene of interest
+        * Negative: When less than 2 LOH tools report LOH in the gene of interest
+
+    Variants are classified in each list (posData or negData) according to LOH found
+    """
     # Variables
-    # Stats
     pairs = 0 # Number of submitters with pair tumor-control
     done = [] # List of submitters with ASCAT2, FACETS and Sequenza done
     positive = [] # List of submitters where ASCAT2, FACETS and Sequenza reported LOH
-    variants = {} # Histogram with the positions (key) and the times a variant is reported in that position (value)
+    posHist = {} # Histogram with the positions (key) and the times a variant is reported in that position (value)
     negative = [] # List of submitters where ASCAT2, FACETS and Sequenza do not report LOH (or less than 2 tools report LOH)
-    negVars = {} # Histogram with the positions {key} and times a variant is reported in that position (but for negative submitters)
-    data = "" # Text table with the information about the variants found
-    negData = ""
+    negHist = {} # Histogram with the positions {key} and times a variant is reported in that position (but for negative submitters)
+    posData = "" # Two-dimension list with the information of each variant found in LOH submitters
+    negData = "" # Two-dimension list with the information of each variant found in no-LOH submitters
 
     print("{} INFO: Getting {} submitters".format(getTime(), cancer))
     # Get the submitter IDs from the cancer repository
@@ -107,11 +121,11 @@ def getData() :
           q = cur.execute("SELECT submitter FROM patient WHERE cancer='{cancer}'".format(cancer = cancer))
           cases = q.fetchall()
 
-    print("{} INFO: Total submitters in {} cancer: {}".format(getTime(), cancer, len(cases)))
+    print("{} INFO: {} submitters found".format(getTime(), len(cases)))
     # Get the tumors and controls in each submitter
     for c in cases :
         if cases.index(c) % 100 == 0 :
-            print("{} INFO: {} cases executed".format(getTime(), cases.index(c)))
+            print("{} INFO: {} submitters analyzed".format(getTime(), cases.index(c)))
 
         if c[0] not in done : # Don't do the analysis more than once in the same submitter
             # Get the tumor and control samples from the submitter
@@ -153,7 +167,7 @@ def getData() :
                         # Check LOH in the gene, add the output to a list
                         aux = asc.checkAscat(folder, gene)
                         loh.append(aux)
-                    if len(loh) >= 3 :
+                    if len(loh) >= 2 :
                         done.append(c[0])
                     # Count the number of LOH found in the patient
                     lohs = loh.count("L") + loh.count("D") # Copy number neutral +`copy number lose`
@@ -171,9 +185,9 @@ def getData() :
                                 # Create a histogram that counts the frequency of each position
                                 pos = int(aux[1])
                                 if pos in variants.keys()  :
-                                    variants[pos] += 1
+                                    posHist[pos] += 1
                                 else :
-                                    variants[pos] = 1
+                                    posHist[pos] = 1
                                 # In case we prefer to collect the full variant...
                                 # key = "{}-{}-{}".format(pos, ref, alt)
                                 # if key in variants.keys() :
@@ -183,8 +197,9 @@ def getData() :
                                 # Store the variant information in a variable
                                 # Do not add intergenic, downstream, upstream variants
                                 if aux[5] in ["intronic", "exonic", "splicing", "UTR3", "UTR5"] :
-                                    data += "{chr}\t{st}\t{end}\t{ref}\t{alt}\t{ex}\t{typex}\t{loh}\t{sub}\t{idtm}\t{idcn}\n".format(
-                                        chr = aux[0], st = aux[1], end = aux[2], ref = aux[3], alt = aux[4], ex = aux[5], typex = aux[8], sub = c[0], idtm = tm[0], idcn = cn[0], loh = lohs)
+                                    # Column order: chrom, start, end, ref, alt, gene_position, exonic_type, submitter, uuid_tumor, uuid_control, lohs_reported
+                                    posData.append([aux[0], aux[1], aux[2], aux[3], aux[4], aux[5], aux[8], c[0], tm[0], cn[0], lohs])
+
                     else :
                         negative.append(c[0])
                         germCall = "{wd}/{sub}/{uuid}/{suffix}".format(wd = wd, sub = c[0], uuid = cn[0], suffix = varCallSuffix)
@@ -197,19 +212,16 @@ def getData() :
                             if len(aux) > 1 :
                                 # Create a histogram that counts the frequency of each position
                                 pos = int(aux[1])
-                                ref = aux[2]
-                                alt = aux[3]
                                 if pos in negVars.keys()  :
-                                    negVars[pos] += 1
+                                    negHist[pos] += 1
                                 else :
-                                    negVars[pos] = 1
+                                    negHist[pos] = 1
                                 # Do not add intergenic, downstream, upstream variants
                                 if aux[5] in ["intronic", "exonic", "splicing", "UTR3", "UTR5"] :
-                                    negData += "{chr}\t{st}\t{end}\t{ref}\t{alt}\t{ex}\t{typex}\t{loh}\t{sub}\t{idtm}\t{idcn}\n".format(
-                                        chr = aux[0], st = aux[1], end = aux[2], ref = aux[3], alt = aux[4], ex = aux[5], typex = aux[8], sub = c[0], idtm = tm[0], idcn = cn[0], loh = lohs)
+                                    # Column order: chrom, start, end, ref, alt, gene_position, exonic_type, submitter, uuid_tumor, uuid_control, lohs_reported
+                                    negData.append([aux[0], aux[1], aux[2], aux[3], aux[4], aux[5], aux[8], c[0], tm[0], cn[0], lohs])
 
 
-    # Check if FACETS/Sequenza/ASCAT2 have reported LOH
     print("{} INFO: Pairs tumor-control: {}".format(getTime(), pairs))
     print("{} INFO: Analysis done in {} pairs".format(getTime(), len(done)))
     print("{} INFO: {}  had 2 or more LOH reported in {} gene".format(getTime(), len(positive), genename))
@@ -217,45 +229,51 @@ def getData() :
     # Print the data in histogram format to do a plot in R that searches for clusters
     # Two possible options to plot the variants
     # 1) From the lowest mutation coordinate
-    minim = min(variants.keys())
-    maxim = max(variants.keys())
+    # minim = min(posHist.keys())
+    # maxim = max(posHist.keys())
     # 2) From the gene start
     minim = gene[1]
     maxim = gene[2]
     with open("positionHistogram.tsv", "w") as fi :
         fi.write("position\ttimes\n")
         for i in range(minim, maxim+1) :
-            if i in variants.keys() :
-                fi.write("{}\t{}\n".format(i, variants[i]))
+            if i in posHist.keys() :
+                fi.write("{}\t{}\n".format(i, posHist[i]))
             else :
                 fi.write("{}\t0\n".format(i))
 
     with open("negativeHistogram.tsv", "w") as fi :
         fi.write("position\ttimes\n")
         for i in range(minim, maxim+1) :
-            if i in negVars.keys() :
-                fi.write("{}\t{}\n".format(i, negVars[i]))
+            if i in negHist.keys() :
+                fi.write("{}\t{}\n".format(i, negHist[i]))
             else :
                 fi.write("{}\t0\n".format(i))
 
     print("{} INFO: Variant-position histogram stored as positionHistogram.tsv and negativeHistogram.tsv".format(getTime()))
 
+    # Write the variants data in a tab-separated file
     with open("posVariants.tsv", "w") as fi :
-        fi.write(data)
+        for l in posData :
+            fi.write("\t".join(l))
+            fi.write("\n")
 
     with open("negVariants.tsv", "w") as fi :
-        fi.write(negData)
+        for l in negData :
+            fi.write("\t".join(l))
+            fi.write("\n")
 
-    print("{} INFO: Variant information stored as variants.tsv".format(getTime()))
+    print("{} INFO: Variant information stored as posVariants.tsv and negVariants.tsv".format(getTime()))
     print("{} INFO: Creating the plots".format(getTime()))
     cmd = "Rscript main9.R {}".format(genename)
     pr = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     std, err = pr.communicate()
     print(std.decode())
     if pr.returncode != 0 :
-        print("{} WARNING: Error found while running R. Description\n".format(getTime(), err.decode()))
+        print("{} WARNING: Error found while running R ({}). Description\n".format(getTime(), cmd, err.decode()))
 
-    return data, negData
+    # Return variants data for further analysis
+    return posData, negData
 
 def readClinVar() :
     """Read ClinVar vcf database. Convert the variants and its annotations in a python dict, where the key is the pair chr-position"""
@@ -286,42 +304,45 @@ def annotateClinVar(data, cnt) :
             supData = getClinVar(cnt[search], d)
 
 def filterVariants(data, filename, cnt = None) :
-    """Check the variants and remove the submitters (and their variants) with a pathogenic (positive) variant"""
+    """Annotate the variants passed as parameter (data) with ClinVar data (cnt variable. If data is not available yet, it calls the function to get ClinVar information)
+    Then reads the variant information obtained and classifies the submitters according to the variant pathogenicity:
+        * Pathogenic when a pathogenic variant (splicing, exonic-indels, exonic-stopgain) is found. Or when the variant is annotated in ClinVar as related with cancer
+        * Negative when no pathogenic variant is found, neither the variants are annotated as related with cancer
+    """
     posSubmitters = [] # Submitters where a pathogenic variant is found
     tmplist = []
-    nopos = [] # Variants that are not considered positive (like frameshift indels, stopgains...)
+    nopos = [] # Variants that are in submitters with a pathogenic variant (like frameshift indels, stopgains...)
     ispos = []
 
     # Get ClinVar data
     if cnt == None :
         cnt = readClinVar()
 
-    for d in data.split("\n") :
-        v = d.split("\t")
-        if len(v) > 8 :
+    for d in data :
+        if len(d) > 8 :
             # Check if the variant type is considered positive
-            if v[6] in cte.var_positive or v[5] in cte.var_positive:
-                posSubmitters.append(v[8])
+            if d[6] in cte.var_positive or d[5] in cte.var_positive:
+                posSubmitters.append(d[8])
 
             # As ANNOVAR changes the position in insertions/deletions, we substract 1 to the start position
-            if v[4] == "-" :
-                pos = int(v[1]) - 1
+            if d[4] == "-" :
+                pos = int(d[1]) - 1
             else :
-                pos = int(v[1])
+                pos = int(d[1])
 
-            search = "{}-{}".format(v[0].replace("chr", ""), pos)
+            search = "{}-{}".format(d[0].replace("chr", ""), pos)
             supData = {"db" : {}, "disease" : "NA", "significance" : "NA", "revStatus" : "NA"}
             if search in cnt.keys() :
                 supData = getClinVar(cnt[search], d)
 
             # Check if the variant is associated with cancer
-            if supData["disease"].find("cancer") > 0 and v[8] not in posSubmitters :
-                posSubmitters.append(v[8])
+            if supData["disease"].find("cancer") > 0 and d[8] not in posSubmitters :
+                posSubmitters.append(d[8])
 
             # Check if the submitter is considered a positive case
-            v.append(supData["disease"])
-            v.append(supData["significance"])
-            tmplist.append(v)
+            d.append(supData["disease"])
+            d.append(supData["significance"])
+            tmplist.append(d)
 
     for v in tmplist :
         if v[8] in posSubmitters :
@@ -382,23 +403,24 @@ if __name__ == "__main__" :
     print("{} INFO: Getting the variants in {} gene written in each {} file".format(getTime(), genename, varCallSuffix))
     pos_variants, neg_variants = getData()
     clinvar = readClinVar()
+    # TODO: MODIFICAR AQUESTES LINIES PER AGAFAR LES VARIANTS EN EL NOU FORMAT
     # with open("posVariants.tsv", "r") as fi :
     #     pos_variants = fi.read()
     # with open("negVariants.tsv", "r") as fi :
     #     neg_variants = fi.read()
     patho, nega = filterVariants(pos_variants, "posVariants.annotated", clinvar)
     groupVariants(patho, nega, "posVariants.grouped.tsv")
-    patho, nega = filterVariants(neg_variants, "negVariants.annotated", clinvar)
-    groupVariants(patho, nega, "negVariants.grouped.tsv")
-    aux = []
-    for d in pos_variants.split("\n") :
-        if d != "" :
-            aux.append(d.split("\t"))
-    pos_variants = aux
-    aux = []
-    for d in neg_variants.split("\n") :
-        if d != "" :
-            aux.append(d.split("\t"))
-    neg_variants = aux
-    pos_variants = annotateClinVar(pos_variants, clinvar)
-    groupVariants(pos_variants, neg_variants, "allVariants.grouped.tsv")
+    # patho, nega = filterVariants(neg_variants, "negVariants.annotated", clinvar)
+    # groupVariants(patho, nega, "negVariants.grouped.tsv")
+    # aux = []
+    # for d in pos_variants.split("\n") :
+    #     if d != "" :
+    #         aux.append(d.split("\t"))
+    # pos_variants = aux
+    # aux = []
+    # for d in neg_variants.split("\n") :
+    #     if d != "" :
+    #         aux.append(d.split("\t"))
+    # neg_variants = aux
+    # pos_variants = annotateClinVar(pos_variants, clinvar)
+    # groupVariants(pos_variants, neg_variants, "allVariants.grouped.tsv")
