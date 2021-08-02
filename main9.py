@@ -346,9 +346,10 @@ def groupVariants(patho, nega, filename) :
         for k, v in groups.items() :
             fi.write(k.replace(";", "\t"))
             if k in addinfo :
+                fi.write("\t")
                 fi.write(addinfo[k])
             else :
-                fi.write("NA\tNA")
+                fi.write("\tNA\tNA")
             fi.write("\t{}\t".format(v["No_pathogenic"]))
             fi.write("{}\n".format(v["Pathogenic"]))
 
