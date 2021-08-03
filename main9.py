@@ -198,7 +198,7 @@ def getData() :
                                 # Do not add intergenic, downstream, upstream variants
                                 if aux[5] in ["intronic", "exonic", "splicing", "UTR3", "UTR5"] :
                                     # Column order: chrom, start, end, ref, alt, gene_position, exonic_type, submitter, uuid_tumor, uuid_control, lohs_reported
-                                    posData.append([aux[0], aux[1], aux[2], aux[3], aux[4], aux[5], aux[8], c[0], tm[0], cn[0], lohs])
+                                    posData.append([aux[0], aux[1], aux[2], aux[3], aux[4], aux[5], aux[8], c[0], tm[0], cn[0], str(lohs)])
 
                     else :
                         negative.append(c[0])
@@ -219,7 +219,7 @@ def getData() :
                                 # Do not add intergenic, downstream, upstream variants
                                 if aux[5] in ["intronic", "exonic", "splicing", "UTR3", "UTR5"] :
                                     # Column order: chrom, start, end, ref, alt, gene_position, exonic_type, submitter, uuid_tumor, uuid_control, lohs_reported
-                                    negData.append([aux[0], aux[1], aux[2], aux[3], aux[4], aux[5], aux[8], c[0], tm[0], cn[0], lohs])
+                                    negData.append([aux[0], aux[1], aux[2], aux[3], aux[4], aux[5], aux[8], c[0], tm[0], cn[0], str(lohs)])
 
 
     print("{} INFO: Pairs tumor-control: {}".format(getTime(), pairs))
