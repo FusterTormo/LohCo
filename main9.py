@@ -184,7 +184,7 @@ def getData() :
                             if len(aux) > 1 :
                                 # Create a histogram that counts the frequency of each position
                                 pos = int(aux[1])
-                                if pos in variants.keys()  :
+                                if pos in posHist.keys()  :
                                     posHist[pos] += 1
                                 else :
                                     posHist[pos] = 1
