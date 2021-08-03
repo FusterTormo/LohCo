@@ -56,10 +56,9 @@ def getClinVar(clinvar, variant) :
 
     data = {"db" : "NA", "disease" : "NA", "significance" : "NA", "revStatus" : "NA"}
     # Check if the variant is exactly the same as the reported by ClinVar
-    tmp = variant.split("\t")
-    ref = tmp[3]
-    alt = tmp[4]
-    aux = tmp[0:5]
+    ref = variant[3]
+    alt = variant[4]
+    aux = variant[0:5]
     # Extract the interesting data from the clinvar line
     tmp = clinvar.split("\t")
     cln_ref = tmp[3]
@@ -250,7 +249,7 @@ def getData() :
             else :
                 fi.write("{}\t0\n".format(i))
 
-    print("{} INFO: Variant-position histogram stored as positionHistogram.tsv and negativeHistogram.tsv".format(getTime()))
+    print("{} INFO: Variant-position histograms stored as positionHistogram.tsv and negativeHistogram.tsv".format(getTime()))
 
     # Write the variants data in a tab-separated file
     with open("posVariants.tsv", "w") as fi :
