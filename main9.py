@@ -40,6 +40,10 @@ genename = "PALB2"
 varCallSuffix = "platypusGerm/platypus.hg38_multianno.txt"
 #varCallSuffix = "strelkaGerm/results/variants/strelka.hg38_multianno.txt"
 
+def getTime() :
+    """Returns current time (hours:minutes:seconds) in a fancy format"""
+    return time.strftime("%H:%M:%S", time.gmtime())
+
 def getData() :
     """Get LOH and variants information for each submitter in the gene of interest
 
@@ -91,6 +95,7 @@ def getData() :
                     pr = subprocess.Popen(cmd, shell = True, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
                     # Get LOH
                     lohs = 0 # Number of tools that reported LOH (Delecion or copy number normal)
+                    loh = []
                     # Get FACETS output file
                     folder = "{wd}/{sub}/{pre}_FACETS".format(wd = wd, sub = c[0], pre = prefix)
                     file = "{fld}/facets_comp_cncf.tsv".format(fld = folder)
@@ -130,7 +135,7 @@ def getData() :
                         negative.append(c[0])
                         std, err = pr.communicate()
                         print(std.decode())
-                    sys.exit()
+
 
 if __name__ == "__main__" :
     # NOTE: To change the analysis parameters, change the constants at the beginning of the file
@@ -138,9 +143,7 @@ if __name__ == "__main__" :
 
 
 
-# def getTime() :
-#     """Returns current time (hours:minutes:seconds) in a fancy format"""
-#     return time.strftime("%H:%M:%S", time.gmtime())
+
 #
 # def getClinVar(clinvar, variant) :
 #     """Extract the important information from ClinVar
