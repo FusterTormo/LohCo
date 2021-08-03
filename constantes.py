@@ -23,10 +23,10 @@ annovar_db = "/home/ffuster/share/biodata/Indexes/ANNOVAR/humandb/"
 genoma_referencia = "/home/ffuster/share/BDsole/referencies/ucsc/hg19.fa"
 dbsnp = "/home/ffuster/share/BDsole/referencies/gnomad.exomes.r2.1.1.sites.vcf" # Descargado desde https://gnomad.broadinstitute.org/downloads
 # Archivos de manifest. Actualizar ruta en caso de cambiar el manifest
-manifest = "/home/ffuster/panalisi/resultats/manifest_TWIST/manifest.bed"
-gzmanifest = "/home/ffuster/panalisi/resultats/manifest_TWIST/manifest.bed.gz"
-manifestidx = "/home/ffuster/panalisi/resultats/manifest_TWIST/manifest.bed.gz.tbi"
-genes = "/home/ffuster/panalisi/resultats/manifest_TWIST/gensAestudi.txt"
+manifest = "/home/ffuster/panalisi/resultats/manifest_Roche/manifest.bed"
+gzmanifest = "/home/ffuster/panalisi/resultats/manifest_Roche/manifest.bed.gz"
+manifestidx = "/home/ffuster/panalisi/resultats/manifest_Roche/manifest.bed.gz.tbi"
+genes = "/home/ffuster/panalisi/resultats/manifest_Roche/gensAestudi.txt"
 
 prefijoTanda = "tanda" # Prefijo que tiene todas las tandas analizadas
 scriptdir = "/home/ffuster/AUP" # Directorio de trabajo donde estan los scripts
