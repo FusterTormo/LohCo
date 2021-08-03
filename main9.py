@@ -86,8 +86,51 @@ def getData() :
                     pairs += 1
                     prefix = "{}_VS_{}".format(tm[0].split("-")[0], cn[0].split("-")[0])
                     # Get and annotate the variants
-                    cmd = "grep {} {}".format()
+                    germCall = "{wd}/{sub}/{uuid}/{suffix}".format(wd = wd, sub = c[0], uuid = cn[0], suffix = varCallSuffix)
+                    cmd = "grep {gene} {vc}".format(gene = genename, vc = germCall)
+                    pr = subprocess.Popen(cmd, shell = True, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
                     # Get LOH
+                    lohs = 0 # Number of tools that reported LOH (Delecion or copy number normal)
+                    # Get FACETS output file
+                    folder = "{wd}/{sub}/{pre}_FACETS".format(wd = wd, sub = c[0], pre = prefix)
+                    file = "{fld}/facets_comp_cncf.tsv".format(fld = folder)
+                    if os.path.isfile(file) :
+                        # Check LOH in the gene, add the output to a list
+                        aux = lib.getLOH(file, "facets", gene)
+                        loh.append(aux)
+                    # Get Sequenza output file
+                    folder = "{wd}/{sub}/{pre}_Sequenza".format(wd = wd, sub = c[0], pre = prefix)
+                    file = "{fld}/{case}_segments.txt".format(fld = folder, case = c[0])
+                    if os.path.isfile(file) :
+                        # Check LOH in the gene, add th output to a list
+                        aux = lib.getLOH(file, "sequenza", gene)
+                        loh.append(aux)
+                    # Get PURPLE output file
+                    folder = "{wd}/{sub}/{pre}_PURPLE".format(wd = wd, sub = c[0], pre = prefix)
+                    file = "{fld}/TUMOR.purple.cnv.somatic.tsv".format(fld = folder)
+                    if os.path.isfile(file) :
+                        aux = lib.getLOH(file, "purple", gene)
+                        loh.append(aux)
+                    # Get ASCAT2 output file
+                    folder = "{wd}/{sub}/ASCAT2".format(wd = wd, sub = c[0])
+                    if os.path.isdir(folder) :
+                        # Check LOH in the gene, add the output to a list
+                        aux = asc.checkAscat(folder, gene)
+                        loh.append(aux)
+                    if len(loh) >= 2 :
+                        done.append(c[0])
+                    # Count the number of LOH found in the patient
+                    lohs = loh.count("L") + loh.count("D") # Copy number neutral +`copy number lose`
+                    print(lohs)
+                    if lohs >= 2 :
+                        positive.append(c[0])
+                        std, err = pr.communicate()
+                        print(std.decode())
+                    else :
+                        negative.append(c[0])
+                        std, err = pr.communicate()
+                        print(std.decode())
+                    sys.exit()
 
 if __name__ == "__main__" :
     # NOTE: To change the analysis parameters, change the constants at the beginning of the file
