@@ -9,6 +9,9 @@ import sys
 import constantes as cte
 import vcfQC
 
+# Constantes locales
+imgFolder = "img" # Nombre de la carpeta donde se guardaran las imagenes generadas por el script de R
+
 def datosPlantilla() :
     """La plantilla necesita
         * una tabla de variantes (formato <tr><td>CROMOSOMA</td><td>POSICION</td><td>REF</td><td>ALT</td><td>GEN</td><td>VECES</td>),
@@ -40,9 +43,9 @@ def datosPlantilla() :
     for f in files :
         if f.endswith(".png") : # Es una imagen
             if f.endswith("_coverage.png") :
-                samps += "<img src='{}'>\n".format(f)
+                samps += "<img src='{}/{}'>\n".format(imgFolder, f)
             elif f.startswith("cov") :
-                covs += "<img src='{}'>\n".format(f)
+                covs += "<img src='{}/{}'>\n".format(imgFolder, f)
 
     return tabVar, covs, samps
 
@@ -258,6 +261,8 @@ def main() :
         os.mkdir(outDir)
         shutil.move(arx, outDir)
         os.chdir(outDir)
+        
+    os.mkdir(imgFolder)
 
     # Crear los graficos en la carpetaº
     print("INFO: Ejecutando R")
