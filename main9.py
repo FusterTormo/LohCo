@@ -113,9 +113,9 @@ def annotateClinVar(data, cln) :
     chrom = d[0].replace("chr", "")
     # As ANNOVAR changes the position in insertions/deletions, we substract 1 to the start position
     if d[1] == "-" :
-        pos = int(v[1]) - 1
+        pos = int(d[1]) - 1
     else :
-        pos = int(v[1])
+        pos = int(d[1])
 
     search = "{}-{}".format(chrom, pos)
     supData = {"db" : {}, "disease" : "NA", "significance" : "NA", "revStatus" : "NA"}
@@ -209,7 +209,7 @@ def getData() :
                     # Count the number of LOH found in the patient
                     lohs = loh.count("L") + loh.count("D") # Copy number neutral +`copy number lose`
                     std, err = pr.communicate() # Get the output from grep. This grep was launched before the LOH calling
-                    rawVars = std.decode().split("\n")
+                    rawVars = std.decode().strip().split("\n")
                     annoVars = []
                     for r in rawVars :
                         tmp = annotateClinVar(r, clinvarData)
