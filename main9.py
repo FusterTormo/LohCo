@@ -125,7 +125,7 @@ def getData() :
     negHist = {} # Histogram with the positions {key} and times a variant is reported in that position (but for negative submitters)
     posData = [] # Two-dimension list with the information of each variant found in LOH submitters
     negData = [] # Two-dimension list with the information of each variant found in no-LOH submitters
-    clinvarData = readClinVar()
+    clinvarData = readClinVar() # Transform the ClinVar vcf in a python dict
 
     print("{} INFO: Getting {} submitters".format(getTime(), cancer))
     # Get the submitter IDs from the cancer repository
@@ -190,18 +190,17 @@ def getData() :
                         done.append(c[0])
                     # Count the number of LOH found in the patient
                     lohs = loh.count("L") + loh.count("D") # Copy number neutral +`copy number lose`
-                    print(lohs)
+                    std, err = pr.communicate() # Get the output from the grep bash command
+                    rawVars = std.decode().split("\n")
+                    print("{} has {} LOHs and {} variants".format(c[0], lohs, len(rawVars)))
                     if lohs >= 2 :
                         positive.append(c[0])
-                        std, err = pr.communicate()
-                        print(std.decode())
                         # # TODO: Fer una funcion que agafe el decode, el parsege i l'anote amb ClinVar
                         # Emplenar posHist (dict)
                         # Emplenar posData (list)
                     else :
                         negative.append(c[0])
-                        std, err = pr.communicate()
-                        print(std.decode())
+
                         # Emplenar negHist (dict)
                         # Emplenar negData (list)
 
