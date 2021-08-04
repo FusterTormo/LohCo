@@ -190,18 +190,16 @@ def getData() :
                         done.append(c[0])
                     # Count the number of LOH found in the patient
                     lohs = loh.count("L") + loh.count("D") # Copy number neutral +`copy number lose`
-                    print(lohs)
+                    std, err = pr.communicate() # Get the output from grep. This grep was launched before the LOH calling
+                    rawVars = std.decode().split("\n")
+                    print("{} has {} LOHs and {} variants".format(c[0], lohs, len(rawVars)))
                     if lohs >= 2 :
                         positive.append(c[0])
-                        std, err = pr.communicate()
-                        print(std.decode())
                         # # TODO: Fer una funcion que agafe el decode, el parsege i l'anote amb ClinVar
                         # Emplenar posHist (dict)
                         # Emplenar posData (list)
                     else :
                         negative.append(c[0])
-                        std, err = pr.communicate()
-                        print(std.decode())
                         # Emplenar negHist (dict)
                         # Emplenar negData (list)
 
