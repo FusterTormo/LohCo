@@ -227,16 +227,17 @@ def getData() :
                             annoVars.append(tmp)
                             if tmp["type"] in cte.var_positive or tmp["exonicType"] in cte.var_positive :
                                 isPathogenic = True
+                            # # TODO: Tenir en compte que les variants poden estar relacionades amb cancer pero tenir significat com a benign o unknown_significance
                             if tmp["disease"].find("cancer") > 0 :
                                 isPathogenic = True
 
+                    print("{} -> {} analyses".format(c[0], len(loh)))
                     if lohs >= 2 :
                         positive.append(c[0])
                         # # TODO: Comprovar que les variants stopgain/frameshift es consideren patogeniques tambe
                         if isPathogenic :
-                            print(annoVars)
+                            pathogenic.append(c[0])
                             patData = patData + annoVars
-                            sys.exit()
                         else :
                             posData = posData + annoVars
                         # Emplenar posHist (dict)
@@ -246,7 +247,7 @@ def getData() :
                         negData += annoVars
                         # Emplenar negHist (dict)
                         # Emplenar negData (list)
-
+    print("{} positive submitters")
 
 if __name__ == "__main__" :
     # NOTE: To change the analysis parameters, change the constants at the beginning of the file
