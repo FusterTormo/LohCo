@@ -274,12 +274,6 @@ def main() :
         print(err.decode())
     else :
         print("INFO: Graficos generados correctamente")
-        cmd = "mv *png {}".format(imgFolder)
-        proc = subprocess.Popen(cmd, shell = True, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
-        out, err = proc.communicate()
-        if proc.returncode != 0 :
-            print("WARNING: No se pueden mover las imagenes creadas a la carpeta {}".format(imgFolder))
-            print(err.decode())
         print("INFO: Creando web con el informe")
         # Guardar el contenido de la plantilla en una variable
         with open(cte.pathAllTemplate, "r") as fi :
@@ -290,7 +284,15 @@ def main() :
         txt.replace("snvQC.png", "{}/snvQC.png".format(imgFolder))
 
         vars, bases, cov = datosPlantilla() # Recoger los datos necesarios para rellenar la plantilla
-        print(bases)
+
+        # Mover los graficos a la carpeta de graficos
+        cmd = "mv *png {}".format(imgFolder)
+        proc = subprocess.Popen(cmd, shell = True, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+        out, err = proc.communicate()
+        if proc.returncode != 0 :
+            print("WARNING: No se pueden mover las imagenes creadas a la carpeta {}".format(imgFolder))
+            print(err.decode())
+
         fic = cte.pathAllTemplate.split("/")[-1]
         with open(fic, "w") as fi :
             fi.write(txt.format(tanda = "{}{}".format(cte.prefijoTanda, tanda), variantes = vars, percentBases = cov, covBases = bases))
