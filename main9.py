@@ -44,6 +44,69 @@ def getTime() :
     """Returns current time (hours:minutes:seconds) in a fancy format"""
     return time.strftime("%H:%M:%S", time.gmtime())
 
+def readClinVar() :
+    """Read ClinVar vcf database. Convert the variants and its annotations in a python dict, where the key is the pair chr-position"""
+    cnt = {}
+    with open(vcf, "r") as fi :
+        for l in fi :
+            if not l.startswith("#") :
+                aux = l.strip().split("\t")
+                idx = "{}-{}".format(aux[0], aux[1])
+                if idx not in cnt.keys() : # PATCH!! Get the first element if there are position duplicates
+                    cnt[idx] = l
+    return cnt
+
+def extractClinVar(clinvar, variant) :
+    """Extract the important information from ClinVar
+
+    Columns extracted (description given in clinvar vcf file)
+        * CLNDISDB: Tag-value pairs of disease database name and identifier, e.g. OMIM:NNNNNN
+        * CLNDN: ClinVar's preferred disease name for the concept specified by disease identifiers in CLNDISDB
+        * CLNSIG: Clinical significance for this single variant
+        * CLNREVSTAT: ClinVar review status for the Variation ID
+    """
+
+    data = {"db" : "NA", "disease" : "NA", "significance" : "NA", "revStatus" : "NA"}
+    # Check if the variant is exactly the same as the reported by ClinVar
+    ref = variant[3]
+    alt = variant[4]
+    aux = variant[0:5]
+    # Extract the interesting data from the clinvar line
+    tmp = clinvar.split("\t")
+    cln_ref = tmp[3]
+    cln_alt = tmp[4]
+    info = tmp[7]
+    aux2 = tmp[0:5]
+    # Indel scenario. VCF syntax is different to ANNOVAR syntax. Converting the VCF syntax to ANNOVAR syntax
+    if len(cln_ref) > 1 or len(cln_alt) > 1 :
+        if len(cln_ref) == 1 :
+            cln_ref = "-"
+        else :
+            cln_ref = cln_ref[1:]
+        if len(cln_alt) == 1 :
+            cln_alt = "-"
+        else :
+            cln_alt = cln_alt[1:]
+
+    if ref == cln_ref and alt == cln_alt :
+        for i in info.split(";") :
+            tmp = i.split("=")
+            # Database name identifiers in pairs "OMIM:MMMMMMM"
+            if tmp[0] == "CLNDISDB" :
+                data["db"] = ",".join(aux[1:])
+            # Diagnostic name
+            if tmp[0] == "CLNDN" :
+                data["disease"] = tmp[1]
+            # Clinical significance
+            if tmp[0] == "CLNSIG" :
+                data["significance"] = tmp[1]
+            # Revision status
+            if tmp[0] == "CLNREVSTAT" :
+                data["revStatus"] = tmp[1]
+
+    return data
+
+
 def getData() :
     """Get LOH and variants information for each submitter in the gene of interest
 
@@ -62,6 +125,7 @@ def getData() :
     negHist = {} # Histogram with the positions {key} and times a variant is reported in that position (but for negative submitters)
     posData = [] # Two-dimension list with the information of each variant found in LOH submitters
     negData = [] # Two-dimension list with the information of each variant found in no-LOH submitters
+    clinvarData = readClinVar()
 
     print("{} INFO: Getting {} submitters".format(getTime(), cancer))
     # Get the submitter IDs from the cancer repository
@@ -131,10 +195,15 @@ def getData() :
                         positive.append(c[0])
                         std, err = pr.communicate()
                         print(std.decode())
+                        # # TODO: Fer una funcion que agafe el decode, el parsege i l'anote amb ClinVar
+                        # Emplenar posHist (dict)
+                        # Emplenar posData (list)
                     else :
                         negative.append(c[0])
                         std, err = pr.communicate()
                         print(std.decode())
+                        # Emplenar negHist (dict)
+                        # Emplenar negData (list)
 
 
 if __name__ == "__main__" :
@@ -144,56 +213,6 @@ if __name__ == "__main__" :
 
 
 
-#
-# def getClinVar(clinvar, variant) :
-#     """Extract the important information from ClinVar
-#
-#     Columns extracted (description given in clinvar vcf file)
-#         * CLNDISDB: Tag-value pairs of disease database name and identifier, e.g. OMIM:NNNNNN
-#         * CLNDN: ClinVar's preferred disease name for the concept specified by disease identifiers in CLNDISDB
-#         * CLNSIG: Clinical significance for this single variant
-#         * CLNREVSTAT: ClinVar review status for the Variation ID
-#     """
-#
-#     data = {"db" : "NA", "disease" : "NA", "significance" : "NA", "revStatus" : "NA"}
-#     # Check if the variant is exactly the same as the reported by ClinVar
-#     ref = variant[3]
-#     alt = variant[4]
-#     aux = variant[0:5]
-#     # Extract the interesting data from the clinvar line
-#     tmp = clinvar.split("\t")
-#     cln_ref = tmp[3]
-#     cln_alt = tmp[4]
-#     info = tmp[7]
-#     aux2 = tmp[0:5]
-#     # Indel scenario. VCF syntax is different to ANNOVAR syntax. Converting the VCF syntax to ANNOVAR syntax
-#     if len(cln_ref) > 1 or len(cln_alt) > 1 :
-#         if len(cln_ref) == 1 :
-#             cln_ref = "-"
-#         else :
-#             cln_ref = cln_ref[1:]
-#         if len(cln_alt) == 1 :
-#             cln_alt = "-"
-#         else :
-#             cln_alt = cln_alt[1:]
-#
-#     if ref == cln_ref and alt == cln_alt :
-#         for i in info.split(";") :
-#             tmp = i.split("=")
-#             # Database name identifiers in pairs "OMIM:MMMMMMM"
-#             if tmp[0] == "CLNDISDB" :
-#                 data["db"] = ",".join(aux[1:])
-#             # Diagnostic name
-#             if tmp[0] == "CLNDN" :
-#                 data["disease"] = tmp[1]
-#             # Clinical significance
-#             if tmp[0] == "CLNSIG" :
-#                 data["significance"] = tmp[1]
-#             # Revision status
-#             if tmp[0] == "CLNREVSTAT" :
-#                 data["revStatus"] = tmp[1]
-#
-#     return data
 #
 # def getData() :
 #     """Get LOH and variants information for each submitter in the gene of interest
@@ -375,17 +394,6 @@ if __name__ == "__main__" :
 #     # Return variants data for further analysis
 #     return posData, negData
 #
-# def readClinVar() :
-#     """Read ClinVar vcf database. Convert the variants and its annotations in a python dict, where the key is the pair chr-position"""
-#     cnt = {}
-#     with open(vcf, "r") as fi :
-#         for l in fi :
-#             if not l.startswith("#") :
-#                 aux = l.strip().split("\t")
-#                 idx = "{}-{}".format(aux[0], aux[1])
-#                 if idx not in cnt.keys() : # PATCH!! Get the first element if there are position duplicates
-#                     cnt[idx] = l
-#     return cnt
 #
 # def annotateClinVar(data, cnt) :
 #     """Add ClinVar information to the variants list passed as parameter (data)"""
