@@ -109,8 +109,8 @@ def extractClinVar(clinvar, variant) :
 def annotateClinVar(data, cln) :
     """Add ClinVar information to the variants list passed as parameter (data)"""
     anno = []
-    chrom = d[0].replace("chr", "")
     d = data.split("\t")
+    chrom = d[0].replace("chr", "")
     # As ANNOVAR changes the position in insertions/deletions, we substract 1 to the start position
     if d[1] == "-" :
         pos = int(v[1]) - 1
@@ -215,7 +215,7 @@ def getData() :
                         tmp = annotateClinVar(r, clinvarData)
                         print(r)
                         print(tmp)
-                        
+
                     if lohs >= 2 :
                         positive.append(c[0])
                         # # TODO: Fer una funcion que agafe el decode, el parsege i l'anote amb ClinVar
