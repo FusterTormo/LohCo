@@ -106,6 +106,24 @@ def extractClinVar(clinvar, variant) :
 
     return data
 
+def annotateClinVar(data, cln) :
+    """Add ClinVar information to the variants list passed as parameter (data)"""
+    anno = []
+    chrom = d[0].replace("chr", "")
+    d = data.split("\t")
+    # As ANNOVAR changes the position in insertions/deletions, we substract 1 to the start position
+    if d[1] == "-" :
+        pos = int(v[1]) - 1
+    else :
+        pos = int(v[1])
+
+    search = "{}-{}".format(chrom, pos)
+    supData = {"db" : {}, "disease" : "NA", "significance" : "NA", "revStatus" : "NA"}
+    if search in cln.keys() :
+        supData = extractClinVar(cln[search], d)
+
+    return supData
+
 
 def getData() :
     """Get LOH and variants information for each submitter in the gene of interest
@@ -192,7 +210,12 @@ def getData() :
                     lohs = loh.count("L") + loh.count("D") # Copy number neutral +`copy number lose`
                     std, err = pr.communicate() # Get the output from grep. This grep was launched before the LOH calling
                     rawVars = std.decode().split("\n")
-                    print("{} has {} LOHs and {} variants".format(c[0], lohs, len(rawVars)))
+                    annoVars = []
+                    for r in rawVars :
+                        tmp = annotateClinVar(r, clinvarData)
+                        print(r)
+                        print(tmp)
+                        
                     if lohs >= 2 :
                         positive.append(c[0])
                         # # TODO: Fer una funcion que agafe el decode, el parsege i l'anote amb ClinVar
@@ -393,21 +416,6 @@ if __name__ == "__main__" :
 #     return posData, negData
 #
 #
-# def annotateClinVar(data, cnt) :
-#     """Add ClinVar information to the variants list passed as parameter (data)"""
-#     anno = []
-#     for d in data :
-#         chrom = d[0].replace("chr", "")
-#         # As ANNOVAR changes the position in insertions/deletions, we substract 1 to the start position
-#         if d[1] == "-" :
-#             pos = int(v[1]) - 1
-#         else :
-#             pos = int(v[1])
-#
-#         search = "{}-{}".format(chrom, pos)
-#         supData = {"db" : {}, "disease" : "NA", "significance" : "NA", "revStatus" : "NA"}
-#         if search in cnt.keys() :
-#             supData = getClinVar(cnt[search], d)
 #
 # def filterVariants(data, filename, cnt = None) :
 #     """Annotate the variants passed as parameter (data) with ClinVar data (cnt variable. If data is not available yet, it calls the function to get ClinVar information)
