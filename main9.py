@@ -132,6 +132,7 @@ def getData() :
 
     Classify the submitters as
         * Positive: When 2 or more LOH tools report LOH (CNN-LOH or CNL-LOH) in the gene of interest
+        * Pathogenic: Positive submitters that have a pathogenic variant (see cte.var_positive) in combination with LOH
         * Negative: When less than 2 LOH tools report LOH in the gene of interest
 
     Variants are classified in each list (posData or negData) according to LOH found
@@ -143,8 +144,10 @@ def getData() :
     posHist = {} # Histogram with the positions (key) and the times a variant is reported in that position (value)
     negative = [] # List of submitters where ASCAT2, FACETS and Sequenza do not report LOH (or less than 2 tools report LOH)
     negHist = {} # Histogram with the positions {key} and times a variant is reported in that position (but for negative submitters)
+    pathogenic = [] # List of submitters that are positive for LOH and a pathogenic variant in the gene is found
     posData = [] # Two-dimension list with the information of each variant found in LOH submitters
     negData = [] # Two-dimension list with the information of each variant found in no-LOH submitters
+    pathData = [] # Two-dimension list with the informatino of each variant found in pathogenic submitters
     clinvarData = readClinVar()
 
     print("{} INFO: Getting {} submitters".format(getTime(), cancer))
@@ -222,9 +225,13 @@ def getData() :
                             tmp["control"] = cn[0]
                             tmp["lohCount"] = str(lohs)
                             annoVars.append(tmp)
+                            if tmp["type"] in cte.var_positive or tmp["exonicType"] in cte.var_positive :
+                                isPathogenic = True
 
                     if lohs >= 2 :
                         positive.append(c[0])
+                        if isPathogenic :
+                            print(annoVars)
                         # # TODO: Fer una funcion que agafe el decode, el parsege i l'anote amb ClinVar
                         # Emplenar posHist (dict)
                         # Emplenar posData (list)
