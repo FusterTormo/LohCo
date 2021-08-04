@@ -123,7 +123,7 @@ def annotateClinVar(data, cln) :
         supData = extractClinVar(cln[search], d)
 
     anno = {"chrom" : d[0], "start" : d[1], "end" : d[2], "ref" : d[3], "alt" : d[4], "type" : d[5], "exonicType" : d[8], "disease" : supData["disease"], "significance" : supData["significance"]}
-    print(anno)
+
     return anno
 
 
@@ -147,7 +147,7 @@ def getData() :
     pathogenic = [] # List of submitters that are positive for LOH and a pathogenic variant in the gene is found
     posData = [] # Two-dimension list with the information of each variant found in LOH submitters
     negData = [] # Two-dimension list with the information of each variant found in no-LOH submitters
-    pathData = [] # Two-dimension list with the informatino of each variant found in pathogenic submitters
+    patData = [] # Two-dimension list with the informatino of each variant found in pathogenic submitters
     clinvarData = readClinVar()
 
     print("{} INFO: Getting {} submitters".format(getTime(), cancer))
@@ -227,16 +227,23 @@ def getData() :
                             annoVars.append(tmp)
                             if tmp["type"] in cte.var_positive or tmp["exonicType"] in cte.var_positive :
                                 isPathogenic = True
+                            if tmp["disease"].find("cancer") > 0 :
+                                isPathogenic = True
 
                     if lohs >= 2 :
                         positive.append(c[0])
+                        # # TODO: Comprovar que les variants stopgain/frameshift es consideren patogeniques tambe
                         if isPathogenic :
                             print(annoVars)
-                        # # TODO: Fer una funcion que agafe el decode, el parsege i l'anote amb ClinVar
+                            patData = patData + annoVars
+                            sys.exit()
+                        else :
+                            posData = posData + annoVars
                         # Emplenar posHist (dict)
                         # Emplenar posData (list)
                     else :
                         negative.append(c[0])
+                        negData += annoVars
                         # Emplenar negHist (dict)
                         # Emplenar negData (list)
 
