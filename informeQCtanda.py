@@ -279,9 +279,11 @@ def main() :
         with open(cte.pathAllTemplate, "r") as fi :
             txt = fi.read()
 
-        # Modificar las rutas de los graficos "fijos" snvQC.png y readsQC.png
-        txt.replace("readsQC.png", "{}/readsQC.png".format(imgFolder))
-        txt.replace("snvQC.png", "{}/snvQC.png".format(imgFolder))
+        # PARCHE: Modificar las rutas de los graficos "fijos" snvQC.png y readsQC.png
+        newImg = "{}/readsQC.png".format(imgFolder)
+        txt.replace("readsQC.png", newImg)
+        newImg = "{}/snvQC.png".format(imgFolder)
+        txt.replace("snvQC.png", newImg)
 
         vars, bases, cov = datosPlantilla() # Recoger los datos necesarios para rellenar la plantilla
 
