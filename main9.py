@@ -220,7 +220,7 @@ def getData() :
                     for r in rawVars :
                         if r != "" :
                             tmp = annotateClinVar(r, clinvarData)
-                            tmp["submitter"] = c[0])
+                            tmp["submitter"] = c[0]
                             tmp["tumor"] = tm[0]
                             tmp["control"] = cn[0]
                             tmp["lohCount"] = str(lohs)
