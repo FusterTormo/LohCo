@@ -175,79 +175,83 @@ def getData() :
             for tm in tumors :
                 for cn in controls :
                     pairs += 1
-                    prefix = "{}_VS_{}".format(tm[0].split("-")[0], cn[0].split("-")[0])
-                    # Get and annotate the variants
-                    germCall = "{wd}/{sub}/{uuid}/{suffix}".format(wd = wd, sub = c[0], uuid = cn[0], suffix = varCallSuffix)
-                    cmd = "grep {gene} {vc}".format(gene = genename, vc = germCall)
-                    pr = subprocess.Popen(cmd, shell = True, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
-                    # Get LOH
-                    lohs = 0 # Number of tools that reported LOH (Delecion or copy number normal)
-                    loh = []
-                    # Get FACETS output file
-                    folder = "{wd}/{sub}/{pre}_FACETS".format(wd = wd, sub = c[0], pre = prefix)
-                    file = "{fld}/facets_comp_cncf.tsv".format(fld = folder)
-                    if os.path.isfile(file) :
-                        # Check LOH in the gene, add the output to a list
-                        aux = lib.getLOH(file, "facets", gene)
-                        loh.append(aux)
-                    # Get Sequenza output file
-                    folder = "{wd}/{sub}/{pre}_Sequenza".format(wd = wd, sub = c[0], pre = prefix)
-                    file = "{fld}/{case}_segments.txt".format(fld = folder, case = c[0])
-                    if os.path.isfile(file) :
-                        # Check LOH in the gene, add th output to a list
-                        aux = lib.getLOH(file, "sequenza", gene)
-                        loh.append(aux)
-                    # Get PURPLE output file
-                    folder = "{wd}/{sub}/{pre}_PURPLE".format(wd = wd, sub = c[0], pre = prefix)
-                    file = "{fld}/TUMOR.purple.cnv.somatic.tsv".format(fld = folder)
-                    if os.path.isfile(file) :
-                        aux = lib.getLOH(file, "purple", gene)
-                        loh.append(aux)
-                    # Get ASCAT2 output file
-                    folder = "{wd}/{sub}/ASCAT2".format(wd = wd, sub = c[0])
-                    if os.path.isdir(folder) :
-                        # Check LOH in the gene, add the output to a list
-                        aux = asc.checkAscat(folder, gene)
-                        loh.append(aux)
-                    if len(loh) >= 2 :
-                        done.append(c[0])
-                    # Count the number of LOH found in the patient
-                    lohs = loh.count("L") + loh.count("D") # Copy number neutral +`copy number lose`
-                    std, err = pr.communicate() # Get the output from grep. This grep was launched before the LOH calling
-                    rawVars = std.decode().strip().split("\n")
-                    annoVars = []
-                    isPathogenic = False
-                    for r in rawVars :
-                        if r != "" :
-                            tmp = annotateClinVar(r, clinvarData)
-                            tmp["submitter"] = c[0]
-                            tmp["tumor"] = tm[0]
-                            tmp["control"] = cn[0]
-                            tmp["lohCount"] = str(lohs)
-                            annoVars.append(tmp)
-                            if tmp["type"] in cte.var_positive or tmp["exonicType"] in cte.var_positive :
-                                isPathogenic = True
-                            # # TODO: Tenir en compte que les variants poden estar relacionades amb cancer pero tenir significat com a benign o unknown_significance
-                            if tmp["disease"].find("cancer") > 0 :
-                                isPathogenic = True
+                    if c[0] not in done :
+                        prefix = "{}_VS_{}".format(tm[0].split("-")[0], cn[0].split("-")[0])
+                        # Get and annotate the variants
+                        germCall = "{wd}/{sub}/{uuid}/{suffix}".format(wd = wd, sub = c[0], uuid = cn[0], suffix = varCallSuffix)
+                        cmd = "grep {gene} {vc}".format(gene = genename, vc = germCall)
+                        pr = subprocess.Popen(cmd, shell = True, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+                        # Get LOH
+                        lohs = 0 # Number of tools that reported LOH (Delecion or copy number normal)
+                        loh = []
+                        # Get FACETS output file
+                        folder = "{wd}/{sub}/{pre}_FACETS".format(wd = wd, sub = c[0], pre = prefix)
+                        file = "{fld}/facets_comp_cncf.tsv".format(fld = folder)
+                        if os.path.isfile(file) :
+                            # Check LOH in the gene, add the output to a list
+                            aux = lib.getLOH(file, "facets", gene)
+                            loh.append(aux)
+                        # Get Sequenza output file
+                        folder = "{wd}/{sub}/{pre}_Sequenza".format(wd = wd, sub = c[0], pre = prefix)
+                        file = "{fld}/{case}_segments.txt".format(fld = folder, case = c[0])
+                        if os.path.isfile(file) :
+                            # Check LOH in the gene, add th output to a list
+                            aux = lib.getLOH(file, "sequenza", gene)
+                            loh.append(aux)
+                        # Get PURPLE output file
+                        folder = "{wd}/{sub}/{pre}_PURPLE".format(wd = wd, sub = c[0], pre = prefix)
+                        file = "{fld}/TUMOR.purple.cnv.somatic.tsv".format(fld = folder)
+                        if os.path.isfile(file) :
+                            aux = lib.getLOH(file, "purple", gene)
+                            loh.append(aux)
+                        # Get ASCAT2 output file
+                        folder = "{wd}/{sub}/ASCAT2".format(wd = wd, sub = c[0])
+                        if os.path.isdir(folder) :
+                            # Check LOH in the gene, add the output to a list
+                            aux = asc.checkAscat(folder, gene)
+                            loh.append(aux)
+                        if len(loh) >= 2 :
+                            done.append(c[0])
+                        # Count the number of LOH found in the patient
+                        lohs = loh.count("L") + loh.count("D") # Copy number neutral +`copy number lose`
+                        std, err = pr.communicate() # Get the output from grep. This grep was launched before the LOH calling
+                        rawVars = std.decode().strip().split("\n")
+                        annoVars = []
+                        isPathogenic = False
+                        for r in rawVars :
+                            if r != "" :
+                                tmp = annotateClinVar(r, clinvarData)
+                                tmp["submitter"] = c[0]
+                                tmp["tumor"] = tm[0]
+                                tmp["control"] = cn[0]
+                                tmp["lohCount"] = str(lohs)
+                                annoVars.append(tmp)
+                                if tmp["type"] in cte.var_positive or tmp["exonicType"] in cte.var_positive :
+                                    isPathogenic = True
+                                # # TODO: Tenir en compte que les variants poden estar relacionades amb cancer pero tenir significat com a benign o unknown_significance
+                                if tmp["disease"].find("cancer") > 0 :
+                                    isPathogenic = True
 
-                    print("{} -> {} analyses".format(c[0], len(loh)))
-                    if lohs >= 2 :
-                        positive.append(c[0])
-                        # # TODO: Comprovar que les variants stopgain/frameshift es consideren patogeniques tambe
-                        if isPathogenic :
-                            pathogenic.append(c[0])
-                            patData = patData + annoVars
+                        print("{} -> {} analyses".format(c[0], len(loh)))
+                        if lohs >= 2 :
+                            positive.append(c[0])
+                            # # TODO: Comprovar que les variants stopgain/frameshift es consideren patogeniques tambe
+                            if isPathogenic :
+                                pathogenic.append(c[0])
+                                patData = patData + annoVars
+                            else :
+                                posData = posData + annoVars
+                            # Emplenar posHist (dict)
+                            # Emplenar posData (list)
                         else :
-                            posData = posData + annoVars
-                        # Emplenar posHist (dict)
-                        # Emplenar posData (list)
-                    else :
-                        negative.append(c[0])
-                        negData += annoVars
-                        # Emplenar negHist (dict)
-                        # Emplenar negData (list)
-    print("{} positive submitters")
+                            negative.append(c[0])
+                            negData += annoVars
+                            # Emplenar negHist (dict)
+                            # Emplenar negData (list)
+    print("{} submitters with enough LOH information".format(len(done)))
+    print("{} submitters considered LOH positive".format(len(positive)))
+    print("{} submitters had were positive and had a pathogenic variant".format(len(pathogenic)))
+    print("{} submitters do not have LOH".format(len(negative)))
 
 if __name__ == "__main__" :
     # NOTE: To change the analysis parameters, change the constants at the beginning of the file
