@@ -212,9 +212,9 @@ def getData() :
                     rawVars = std.decode().strip().split("\n")
                     annoVars = []
                     for r in rawVars :
-                        tmp = annotateClinVar(r, clinvarData)
-                        print(r)
-                        print(tmp)
+                        if r != "" :
+                            tmp = annotateClinVar(r, clinvarData)
+                            print(tmp)
 
                     if lohs >= 2 :
                         positive.append(c[0])
