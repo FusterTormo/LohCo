@@ -285,8 +285,12 @@ def main() :
         with open(cte.pathAllTemplate, "r") as fi :
             txt = fi.read()
 
-        vars, bases, cov = datosPlantilla() # Recoger los datos necesarios para rellenar la plantilla
+        # Modificar las rutas de los graficos "fijos" snvQC.png y readsQC.png
+        txt.replace("readsQC.png", "{}/readsQC.png".format(imgFolder))
+        txt.replace("snvQC.png", "{}/snvQC.png".format(imgFolder))
 
+        vars, bases, cov = datosPlantilla() # Recoger los datos necesarios para rellenar la plantilla
+        print(bases)
         fic = cte.pathAllTemplate.split("/")[-1]
         with open(fic, "w") as fi :
             fi.write(txt.format(tanda = "{}{}".format(cte.prefijoTanda, tanda), variantes = vars, percentBases = cov, covBases = bases))
