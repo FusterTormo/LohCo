@@ -122,7 +122,9 @@ def annotateClinVar(data, cln) :
     if search in cln.keys() :
         supData = extractClinVar(cln[search], d)
 
-    return supData
+    anno = {"chrom" : d[0], "start" : d[1], "end" : d[2], "ref" : d[3], "alt" : d[4], "type" : d[5], "exonicType" : d[8], "disease" : supData["disease"], "significance" : supData["significance"]}
+    print(anno)
+    return anno
 
 
 def getData() :
@@ -211,10 +213,15 @@ def getData() :
                     std, err = pr.communicate() # Get the output from grep. This grep was launched before the LOH calling
                     rawVars = std.decode().strip().split("\n")
                     annoVars = []
+                    isPathogenic = False
                     for r in rawVars :
                         if r != "" :
                             tmp = annotateClinVar(r, clinvarData)
-                            print(tmp)
+                            tmp["submitter"] = c[0])
+                            tmp["tumor"] = tm[0]
+                            tmp["control"] = cn[0]
+                            tmp["lohCount"] = str(lohs)
+                            annoVars.append(tmp)
 
                     if lohs >= 2 :
                         positive.append(c[0])
