@@ -16,7 +16,12 @@ Search VUS variants in LOH
 """
 
 """
-USAGE:
+USAGE: Modify the constants below:
+    * gene: gene coordinates. Some examples available below
+    * genename: gene name to search in ANNOVAR output data
+    * varCallSuffix: variant caller of interest. Available options are commented
+
+Additionally, it is possible to modify the TCGA cancer repository by changing the constant cancer (cancer repository name) and cFolder (cancer folder where all the data is)
 """
 
 # Constants
@@ -25,11 +30,13 @@ brca1 = ["17", 43044295, 43125483]
 brca2 = ["13", 32315508, 32400268]
 atm = ["11", 108222832, 108369099]
 palb2 = ["16", 23603165, 23641310]
+rad51c = ["17", 58692602, 58735611]
+rad51 = ["15", 40695174, 40732340]
 # Cancer repository of interest, and full path to files
-cFolder = "fsupek_cancer2"
+cFolder = "fsupek_cancer2" # Shared folder where the data is stored
 cancer = "OV" # Cancer repository to search
 dbcon = sqlite3.connect("/g/strcombio/fsupek_cancer2/TCGA_bam/info/info.db")
-wd = "/g/strcombio/{cancer_path}/TCGA_bam/{c}".format(c = cancer, cancer_path = cFolder)
+wd = "/g/strcombio/{cancer_path}/TCGA_bam/{c}".format(c = cancer, cancer_path = cFolder) # Full path to TCGA repository data
 # Constants for ClinVar
 keyword = "cancer" # If the variant has this keyword in ClinVar annotations. It will be considered pathogenic
 vcf = "clinvar.vcf" # Path to ClinVar database
@@ -242,21 +249,71 @@ def getData() :
                             else :
                                 posData = posData + annoVars
                             # Emplenar posHist (dict)
-                            # Emplenar posData (list)
                         else :
                             negative.append(c[0])
                             negData += annoVars
                             # Emplenar negHist (dict)
-                            # Emplenar negData (list)
+
     print("{} submitters with enough LOH information".format(len(done)))
     print("{} submitters considered LOH positive".format(len(positive)))
     print("{} submitters had were positive and had a pathogenic variant".format(len(pathogenic)))
     print("{} submitters do not have LOH".format(len(negative)))
 
+    return posData, patData, negData
+
+def groupVariants(pos, pat, neg, filename) :
+    """Count the number of variants in each group"""
+    groups = {}
+    addinfo = {}
+
+    for p in pos :
+        key = "{chr};{sta};{end};{ref};{alt};{func};{exonic}".format(
+            chr = p["chrom"], sta = p["start"], end = p["end"], ref = p["ref"], alt = p["alt"], func = p["type"], exonic = p["exonicType"])
+        if key in groups.keys() :
+            groups[key]["Positive"] += 1
+        else :
+            groups[key] = {"Positive" : 1, "Pathogenic" : 0, "Negative" : 0}
+            addinfo[key] = {"significance" : p["significance"], "disease" : p["disease"]}
+
+    for p in pat :
+        key = "{chr};{sta};{end};{ref};{alt};{func};{exonic}".format(
+            chr = p["chrom"], sta = p["start"], end = p["end"], ref = p["ref"], alt = p["alt"], func = p["type"], exonic = p["exonicType"])
+        if key in groups.keys() :
+            groups[key]["Pathogenic"] += 1
+        else :
+            groups[key] = {"Positive" : 0, "Pathogenic" : 1, "Negative" : 0}
+            addinfo[key] = {"significance" : p["significance"], "disease" : p["disease"]}
+
+    for p in neg :
+        key = "{chr};{sta};{end};{ref};{alt};{func};{exonic}".format(
+            chr = p["chrom"], sta = p["start"], end = p["end"], ref = p["ref"], alt = p["alt"], func = p["type"], exonic = p["exonicType"])
+        if key in groups.keys() :
+            groups[key] += 1
+        else :
+            groups[key] = {"Positive" : 0, "Pathogenic" : 0, "Negative" : 1}
+            addinfo[key] = {"significance" : p["significance"], "disease" : p["disease"]}
+
+    print(groups)
+    # with open(filename, "w") as fi :
+    #     fi.write("Chr\tStart\tEnd\tRef\tAlt\tType\tExonicType\tClinVarDisease\tClinVarSignf\tInNegative\tInPathogenic\n")
+    #     for k, v in groups.items() :
+    #         fi.write(k.replace(";", "\t"))
+    #         if k in addinfo :
+    #             fi.write("\t")
+    #             fi.write(addinfo[k])
+    #         else :
+    #             fi.write("\tNA\tNA")
+    #         fi.write("\t{}\t".format(v["No_pathogenic"]))
+    #         fi.write("{}\n".format(v["Pathogenic"]))
+    #
+    # print("{} INFO: Output stored as {}".format(getTime(), filename))
+
+
+
 if __name__ == "__main__" :
     # NOTE: To change the analysis parameters, change the constants at the beginning of the file
-    getData()
-
+    positive, pathogenic, negative = getData()
+    groupVariants(positive, pathogenic, negative)
 
 
 
@@ -504,40 +561,6 @@ if __name__ == "__main__" :
 #
 #     return ispos, nopos
 #
-# def groupVariants(patho, nega, filename) :
-#     """Count the number of variants in each group"""
-#     groups = {}
-#     addinfo = {}
-#
-#     for n in nega :
-#         key = "{chr};{sta};{end};{ref};{alt};{func};{exonic}".format(chr = n[0], sta = n[1], end = n[2], ref = n[3], alt = n[4], func = n[5], exonic = n[6])
-#         if key in groups.keys() :
-#             groups[key]["No_pathogenic"] += 1
-#         else :
-#             groups[key] = {"No_pathogenic" : 1, "Pathogenic" : 0}
-#
-#     for p in patho :
-#         key = "{chr};{sta};{end};{ref};{alt};{func};{exonic}".format(chr = p[0], sta = p[1], end = p[2], ref = p[3], alt = p[4], func = p[5], exonic = p[6])
-#         if key not in addinfo.keys() :
-#             addinfo[key] = "{}\t{}".format(p[-2], p[-1])
-#         if key in groups.keys() :
-#             groups[key]["Pathogenic"] += 1
-#         else :
-#             groups[key] = {"Pathogenic" : 1, "No_pathogenic" : 0}
-#
-#     with open(filename, "w") as fi :
-#         fi.write("Chr\tStart\tEnd\tRef\tAlt\tType\tExonicType\tClinVarDisease\tClinVarSignf\tInNegative\tInPathogenic\n")
-#         for k, v in groups.items() :
-#             fi.write(k.replace(";", "\t"))
-#             if k in addinfo :
-#                 fi.write("\t")
-#                 fi.write(addinfo[k])
-#             else :
-#                 fi.write("\tNA\tNA")
-#             fi.write("\t{}\t".format(v["No_pathogenic"]))
-#             fi.write("{}\n".format(v["Pathogenic"]))
-#
-#     print("{} INFO: Output stored as {}".format(getTime(), filename))
 #
 # if __name__ == "__main__" :
 #     print("{} INFO: Getting the variants in {} gene written in each {} file".format(getTime(), genename, varCallSuffix))
