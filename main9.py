@@ -255,19 +255,28 @@ def getData() :
                                 pathogenic.append(c[0])
                                 patData = patData + annoVars
                                 for a in annoVars :
-                                    aux = a["start"]
-                                    patHist[aux] += 1
+                                    aux = int(a["start"])
+                                    if aux in patHist :
+                                        patHist[aux] += 1
+                                    else :
+                                        patHist[aux] = 1
                             else :
                                 posData = posData + annoVars
                                 for a in annoVars :
-                                    aux = a["start"]
-                                    posHist[aux] += 1
+                                    aux = int(a["start"])
+                                    if aux in posHist.keys() :
+                                        posHist[aux] += 1
+                                    else :
+                                        posHist[aux] = 1
                         else :
                             negative.append(c[0])
                             negData += annoVars
                             for a in annoVars :
-                                aux = a["start"]
-                                negHist += 1
+                                aux = int(a["start"])
+                                if aux in negHist.keys() :
+                                    negHist += 1
+                                else :
+                                    negHist[aux] = 1
 
     print("{} submitters with enough LOH information".format(len(done)))
     print("{} submitters considered LOH positive".format(len(positive)))
