@@ -274,7 +274,7 @@ def getData() :
     print("{} submitters had were positive and had a pathogenic variant".format(len(pathogenic)))
     print("{} submitters do not have LOH".format(len(negative)))
     print(posHist)
-    
+
     return posData, patData, negData
 
 def groupVariants(pos, pat, neg, filename) :
@@ -314,8 +314,7 @@ def groupVariants(pos, pat, neg, filename) :
         for k, v in groups.items() :
             fi.write(k.replace(";", "\t"))
             if k in addinfo :
-                fi.write("\t")
-                fi.write(addinfo[k])
+                fi.write("\t{sig}\t{disease}".format(sig = addinfo[k]["significance"], disease = addinfo[k]["disease"]))
             else :
                 fi.write("\tNA\tNA")
             fi.write("\t{}\t".format(v["Positive"]))
