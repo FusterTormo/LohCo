@@ -152,10 +152,19 @@ def getData() :
     negative = [] # List of submitters where ASCAT2, FACETS and Sequenza do not report LOH (or less than 2 tools report LOH)
     negHist = {} # Histogram with the positions {key} and times a variant is reported in that position (but for negative submitters)
     pathogenic = [] # List of submitters that are positive for LOH and a pathogenic variant in the gene is found
+    patHist = {} # Histogram with the positions {key} and times a variant is reported in that position (for positive submitters with a reported pathogenic variant)
     posData = [] # Two-dimension list with the information of each variant found in LOH submitters
     negData = [] # Two-dimension list with the information of each variant found in no-LOH submitters
     patData = [] # Two-dimension list with the informatino of each variant found in pathogenic submitters
+
+    # Initiallize the data
     clinvarData = readClinVar()
+    geneStart = gene[1]
+    geneEnd = gene[2]
+    for i in range(geneStart, geneEnd+1) :
+        posHist[i] = 0
+        negHist[i] = 0
+        patHist[i] = 0
 
     print("{} INFO: Getting {} submitters".format(getTime(), cancer))
     # Get the submitter IDs from the cancer repository
@@ -245,19 +254,27 @@ def getData() :
                             if isPathogenic :
                                 pathogenic.append(c[0])
                                 patData = patData + annoVars
+                                for a in annoVars :
+                                    aux = a["start"]
+                                    patHist[aux] += 1
                             else :
                                 posData = posData + annoVars
-                            # Emplenar posHist (dict)
+                                for a in annoVars :
+                                    aux = a["start"]
+                                    posHist[aux] += 1
                         else :
                             negative.append(c[0])
                             negData += annoVars
-                            # Emplenar negHist (dict)
+                            for a in annoVars :
+                                aux = a["start"]
+                                negHist += 1
 
     print("{} submitters with enough LOH information".format(len(done)))
     print("{} submitters considered LOH positive".format(len(positive)))
     print("{} submitters had were positive and had a pathogenic variant".format(len(pathogenic)))
     print("{} submitters do not have LOH".format(len(negative)))
-
+    print(posHist)
+    
     return posData, patData, negData
 
 def groupVariants(pos, pat, neg, filename) :
@@ -307,11 +324,13 @@ def groupVariants(pos, pat, neg, filename) :
 
     print("{} INFO: Output stored as {}".format(getTime(), filename))
 
+    return groups
+
 
 if __name__ == "__main__" :
     # NOTE: To change the analysis parameters, change the constants at the beginning of the file
     positive, pathogenic, negative = getData()
-    groupVariants(positive, pathogenic, negative, "grouped.vars.tsv")
+    groups = groupVariants(positive, pathogenic, negative, "grouped.vars.tsv")
 
 
 
