@@ -239,7 +239,6 @@ def getData() :
                                 if tmp["disease"].find("cancer") > 0 :
                                     isPathogenic = True
 
-                        print("{} -> {} analyses".format(c[0], len(loh)))
                         if lohs >= 2 :
                             positive.append(c[0])
                             # # TODO: Comprovar que les variants stopgain/frameshift es consideren patogeniques tambe
@@ -288,32 +287,31 @@ def groupVariants(pos, pat, neg, filename) :
         key = "{chr};{sta};{end};{ref};{alt};{func};{exonic}".format(
             chr = p["chrom"], sta = p["start"], end = p["end"], ref = p["ref"], alt = p["alt"], func = p["type"], exonic = p["exonicType"])
         if key in groups.keys() :
-            groups[key] += 1
+            groups[key]["Negative"] += 1
         else :
             groups[key] = {"Positive" : 0, "Pathogenic" : 0, "Negative" : 1}
             addinfo[key] = {"significance" : p["significance"], "disease" : p["disease"]}
 
-    print(groups)
-    # with open(filename, "w") as fi :
-    #     fi.write("Chr\tStart\tEnd\tRef\tAlt\tType\tExonicType\tClinVarDisease\tClinVarSignf\tInNegative\tInPathogenic\n")
-    #     for k, v in groups.items() :
-    #         fi.write(k.replace(";", "\t"))
-    #         if k in addinfo :
-    #             fi.write("\t")
-    #             fi.write(addinfo[k])
-    #         else :
-    #             fi.write("\tNA\tNA")
-    #         fi.write("\t{}\t".format(v["No_pathogenic"]))
-    #         fi.write("{}\n".format(v["Pathogenic"]))
-    #
-    # print("{} INFO: Output stored as {}".format(getTime(), filename))
+    with open(filename, "w") as fi :
+        fi.write("Chr\tStart\tEnd\tRef\tAlt\tType\tExonicType\tClinVarDisease\tClinVarSignf\tInLOHPositive\tInLOHPathogenic\tInNegative\n")
+        for k, v in groups.items() :
+            fi.write(k.replace(";", "\t"))
+            if k in addinfo :
+                fi.write("\t")
+                fi.write(addinfo[k])
+            else :
+                fi.write("\tNA\tNA")
+            fi.write("\t{}\t".format(v["Positive"]))
+            fi.write("\t{}\t".format(v["Pathogenic"]))
+            fi.write("{}\n".format(v["Negative"]))
 
+    print("{} INFO: Output stored as {}".format(getTime(), filename))
 
 
 if __name__ == "__main__" :
     # NOTE: To change the analysis parameters, change the constants at the beginning of the file
     positive, pathogenic, negative = getData()
-    groupVariants(positive, pathogenic, negative)
+    groupVariants(positive, pathogenic, negative, "grouped.vars.tsv")
 
 
 
