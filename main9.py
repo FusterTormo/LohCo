@@ -299,7 +299,7 @@ def getData() :
                             for a in annoVars :
                                 aux = int(a["start"])
                                 if aux in negHist.keys() :
-                                    negHist += 1
+                                    negHist[aux] += 1
                                 else :
                                     negHist[aux] = 1
 
