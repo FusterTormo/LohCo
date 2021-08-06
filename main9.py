@@ -133,6 +133,31 @@ def annotateClinVar(data, cln) :
 
     return anno
 
+def saveHistogram(data, filename) :
+    """Save dict with number of variants in each gene position in a tsv file"""
+    minim = min(data.keys())
+    maxim = max(data.keys())
+    total = sum(data.values())
+    with open(filename, "w") as fi :
+        fi.write("position\ttimes\tfreq\n")
+        for i in range(minim, maxim+1) :
+            if i in data.keys() :
+                fi.write("{}\t{}\t{}\n".format(i, data[i], round(data[i]/total, 6)))
+            else :
+                fi.write("{}\t0\t0\n".format(i))
+
+    print("INFO: Variant histogram data saved as {}".format(filename))
+
+def saveVariants(data, filename) :
+    """Save variants data in a tsv file"""
+    with open(filename, "w") as fi :
+        fi.write("chrom\tstart\tend\tref\talt\ttype\texonic.type\tlohs\tcln.signf\tcln.disease\tsubmitter\ttumor.id\tcontrol.id\n")
+        for d in data :
+            fi.write("{cr}\t{st}\t{nd}\t{ref}\t{alt}\t{tp}\t{ex}\t{loh}\t{sgnf}\t{dss}\t{sub}\t{tm}\t{cn}\n".format(
+                cr = d["chrom"], st = d["start"], nd = d["end"], ref = d["ref"], alt = d["alt"], tp = d["type"], ex = d["exonicType"], loh = d["lohCount"], sgnf = d["significance"], dss = d["disease"],
+                sub = d["submitter"], tm = d["tumor"], cn = d["control"]))
+
+    print("INFO: Variants saved as {}".format(filename))
 
 def getData() :
     """Get LOH and variants information for each submitter in the gene of interest
@@ -282,7 +307,16 @@ def getData() :
     print("{} submitters considered LOH positive".format(len(positive)))
     print("{} submitters had were positive and had a pathogenic variant".format(len(pathogenic)))
     print("{} submitters do not have LOH".format(len(negative)))
-    print(posHist)
+
+    # Save variant position counts in a tsv file
+    saveHistogram(posHist, "positiveHistogram.tsv")
+    saveHistogram(patHist, "pathogenicHistogram.tsv")
+    saveHistogram(negHist, "negativeHistogram.tsv")
+
+    # Save variant data in a tsv file
+    saveVariants(posData, "posVariants.tsv")
+    saveVariants(patData, "patVariants.tsv")
+    saveVariants(negData, "negVariants.tsv")
 
     return posData, patData, negData
 
