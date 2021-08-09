@@ -5,26 +5,73 @@ gene = sysarg[1][1]
 
 # Load the data
 cat("R-INFO: Loading data\n")
-p <- read.table("positionHistogram.tsv", header = TRUE, sep = "\t")
+p <- read.table("positiveHistogram.tsv", header = TRUE, sep = "\t")
+t <- read.table("pathogenicHistogram.tsv", header = TRUE, sep = "\t")
 n <- read.table("negativeHistogram.tsv", header = TRUE, sep = "\t")
-mt <- matrix(c(p$times, n$times), nrow = 2, byrow = TRUE)
-pos <- read.table("posVariants.tsv", header = FALSE, sep = "\t")
-neg <- read.table("negVariants.tsv", header = FALSE, sep = "\t")
-colnames(pos) <- c("chr", "start", "end", "ref", "alt", "position", "exonic", "submitter", "tm", "cn")
-colnames(neg) <- c("chr", "start", "end", "ref", "alt", "position", "exonic", "submitter", "tm", "cn")
-fpos <- read.table("posVariants.annotated.tsv", header = FALSE, sep = "\t")
-fneg <- read.table("negVariants.annotated.tsv", header = FALSE, sep = "\t")
-colnames(fpos) <- c("chr", "start", "end", "ref", "alt", "position", "exonic", "submitter", "tm", "cn", "disease", "significance")
-colnames(fneg) <- c("chr", "start", "end", "ref", "alt", "position", "exonic", "submitter", "tm", "cn", "disease", "significance")
-
+vp <- read.table("posVariants.tsv", header = TRUE, sep = "\t")
+vt <- read.table("patVariants.tsv", header = TRUE, sep = "\t")
+vn <- read.table("negVariants.tsv", header = TRUE, sep = "\t")
 cat("R-INFO: Data loaded successfully. Creating the plots\n")
-# The plots
-# Number of times a position is mutated in BRCA1
+
+# Assert the coordinates in the histograms are the same
+# First position
+if (p$position[1] != t$position[1])
+  cat("R-WARNING: Initial coordinates in positive and pathogenic are not the same")
+if (p$position[1] != n$position[1])
+  cat("R-WARNING: Innitial coordinates in positive and negative are not the same")
+if (t$position[1] != n$position[1])
+  cat("R-WARNING: Initial coordinates in negative and pathogenic are not the same")
+# Last position
+if (rev(p$position)[1] != rev(t$position)[1])
+  cat("R-WARNING: Final coordinates in positive and pathogenic are not the same")
+if (rev(p$position)[1] != rev(n$position)[1])
+  cat("R-WARNING: Final coordinates in positive and negative are not the same")
+if (rev(t$position)[1] != rev(n$position)[1])
+  cat("R-WARNING: Final coordinates in negative and pathogenic are not the same")
+
+# Plots
+
+# Number of times a position is mutated in the gene
 png(width = 1261, height = 906, filename = paste(gene, "_genePos.png", sep = ""))
-plot(p$times, pch = 18, col = "red", main = "Variant position", xlab = "BRCA1 position", ylab = "Variants found")
-points(n$times, pch = 20, col = "blue")
-legend("topleft", fill = c("red", "blue"), legend = c("Positive", "Negative"))
+plot(p$times, pch = 18, col = "red", main = "Variant position", xlab = paste(gene, "position"), ylab = "Variants found")
+points(n$times, pch = 18, col = "blue")
+points(t$times, pch = 18, col = "orange")
+legend("topleft", fill = c("red", "blue", "orange"), legend = c("Positive", "Negative", "Pathogenic"))
 dev.off()
+# Frequency that this position is mutated in the gene
+png(width = 1261, height = 906, filename = paste(gene, "_geneFreq.png", sep = ""))
+plot(p$freq, pch = 18, col = "red", main = "Variant position", xlab = paste(gene, "position"), ylab = "Variant frequency")
+points(n$freq, pch = 18, col = "blue")
+points(t$freq, pch = 18, col = "orange")
+legend("topleft", fill = c("red", "blue", "orange"), legend = c("Positive", "Negative", "Pathogenic"))
+dev.off()
+
+# Barplot with variant type
+tab <- table(vp$type)
+total <- length(vp$type)
+perc <- 100*tab/total
+barplot(perc, col = rainbow(length(tab)), main = "Variant type percent in positive submitters")
+tab <- table(vt$type)
+total <- length(vt$type)
+perc <- 100*tab/total
+barplot(perc, col = rainbow(length(tab)), main = "Variant type percent in pathogenic submitters")
+tab <- table(vn$type)
+total <- length(vn$type)
+perc <- 100*tab/total
+barplot(perc, col = rainbow(length(tab)), main = "Variant type percent in negative submitters")
+
+# Variants per submitter
+boxplot(table(vp$submitter), table(vt$submitter), table(vn$submitter), col = c("red", "orange", "blue"), main = "Variants per submitter")
+
+# Clinvar reported significance
+barplot(table(vp$cln.signf), col = "red", main = "Reported significance in positive group")
+barplot(table(vt$cln.signf), col = "orange", main = "Reported significance in pathogenic group")
+barplot(table(vn$cln.signf), col = "blue", main = "Reported significance in negative group")
+
+#TODO continuar per aci per si queda alguna grafica per transferir
+# TODO editar els colors de les grafiques i fer les comandes per guardar en el disc
+# The plots
+
 
 # Zoom by selecting only the positions with more than 1 variant
 pzoom <- p[p$times > 1,]
