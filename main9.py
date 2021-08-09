@@ -372,10 +372,44 @@ def groupVariants(pos, pat, neg, filename) :
 
     return groups
 
+def variantClassifier(vars) :
+    p = 0
+    n = 0
+    u = 0
+    for v in vars :
+        if v["type"] == "splicing" or (v["type"] == "exonic" and v["exonicType"] in cte.var_positive) :
+            p += 1
+        elif v["type"] == "exonic" :
+            if v["exonicType"] in cte.var_neutral :
+                u += 1
+            else :
+                n += 1
+        else :
+            n += 1
+    print(v)
+    print("Pos: {}, Neg: {}, Unk: {}".format(p, n, u))
+
+
+
+def groupSubmitters(variants) :
+    current = ""
+    tmpVars = []
+    allData = []
+    for v in variants :
+        if current != v["submitter"] :
+            allData += variantClassifier(tmpVars)
+            current = v["submitter"]
+            del(tmpVars)
+            tmpVars = [v]
+        else :
+            tmpVars.append(v)
+
 
 if __name__ == "__main__" :
     # NOTE: To change the analysis parameters, change the constants at the beginning of the file
+    # # TODO: If tsv files are created, read them rather than call getData()
     positive, pathogenic, negative = getData()
     groups = groupVariants(positive, pathogenic, negative, "grouped.vars.tsv")
     # # TODO: Group the variants according to its type. More information in issue #2 on github
+    groupSubmitters(positive)
     # # TODO: Run main9.R
