@@ -115,21 +115,24 @@ def extractClinVar(clinvar, variant) :
 
 def annotateClinVar(data, cln) :
     """Add ClinVar information to the variants list passed as parameter (data)"""
-    anno = []
     d = data.split("\t")
-    chrom = d[0].replace("chr", "")
-    # As ANNOVAR changes the position in insertions/deletions, we substract 1 to the start position
-    if d[1] == "-" :
-        pos = int(d[1]) - 1
+    if d[5] in ["intronic", "exonic", "splicing", "UTR3", "UTR5"] :
+        anno = []
+        chrom = d[0].replace("chr", "")
+        # As ANNOVAR changes the position in insertions/deletions, we substract 1 to the start position
+        if d[1] == "-" :
+            pos = int(d[1]) - 1
+        else :
+            pos = int(d[1])
+
+        search = "{}-{}".format(chrom, pos)
+        supData = {"db" : {}, "disease" : "NA", "significance" : "NA", "revStatus" : "NA"}
+        if search in cln.keys() :
+            supData = extractClinVar(cln[search], d)
+
+        anno = {"chrom" : d[0], "start" : d[1], "end" : d[2], "ref" : d[3], "alt" : d[4], "type" : d[5], "exonicType" : d[8], "disease" : supData["disease"], "significance" : supData["significance"]}
     else :
-        pos = int(d[1])
-
-    search = "{}-{}".format(chrom, pos)
-    supData = {"db" : {}, "disease" : "NA", "significance" : "NA", "revStatus" : "NA"}
-    if search in cln.keys() :
-        supData = extractClinVar(cln[search], d)
-
-    anno = {"chrom" : d[0], "start" : d[1], "end" : d[2], "ref" : d[3], "alt" : d[4], "type" : d[5], "exonicType" : d[8], "disease" : supData["disease"], "significance" : supData["significance"]}
+        anno = ""
 
     return anno
 
@@ -262,16 +265,17 @@ def getData() :
                         for r in rawVars :
                             if r != "" :
                                 tmp = annotateClinVar(r, clinvarData)
-                                tmp["submitter"] = c[0]
-                                tmp["tumor"] = tm[0]
-                                tmp["control"] = cn[0]
-                                tmp["lohCount"] = str(lohs)
-                                annoVars.append(tmp)
-                                if tmp["type"] in cte.var_positive or tmp["exonicType"] in cte.var_positive :
-                                    isPathogenic = True
-                                # # TODO: Tenir en compte que les variants poden estar relacionades amb cancer pero tenir significat com a benign o unknown_significance
-                                if tmp["disease"].find("cancer") > 0 :
-                                    isPathogenic = True
+                                if tmp != "" :
+                                    tmp["submitter"] = c[0]
+                                    tmp["tumor"] = tm[0]
+                                    tmp["control"] = cn[0]
+                                    tmp["lohCount"] = str(lohs)
+                                    annoVars.append(tmp)
+                                    if tmp["type"] in cte.var_positive or tmp["exonicType"] in cte.var_positive :
+                                        isPathogenic = True
+                                    # # TODO: Tenir en compte que les variants poden estar relacionades amb cancer pero tenir significat com a benign o unknown_significance
+                                    if tmp["disease"].find("cancer") > 0 :
+                                        isPathogenic = True
 
                         if lohs >= 2 :
                             positive.append(c[0])
@@ -373,29 +377,5 @@ if __name__ == "__main__" :
     # NOTE: To change the analysis parameters, change the constants at the beginning of the file
     positive, pathogenic, negative = getData()
     groups = groupVariants(positive, pathogenic, negative, "grouped.vars.tsv")
-
-# if __name__ == "__main__" :
-#     print("{} INFO: Getting the variants in {} gene written in each {} file".format(getTime(), genename, varCallSuffix))
-#     pos_variants, neg_variants = getData()
-#     clinvar = readClinVar()
-#     # TODO: MODIFICAR AQUESTES LINIES PER AGAFAR LES VARIANTS EN EL NOU FORMAT
-#     # with open("posVariants.tsv", "r") as fi :
-#     #     pos_variants = fi.read()
-#     # with open("negVariants.tsv", "r") as fi :
-#     #     neg_variants = fi.read()
-#     patho, nega = filterVariants(pos_variants, "posVariants.annotated", clinvar)
-#     groupVariants(patho, nega, "posVariants.grouped.tsv")
-#     # patho, nega = filterVariants(neg_variants, "negVariants.annotated", clinvar)
-#     # groupVariants(patho, nega, "negVariants.grouped.tsv")
-#     # aux = []
-#     # for d in pos_variants.split("\n") :
-#     #     if d != "" :
-#     #         aux.append(d.split("\t"))
-#     # pos_variants = aux
-#     # aux = []
-#     # for d in neg_variants.split("\n") :
-#     #     if d != "" :
-#     #         aux.append(d.split("\t"))
-#     # neg_variants = aux
-#     # pos_variants = annotateClinVar(pos_variants, clinvar)
-#     # groupVariants(pos_variants, neg_variants, "allVariants.grouped.tsv")
+    # # TODO: Group the variants according to its type. More information in issue #2 on github
+    # # TODO: Run main9.R
