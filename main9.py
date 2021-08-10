@@ -378,6 +378,7 @@ def variantClassifier(vars) :
     u = 0
     signs = {}
     line = ""
+    data = {}
     for v in vars :
         # Classify ClinVar significance
         if v["significance"] in signs.keys() :
@@ -394,12 +395,15 @@ def variantClassifier(vars) :
                 n += 1
         else :
             n += 1
-    line = v["submitter"]
-    line += "\t{}\t{}\t{}".format(p, n, u))
+    data["submitter"] = v["submitter"]
+    data["positive"] = p
+    data["negative"] = n
+    data["unknown"] = u
     for k,v in signs.items() :
         line += "\t{} ({})".format(k, v)
-    line += "\n"
-    print(line)
+    data["significances"] = line
+
+    return data
 
 def groupSubmitters(variants) :
     current = ""
@@ -409,8 +413,7 @@ def groupSubmitters(variants) :
         if current != v["submitter"] :
             current = v["submitter"]
             if len(tmpVars) > 0 :
-                # allData += variantClassifier(tmpVars)
-                variantClassifier(tmpVars)
+                allData.append(variantClassifier(tmpVars))
                 del(tmpVars)
                 tmpVars = [v]
         else :
@@ -440,5 +443,5 @@ if __name__ == "__main__" :
     negative = readFile("negVariants.tsv")
     # groups = groupVariants(positive, pathogenic, negative, "grouped.vars.tsv")
     # # TODO: Group the variants according to its type. More information in issue #2 on github
-    groupSubmitters(positive)
+    groupSubmitters(pathogenic)
     # # TODO: Run main9.R
