@@ -418,6 +418,7 @@ def groupSubmitters(variants) :
                 tmpVars = [v]
         else :
             tmpVars.append(v)
+    return allData
 
 def readFile(path) :
     data = []
@@ -441,7 +442,12 @@ if __name__ == "__main__" :
     positive = readFile("posVariants.tsv")
     pathogenic = readFile("patVariants.tsv")
     negative = readFile("negVariants.tsv")
-    # groups = groupVariants(positive, pathogenic, negative, "grouped.vars.tsv")
+    groups = groupVariants(positive, pathogenic, negative, "grouped.vars.tsv")
     # # TODO: Group the variants according to its type. More information in issue #2 on github
-    groupSubmitters(pathogenic)
+    submitters = groupSubmitters(positive)
+    tmp = groupSubmitters(pathogenic)
+    submitters += tmp
+    tmp = groupSubmitters(negative)
+    submitters += tmp
+    print(len(submitters))
     # # TODO: Run main9.R
