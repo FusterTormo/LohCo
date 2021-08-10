@@ -404,12 +404,29 @@ def groupSubmitters(variants) :
         else :
             tmpVars.append(v)
 
+def readFile(path) :
+    data = []
+    header = True
+    with open(path, "r") as fi :
+        for l in fi :
+            if header :
+                header = False
+            else :
+                aux = l.strip().split("\t")
+                dc = {"chrom" : aux[0], "start" : aux[1], "end" : aux[2], "ref" : aux[3], "alt" : aux[4], "type" : aux[5], "exonicType" : aux[6], "lohCount" : aux[7],
+                "significance" : aux[8], "disease" : aux[9], "submitter" : aux[10], "tumor" : aux[11], "control" : aux[12]}
+                data.append(dc)
+    print(data[0])
+    print(data[-1])
+
 
 if __name__ == "__main__" :
     # NOTE: To change the analysis parameters, change the constants at the beginning of the file
     # # TODO: If tsv files are created, read them rather than call getData()
-    positive, pathogenic, negative = getData()
-    groups = groupVariants(positive, pathogenic, negative, "grouped.vars.tsv")
+    #positive, pathogenic, negative = getData()
+    readFile("posVariants.tsv")
+    readFile("patVariants.tsv")
+    #groups = groupVariants(positive, pathogenic, negative, "grouped.vars.tsv")
     # # TODO: Group the variants according to its type. More information in issue #2 on github
-    groupSubmitters(positive)
+    #groupSubmitters(positive)
     # # TODO: Run main9.R
