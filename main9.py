@@ -219,6 +219,7 @@ def getData() :
             for tm in tumors :
                 for cn in controls :
                     pairs += 1
+                    print("INFO: {} pairs, {} +, {} -, {} *".format(pairs, len(positive), len(negative), len(pathogenic)))
                     if c[0] not in done :
                         prefix = "{}_VS_{}".format(tm[0].split("-")[0], cn[0].split("-")[0])
                         # Get and annotate the variants
