@@ -377,6 +377,7 @@ def variantClassifier(vars) :
     n = 0
     u = 0
     signs = {}
+    line = ""
     for v in vars :
         # Classify ClinVar significance
         if v["significance"] in signs.keys() :
@@ -393,9 +394,12 @@ def variantClassifier(vars) :
                 n += 1
         else :
             n += 1
-    print(vars)
-    print("\n--------\nPos: {}, Neg: {}, Unk: {}\n--------\n".format(p, n, u))
-    print(signs)
+    line = v["submitter"]
+    line += "\t{}\t{}\t{}".format(p, n, u))
+    for k,v in signs.items() :
+        line += "\t{} ({})".format(k, v)
+    line += "\n"
+    print(line)
 
 def groupSubmitters(variants) :
     current = ""
