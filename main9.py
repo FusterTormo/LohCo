@@ -310,7 +310,7 @@ def getData() :
 
     print("{} submitters with enough LOH information".format(len(done)))
     print("{} submitters considered LOH positive".format(len(positive)))
-    print("{} submitters had were positive and had a pathogenic variant".format(len(pathogenic)))
+    print("{} submitters considered LOH positive and had a pathogenic variant".format(len(pathogenic)))
     print("{} submitters do not have LOH".format(len(negative)))
 
     # Save variant position counts in a tsv file
@@ -412,13 +412,17 @@ def groupSubmitters(variants) :
     allData = []
     for v in variants :
         if current != v["submitter"] :
-            current = v["submitter"]
             if len(tmpVars) > 0 :
+                print("{} - {} variants".format(current, len(tmpVars)))
                 allData.append(variantClassifier(tmpVars))
                 del(tmpVars)
                 tmpVars = [v]
+            current = v["submitter"]
         else :
             tmpVars.append(v)
+
+    allData.append(variantClassifier(tmpVars))
+
     return allData
 
 def readFile(path) :
