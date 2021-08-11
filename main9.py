@@ -373,6 +373,7 @@ def groupVariants(pos, pat, neg, filename) :
     return groups
 
 def variantClassifier(vars) :
+    """Classify the variant list passed as parameter according to libconstants classification. Additionally, group the Clinvar tags. Return the data in a dictionary"""
     p = 0
     n = 0
     u = 0
@@ -406,6 +407,7 @@ def variantClassifier(vars) :
     return data
 
 def groupSubmitters(variants) :
+    """Group the variants by submitter. Classify these variants as positive, negative or unknown. Group ClinVar tags. Return all in a dictionary"""
     current = variants[0]["submitter"]
     tmpVars = []
     allData = []
@@ -424,6 +426,7 @@ def groupSubmitters(variants) :
     return allData
 
 def readFile(path) :
+    """Read *Variants.tsv file. Convert the content to the same format as created in getData"""
     data = []
     header = True
     with open(path, "r") as fi :
@@ -440,20 +443,26 @@ def readFile(path) :
 
 if __name__ == "__main__" :
     # NOTE: To change the analysis parameters, change the constants at the beginning of the file
-    # positive, pathogenic, negative = getData()
-    positive = readFile("posVariants.tsv")
-    pathogenic = readFile("patVariants.tsv")
-    negative = readFile("negVariants.tsv")
-    # groups = groupVariants(positive, pathogenic, negative, "grouped.vars.tsv")
+    # Read the data, either creating the tsv files or reading the previously created files
+    positive, pathogenic, negative = getData()
+    # positive = readFile("posVariants.tsv")
+    # pathogenic = readFile("patVariants.tsv")
+    # negative = readFile("negVariants.tsv")
+
+    # Group the variants and count how many times each are present in the different cases
+    groups = groupVariants(positive, pathogenic, negative, "grouped.vars.tsv")
+
     # Group the variants in each submitter according to its type
     submitters = groupSubmitters(positive)
     tmp = groupSubmitters(pathogenic)
     submitters += tmp
     tmp = groupSubmitters(negative)
     submitters += tmp
-    # Save submitter data in a tsv file
-    with open("variansGrouped.tsv", "w") as fi :
+
+    # Save the data in the last function in a tsv file
+    with open("variantsGrouped.tsv", "w") as fi :
         fi.write("submitter\tvar_positive\tvar_negative\tvar_unknown\tsignificance\n")
         for s in submitters :
             fi.write("{sub}\t{pos}\t{neg}\t{unk}\t{sig}\n".format(sub = s["submitter"], pos = s["positive"], neg = s["negative"], unk = s["unknown"], sig = s["significances"]))
+    print("INFO: Variant classification grouped by submitter stored as variantsGrouped.tsv")
     # # TODO: Run main9.R
