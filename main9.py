@@ -219,7 +219,6 @@ def getData() :
             for tm in tumors :
                 for cn in controls :
                     pairs += 1
-                    print("INFO: {} pairs, {} +, {} -, {} *".format(pairs, len(positive), len(negative), len(pathogenic)))
                     if c[0] not in done :
                         prefix = "{}_VS_{}".format(tm[0].split("-")[0], cn[0].split("-")[0])
                         # Get and annotate the variants
@@ -452,5 +451,9 @@ if __name__ == "__main__" :
     submitters += tmp
     tmp = groupSubmitters(negative)
     submitters += tmp
-    print(submitters)
+    # Save submitter data in a tsv file
+    with open("variansGrouped.tsv", "w") as fi :
+        fi.write("submitter\tvar_positive\tvar_negative\tvar_unknown\tsignificance\n")
+        for s in submitters :
+            fi.write("{sub}\t{pos}\t{neg}\t{unk}\t{sig}\n".format(s["submitter"], s["positive"], s["negative"], s["unknown"], s["significances"]))
     # # TODO: Run main9.R
