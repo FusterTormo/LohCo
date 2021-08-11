@@ -309,10 +309,10 @@ def getData() :
 
     print("{} submitters with enough LOH information".format(len(done)))
     print("{} submitters considered LOH positive ({} variants per submitter). {} had no variants in {} gene".format(
-        len(positive.keys()), sum(positive.values())/len(positive.values()), positive.values().count(0), genename))
+        len(positive.keys()), round(sum(positive.values())/len(positive.values()),2), list(positive.values().)count(0), genename))
     print("{} submitters considered LOH positive and had a pathogenic variant".format(len(pathogenic.keys())))
     print("{} submitters do not have LOH ({} variants per submitter). {} had no variants in {} gene".format(
-        len(negative.keys()), sum(negative.values())/len(negative.values()), negative.values().count(0), genename))
+        len(negative.keys()), round(sum(negative.values())/len(negative.values()),2), list(negative.values()).count(0), genename))
 
     # Save variant position counts in a tsv file
     saveHistogram(posHist, "positiveHistogram.tsv")
