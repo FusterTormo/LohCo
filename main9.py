@@ -413,7 +413,6 @@ def groupSubmitters(variants) :
     for v in variants :
         if current != v["submitter"] :
             if len(tmpVars) > 0 :
-                print("{} - {} variants".format(current, len(tmpVars)))
                 allData.append(variantClassifier(tmpVars))
                 del(tmpVars)
                 tmpVars = [v]
@@ -449,12 +448,9 @@ if __name__ == "__main__" :
     # groups = groupVariants(positive, pathogenic, negative, "grouped.vars.tsv")
     # Group the variants in each submitter according to its type
     submitters = groupSubmitters(positive)
-    print(len(submitters))
     tmp = groupSubmitters(pathogenic)
-    print(len(tmp))
     submitters += tmp
     tmp = groupSubmitters(negative)
-    print(len(tmp))
     submitters += tmp
-    print(len(submitters))
+    print(submitters)
     # # TODO: Run main9.R
