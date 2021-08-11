@@ -309,7 +309,7 @@ def getData() :
 
     print("{} submitters with enough LOH information".format(len(done)))
     print("{} submitters considered LOH positive ({} variants per submitter). {} had no variants in {} gene".format(
-        len(positive.keys()), round(sum(positive.values())/len(positive.values()),2), list(positive.values().)count(0), genename))
+        len(positive.keys()), round(sum(positive.values())/len(positive.values()),2), list(positive.values()).count(0), genename))
     print("{} submitters considered LOH positive and had a pathogenic variant".format(len(pathogenic.keys())))
     print("{} submitters do not have LOH ({} variants per submitter). {} had no variants in {} gene".format(
         len(negative.keys()), round(sum(negative.values())/len(negative.values()),2), list(negative.values()).count(0), genename))
@@ -456,15 +456,25 @@ if __name__ == "__main__" :
 
     # Group the variants in each submitter according to its type
     submitters = groupSubmitters(positive)
-    tmp = groupSubmitters(pathogenic)
-    submitters += tmp
-    tmp = groupSubmitters(negative)
-    submitters += tmp
-
     # Save the data in the last function in a tsv file
-    with open("variantsGrouped.tsv", "w") as fi :
+    with open("posVarsGrouped.tsv", "w") as fi :
         fi.write("submitter\tvar_positive\tvar_negative\tvar_unknown\tsignificance\n")
         for s in submitters :
             fi.write("{sub}\t{pos}\t{neg}\t{unk}\t{sig}\n".format(sub = s["submitter"], pos = s["positive"], neg = s["negative"], unk = s["unknown"], sig = s["significances"]))
-    print("INFO: Variant classification grouped by submitter stored as variantsGrouped.tsv")
+
+    tmp = groupSubmitters(pathogenic)
+    with open("patVarsGrouped.tsv", "a") as fi :
+        fi.write("submitter\tvar_positive\tvar_negative\tvar_unknown\tsignificance\n")
+        for s in tmp :
+            fi.write("{sub}\t{pos}\t{neg}\t{unk}\t{sig}\n".format(sub = s["submitter"], pos = s["positive"], neg = s["negative"], unk = s["unknown"], sig = s["significances"]))
+    submitters += tmp
+
+    tmp = groupSubmitters(negative)
+    with open("negVarsGrouped.tsv", "a") as fi :
+        fi.write("submitter\tvar_positive\tvar_negative\tvar_unknown\tsignificance\n")
+        for s in tmp :
+            fi.write("{sub}\t{pos}\t{neg}\t{unk}\t{sig}\n".format(sub = s["submitter"], pos = s["positive"], neg = s["negative"], unk = s["unknown"], sig = s["significances"]))
+    submitters += tmp
+
+    print("INFO: Variant classification grouped by submitter stored as posVarsGrouped.tsv, patVarsGrouped.tsv, and negVarsGrouped.tsv")
     # # TODO: Run main9.R
