@@ -438,17 +438,19 @@ def readFile(path) :
 
 if __name__ == "__main__" :
     # NOTE: To change the analysis parameters, change the constants at the beginning of the file
-    # # TODO: If tsv files are created, read them rather than call getData()
     # positive, pathogenic, negative = getData()
     positive = readFile("posVariants.tsv")
     pathogenic = readFile("patVariants.tsv")
     negative = readFile("negVariants.tsv")
-    groups = groupVariants(positive, pathogenic, negative, "grouped.vars.tsv")
-    # # TODO: Group the variants according to its type. More information in issue #2 on github
+    # groups = groupVariants(positive, pathogenic, negative, "grouped.vars.tsv")
+    # Group the variants in each submitter according to its type
     submitters = groupSubmitters(positive)
+    print(len(submitters))
     tmp = groupSubmitters(pathogenic)
+    print(len(tmp))
     submitters += tmp
     tmp = groupSubmitters(negative)
+    print(len(tmp))
     submitters += tmp
     print(len(submitters))
     # # TODO: Run main9.R
