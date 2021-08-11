@@ -407,7 +407,7 @@ def variantClassifier(vars) :
     return data
 
 def groupSubmitters(variants) :
-    current = ""
+    current = variants[0]["submitter"]
     tmpVars = []
     allData = []
     for v in variants :
