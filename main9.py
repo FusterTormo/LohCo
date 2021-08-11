@@ -175,11 +175,11 @@ def getData() :
     # Variables
     pairs = 0 # Number of submitters with pair tumor-control
     done = [] # List of submitters with ASCAT2, FACETS and Sequenza done
-    positive = [] # List of submitters where ASCAT2, FACETS and Sequenza reported LOH
+    positive = {} # List of submitters (and the number of variants in the gene) where ASCAT2, FACETS and Sequenza reported LOH
     posHist = {} # Histogram with the positions (key) and the times a variant is reported in that position (value)
-    negative = [] # List of submitters where ASCAT2, FACETS and Sequenza do not report LOH (or less than 2 tools report LOH)
+    negative = {} # List of submitters (and the number of variants in the gene) where ASCAT2, FACETS and Sequenza do not report LOH (or less than 2 tools report LOH)
     negHist = {} # Histogram with the positions {key} and times a variant is reported in that position (but for negative submitters)
-    pathogenic = [] # List of submitters that are positive for LOH and a pathogenic variant in the gene is found
+    pathogenic = {} # List of submitters (and the number of variants in the gene) that are positive for LOH and a pathogenic variant in the gene is found
     patHist = {} # Histogram with the positions {key} and times a variant is reported in that position (for positive submitters with a reported pathogenic variant)
     posData = [] # Two-dimension list with the information of each variant found in LOH submitters
     negData = [] # Two-dimension list with the information of each variant found in no-LOH submitters
@@ -278,10 +278,10 @@ def getData() :
                                         isPathogenic = True
 
                         if lohs >= 2 :
-                            positive.append(c[0])
+                            positive[c[0]] = len(annoVars)
                             # # TODO: Comprovar que les variants stopgain/frameshift es consideren patogeniques tambe
                             if isPathogenic :
-                                pathogenic.append(c[0])
+                                pathogenic[c[0]] = len(annoVars)
                                 patData = patData + annoVars
                                 for a in annoVars :
                                     aux = int(a["start"])
@@ -298,7 +298,7 @@ def getData() :
                                     else :
                                         posHist[aux] = 1
                         else :
-                            negative.append(c[0])
+                            negative[c[0]] = len(annoVars)
                             negData += annoVars
                             for a in annoVars :
                                 aux = int(a["start"])
@@ -308,9 +308,11 @@ def getData() :
                                     negHist[aux] = 1
 
     print("{} submitters with enough LOH information".format(len(done)))
-    print("{} submitters considered LOH positive".format(len(positive)))
-    print("{} submitters considered LOH positive and had a pathogenic variant".format(len(pathogenic)))
-    print("{} submitters do not have LOH".format(len(negative)))
+    print("{} submitters considered LOH positive ({} variants per submitter). {} had no variants in {} gene".format(
+        len(positive.keys()), sum(positive.values())/len(positive.values()), positive.values().count(0), genename))
+    print("{} submitters considered LOH positive and had a pathogenic variant".format(len(pathogenic.keys())))
+    print("{} submitters do not have LOH ({} variants per submitter). {} had no variants in {} gene".format(
+        len(negative.keys()), sum(negative.values())/len(negative.values()), negative.values().count(0), genename))
 
     # Save variant position counts in a tsv file
     saveHistogram(posHist, "positiveHistogram.tsv")
