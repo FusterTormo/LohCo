@@ -455,5 +455,5 @@ if __name__ == "__main__" :
     with open("variansGrouped.tsv", "w") as fi :
         fi.write("submitter\tvar_positive\tvar_negative\tvar_unknown\tsignificance\n")
         for s in submitters :
-            fi.write("{sub}\t{pos}\t{neg}\t{unk}\t{sig}\n".format(s["submitter"], s["positive"], s["negative"], s["unknown"], s["significances"]))
+            fi.write("{sub}\t{pos}\t{neg}\t{unk}\t{sig}\n".format(sub = s["submitter"], pos = s["positive"], neg = s["negative"], unk = s["unknown"], sig = s["significances"]))
     # # TODO: Run main9.R
