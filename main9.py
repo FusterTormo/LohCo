@@ -445,6 +445,30 @@ def readFile(path) :
 
 if __name__ == "__main__" :
     # NOTE: To change the analysis parameters, change the constants at the beginning of the file
+    # Check if the folder structure has been created before. Ask to remove the data before running the program
+    mainFolder = "VUS_project"
+    if varCallSuffix == "platypusGerm/platypus.hg38_multianno.txt" :
+        subfolder = "{}/Platypus".format(mainFolder)
+        genFolder = "{}/{}".format(subfolder, genename)
+    elif varCallSuffix == "strelkaGerm/results/variants/strelka.hg38_multianno.txt" :
+        subfolder = "{}/Strelka2".format(mainFolder)
+        genFolder = "{}/{}".format(subfolder, genename)
+
+    if os.path.isdir(geneFolder) :
+        opt = input("INPUT: Remove previously calculated data? (Y/N) ")
+        if opt == "N" or opt == "n":
+            sys.exit()
+
+    # Move all the data to a folder
+    if not os.path.isdir(mainFolder) :
+        os.mkdir(mainFolder)
+    if not os.path.isdir(subfolder)) :
+        os.mkdir(subfolder)
+    if not os.path.isdir(genDir) :
+        os.mkdir(genDir)
+    sys.exit()
+    
+    # Run the analysis
     # Read the data, either creating the tsv files or reading the previously created files
     positive, pathogenic, negative = getData()
     # positive = readFile("posVariants.tsv")
@@ -477,4 +501,13 @@ if __name__ == "__main__" :
     submitters += tmp
 
     print("INFO: Variant classification grouped by submitter stored as posVarsGrouped.tsv, patVarsGrouped.tsv, and negVarsGrouped.tsv")
+
+    # Move all the data to a folder
+    if not os.path.isdir(mainFolder) :
+        os.mkdir(mainFolder)
+    if not os.path.isdir(subfolder)) :
+        os.mkdir(subfolder)
+    if not os.path.isdir(genDir) :
+        os.mkdir(genDir)
+
     # # TODO: Run main9.R
