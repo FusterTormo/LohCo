@@ -359,15 +359,15 @@ def groupVariants(pos, pat, neg, filename) :
             addinfo[key] = {"significance" : p["significance"], "disease" : p["disease"]}
 
     with open(filename, "w") as fi :
-        fi.write("Chr\tStart\tEnd\tRef\tAlt\tType\tExonicType\tClinVarDisease\tClinVarSignf\tInLOHPositive\tInLOHPathogenic\tInNegative\n")
+        fi.write("Chr\tStart\tEnd\tRef\tAlt\tType\tExonicType\tClinVarDisease\tClinVarSignf\tInLOHPositive\tInLOHPathogenic\tInLOHNegative\n")
         for k, v in groups.items() :
             fi.write(k.replace(";", "\t"))
             if k in addinfo :
-                fi.write("\t{sig}\t{disease}".format(sig = addinfo[k]["significance"], disease = addinfo[k]["disease"]))
+                fi.write("\t{disease}\t{sig}".format(sig = addinfo[k]["significance"], disease = addinfo[k]["disease"]))
             else :
                 fi.write("\tNA\tNA")
             fi.write("\t{}\t".format(v["Positive"]))
-            fi.write("\t{}\t".format(v["Pathogenic"]))
+            fi.write("{}\t".format(v["Pathogenic"]))
             fi.write("{}\n".format(v["Negative"]))
 
     print("{} INFO: Output stored as {}".format(getTime(), filename))
@@ -510,4 +510,5 @@ if __name__ == "__main__" :
     os.rename("posVarsGrouped.tsv", "{}/posVarsGrouped.tsv".format(geneFolder))
     os.rename("patVarsGrouped.tsv", "{}/patVarsGrouped.tsv".format(geneFolder))
     os.rename("negVarsGrouped.tsv", "{}/negVarsGrouped.tsv".format(geneFolder))
-    # # TODO: Run main9.R
+
+    ## TODO:  Run main9.R to create the plots
