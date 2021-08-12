@@ -149,7 +149,7 @@ def saveHistogram(data, filename) :
             else :
                 fi.write("{}\t0\t0\n".format(i))
 
-    print("INFO: Variant histogram data saved as {}".format(filename))
+    print("{} INFO: Variant histogram data saved as {}".format(getTime(), filename))
 
 def saveVariants(data, filename) :
     """Save variants data in a tsv file"""
@@ -160,7 +160,7 @@ def saveVariants(data, filename) :
                 cr = d["chrom"], st = d["start"], nd = d["end"], ref = d["ref"], alt = d["alt"], tp = d["type"], ex = d["exonicType"], loh = d["lohCount"], sgnf = d["significance"], dss = d["disease"],
                 sub = d["submitter"], tm = d["tumor"], cn = d["control"]))
 
-    print("INFO: Variants saved as {}".format(filename))
+    print("{} INFO: Variants saved as {}".format(getTime(), filename))
 
 def getData() :
     """Get LOH and variants information for each submitter in the gene of interest
@@ -307,11 +307,12 @@ def getData() :
                                 else :
                                     negHist[aux] = 1
 
-    print("{} submitters with enough LOH information".format(len(done)))
-    print("{} submitters considered LOH positive ({} variants per submitter). {} had no variants in {} gene".format(
+    print("{} INFO: Stats".format(getTime()))
+    print("\t{} submitters with enough LOH information".format(len(done)))
+    print("\t{} submitters considered LOH positive ({} variants per submitter). {} had no variants in {} gene".format(
         len(positive.keys()), round(sum(positive.values())/len(positive.values()),2), list(positive.values()).count(0), genename))
-    print("{} submitters considered LOH positive and had a pathogenic variant".format(len(pathogenic.keys())))
-    print("{} submitters do not have LOH ({} variants per submitter). {} had no variants in {} gene".format(
+    print("\t{} submitters considered LOH positive and had a pathogenic variant".format(len(pathogenic.keys())))
+    print("\t{} submitters do not have LOH ({} variants per submitter). {} had no variants in {} gene".format(
         len(negative.keys()), round(sum(negative.values())/len(negative.values()),2), list(negative.values()).count(0), genename))
 
     # Save variant position counts in a tsv file
@@ -370,7 +371,7 @@ def groupVariants(pos, pat, neg, filename) :
             fi.write("{}\t".format(v["Pathogenic"]))
             fi.write("{}\n".format(v["Negative"]))
 
-    print("{} INFO: Output stored as {}".format(getTime(), filename))
+    print("{} INFO: Variants grouped and counted by groups. Data stored as {}".format(getTime(), filename))
 
     return groups
 
@@ -491,7 +492,7 @@ if __name__ == "__main__" :
             fi.write("{sub}\t{pos}\t{neg}\t{unk}\t{sig}\n".format(sub = s["submitter"], pos = s["positive"], neg = s["negative"], unk = s["unknown"], sig = s["significances"]))
     submitters += tmp
 
-    print("INFO: Variant classification grouped by submitter stored as posVarsGrouped.tsv, patVarsGrouped.tsv, and negVarsGrouped.tsv")
+    print("{} INFO: Variant classification grouped by submitter stored as posVarsGrouped.tsv, patVarsGrouped.tsv, and negVarsGrouped.tsv".format(getTime()))
 
     # Move all the data to a folder
     if not os.path.isdir(mainFolder) :
@@ -510,5 +511,4 @@ if __name__ == "__main__" :
     os.rename("posVarsGrouped.tsv", "{}/posVarsGrouped.tsv".format(geneFolder))
     os.rename("patVarsGrouped.tsv", "{}/patVarsGrouped.tsv".format(geneFolder))
     os.rename("negVarsGrouped.tsv", "{}/negVarsGrouped.tsv".format(geneFolder))
-
-    ## TODO:  Run main9.R to create the plots
+    print("{temp} INFO: Data moved to {fold}. Run main9.R in {fold} to get further statistics".format(temp = getTime(), fold = geneFolder))
