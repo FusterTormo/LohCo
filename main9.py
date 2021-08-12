@@ -449,25 +449,16 @@ if __name__ == "__main__" :
     mainFolder = "VUS_project"
     if varCallSuffix == "platypusGerm/platypus.hg38_multianno.txt" :
         subfolder = "{}/Platypus".format(mainFolder)
-        genFolder = "{}/{}".format(subfolder, genename)
+        geneFolder = "{}/{}".format(subfolder, genename)
     elif varCallSuffix == "strelkaGerm/results/variants/strelka.hg38_multianno.txt" :
         subfolder = "{}/Strelka2".format(mainFolder)
-        genFolder = "{}/{}".format(subfolder, genename)
+        geneFolder = "{}/{}".format(subfolder, genename)
 
     if os.path.isdir(geneFolder) :
         opt = input("INPUT: Remove previously calculated data? (Y/N) ")
         if opt == "N" or opt == "n":
             sys.exit()
 
-    # Move all the data to a folder
-    if not os.path.isdir(mainFolder) :
-        os.mkdir(mainFolder)
-    if not os.path.isdir(subfolder)) :
-        os.mkdir(subfolder)
-    if not os.path.isdir(genDir) :
-        os.mkdir(genDir)
-    sys.exit()
-    
     # Run the analysis
     # Read the data, either creating the tsv files or reading the previously created files
     positive, pathogenic, negative = getData()
@@ -505,9 +496,18 @@ if __name__ == "__main__" :
     # Move all the data to a folder
     if not os.path.isdir(mainFolder) :
         os.mkdir(mainFolder)
-    if not os.path.isdir(subfolder)) :
+    if not os.path.isdir(subfolder) :
         os.mkdir(subfolder)
-    if not os.path.isdir(genDir) :
-        os.mkdir(genDir)
-
+    if not os.path.isdir(geneFolder) :
+        os.mkdir(geneFolder)
+    os.rename("positiveHistogram.tsv", "{}/positiveHistogram.tsv".format(geneFolder))
+    os.rename("pathogenicHistogram.tsv", "{}/pathogenicHistogram.tsv".format(geneFolder))
+    os.rename("negativeHistogram.tsv", "{}/negativeHistogram.tsv".format(geneFolder))
+    os.rename("posVariants.tsv", "{}/posVariants.tsv".format(geneFolder))
+    os.rename("patVariants.tsv", "{}/patVariants.tsv".format(geneFolder))
+    os.rename("negVariants.tsv", "{}/negVariants.tsv".format(geneFolder))
+    os.rename("grouped.vars.tsv", "{}/grouped.vars.tsv".format(geneFolder))
+    os.rename("posVarsGrouped.tsv", "{}/posVarsGrouped.tsv".format(geneFolder))
+    os.rename("patVarsGrouped.tsv", "{}/patVarsGrouped.tsv".format(geneFolder))
+    os.rename("negVarsGrouped.tsv", "{}/negVarsGrouped.tsv".format(geneFolder))
     # # TODO: Run main9.R
