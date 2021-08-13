@@ -142,8 +142,7 @@ def saveHistogram(data, filename) :
     maxim = max(data.keys())
     total = sum(data.values())
     if total == 0 :
-        print("WARNING: Possible invalid data")
-        print(data.values())
+        print("WARNING: Possible invalid data. No variants found")
     else :
         with open(filename, "w") as fi :
             fi.write("position\ttimes\tfreq\n")
