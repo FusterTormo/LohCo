@@ -141,15 +141,19 @@ def saveHistogram(data, filename) :
     minim = min(data.keys())
     maxim = max(data.keys())
     total = sum(data.values())
-    with open(filename, "w") as fi :
-        fi.write("position\ttimes\tfreq\n")
-        for i in range(minim, maxim+1) :
-            if i in data.keys() :
-                fi.write("{}\t{}\t{}\n".format(i, data[i], round(data[i]/total, 6)))
-            else :
-                fi.write("{}\t0\t0\n".format(i))
+    if total == 0 :
+        print("WARNING: Possible invalid data")
+        print(data.values())
+    else :
+        with open(filename, "w") as fi :
+            fi.write("position\ttimes\tfreq\n")
+            for i in range(minim, maxim+1) :
+                if i in data.keys() :
+                    fi.write("{}\t{}\t{}\n".format(i, data[i], round(data[i]/total, 6)))
+                else :
+                    fi.write("{}\t0\t0\n".format(i))
 
-    print("{} INFO: Variant histogram data saved as {}".format(getTime(), filename))
+        print("{} INFO: Variant histogram data saved as {}".format(getTime(), filename))
 
 def saveVariants(data, filename) :
     """Save variants data in a tsv file"""
