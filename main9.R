@@ -1,4 +1,12 @@
 library(knitr)
+
+# Functions
+printSummary <- function(data) {
+  cat("R-INFO: Summary stats:\n")
+  cat("\tMean: ", mean(data), " Median: ", median(data), " Min: ", min(data), " Max: ", max(data), "\n")
+}
+
+# Main program
 # Get the gene name for 
 sysarg <- commandArgs(trailingOnly = TRUE)
 gene = sysarg[1][1]
@@ -19,7 +27,7 @@ cat("R-INFO: Data loaded successfully. Creating the plots\n")
 if (p$position[1] != t$position[1])
   cat("R-WARNING: Initial coordinates in positive and pathogenic are not the same\n")
 if (p$position[1] != n$position[1])
-  cat("R-WARNING: Innitial coordinates in positive and negative are not the same\n")
+  cat("R-WARNING: Initial coordinates in positive and negative are not the same\n")
 if (t$position[1] != n$position[1])
   cat("R-WARNING: Initial coordinates in negative and pathogenic are not the same\n")
 # Last position
@@ -84,7 +92,7 @@ barplot(table(vn$cln.signf), col = "blue", main = "Reported significance in nega
 # Tables
 # Variants present in LOH positive submitters but not in LOH negative submitters
 cat("R-INFO: Variants present in LOH positive/pathogenic submitters, but not in LOH negative submitters\n")
-d <- gr[gr$InNegative == 0,]
+d <- gr[gr$InLOHNegative == 0,]
 knitr::kable(d)
 
 cat("\n\nR-INFO: Coding variants present in LOH positive/pathogenic submitters, but not in LOH negative submitters\n")
@@ -92,15 +100,15 @@ e <- d[d$Type == "exonic" | d$Type == "splicing",]
 knitr::kable(e)
 
 cat("\nR-INFO: Variants reported per LOH positive submitter\n")
-knitr::kable(summary(as.matrix(table(vp$submitter))))
+printSummary(as.matrix(table(vp$submitter))[,1])
 
 cat("\nR-INFO: Variants reported per LOH pathogenic submitter\n")
-knitr::kable(summary(as.matrix(table(vt$submitter))))
+printSummary(as.matrix(table(vt$submitter))[,1])
 
 cat("\nR-INFO: Variants reported per LOH negative submitter\n")
-knitr::kable(summary(as.matrix(table(vn$submitter))))
+printSummary(as.matrix(table(vn$submitter))[,1])
 
-print("R-INFO: Script finished successfully. Check plots, specially ZoomFreq, for further clues")
+cat("R-INFO: Script finished successfully. Check plots, specially ZoomFreq, for further clues\n")
 
 # # Get the number of variants per submitter
 # e1 <- as.data.frame(table(pos$submitter))
