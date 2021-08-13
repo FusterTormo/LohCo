@@ -42,7 +42,7 @@ if (rev(t$position)[1] != rev(n$position)[1])
 cat("R-INFO: Creating the plots\n")
 # Times a position is mutated in the gene
 png(width = 1261, height = 906, filename = paste(gene, "_Pos.png", sep = ""))
-plot(p$position, p$times, pch = 18, col = "red", main = "Variant position", xlab = paste(gene, "position"), ylab = "Variants found")
+plot(p$position, p$times, pch = 18, col = "red", main = "Variant position", xlab = paste(gene, "position"), ylab = "Variants found", xlim = c(min(p$position, n$position, t$position), max(p$position, n$position, t$position)))
 points(n$position, n$times, pch = 18, col = "blue")
 points(t$position, t$times, pch = 18, col = "orange")
 legend("topleft", fill = c("red", "blue", "orange"), legend = c("Positive", "Negative", "Pathogenic"))
