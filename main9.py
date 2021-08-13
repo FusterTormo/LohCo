@@ -143,6 +143,15 @@ def saveHistogram(data, filename) :
     total = sum(data.values())
     if total == 0 :
         print("WARNING: Possible invalid data. No variants found")
+        with open(filename, "w") as fi :
+            fi.write("position\ttimes\tfreq\n")
+            for i in range(minim, maxim+1) :
+                if i in data.keys() :
+                    fi.write("{}\t{}\t0\n".format(i, data[i]))
+                else :
+                    fi.write("{}\t0\t0\n".format(i))
+
+        print("{} INFO: Variant histogram data saved as {}".format(getTime(), filename))
     else :
         with open(filename, "w") as fi :
             fi.write("position\ttimes\tfreq\n")
