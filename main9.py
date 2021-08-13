@@ -450,6 +450,7 @@ def readFile(path) :
 
 if __name__ == "__main__" :
     # NOTE: To change the analysis parameters, change the constants at the beginning of the file
+    print("{} INFO: Getting the variants in {} gene written in each {} file".format(getTime(), genename, varCallSuffix))
     # Check if the folder structure has been created before. Ask to remove the data before running the program
     mainFolder = "VUS_project"
     if varCallSuffix == "platypusGerm/platypus.hg38_multianno.txt" :
