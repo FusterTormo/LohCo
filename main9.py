@@ -423,20 +423,21 @@ def variantClassifier(vars) :
 
 def groupSubmitters(variants) :
     """Group the variants by submitter. Classify these variants as positive, negative or unknown. Group ClinVar tags. Return all in a dictionary"""
-    current = variants[0]["submitter"]
     tmpVars = []
     allData = []
-    for v in variants :
-        if current != v["submitter"] :
-            if len(tmpVars) > 0 :
-                allData.append(variantClassifier(tmpVars))
-                del(tmpVars)
-                tmpVars = [v]
-            current = v["submitter"]
-        else :
-            tmpVars.append(v)
+    if len(variants) > 0 :
+        current = variants[0]["submitter"]
+        for v in variants :
+            if current != v["submitter"] :
+                if len(tmpVars) > 0 :
+                    allData.append(variantClassifier(tmpVars))
+                    del(tmpVars)
+                    tmpVars = [v]
+                current = v["submitter"]
+            else :
+                tmpVars.append(v)
 
-    allData.append(variantClassifier(tmpVars))
+        allData.append(variantClassifier(tmpVars))
 
     return allData
 
