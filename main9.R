@@ -47,9 +47,9 @@ points(n$position, n$times, pch = 18, col = "blue")
 points(t$position, t$times, pch = 18, col = "orange")
 legend("topleft", fill = c("red", "blue", "orange"), legend = c("Positive", "Negative", "Pathogenic"))
 dev.off()
-# Frequency that this position is mutated in the gene
+# Frequency that a position is mutated in the gene
 png(width = 1261, height = 906, filename = paste(gene, "_Freq.png", sep = ""))
-plot(p$position, p$freq, pch = 18, col = "red", main = "Variant position", xlab = paste(gene, "position"), ylab = "Variant frequency")
+plot(p$position, p$freq, pch = 18, col = "red", main = "Variant position", xlab = paste(gene, "position"), ylab = "Variant frequency", xlim = c(min(p$position, n$position, t$position), max(p$position, n$position, t$position)))
 points(n$position, n$freq, pch = 18, col = "blue")
 points(t$position, t$freq, pch = 18, col = "orange")
 legend("topleft", fill = c("red", "blue", "orange"), legend = c("Positive", "Negative", "Pathogenic"))
@@ -90,28 +90,29 @@ barplot(table(vt$cln.signf), col = "orange", main = "Reported significance in pa
 barplot(table(vn$cln.signf), col = "blue", main = "Reported significance in negative group")
 
 # Tables
-# Variants present in LOH positive submitters but not in LOH negative submitters
+# Variants present in LOH positive/pathogenic submitters but not in LOH negative submitters
 cat("R-INFO: Variants present in LOH positive/pathogenic submitters, but not in LOH negative submitters\n")
 d <- gr[gr$InLOHNegative == 0,]
-knitr::kable(d)
+# knitr::kable(d) # Print the table in console, in a fancy manner
 write.table(d, file = "allCandVars.tsv", quote = FALSE, row.names = FALSE)
 
 cat("\n\nR-INFO: Coding variants present in LOH positive/pathogenic submitters, but not in LOH negative submitters\n")
 e <- d[d$Type == "exonic" | d$Type == "splicing",]
-knitr::kable(e)
+knitr::kable(e) # Print the table in console, in a fancy manner
 write.table(d, file = "candVars.tsv", quote = FALSE, row.names = FALSE)
 
-cat("\nR-INFO: Variants reported per LOH positive submitter\n")
+cat("\nR-INFO: Variants reported for each LOH positive submitter\n")
 printSummary(as.matrix(table(vp$submitter))[,1])
 
-cat("\nR-INFO: Variants reported per LOH pathogenic submitter\n")
+cat("\nR-INFO: Variants reported for each LOH pathogenic submitter\n")
 printSummary(as.matrix(table(vt$submitter))[,1])
 
-cat("\nR-INFO: Variants reported per LOH negative submitter\n")
+cat("\nR-INFO: Variants reported for each LOH negative submitter\n")
 printSummary(as.matrix(table(vn$submitter))[,1])
 
 cat("R-INFO: Script finished successfully. Check plots, specially ZoomFreq, for further clues. Candidate variants stored as allCandVars.tsv and candVars.tsv\n")
 
+#####  Old code #####
 # # Get the number of variants per submitter
 # e1 <- as.data.frame(table(pos$submitter))
 # e2 <- as.data.frame(table(neg$submitter))
