@@ -93,12 +93,16 @@ barplot(table(vn$cln.signf), col = "blue", main = "Reported significance in nega
 # Variants present in LOH positive/pathogenic submitters but not in LOH negative submitters
 cat("R-INFO: Variants present in LOH positive/pathogenic submitters, but not in LOH negative submitters\n")
 d <- gr[gr$InLOHNegative == 0,]
-# knitr::kable(d) # Print the table in console, in a fancy manner
+if (length(d$Chr) < 5) {
+  knitr::kable(d) # Print the table in console, in a fancy manner
+}
 write.table(d, file = "allCandVars.tsv", quote = FALSE, row.names = FALSE)
 
 cat("\n\nR-INFO: Coding variants present in LOH positive/pathogenic submitters, but not in LOH negative submitters\n")
 e <- d[d$Type == "exonic" | d$Type == "splicing",]
-knitr::kable(e) # Print the table in console, in a fancy manner
+if (length(e$Chr) < 5) {
+  knitr::kable(e) # Print the table in console, in a fancy manner
+}
 write.table(d, file = "candVars.tsv", quote = FALSE, row.names = FALSE)
 
 cat("\nR-INFO: Variants reported for each LOH positive submitter\n")
@@ -112,7 +116,7 @@ printSummary(as.matrix(table(vn$submitter))[,1])
 
 cat("R-INFO: Script finished successfully. Check plots, specially ZoomFreq, for further clues. Candidate variants stored as allCandVars.tsv and candVars.tsv\n")
 
-#####  Old code #####
+#####  Old code ##### 
 # # Get the number of variants per submitter
 # e1 <- as.data.frame(table(pos$submitter))
 # e2 <- as.data.frame(table(neg$submitter))
