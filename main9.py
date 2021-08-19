@@ -456,8 +456,15 @@ def readFile(path) :
                 data.append(dc)
     return data
 
-
-if __name__ == "__main__" :
+def main() :
+    """MAIN FUNCTION: Get LOH and variants from a gene, defined as a constant.
+    Count how many times a position is mutated in that gene
+    Classify the samples (submitters) as
+        * Positive: More than one tool reported LOH in that gene
+        * Pathogenic: A positive sample that has a pathogenic variant
+        * Negative: Only 1 tool (or none) reported LOH in that gene
+    Group the variants found, counting how many times the variant is reported in each group
+    Count the variants by submitter, classifying the variants as positive, negative or unknown"""
     # NOTE: To change the analysis parameters, change the constants at the beginning of the file
     print("{} INFO: Getting the variants in {} gene written in each {} file".format(getTime(), genename, varCallSuffix))
     # Check if the folder structure has been created before. Ask to remove the data before running the program
@@ -526,3 +533,80 @@ if __name__ == "__main__" :
     os.rename("patVarsGrouped.tsv", "{}/patVarsGrouped.tsv".format(geneFolder))
     os.rename("negVarsGrouped.tsv", "{}/negVarsGrouped.tsv".format(geneFolder))
     print("{temp} INFO: Data moved to {fold}. Run main9.R in {fold} to get further statistics".format(temp = getTime(), fold = geneFolder))
+
+def fastMain() :
+    """MAIN FUNCTION: Does the same as main function, but getting the data from a previous main execution. So this function reads posVariants.tsv, patVariants.tsv
+    and negVariants.tsv instead of calling getData function"""
+    print("{} INFO: Getting the variants and LOH from posVariants, patVariants and negVariants tsv files".format(getTime()))
+    positive = readFile("posVariants.tsv")
+    pathogenic = readFile("patVariants.tsv")
+    negative = readFile("negVariants.tsv")
+
+    # Group the variants and count how many times each are present in the different cases
+    groups = groupVariants(positive, pathogenic, negative, "grouped.vars.tsv")
+
+    # Group the variants in each submitter according to its type
+    submitters = groupSubmitters(positive)
+    # Save the data in the last function in a tsv file
+    with open("posVarsGrouped.tsv", "w") as fi :
+        fi.write("submitter\tvar_positive\tvar_negative\tvar_unknown\tsignificance\n")
+        for s in submitters :
+            fi.write("{sub}\t{pos}\t{neg}\t{unk}\t{sig}\n".format(sub = s["submitter"], pos = s["positive"], neg = s["negative"], unk = s["unknown"], sig = s["significances"]))
+
+    tmp = groupSubmitters(pathogenic)
+    with open("patVarsGrouped.tsv", "a") as fi :
+        fi.write("submitter\tvar_positive\tvar_negative\tvar_unknown\tsignificance\n")
+        for s in tmp :
+            fi.write("{sub}\t{pos}\t{neg}\t{unk}\t{sig}\n".format(sub = s["submitter"], pos = s["positive"], neg = s["negative"], unk = s["unknown"], sig = s["significances"]))
+    submitters += tmp
+
+    tmp = groupSubmitters(negative)
+    with open("negVarsGrouped.tsv", "a") as fi :
+        fi.write("submitter\tvar_positive\tvar_negative\tvar_unknown\tsignificance\n")
+        for s in tmp :
+            fi.write("{sub}\t{pos}\t{neg}\t{unk}\t{sig}\n".format(sub = s["submitter"], pos = s["positive"], neg = s["negative"], unk = s["unknown"], sig = s["significances"]))
+    submitters += tmp
+
+    print("{} INFO: Variant classification grouped by submitter stored as posVarsGrouped.tsv, patVarsGrouped.tsv, and negVarsGrouped.tsv".format(getTime()))
+
+def filterCandidates() :
+    """MAIN FUNCTION: Looks for coincidences in Platypus and Strelka2 candidate variants.
+    Reports not coincident variants to watch manually what happened
+    The coincident variants are searched in cancer repositories where LOH is not expected
+    **This function is called after running main9.R in gene folder**
+    """
+    pl_cand = [] # Candidate variants from Platypus variant caller
+    pl_all = [] # All variants from Platypus variant caller
+    st_cand = [] # Candidate variants from Strelka2 variant caller
+    st_all = [] # All variants from Strelka2 variant caller
+    abs_path = os.path.abspath(os.getcwd()).split("/")
+    gene = abs_path[-1]
+    vc = abs_path[-2]
+    print("{} INFO: Reading variants".format(getTime()))
+    if vc == "Platypus" :
+        with open("candVars.tsv", "r") as fi :
+            header = []
+            for l in fi :
+                aux = l.strip().split("\t")
+                if len(header) == 0 :
+                    header = aux
+                else :
+                    temp = {}
+                    it = 0
+                    for h in header :
+                        temp[h] = aux[it]
+                        it += 1
+                    pl_cand.append(temp)
+    print(pl_cand[0])
+
+
+
+if __name__ == "__main__" :
+    filterCandidates()
+    # # Execute main function, depending on the files available
+    # if os.path.isfile("candVars.tsv") and os.path.isfile("allCandVars.tsv") :
+    #     filterCandidates()
+    # elif os.path.isfile("posVariants.tsv") and os.path.isfile("patVariants.tsv") and os.path.isfile("negVariants.tsv") :
+    #     fastMain()
+    # else :
+    #     main()

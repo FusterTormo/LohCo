@@ -55,10 +55,10 @@ points(t$position, t$freq, pch = 18, col = "orange")
 legend("topleft", fill = c("red", "blue", "orange"), legend = c("Positive", "Negative", "Pathogenic"))
 dev.off()
 # Select the positions in positive submitters where there are variants
-png(width = 1261, height = 906, filename = paste(gene, "_ZoomFreq.png", sep = ""))
 pzoom <- p[p$freq > 0,]
 tzoom <- t[t$position %in% pzoom$position,]
 nzoom <- n[n$position %in% pzoom$position,]
+png(width = 1261, height = 906, filename = paste(gene, "_ZoomFreq.png", sep = ""))
 plot(pzoom$freq, pch = 18, col = "red", main = "Variant position", xlab = "BRCA1 position", ylab = "Variants found", ylim = c(0, max(pzoom$freq)))
 points(tzoom$freq, pch = 18, col = "orange")
 points(nzoom$freq, pch = 18, col = "blue")
@@ -85,9 +85,11 @@ boxplot(as.matrix(table(vp$submitter))[,1], as.matrix(table(vt$submitter))[,1], 
 dev.off()
 
 # Clinvar reported significance
+png(paste(gene, "_significance.png"), width = 1261, height = 941)
 barplot(table(vp$cln.signf), col = "red", main = "Reported significance in positive group")
 barplot(table(vt$cln.signf), col = "orange", main = "Reported significance in pathogenic group")
 barplot(table(vn$cln.signf), col = "blue", main = "Reported significance in negative group")
+dev.off()
 
 # Tables
 # Variants present in LOH positive/pathogenic submitters but not in LOH negative submitters
@@ -114,7 +116,7 @@ printSummary(as.matrix(table(vt$submitter))[,1])
 cat("R-INFO: Variants in ", gene, " reported for each LOH negative submitter\n")
 printSummary(as.matrix(table(vn$submitter))[,1])
 
-cat("R-INFO: Script finished successfully. Check plots, specially ZoomFreq, for further clues. Candidate variants stored as allCandVars.tsv and candVars.tsv. Run main9.py in this folder to search this variants in other cancer repositories\n")
+cat("R-INFO: Script finished successfully. Check plots, specially ZoomFreq, for further clues. \n\tCandidate variants stored as allCandVars.tsv and candVars.tsv. \n\tRun main9.py in this folder to search this variants in other cancer repositories\n")
 
 #####  Old code ##### 
 # # Get the number of variants per submitter
