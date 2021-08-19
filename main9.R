@@ -91,30 +91,30 @@ barplot(table(vn$cln.signf), col = "blue", main = "Reported significance in nega
 
 # Tables
 # Variants present in LOH positive/pathogenic submitters but not in LOH negative submitters
-cat("R-INFO: Variants present in LOH positive/pathogenic submitters, but not in LOH negative submitters\n")
 d <- gr[gr$InLOHNegative == 0,]
 if (length(d$Chr) < 5) {
+  cat("R-INFO: Variants present in LOH positive/pathogenic submitters, but not in LOH negative submitters\n")
   knitr::kable(d) # Print the table in console, in a fancy manner
 }
 write.table(d, file = "allCandVars.tsv", quote = FALSE, row.names = FALSE)
 
-cat("\n\nR-INFO: Coding variants present in LOH positive/pathogenic submitters, but not in LOH negative submitters\n")
 e <- d[d$Type == "exonic" | d$Type == "splicing",]
 if (length(e$Chr) < 5) {
+  cat("\n\nR-INFO: Coding variants present in LOH positive/pathogenic submitters, but not in LOH negative submitters\n")
   knitr::kable(e) # Print the table in console, in a fancy manner
 }
 write.table(d, file = "candVars.tsv", quote = FALSE, row.names = FALSE)
 
-cat("\nR-INFO: Variants reported for each LOH positive submitter\n")
+cat("\nR-INFO: Variants in ", gene, " reported for each LOH positive submitter\n")
 printSummary(as.matrix(table(vp$submitter))[,1])
 
-cat("\nR-INFO: Variants reported for each LOH pathogenic submitter\n")
+cat("\nR-INFO: Variants in ", gene, " reported for each LOH pathogenic submitter\n")
 printSummary(as.matrix(table(vt$submitter))[,1])
 
-cat("\nR-INFO: Variants reported for each LOH negative submitter\n")
+cat("\nR-INFO: Variants in ", gene, " reported for each LOH negative submitter\n")
 printSummary(as.matrix(table(vn$submitter))[,1])
 
-cat("R-INFO: Script finished successfully. Check plots, specially ZoomFreq, for further clues. Candidate variants stored as allCandVars.tsv and candVars.tsv\n")
+cat("R-INFO: Script finished successfully. Check plots, specially ZoomFreq, for further clues. Candidate variants stored as allCandVars.tsv and candVars.tsv. Run main9.py in this folder to search this variants in other cancer repositories\n")
 
 #####  Old code ##### 
 # # Get the number of variants per submitter
