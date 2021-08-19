@@ -456,6 +456,24 @@ def readFile(path) :
                 data.append(dc)
     return data
 
+def readCandidateFiles(filename) :
+    """Read *candVars.tsv file. Convert the content in a list of dictionaries. Each element in the list is a line (variant) in the file"""
+    cand = []
+    with open(filename, "r") as fi :
+        header = []
+        for l in fi :
+            aux = l.strip().split("\t")
+            if len(header) == 0 :
+                header = aux
+            else :
+                temp = {}
+                it = 0
+                for h in header :
+                    temp[h] = aux[it]
+                    it += 1
+                cand.append(temp)
+    return cand
+
 def main() :
     """MAIN FUNCTION: Get LOH and variants from a gene, defined as a constant.
     Count how many times a position is mutated in that gene
@@ -584,20 +602,11 @@ def filterCandidates() :
     vc = abs_path[-2]
     print("{} INFO: Reading variants".format(getTime()))
     if vc == "Platypus" :
-        with open("candVars.tsv", "r") as fi :
-            header = []
-            for l in fi :
-                aux = l.strip().split("\t")
-                if len(header) == 0 :
-                    header = aux
-                else :
-                    temp = {}
-                    it = 0
-                    for h in header :
-                        temp[h] = aux[it]
-                        it += 1
-                    pl_cand.append(temp)
-    print(pl_cand[0])
+        pl_cand = readCandidateFiles("candVars.tsv")
+        st_cand = readCandidateFiles("../../Strelka2/{}/candVars".format(gene))
+        print(st_cand[0])
+        print(pl_cand[0])
+
 
 
 
