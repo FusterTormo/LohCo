@@ -96,22 +96,22 @@ if (length(d$Chr) < 5) {
   cat("R-INFO: Variants present in LOH positive/pathogenic submitters, but not in LOH negative submitters\n")
   knitr::kable(d) # Print the table in console, in a fancy manner
 }
-write.table(d, file = "allCandVars.tsv", quote = FALSE, row.names = FALSE)
+write.table(d, file = "allCandVars.tsv", quote = FALSE, row.names = FALSE, sep = "\t")
 
 e <- d[d$Type == "exonic" | d$Type == "splicing",]
 if (length(e$Chr) < 5) {
   cat("\n\nR-INFO: Coding variants present in LOH positive/pathogenic submitters, but not in LOH negative submitters\n")
   knitr::kable(e) # Print the table in console, in a fancy manner
 }
-write.table(d, file = "candVars.tsv", quote = FALSE, row.names = FALSE)
+write.table(e, file = "candVars.tsv", quote = FALSE, row.names = FALSE, sep = "\t")
 
 cat("\nR-INFO: Variants in ", gene, " reported for each LOH positive submitter\n")
 printSummary(as.matrix(table(vp$submitter))[,1])
 
-cat("\nR-INFO: Variants in ", gene, " reported for each LOH pathogenic submitter\n")
+cat("R-INFO: Variants in ", gene, " reported for each LOH pathogenic submitter\n")
 printSummary(as.matrix(table(vt$submitter))[,1])
 
-cat("\nR-INFO: Variants in ", gene, " reported for each LOH negative submitter\n")
+cat("R-INFO: Variants in ", gene, " reported for each LOH negative submitter\n")
 printSummary(as.matrix(table(vn$submitter))[,1])
 
 cat("R-INFO: Script finished successfully. Check plots, specially ZoomFreq, for further clues. Candidate variants stored as allCandVars.tsv and candVars.tsv. Run main9.py in this folder to search this variants in other cancer repositories\n")
