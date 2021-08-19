@@ -482,7 +482,7 @@ def printCandidateVariants(lst) :
     """Print a list of variants (dict) in a fancy format"""
     if len(lst) > 0 :
         for l in lst :
-            print("{chr}:{st}-{nd}\t{rf}>{lt}".format(chr = l["Chr"], st = l["Start"], nd = l["End"], rf = l["Ref"], lt = l["Alt"]))
+            print("\t{chr}:{st}-{nd}\t{rf}>{lt}".format(chr = l["Chr"], st = l["Start"], nd = l["End"], rf = l["Ref"], lt = l["Alt"]))
 
 
 def main() :
@@ -653,6 +653,15 @@ def filterCandidates() :
             dif.append(s)
     print("{} INFO: {} variants found in Strelka2, but not in Platypus".format(getTime(), len(dif)))
     printCandidateVariants(dif)
+    print("{} INFO: Searching the common variants in HNSC".format(getTime()))
+    for s in same :
+        cmd = "zgrep -w {coord} /g/strcombio/fsupek_cancer1/TCGA_bam/HNSC/*/*/strelkaGerm/results/variants/variants.vcf.gz | grep -c {chr}".format(coord = s["Start"], chr = s["Chr"])
+        pr = subprocess.Popen(cmd, shell = True, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+        out, err = pr.communicate()
+        print(getTime())
+        print(out)
+        print(cmd)
+        break
 
 if __name__ == "__main__" :
     filterCandidates()
