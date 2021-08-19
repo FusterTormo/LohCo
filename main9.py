@@ -116,7 +116,7 @@ def extractClinVar(clinvar, variant) :
 def annotateClinVar(data, cln) :
     """Add ClinVar information to the variants list passed as parameter (data)"""
     d = data.split("\t")
-    if d[5] in ["intronic", "exonic", "splicing", "UTR3", "UTR5"] :
+    if d[5] in ["intronic", "exonic", "splicing", "UTR3", "UTR5"] and d[6] == genename:
         anno = []
         chrom = d[0].replace("chr", "")
         # As ANNOVAR changes the position in insertions/deletions, we substract 1 to the start position
@@ -235,7 +235,7 @@ def getData() :
                         prefix = "{}_VS_{}".format(tm[0].split("-")[0], cn[0].split("-")[0])
                         # Get and annotate the variants
                         germCall = "{wd}/{sub}/{uuid}/{suffix}".format(wd = wd, sub = c[0], uuid = cn[0], suffix = varCallSuffix)
-                        cmd = "grep {gene} {vc}".format(gene = genename, vc = germCall)
+                        cmd = "grep -w {gene} {vc}".format(gene = genename, vc = germCall)
                         pr = subprocess.Popen(cmd, shell = True, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
                         # Get LOH
                         lohs = 0 # Number of tools that reported LOH (Delecion or copy number normal)
