@@ -20,7 +20,6 @@ vp <- read.table("posVariants.tsv", header = TRUE, sep = "\t")
 vt <- read.table("patVariants.tsv", header = TRUE, sep = "\t")
 vn <- read.table("negVariants.tsv", header = TRUE, sep = "\t")
 gr <- read.table("grouped.vars.tsv", header = TRUE, sep = "\t")
-cat("R-INFO: Data loaded successfully. Creating the plots\n")
 
 # Assert the coordinates in the histograms are the same
 # First position
@@ -39,7 +38,7 @@ if (rev(t$position)[1] != rev(n$position)[1])
   cat("R-WARNING: Final coordinates in negative and pathogenic are not the same\n")
 
 # Plots
-cat("R-INFO: Creating the plots\n")
+cat("R-INFO: Data loaded successfully. Creating the plots\n")
 # Times a position is mutated in the gene
 png(width = 1261, height = 906, filename = paste(gene, "_Pos.png", sep = ""))
 plot(p$position, p$times, pch = 18, col = "red", main = "Variant position", xlab = paste(gene, "position"), ylab = "Variants found", xlim = c(min(p$position, n$position, t$position), max(p$position, n$position, t$position)))
@@ -56,28 +55,38 @@ legend("topleft", fill = c("red", "blue", "orange"), legend = c("Positive", "Neg
 dev.off()
 # Select the positions in positive submitters where there are variants
 pzoom <- p[p$freq > 0,]
-tzoom <- t[t$position %in% pzoom$position,]
-nzoom <- n[n$position %in% pzoom$position,]
-png(width = 1261, height = 906, filename = paste(gene, "_ZoomFreq.png", sep = ""))
-plot(pzoom$freq, pch = 18, col = "red", main = "Variant position", xlab = "BRCA1 position", ylab = "Variants found", ylim = c(0, max(pzoom$freq)))
-points(tzoom$freq, pch = 18, col = "orange")
-points(nzoom$freq, pch = 18, col = "blue")
-legend("topleft", fill = c("red", "blue", "orange"), legend = c("Positive", "Negative", "Pathogenic"))
-dev.off()
+if (length(pzoom$position) > 0) {
+  tzoom <- t[t$position %in% pzoom$position,]
+  nzoom <- n[n$position %in% pzoom$position,]
+  png(width = 1261, height = 906, filename = paste(gene, "_ZoomFreq.png", sep = ""))
+  plot(pzoom$freq, pch = 18, col = "red", main = "Variant position", xlab = "BRCA1 position", ylab = "Variants found", ylim = c(0, max(pzoom$freq)))
+  points(tzoom$freq, pch = 18, col = "orange")
+  points(nzoom$freq, pch = 18, col = "blue")
+  legend("topleft", fill = c("red", "blue", "orange"), legend = c("Positive", "Negative", "Pathogenic"))
+  dev.off()
+} else {
+  cat("R-WARNING: No positions had a frequency higher than 0 in positive submitters. Zoom plot not created")
+}
 
 # Barplot with variant type
 tp <- as.table(table(vp$type))
-png(width=1261, height = 906, filename = paste(gene, "_VarsPositive.png", sep = ""))
-barplot(100*prop.table(tp), col = rainbow(length(tp)), main = "Variant type percent in positive submitters", ylim = c(0, 100))
-dev.off()
+if (length(tp) > 0) {
+  png(width=1261, height = 906, filename = paste(gene, "_VarsPositive.png", sep = ""))
+  barplot(100*prop.table(tp), col = rainbow(length(tp)), main = "Variant type percent in positive submitters", ylim = c(0, 100))
+  dev.off()
+}
 tt <- as.table(table(vt$type))
-png(width=1261, height = 906, filename = paste(gene, "_VarsPathogenic.png", sep = ""))
-barplot(100*prop.table(tt), col = rainbow(length(tt)), main = "Variant type percent in pathogenic submitters", ylim = c(0, 100))
-dev.off()
+if (length(tt) > 0) {
+  png(width=1261, height = 906, filename = paste(gene, "_VarsPathogenic.png", sep = ""))
+  barplot(100*prop.table(tt), col = rainbow(length(tt)), main = "Variant type percent in pathogenic submitters", ylim = c(0, 100))
+  dev.off()
+}
 tn <- as.table(table(vn$type))
-png(width=1261, height = 906, filename = paste(gene, "_VarsNegative.png", sep = ""))
-barplot(100*prop.table(tn), col = rainbow(length(tn)), main = "Variant type percent in negative submitters", ylim = c(0, 100))
-dev.off()
+if (length(tn) > 0) {
+  png(width=1261, height = 906, filename = paste(gene, "_VarsNegative.png", sep = ""))
+  barplot(100*prop.table(tn), col = rainbow(length(tn)), main = "Variant type percent in negative submitters", ylim = c(0, 100))
+  dev.off()
+}
 
 # Variants per submitter
 png(width=1261, height = 941, filename = paste(gene, "_varsXsubmitter.png", sep = ""))
@@ -86,9 +95,9 @@ dev.off()
 
 # Clinvar reported significance
 png(paste(gene, "_significance.png"), width = 1261, height = 941)
-barplot(table(vp$cln.signf), col = "red", main = "Reported significance in positive group")
-barplot(table(vt$cln.signf), col = "orange", main = "Reported significance in pathogenic group")
-barplot(table(vn$cln.signf), col = "blue", main = "Reported significance in negative group")
+barplot(table(vp$cln.signf, useNA = "always"), col = "red", main = "Reported significance in positive group")
+barplot(table(vt$cln.signf, useNA = "always"), col = "orange", main = "Reported significance in pathogenic group")
+barplot(table(vn$cln.signf, useNA = "always"), col = "blue", main = "Reported significance in negative group")
 dev.off()
 
 # Tables

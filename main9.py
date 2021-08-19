@@ -653,20 +653,19 @@ def filterCandidates() :
             dif.append(s)
     print("{} INFO: {} variants found in Strelka2, but not in Platypus".format(getTime(), len(dif)))
     printCandidateVariants(dif)
-    print("{} INFO: Searching the common variants in HNSC".format(getTime()))
+    print("{} INFO: Searching {} common variants in HNSC. This may take a while".format(getTime(), len(same)))
     for s in same :
         cmd = "zgrep -w {coord} /g/strcombio/fsupek_cancer1/TCGA_bam/HNSC/*/*/strelkaGerm/results/variants/variants.vcf.gz | grep -c {chr}".format(coord = s["Start"], chr = s["Chr"])
         pr = subprocess.Popen(cmd, shell = True, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
         out, err = pr.communicate()
-        print("{tm} INFO: {oc} ocurrences of {chr}:{st}-nd".format(oc = out.decode().strip()), tm = getTime(), chr = s["Chr"], st = s["Start"], nd = s["End"])
+        print("{tm} INFO: {oc} ocurrences of {chr}:{st}-{nd}".format(oc = out.decode().strip(), tm = getTime(), chr = s["Chr"], st = s["Start"], nd = s["End"]))
 
 
 if __name__ == "__main__" :
-    filterCandidates()
-    # # Execute main function, depending on the files available
-    # if os.path.isfile("candVars.tsv") and os.path.isfile("allCandVars.tsv") :
-    #     filterCandidates()
-    # elif os.path.isfile("posVariants.tsv") and os.path.isfile("patVariants.tsv") and os.path.isfile("negVariants.tsv") :
-    #     fastMain()
-    # else :
-    #     main()
+    # Execute main function, depending on the files available
+    if os.path.isfile("candVars.tsv") and os.path.isfile("allCandVars.tsv") :
+        filterCandidates()
+    elif os.path.isfile("posVariants.tsv") and os.path.isfile("patVariants.tsv") and os.path.isfile("negVariants.tsv") :
+        fastMain()
+    else :
+        main()
