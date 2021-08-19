@@ -478,6 +478,13 @@ def readCandidateFiles(filename) :
 
     return cand
 
+def printCandidateVariants(lst) :
+    """Print a list of variants (dict) in a fancy format"""
+    if len(lst) > 0 :
+        for l in lst :
+            print("{chr}:{st}-{nd}\t{rf}>{lt}".format(chr = l["Chr"], st = l["Start"], nd = l["End"], rf = l["Ref"], lt = l["Alt"]))
+
+
 def main() :
     """MAIN FUNCTION: Get LOH and variants from a gene, defined as a constant.
     Count how many times a position is mutated in that gene
@@ -633,7 +640,7 @@ def filterCandidates() :
         else :
             dif.append(p)
     print("{} INFO: {} variants found in Platypus, but not in Strelka2".format(getTime(), len(dif)))
-    print(dif)
+    printCandidateVariants(dif)
     del(dif)
     dif = []
     for s in st_cand :
@@ -645,7 +652,7 @@ def filterCandidates() :
         if not found :
             dif.append(s)
     print("{} INFO: {} variants found in Strelka2, but not in Platypus".format(getTime(), len(dif)))
-    print(dif)
+    printCandidateVariants(dif)
 
 if __name__ == "__main__" :
     filterCandidates()
