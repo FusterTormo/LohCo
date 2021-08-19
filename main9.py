@@ -459,19 +459,23 @@ def readFile(path) :
 def readCandidateFiles(filename) :
     """Read *candVars.tsv file. Convert the content in a list of dictionaries. Each element in the list is a line (variant) in the file"""
     cand = []
-    with open(filename, "r") as fi :
-        header = []
-        for l in fi :
-            aux = l.strip().split("\t")
-            if len(header) == 0 :
-                header = aux
-            else :
-                temp = {}
-                it = 0
-                for h in header :
-                    temp[h] = aux[it]
-                    it += 1
-                cand.append(temp)
+    try :
+        with open(filename, "r") as fi :
+            header = []
+            for l in fi :
+                aux = l.strip().split("\t")
+                if len(header) == 0 :
+                    header = aux
+                else :
+                    temp = {}
+                    it = 0
+                    for h in header :
+                        temp[h] = aux[it]
+                        it += 1
+                    cand.append(temp)
+    except FileNotFoundError :
+        print("WARNING: {} not found".format(filename))
+
     return cand
 
 def main() :
@@ -597,18 +601,51 @@ def filterCandidates() :
     pl_all = [] # All variants from Platypus variant caller
     st_cand = [] # Candidate variants from Strelka2 variant caller
     st_all = [] # All variants from Strelka2 variant caller
+    same = []
+    dif = []
     abs_path = os.path.abspath(os.getcwd()).split("/")
     gene = abs_path[-1]
     vc = abs_path[-2]
     print("{} INFO: Reading variants".format(getTime()))
     if vc == "Platypus" :
         pl_cand = readCandidateFiles("candVars.tsv")
-        st_cand = readCandidateFiles("../../Strelka2/{}/candVars".format(gene))
-        print(st_cand[0])
-        print(pl_cand[0])
-
-
-
+        st_cand = readCandidateFiles("../../Strelka2/{}/candVars.tsv".format(gene))
+        pl_all = readCandidateFiles("allCandVars.tsv")
+        st_all = readCandidateFiles("../../Strelka2/{}/allCandVars.tsv".format(gene))
+    elif vc == "Strelka2" :
+        st_cand = readCandidateFiles("candVars.tsv")
+        pl_cand = readCandidateFiles("../../Platypus/{}/candVars.tsv".format(gene))
+        st_all = readCandidateFiles("allCandVars.tsv")
+        pl_all = readCandidateFiles("../../Platypus/{}/allCandVars.tsv".format(gene))
+    else :
+        print("ERROR: Variant caller not found")
+        sys.exit(1)
+    print("{} INFO: {} variants found in Platypus".format(getTime(), len(pl_cand)))
+    print("{} INFO: {} variants found in Strelka2".format(getTime(), len(st_cand)))
+    for p in pl_cand :
+        found = False
+        for s in st_cand :
+            if p["Start"] == s["Start"] :
+                found = True
+                break
+        if found :
+            same.append(p)
+        else :
+            dif.append(p)
+    print("{} INFO: {} variants found in Platypus, but not in Strelka2".format(getTime(), len(dif)))
+    print(dif)
+    del(dif)
+    dif = []
+    for s in st_cand :
+        found = False
+        for a in same :
+            if a["Start"] == s["Start"] :
+                found = True
+                break
+        if not found :
+            dif.append(s)
+    print("{} INFO: {} variants found in Strelka2, but not in Platypus".format(getTime(), len(dif)))
+    print(dif)
 
 if __name__ == "__main__" :
     filterCandidates()
