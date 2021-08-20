@@ -94,7 +94,7 @@ boxplot(as.matrix(table(vp$submitter))[,1], as.matrix(table(vt$submitter))[,1], 
 dev.off()
 
 # Clinvar reported significance
-png(paste(gene, "_significance.png"), width = 1261, height = 941)
+png(paste(gene, "_significance.png", sep = ""), width = 1261, height = 941)
 barplot(table(vp$cln.signf, useNA = "always"), col = "red", main = "Reported significance in positive group")
 barplot(table(vt$cln.signf, useNA = "always"), col = "orange", main = "Reported significance in pathogenic group")
 barplot(table(vn$cln.signf, useNA = "always"), col = "blue", main = "Reported significance in negative group")

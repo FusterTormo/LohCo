@@ -655,10 +655,12 @@ def filterCandidates() :
     printCandidateVariants(dif)
     print("{} INFO: Searching {} common variants in HNSC. This may take a while".format(getTime(), len(same)))
     for s in same :
+        print("{tm} INFO: Searching {chr}:{st}\n\t{pos} times found in positive, {pat} times found in pathogenic\n\tClinVar disease: {dss}\n\tClinVar significance: {sig}".format(
+            tm = getTime(), chr = s["Chr"], st = s["Start"], pos = s["InLOHPositive"], pat = s["InLOHPathogenic"], dss = s["ClinVarDisease"], sig = s["ClinVarSignf"]))
         cmd = "zgrep -w {coord} /g/strcombio/fsupek_cancer1/TCGA_bam/HNSC/*/*/strelkaGerm/results/variants/variants.vcf.gz | grep -c {chr}".format(coord = s["Start"], chr = s["Chr"])
         pr = subprocess.Popen(cmd, shell = True, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
         out, err = pr.communicate()
-        print("{tm} INFO: {oc} ocurrences of {chr}:{st}-{nd}".format(oc = out.decode().strip(), tm = getTime(), chr = s["Chr"], st = s["Start"], nd = s["End"]))
+        print("\t\t{oc} ocurrences found".format(oc = out.decode().strip(), tm = getTime()))
 
 
 if __name__ == "__main__" :
