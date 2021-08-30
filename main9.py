@@ -641,8 +641,7 @@ def filterCandidates() :
             dif.append(p)
     print("{} INFO: {} variants found in Platypus, but not in Strelka2".format(getTime(), len(dif)))
     printCandidateVariants(dif)
-    del(dif)
-    dif = []
+    dif2 = []
     for s in st_cand :
         found = False
         for a in same :
@@ -650,17 +649,27 @@ def filterCandidates() :
                 found = True
                 break
         if not found :
-            dif.append(s)
-    print("{} INFO: {} variants found in Strelka2, but not in Platypus".format(getTime(), len(dif)))
-    printCandidateVariants(dif)
+            dif2.append(s)
+    print("{} INFO: {} variants found in Strelka2, but not in Platypus".format(getTime(), len(dif2)))
+    printCandidateVariants(dif2)
     print("{} INFO: Searching {} common variants in HNSC. This may take a while".format(getTime(), len(same)))
+    print("Gene\tIn Platypus\tIn Strelka2\tIn Both\tIn HNSC\tConsidered Pathogenic?")
+    onlyp = len(dif)
+    onlys = len(dif2)
+    both = len(same)
     for s in same :
-        print("{tm} INFO: Searching {chr}:{st}\n\t{pos} times found in positive, {pat} times found in pathogenic\n\tClinVar disease: {dss}\n\tClinVar significance: {sig}".format(
-            tm = getTime(), chr = s["Chr"], st = s["Start"], pos = s["InLOHPositive"], pat = s["InLOHPathogenic"], dss = s["ClinVarDisease"], sig = s["ClinVarSignf"]))
+        strpth = ""
+        if s["InLOHPathogenic"] > 0 :
+            strpth = "Yes"
+            if s["ClinVarSignf"] != "NA" :
+                strpth += " ({})".format(s["ClinVarSignf"])
+        else :
+            strpth = "No"
         cmd = "zgrep -w {coord} /g/strcombio/fsupek_cancer1/TCGA_bam/HNSC/*/*/strelkaGerm/results/variants/variants.vcf.gz | grep -c {chr}".format(coord = s["Start"], chr = s["Chr"])
         pr = subprocess.Popen(cmd, shell = True, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
         out, err = pr.communicate()
         print("\t\t{oc} ocurrences found".format(oc = out.decode().strip(), tm = getTime()))
+        print("{gene}\t\t{plt}\t\t{stk}\t\t{both}\t\t{HNSC}\t{pth}".format(gene = gene, plt = onlyp, stk = onlys, both = both, pth = strpth))
 
 
 if __name__ == "__main__" :
