@@ -659,7 +659,7 @@ def filterCandidates() :
     both = len(same)
     for s in same :
         strpth = ""
-        if s["InLOHPathogenic"] > 0 :
+        if int(s["InLOHPathogenic"]) > 0 :
             strpth = "Yes"
             if s["ClinVarSignf"] != "NA" :
                 strpth += " ({})".format(s["ClinVarSignf"])
