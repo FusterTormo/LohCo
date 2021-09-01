@@ -654,8 +654,8 @@ def filterCandidates() :
     printCandidateVariants(dif2)
     print("{} INFO: Searching {} common variants in HNSC. This may take a while".format(getTime(), len(same)))
     print("Gene\tIn Platypus\tIn Strelka2\tIn Both\tPosition\tIn HNSC\tConsidered Pathogenic?")
-    onlyp = len(dif)
-    onlys = len(dif2)
+    onlyp = len(pl_cand)
+    onlys = len(st_cand)
     both = len(same)
     for s in same :
         strpth = ""
