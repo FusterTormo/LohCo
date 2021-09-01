@@ -613,7 +613,7 @@ def filterCandidates() :
     abs_path = os.path.abspath(os.getcwd()).split("/")
     gene = abs_path[-1]
     vc = abs_path[-2]
-    print("{} INFO: Reading variants".format(getTime()))
+    print("{} INFO: Reading variants in {}".format(getTime(), gene))
     if vc == "Platypus" :
         pl_cand = readCandidateFiles("candVars.tsv")
         st_cand = readCandidateFiles("../../Strelka2/{}/candVars.tsv".format(gene))
