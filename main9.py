@@ -482,7 +482,7 @@ def printCandidateVariants(lst) :
     """Print a list of variants (dict) in a fancy format"""
     if len(lst) > 0 :
         for l in lst :
-            print("\t{chr}:{st}-{nd}\t{rf}>{lt}".format(chr = l["Chr"], st = l["Start"], nd = l["End"], rf = l["Ref"], lt = l["Alt"]))
+            print("\t{chr}:{st}-{nd}\t{rf}>{lt}_{tp}(ex)".format(chr = l["Chr"], st = l["Start"], nd = l["End"], rf = l["Ref"], lt = l["Alt"], tp = l["Type"], ex = l["ExonicType"]))
 
 
 def main() :
