@@ -676,6 +676,43 @@ def filterCandidates() :
         out, err = pr.communicate()
         print("{gene}\t{pos}\t{type}\tBoth\t{pth}\t{HNSC}".format(gene = gene, pos = s["Start"], type = typ, HNSC = out.decode().strip(), pth = strpth))
 
+    for s in pl_cand :
+        if s["ClinVarSignf"] != "NA" :
+            if s["ClinVarSignf"].startswith("Conflicting") :
+                strpth = "Conf.Interpret."
+            elif s["ClinVarSignf"].startswith("Uncertain") :
+                strpth = "VUS"
+            else :
+                strpth += s["ClinVarSignf"]
+
+        if s["Type"] == "exonic" :
+            typ = s["ExonicType"]
+        else :
+            typ = s["Type"]
+
+        cmd = "zgrep -w {coord} /g/strcombio/fsupek_cancer1/TCGA_bam/HNSC/*/*/strelkaGerm/results/variants/variants.vcf.gz | grep -c {chr}".format(coord = s["Start"], chr = s["Chr"])
+        pr = subprocess.Popen(cmd, shell = True, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+        out, err = pr.communicate()
+        print("{gene}\t{pos}\t{type}\tPlatypus\t{pth}\t{HNSC}".format(gene = gene, pos = s["Start"], type = typ, HNSC = out.decode().strip(), pth = strpth))
+
+    for s in st_cand :
+        if s["ClinVarSignf"] != "NA" :
+            if s["ClinVarSignf"].startswith("Conflicting") :
+                strpth = "Conf.Interpret."
+            elif s["ClinVarSignf"].startswith("Uncertain") :
+                strpth = "VUS"
+            else :
+                strpth += s["ClinVarSignf"]
+
+        if s["Type"] == "exonic" :
+            typ = s["ExonicType"]
+        else :
+            typ = s["Type"]
+
+        cmd = "zgrep -w {coord} /g/strcombio/fsupek_cancer1/TCGA_bam/HNSC/*/*/strelkaGerm/results/variants/variants.vcf.gz | grep -c {chr}".format(coord = s["Start"], chr = s["Chr"])
+        pr = subprocess.Popen(cmd, shell = True, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+        out, err = pr.communicate()
+        print("{gene}\t{pos}\t{type}\tStrelka2\t{pth}\t{HNSC}".format(gene = gene, pos = s["Start"], type = typ, HNSC = out.decode().strip(), pth = strpth))
 
 if __name__ == "__main__" :
     # Execute main function, depending on the files available
