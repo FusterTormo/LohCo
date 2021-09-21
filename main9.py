@@ -653,7 +653,7 @@ def filterCandidates() :
     print("{} INFO: {} variants found in Strelka2, but not in Platypus".format(getTime(), len(dif2)))
     printCandidateVariants(dif2)
     print("{} INFO: Searching {} common variants in HNSC. This may take a while".format(getTime(), len(same)))
-    print("Gene\tPosition\tType\tReported by\tIn Clinvar\tIn HNSC")
+    print("Gene\tPosition\tType\tReported by\tIn Positive\tIn Pathogenic\tIn Negative\tIn HNSC\tIn Clinvar")
     onlyp = len(pl_cand)
     onlys = len(st_cand)
     both = len(same)
@@ -664,7 +664,7 @@ def filterCandidates() :
             elif s["ClinVarSignf"].startswith("Uncertain") :
                 strpth = "VUS"
             else :
-                strpth += s["ClinVarSignf"]
+                strpth = s["ClinVarSignf"]
 
         if s["Type"] == "exonic" :
             typ = s["ExonicType"]
@@ -674,7 +674,8 @@ def filterCandidates() :
         cmd = "zgrep -w {coord} /g/strcombio/fsupek_cancer1/TCGA_bam/HNSC/*/*/strelkaGerm/results/variants/variants.vcf.gz | grep -c {chr}".format(coord = s["Start"], chr = s["Chr"])
         pr = subprocess.Popen(cmd, shell = True, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
         out, err = pr.communicate()
-        print("{gene}\t{pos}\t{type}\tBoth\t{pth}\t{HNSC}".format(gene = gene, pos = s["Start"], type = typ, HNSC = out.decode().strip(), pth = strpth))
+        print("{gene}\t{pos}\t{type}\tBoth\t{pp}\t{pa}\t{ne}\t{HNSC}\t{pth}".format(
+            gene = gene, pos = s["Start"], type = typ, HNSC = out.decode().strip(), pth = strpth, pp = s["InLOHPositive"], pa = s["InLOHPathogenic"], ne = s["InLOHNegative"]))
 
     for s in pl_cand :
         if s["ClinVarSignf"] != "NA" :
@@ -683,7 +684,7 @@ def filterCandidates() :
             elif s["ClinVarSignf"].startswith("Uncertain") :
                 strpth = "VUS"
             else :
-                strpth += s["ClinVarSignf"]
+                strpth = s["ClinVarSignf"]
 
         if s["Type"] == "exonic" :
             typ = s["ExonicType"]
@@ -693,7 +694,8 @@ def filterCandidates() :
         cmd = "zgrep -w {coord} /g/strcombio/fsupek_cancer1/TCGA_bam/HNSC/*/*/strelkaGerm/results/variants/variants.vcf.gz | grep -c {chr}".format(coord = s["Start"], chr = s["Chr"])
         pr = subprocess.Popen(cmd, shell = True, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
         out, err = pr.communicate()
-        print("{gene}\t{pos}\t{type}\tPlatypus\t{pth}\t{HNSC}".format(gene = gene, pos = s["Start"], type = typ, HNSC = out.decode().strip(), pth = strpth))
+        print("{gene}\t{pos}\t{type}\tPlatypus\t{pp}\t{pa}\t{ne}\t{HNSC}\t{pth}".format(
+            gene = gene, pos = s["Start"], type = typ, HNSC = out.decode().strip(), pth = strpth, pp = s["InLOHPositive"], pa = s["InLOHPathogenic"], ne = s["InLOHNegative"]))
 
     for s in st_cand :
         if s["ClinVarSignf"] != "NA" :
@@ -702,7 +704,7 @@ def filterCandidates() :
             elif s["ClinVarSignf"].startswith("Uncertain") :
                 strpth = "VUS"
             else :
-                strpth += s["ClinVarSignf"]
+                strpth = s["ClinVarSignf"]
 
         if s["Type"] == "exonic" :
             typ = s["ExonicType"]
@@ -712,7 +714,8 @@ def filterCandidates() :
         cmd = "zgrep -w {coord} /g/strcombio/fsupek_cancer1/TCGA_bam/HNSC/*/*/strelkaGerm/results/variants/variants.vcf.gz | grep -c {chr}".format(coord = s["Start"], chr = s["Chr"])
         pr = subprocess.Popen(cmd, shell = True, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
         out, err = pr.communicate()
-        print("{gene}\t{pos}\t{type}\tStrelka2\t{pth}\t{HNSC}".format(gene = gene, pos = s["Start"], type = typ, HNSC = out.decode().strip(), pth = strpth))
+        print("{gene}\t{pos}\t{type}\tStrelka2\t{pp}\t{pa}\t{ne}\t{HNSC}\t{pth}".format(
+            gene = gene, pos = s["Start"], type = typ, HNSC = out.decode().strip(), pth = strpth, pp = s["InLOHPositive"], pa = s["InLOHPathogenic"], ne = s["InLOHNegative"]))
 
 if __name__ == "__main__" :
     # Execute main function, depending on the files available
