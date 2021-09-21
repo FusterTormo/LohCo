@@ -653,7 +653,7 @@ def filterCandidates() :
     print("{} INFO: {} variants found in Strelka2, but not in Platypus".format(getTime(), len(dif2)))
     printCandidateVariants(dif2)
     print("{} INFO: Searching {} common variants in HNSC. This may take a while".format(getTime(), len(same)))
-    print("Gene\tPosition\tType\tReported by\tIn Clinvar\tIn HNSC\tIn ClinVar")
+    print("Gene\tPosition\tType\tReported by\tIn Clinvar\tIn HNSC")
     onlyp = len(pl_cand)
     onlys = len(st_cand)
     both = len(same)
@@ -674,7 +674,7 @@ def filterCandidates() :
         cmd = "zgrep -w {coord} /g/strcombio/fsupek_cancer1/TCGA_bam/HNSC/*/*/strelkaGerm/results/variants/variants.vcf.gz | grep -c {chr}".format(coord = s["Start"], chr = s["Chr"])
         pr = subprocess.Popen(cmd, shell = True, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
         out, err = pr.communicate()
-        print("{gene}\t\t{pos}\t\t{type}\tBoth\t{pth}\t{HNSC}".format(gene = gene, pos = s["Start"], type = typ, HNSC = out.decode().strip(), pth = strpth))
+        print("{gene}\t{pos}\t{type}\tBoth\t{pth}\t{HNSC}".format(gene = gene, pos = s["Start"], type = typ, HNSC = out.decode().strip(), pth = strpth))
 
 
 if __name__ == "__main__" :
