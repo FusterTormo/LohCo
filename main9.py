@@ -653,22 +653,28 @@ def filterCandidates() :
     print("{} INFO: {} variants found in Strelka2, but not in Platypus".format(getTime(), len(dif2)))
     printCandidateVariants(dif2)
     print("{} INFO: Searching {} common variants in HNSC. This may take a while".format(getTime(), len(same)))
-    print("Gene\tIn Platypus\tIn Strelka2\tIn Both\tPosition\tIn HNSC\tConsidered Pathogenic?")
+    print("Gene\tPosition\tType\tReported by\tIn Clinvar\tIn HNSC\tIn ClinVar")
     onlyp = len(pl_cand)
     onlys = len(st_cand)
     both = len(same)
     for s in same :
-        strpth = ""
-        if int(s["InLOHPathogenic"]) > 0 :
-            strpth = "Yes"
-            if s["ClinVarSignf"] != "NA" :
-                strpth += " ({})".format(s["ClinVarSignf"])
+        if s["ClinVarSignf"] != "NA" :
+            if s["ClinVarSignf"].startswith("Conflicting") :
+                strpth = "Conf.Interpret."
+            elif s["ClinVarSignf"].startswith("Uncertain") :
+                strpth = "VUS"
+            else :
+                strpth += s["ClinVarSignf"]
+
+        if s["Type"] == "exonic" :
+            typ = s["ExonicType"]
         else :
-            strpth = "No"
+            typ = s["Type"]
+
         cmd = "zgrep -w {coord} /g/strcombio/fsupek_cancer1/TCGA_bam/HNSC/*/*/strelkaGerm/results/variants/variants.vcf.gz | grep -c {chr}".format(coord = s["Start"], chr = s["Chr"])
         pr = subprocess.Popen(cmd, shell = True, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
         out, err = pr.communicate()
-        print("{gene}\t\t{plt}\t\t{stk}\t{both}\t{pos}\t{HNSC}\t{pth}".format(gene = gene, plt = onlyp, stk = onlys, both = both, pos = s["Start"], HNSC = out.decode().strip(), pth = strpth))
+        print("{gene}\t\t{pos}\t\t{type}\tBoth\t{pth}\t{HNSC}".format(gene = gene, pos = s["Start"], type = typ, HNSC = out.decode().strip(), pth = strpth))
 
 
 if __name__ == "__main__" :
