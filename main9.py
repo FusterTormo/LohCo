@@ -657,6 +657,7 @@ def filterCandidates() :
     onlyp = len(pl_cand)
     onlys = len(st_cand)
     both = len(same)
+    #Search common variants in HNSC
     for s in same :
         if s["ClinVarSignf"] != "NA" :
             if s["ClinVarSignf"].startswith("Conflicting") :
@@ -677,7 +678,8 @@ def filterCandidates() :
         print("{gene}\t{pos}\t{type}\tBoth\t{pp}\t{pa}\t{ne}\t{HNSC}\t{pth}".format(
             gene = gene, pos = s["Start"], type = typ, HNSC = out.decode().strip(), pth = strpth, pp = s["InLOHPositive"], pa = s["InLOHPathogenic"], ne = s["InLOHNegative"]))
 
-    for s in pl_cand :
+    # Search only-Platypus variants in HNSC
+    for s in dif :
         if s["ClinVarSignf"] != "NA" :
             if s["ClinVarSignf"].startswith("Conflicting") :
                 strpth = "Conf.Interpret."
@@ -697,7 +699,8 @@ def filterCandidates() :
         print("{gene}\t{pos}\t{type}\tPlatypus\t{pp}\t{pa}\t{ne}\t{HNSC}\t{pth}".format(
             gene = gene, pos = s["Start"], type = typ, HNSC = out.decode().strip(), pth = strpth, pp = s["InLOHPositive"], pa = s["InLOHPathogenic"], ne = s["InLOHNegative"]))
 
-    for s in st_cand :
+    # Search only-Strelka2 variants in HNSC
+    for s in dif2 :
         if s["ClinVarSignf"] != "NA" :
             if s["ClinVarSignf"].startswith("Conflicting") :
                 strpth = "Conf.Interpret."
