@@ -659,13 +659,12 @@ def filterCandidates() :
     both = len(same)
     #Search common variants in HNSC
     for s in same :
+        strpth = s["ClinVarSignf"]
         if s["ClinVarSignf"] != "NA" :
             if s["ClinVarSignf"].startswith("Conflicting") :
                 strpth = "Conf.Interpret."
             elif s["ClinVarSignf"].startswith("Uncertain") :
                 strpth = "VUS"
-            else :
-                strpth = s["ClinVarSignf"]
 
         if s["Type"] == "exonic" :
             typ = s["ExonicType"]
@@ -680,13 +679,12 @@ def filterCandidates() :
 
     # Search only-Platypus variants in HNSC
     for s in dif :
+        strpth = s["ClinVarSignf"]
         if s["ClinVarSignf"] != "NA" :
             if s["ClinVarSignf"].startswith("Conflicting") :
                 strpth = "Conf.Interpret."
             elif s["ClinVarSignf"].startswith("Uncertain") :
                 strpth = "VUS"
-            else :
-                strpth = s["ClinVarSignf"]
 
         if s["Type"] == "exonic" :
             typ = s["ExonicType"]
@@ -707,7 +705,7 @@ def filterCandidates() :
                 strpth = "Conf.Interpret."
             elif s["ClinVarSignf"].startswith("Uncertain") :
                 strpth = "VUS"
-                
+
         if s["Type"] == "exonic" :
             typ = s["ExonicType"]
         else :
