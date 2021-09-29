@@ -701,14 +701,13 @@ def filterCandidates() :
 
     # Search only-Strelka2 variants in HNSC
     for s in dif2 :
+        strpth = s["ClinVarSignf"]
         if s["ClinVarSignf"] != "NA" :
             if s["ClinVarSignf"].startswith("Conflicting") :
                 strpth = "Conf.Interpret."
             elif s["ClinVarSignf"].startswith("Uncertain") :
                 strpth = "VUS"
-            else :
-                strpth = s["ClinVarSignf"]
-
+                
         if s["Type"] == "exonic" :
             typ = s["ExonicType"]
         else :
