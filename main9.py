@@ -120,7 +120,7 @@ def annotateClinVar(data, cln) :
         anno = []
         chrom = d[0].replace("chr", "")
         # As ANNOVAR changes the position in insertions/deletions, we substract 1 to the start position
-        if d[1] == "-" :
+        if d[4] == "-" :
             pos = int(d[1]) - 1
         else :
             pos = int(d[1])
