@@ -10,7 +10,7 @@ import shlex
 import sqlite3
 import subprocess
 
-gistic = "../14a0766c-6ca4-47bb-ac70-62133c30c1c5/OV.focal_score_by_genes.txt"
+gistic = "OV.focal_score_by_genes.txt"
 dbcon = sqlite3.connect("/g/strcombio/fsupek_cancer2/TCGA_bam/info/info.db")
 
 if os.path.isfile(gistic) :
@@ -45,6 +45,6 @@ if os.path.isfile(gistic) :
         cur = dbcon.cursor()
         q = cur.execute("SELECT submitter, caseId FROM patient WHERE cancer='OV'")
         cases = q.fetchall()
-
+    print(cases[0])
 else :
     print("ERROR: Cannot find GISTIC file in {}".format(gistic))
