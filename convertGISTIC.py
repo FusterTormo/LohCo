@@ -14,10 +14,10 @@ gistic = "OV.focal_score_by_genes.txt"
 dbcon = sqlite3.connect("/g/strcombio/fsupek_cancer2/TCGA_bam/info/info.db")
 
 if os.path.isfile(gistic) :
-    tab = []
-    ensembl = []
-    genes = {}
-    submitters = {}
+    tab = [] # File content
+    genes = {} # Equivalence genes: gene_coordinates
+    submitters = {} # Equivalence uuid : submitter_id
+    order = [] # uuid order according to OV.focal_score_by_genes.txt header
     print("INFO: Reading GISTIC file")
     with open(gistic, "r") as fi :
         for l in fi :
@@ -26,6 +26,8 @@ if os.path.isfile(gistic) :
             tab.append(aux)
             if gene.startswith("ENS") :
                 genes[gene] = {}
+            else :
+                order = aux[2:]
     print("INFO: Extracting genomic data from UCSC database")
     cmd = "mysql --user=genome --host=genome-mysql.soe.ucsc.edu -A -P 3306 -sN -D hg38 -e \"select chrom, chromStart, chromEnd, transcript, protein from knownCanonical\""
     args = shlex.split(cmd)
@@ -45,6 +47,33 @@ if os.path.isfile(gistic) :
         cur = dbcon.cursor()
         q = cur.execute("SELECT submitter, caseId FROM patient WHERE cancer='OV'")
         cases = q.fetchall()
-    print(cases[0])
+    for c in cases :
+        submitters[c[1]] = {"submitter" : c[0], "content" : "Chromosome\tStart\tEnd\tTotal_CN\tMinor_CN\n"}
+    print(len(cases))
+    print("INFO: Converting the GISTIC to common format")
+    for t in tab :
+        coords = gens[t[0]]
+        print(coords)
+        it = 2
+        for o in order :
+            aux = t[it]
+            tcn = -1
+            lcn = -1
+            print(aux)
+            if aux == '-1' :
+                tcn = 1
+                lcn = 0
+            elif aux == '0' :
+                tcn = 2
+                lcn = 1
+            elif aux == '1' :
+                tcn = 3
+                lcn = 1
+            else :
+                print("WARNING: {} not a valid value".format(aux))
+            if o in submitters.keys() :
+                submitters[o]["content"] += "{chr}\t{sta}\t{end}\t{tcn}\t{lcn}\n".format(chr = coords["chr"], sta = coords["start"], end = coords["end"], tcn = tcn, lcn = lcn)
+            break
+    print(submitters)
 else :
     print("ERROR: Cannot find GISTIC file in {}".format(gistic))
