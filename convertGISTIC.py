@@ -23,8 +23,8 @@ if os.path.isfile(gistic) :
         for l in fi :
             aux = l.strip().split("\t")
             gene = aux[0].split(".")[0]
-            tab.append(aux)
             if gene.startswith("ENS") :
+                tab.append(aux)
                 genes[gene] = {}
             else :
                 order = aux[2:]
@@ -49,12 +49,12 @@ if os.path.isfile(gistic) :
         cases = q.fetchall()
     for c in cases :
         submitters[c[1]] = {"submitter" : c[0], "content" : "Chromosome\tStart\tEnd\tTotal_CN\tMinor_CN\n"}
-    print(len(cases))
+
     print("INFO: Converting the GISTIC to common format")
     for t in tab :
-        coords = gens[t[0]]
+        coords = gens[t[0].split(".")[0]]
         print(coords)
-        it = 2
+        it = 3
         for o in order :
             aux = t[it]
             tcn = -1
