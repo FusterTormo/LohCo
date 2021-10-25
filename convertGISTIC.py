@@ -56,6 +56,7 @@ if os.path.isfile(gistic) :
         it = 3
         for o in order :
             aux = t[it]
+            it += 1
             tcn = -1
             lcn = -1
             if aux == '-1' :
@@ -71,6 +72,8 @@ if os.path.isfile(gistic) :
                 print("WARNING: {} not a valid value".format(aux))
             if o in submitters.keys() :
                 submitters[o]["content"] += "{chr}\t{sta}\t{end}\t{tcn}\t{lcn}\n".format(chr = coords["chr"], sta = coords["start"], end = coords["end"], tcn = tcn, lcn = lcn)
+            else :
+                print("{} not found".format(o))
         break
     print(submitters)
 else :
