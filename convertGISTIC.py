@@ -27,7 +27,7 @@ if os.path.isfile(gistic) :
                 tab.append(aux)
                 genes[gene] = {}
             else :
-                order = aux[2:]
+                order = aux[3:]
     print("INFO: Extracting genomic data from UCSC database")
     cmd = "mysql --user=genome --host=genome-mysql.soe.ucsc.edu -A -P 3306 -sN -D hg38 -e \"select chrom, chromStart, chromEnd, transcript, protein from knownCanonical\""
     args = shlex.split(cmd)
@@ -52,14 +52,12 @@ if os.path.isfile(gistic) :
 
     print("INFO: Converting the GISTIC to common format")
     for t in tab :
-        coords = gens[t[0].split(".")[0]]
-        print(coords)
+        coords = genes[t[0].split(".")[0]]
         it = 3
         for o in order :
             aux = t[it]
             tcn = -1
             lcn = -1
-            print(aux)
             if aux == '-1' :
                 tcn = 1
                 lcn = 0
@@ -73,7 +71,7 @@ if os.path.isfile(gistic) :
                 print("WARNING: {} not a valid value".format(aux))
             if o in submitters.keys() :
                 submitters[o]["content"] += "{chr}\t{sta}\t{end}\t{tcn}\t{lcn}\n".format(chr = coords["chr"], sta = coords["start"], end = coords["end"], tcn = tcn, lcn = lcn)
-            break
+        break
     print(submitters)
 else :
     print("ERROR: Cannot find GISTIC file in {}".format(gistic))
