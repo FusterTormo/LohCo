@@ -45,7 +45,7 @@ if os.path.isfile(gistic) :
     print("INFO: Getting submitters' information from TCGA database")
     with dbcon :
         cur = dbcon.cursor()
-        q = cur.execute("SELECT submitter, caseId FROM patient WHERE cancer='OV'")
+        q = cur.execute("SELECT caseId, submitter FROM patient WHERE cancer='OV'")
         cases = q.fetchall()
     for c in cases :
         submitters[c[1]] = {"submitter" : c[0], "content" : "Chromosome\tStart\tEnd\tTotal_CN\tMinor_CN\n"}
