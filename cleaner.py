@@ -59,29 +59,31 @@ def eliminarVariantCalling(ruta) :
 
     for d in dirs :
         path = "{root}/{samp}/variantCalling".format(root = ruta, samp = d)
-        arxius = os.listdir(path)
-        # Eliminar los temporales de un variant calling hecho usando VarScan2
-        if "varscan.vcf" in arxius :
-            for a in arxius :
-                if a == "bwa.pileup" :
-                    pes += os.path.getsize("{dir}/bwa.pileup".format(dir = path))
-                    cont += 1
-                    os.remove("{dir}/bwa.pileup".format(dir = path))
-                elif a.startswith("filtro") and not a.endswith(".allInfo") :
-                    pes += os.path.getsize("{dir}/{file}".format(dir = path, file = a))
-                    cont += 1
-                    os.remove("{dir}/{file}".format(dir = path, file = a))
-        # Eliminar los archivos temporales de un variant calling hecho usando Strelka2
-        if "strelka2.vcf" in arxius :
-            print("WARNING: Opcion no implementada todavia")
-        # Eliminar los archivos temporales de un variant calling hecho usando Mutect2
-        if "mutect.vcf" in arxius :
-            eliminar = ["cand.reanno.tsv", "highMAF.reanno.tsv", "raw.hg19_multianno.txt", cte.variantstats, "conseq.reanno.tsv", "lowVAF.reanno.tsv", "raw.av", "raw.reanno.tsv"]
-            for a in arxius :
-                if a in eliminar :
-                    pes += os.path.getsize("{dir}/{arx}".format(dir = path, arx = a))
-                    cont += 1
-                    os.remove("{dir}/{arx}".format(dir = path, arx = a))
+        if os.path.isdir(path) :
+            print(path)
+            arxius = os.listdir(path)
+            # Eliminar los temporales de un variant calling hecho usando VarScan2
+            if "varscan.vcf" in arxius :
+                for a in arxius :
+                    if a == "bwa.pileup" :
+                        pes += os.path.getsize("{dir}/bwa.pileup".format(dir = path))
+                        cont += 1
+                        os.remove("{dir}/bwa.pileup".format(dir = path))
+                    elif a.startswith("filtro") and not a.endswith(".allInfo") :
+                        pes += os.path.getsize("{dir}/{file}".format(dir = path, file = a))
+                        cont += 1
+                        os.remove("{dir}/{file}".format(dir = path, file = a))
+            # Eliminar los archivos temporales de un variant calling hecho usando Strelka2
+            if "strelka2.vcf" in arxius :
+                print("WARNING: Opcion no implementada todavia")
+            # Eliminar los archivos temporales de un variant calling hecho usando Mutect2
+            if "mutect.vcf" in arxius :
+                eliminar = ["cand.reanno.tsv", "highMAF.reanno.tsv", "raw.hg19_multianno.txt", cte.variantstats, "conseq.reanno.tsv", "lowVAF.reanno.tsv", "raw.av", "raw.reanno.tsv"]
+                for a in arxius :
+                    if a in eliminar :
+                        pes += os.path.getsize("{dir}/{arx}".format(dir = path, arx = a))
+                        cont += 1
+                        os.remove("{dir}/{arx}".format(dir = path, arx = a))
 
 
     print("INFO: {} arxius eliminats. {} espai alliberat".format(cont, convert_size(pes)))
