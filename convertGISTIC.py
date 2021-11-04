@@ -52,7 +52,7 @@ if os.path.isfile(gistic) :
 
     print("INFO: Converting the GISTIC to common format")
     notfound = []
-    unknowgene = []
+    unknowngene = []
     for t in tab :
         currentgene = t[0].split(".")[0]
         coords = genes[currentgene]
@@ -76,12 +76,13 @@ if os.path.isfile(gistic) :
             if o in submitters.keys() :
                 if coords != {} :
                     submitters[o]["content"] += "{chr}\t{sta}\t{end}\t{tcn}\t{lcn}\n".format(chr = coords["chr"], sta = coords["start"], end = coords["end"], tcn = tcn, lcn = lcn)
-                elif currentgene not in unknowgene :
-                    unknowgene.append(currentgene)
+                elif currentgene not in unknowngene :
+                    unknowngene.append(currentgene)
             else :
                 if o not in notfound :
                     notfound.append(o)
 
     print("{} submitters not found".format(len(notfound)))
+    print("{} genes not found".format(len(unknowngene)))
 else :
     print("ERROR: Cannot find GISTIC file in {}".format(gistic))
