@@ -74,10 +74,10 @@ if os.path.isfile(gistic) :
             else :
                 print("WARNING: {} not a valid value".format(aux))
             if o in submitters.keys() :
-                if coords == {} :
+                if coords != {} :
                     submitters[o]["content"] += "{chr}\t{sta}\t{end}\t{tcn}\t{lcn}\n".format(chr = coords["chr"], sta = coords["start"], end = coords["end"], tcn = tcn, lcn = lcn)
                 elif currentgene not in unknowgene :
-                    unknowgene.append()
+                    unknowgene.append(currentgene)
             else :
                 if o not in notfound :
                     notfound.append(o)
