@@ -51,8 +51,11 @@ if os.path.isfile(gistic) :
         submitters[c[1]] = {"submitter" : c[0], "content" : "Chromosome\tStart\tEnd\tTotal_CN\tMinor_CN\n"}
 
     print("INFO: Converting the GISTIC to common format")
+    notfound = []
+    unknowgene = []
     for t in tab :
-        coords = genes[t[0].split(".")[0]]
+        currentgene = t[0].split(".")[0]
+        coords = genes[currentgene]
         it = 3
         for o in order :
             aux = t[it]
@@ -71,10 +74,14 @@ if os.path.isfile(gistic) :
             else :
                 print("WARNING: {} not a valid value".format(aux))
             if o in submitters.keys() :
-                submitters[o]["content"] += "{chr}\t{sta}\t{end}\t{tcn}\t{lcn}\n".format(chr = coords["chr"], sta = coords["start"], end = coords["end"], tcn = tcn, lcn = lcn)
+                if coords == {} :
+                    submitters[o]["content"] += "{chr}\t{sta}\t{end}\t{tcn}\t{lcn}\n".format(chr = coords["chr"], sta = coords["start"], end = coords["end"], tcn = tcn, lcn = lcn)
+                elif currentgene not in unknowgene :
+                    unknowgene.append()
             else :
-                print("{} not found".format(o))
-        break
-    print(submitters)
+                if o not in notfound :
+                    notfound.append(o)
+
+    print("{} submitters not found".format(len(notfound)))
 else :
     print("ERROR: Cannot find GISTIC file in {}".format(gistic))
