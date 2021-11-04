@@ -50,7 +50,7 @@ if os.path.isfile(gistic) :
     for c in cases :
         submitters[c[1]] = {"submitter" : c[0], "content" : "Chromosome\tStart\tEnd\tTotal_CN\tMinor_CN\n"}
 
-    print("INFO: Converting the GISTIC to common format")
+    print("INFO: Converting the GISTIC data to common format")
     notfound = []
     unknowngene = []
     for t in tab :
@@ -82,7 +82,13 @@ if os.path.isfile(gistic) :
                 if o not in notfound :
                     notfound.append(o)
 
-    print("{} submitters not found".format(len(notfound)))
-    print("{} genes not found".format(len(unknowngene)))
+    print("INFO: {} submitters not found".format(len(notfound)))
+    print("INFO: {} genes not found".format(len(unknowngene)))
+    print("INFO: Saving the data in tsv files")
+    for k,v in submitters.items() :
+        filename = "{}_GISTIC.tsv".format(k)
+        with open(filename, "w") as fi :
+            fi.write(v["content"])
+            break
 else :
     print("ERROR: Cannot find GISTIC file in {}".format(gistic))
