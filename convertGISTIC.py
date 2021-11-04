@@ -85,10 +85,14 @@ if os.path.isfile(gistic) :
     print("INFO: {} submitters not found".format(len(notfound)))
     print("INFO: {} genes not found".format(len(unknowngene)))
     print("INFO: Saving the data in tsv files")
+    fullpath = "/g/strcombio/fsupek_cancer2/TCGA_bam/OV"
     for k,v in submitters.items() :
-        filename = "{}_GISTIC.tsv".format(k)
-        with open(filename, "w") as fi :
-            fi.write(v["content"])
-            break
+        currentdir = "{dir}/{sub}".format(dir = fullpath, sub = k)
+        if os.path.isdir(currentdir) :
+            filename = "{}/{}_GISTIC.tsv".format(currentdir, k)
+            with open(filename, "w") as fi :
+                fi.write(v["content"])
+        else :
+            print("WARNING: {} not found".format(currentdir))
 else :
     print("ERROR: Cannot find GISTIC file in {}".format(gistic))
