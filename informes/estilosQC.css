@@ -2,6 +2,7 @@
 	margin: 0;
 	font-family: Arial,Helvetica,Garuda,sans-serif;
 	box-sizing: border-box;
+	font-size: 1vw;
 }
 
 /*Estilos de la cabecera*/
@@ -42,6 +43,16 @@ nav .select {
 
 .invisible {
 	display: none;
+}
+
+#buscar {
+	font-weight: bold;
+}
+
+input {
+	padding: 10px;
+	border: 0;
+	border-bottom: 1px solid #794dff;
 }
 
 section {
