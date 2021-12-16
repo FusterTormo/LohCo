@@ -29,7 +29,7 @@ def anotarManifest(ruta) :
             Path donde esta el manifest que se quiere anotar
     """
     if os.path.isfile(ruta) :
-        print("AYUDA: Pasos previos necesarios para crear un manifest para el genoma de referenia y los variant callers actuales:")
+        print("AYUDA: Pasos previos necesarios para crear un manifest para el genoma de referencia y los variant callers actuales:")
         print("\tMantener una copia del original")
         print("\t\tmv manifest.bed manifest_original.bed")
         print("\tOrdenar el manifest por cromosoma y coordenada")
@@ -62,9 +62,9 @@ def anotarManifest(ruta) :
         with open(arx, "w") as fi :
             fi.write(cont)
             print("INFO: Manifest guardado como {}".format(arx))
-            genes = "{}/gensAestudi.txt".format(dir)
-            print("INFO: Creando el archivo gensAestudi.txt para calculos de coverage")
-            doListaGenes(arx, genes)
+        genes = "{}/gensAestudi.txt".format(dir)
+        print("INFO: Creando el archivo gensAestudi.txt para calculos de coverage")
+        doListaGenes(arx, genes)
 
 def doListaGenes(manifest, genes) :
     """Crear el archivo con la lista de genes que hay dentro del manifest
@@ -82,8 +82,8 @@ def doListaGenes(manifest, genes) :
     with open(manifest, "r") as fi :
         for l in fi :
             aux = l.split("\t")[3]
-            aux = aux.strip()
-            if aux not in listaGenes :
-                listaGenes.append(aux)
+            gen = aux.strip()
+            if gen not in listaGenes :
+                listaGenes.append(gen)
     with open(genes, "w") as fi :
         fi.write("\n".join(listaGenes))
