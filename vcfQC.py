@@ -75,7 +75,11 @@ def getRatios(vcf, imprimir = True) :
                     sb = aux2[isb].split(",") # Orden de los valores en la columna 'SB' de GATK: referenceFW, referenceRV, alteratedFW, alteratedRV
                     fw += int(sb[2])
                     rv += int(sb[3])
-    dnds = float(dns)/float(ds)
+    try :
+        dnds = float(dns)/float(ds)
+    except ZeroDivisionError :
+        dnds = "NA"
+        
     fwrv = int(fw) - int(rv)
 
     if imprimir :
