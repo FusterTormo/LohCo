@@ -190,9 +190,15 @@ def scriptR(datos) :
         fi.write("legend('topleft', fill = brewer.pal(6, 'Set3'), legend = c('C>A', 'C>G', 'C>T', 'T>A', 'T>G', 'T>C'), ncol = 3)\n")
         fi.write("dev.off()\n")
 
-        if os.path.isfile(cte.genes) :
+        # Buscar en la carpeta local el archivo con los genes que se han estudiado en la tanda. En caso contrario, coger la lista tipica de genes
+        geneFile = os.path.basename(cte.genes)
+
+        if not os.path.isfile(geneFile) :
+            geneFile = cte.genes
+
+        if os.path.isfile(geneFile) :
             fi.write("\n# Coverage de cada base en cada gen\n")
-            with open(cte.genes, "r") as fi2 :
+            with open(geneFile, "r") as fi2 :
                 genes = fi2.read().strip()
 
             for g in genes.split("\n") :
@@ -281,9 +287,11 @@ def main() :
 
         # PARCHE: Modificar las rutas de los graficos "fijos" snvQC.png y readsQC.png
         newImg = "{}/readsQC.png".format(imgFolder)
-        txt.replace("readsQC.png", newImg)
+        pref, suf = txt.split("readsQC.png")
+        txt = pref + newImg + suf
         newImg = "{}/snvQC.png".format(imgFolder)
-        txt.replace("snvQC.png", newImg)
+        pref, suf = txt.split("snvQC.png")
+        txt = pref + newImg + suf
 
         vars, bases, cov = datosPlantilla() # Recoger los datos necesarios para rellenar la plantilla
 
