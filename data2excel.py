@@ -469,6 +469,7 @@ def crearExcel(nom) :
         if os.path.isfile(a) :
             aux = a.split(".")[0] # Parsear el nombre que tendra la pestana
             full = wb.add_worksheet(aux.capitalize())
+            # TODO fer els canvis de les pestanyes aci. Posar un diccionari amb l'equivalencia nom_arxiu : nom_pestanya
             if aux == "cand" :
                 full.activate()
             full.freeze_panes(1,0)
